@@ -97,6 +97,10 @@ arm; expected cost and an evaluation chart.
 
 ## Submission (by Thu Oct 29, 5:00 PM CT)
 
+- **Owner:** connect the repo to Vercel, serving `site/` as a static site (decision 0011).
+- A script that records the real engine's five scenario results and the evaluation report into
+  `site/data/`, dated and labelled as recorded; run it after the final evaluation.
+
 - Confirm the track (aimed at Rho fintech).
 - README sections the checklist requires; see `docs/reference/hackathon.md`.
 - Loom video, 2–5 minutes.
