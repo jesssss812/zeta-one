@@ -31,13 +31,19 @@ is the damping made concrete, and the evaluation's friction score is how ζ is m
 
 ## One-line answers
 
-- *How is this different from approvals?* Approvals are per bill, by a person, after the fact. An
-  authorization is per agent, granted up front, bounded and revocable; the engine decides within it.
+- *How is this different from approvals?* Approvals are per bill and in the app, and know nothing
+  of which agent proposed the bill or what it was allowed to do. An authorization is per agent,
+  granted up front, bounded and revocable; the engine decides within it.
 - *How is this different from "know your agent"?* Knowing the agent and checking its authorization
   are two of the three questions. The third is the one a trusted, authorized agent still fails:
   is this payment fraud anyway?
 - *Why not a strong model on everything?* Because most legitimate actions need no judgement at all,
   and the ones that do are a small, measurable fraction. The evaluation shows the fraction.
+- *Why not a cheaper model?* Savings should come from engineering, not from routing money decisions
+  to a less capable model. The only cheap model in the loop is a typed decision model built for
+  calibrated answers, and its calibration is measured, not assumed.
+- *Can agents pay on Rho today?* No: Rho's API and MCP server are read-only by design. The spec
+  names the payments-write scope as the next step, and that is the step Zeta One is built for.
 
 ## Visual identity
 
