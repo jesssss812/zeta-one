@@ -13,7 +13,7 @@ typed decision model ([../reference/jev.md](../reference/jev.md)).
 ## Decision
 
 Risk is assessed in up to three tiers; the policy consumes a single `risk` result whatever tier
-produced it, and risk can never relax an identity or mandate block.
+produced it, and risk can never relax an identity or authorization block.
 
 **Tier 0, deterministic features** (always runs, no network): computed from the data store for the
 proposal's counterparty, bill and business history. Each feature is stored with its value and the

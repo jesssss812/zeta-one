@@ -20,7 +20,7 @@ actor that is software acting for a customer under instructions it may have been
 following. A verified agent can be unauthorized (it exceeded its limit). An authorized agent can be
 manipulated (the vendor's bank details changed yesterday and the invoice says "remit to the new
 account"). Collapsing these into one number hides which control failed and what to do about it.
-Keeping them separate makes the decision explainable: *blocked because the mandate caps payments at
+Keeping them separate makes the decision explainable: *blocked because the authorization caps payments at
 $5,000* is a different conversation from *challenged because this vendor's payment method changed
 three days ago*.
 
@@ -67,7 +67,7 @@ says so.
 > actions.
 >
 > **Solution.** Zeta One is a gateway between agents and money. Every proposed payment is signed by a
-> registered agent, checked against a mandate the business granted (actions, accounts, payees, limits,
+> registered agent, checked against an authorization the business granted (actions, accounts, payees, limits,
 > expiry), then assessed for risk using Rho's own data: vendor history, recent payment-method changes,
 > duplicates, mismatches against the bill, and instructions in the invoice aimed at an automated
 > reader. Hard limits are enforced in code; risk uses a cheap typed decision model (Jev) first and

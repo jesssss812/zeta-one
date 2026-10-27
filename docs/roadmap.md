@@ -14,7 +14,7 @@ The build order, schedule and cut list are in
 
 - Local Rho stand-in with snapshot and live backends, and the committed synthetic seed
   (decisions 0002, 0005).
-- Gateway: signed-request identity, mandate checks, three-tier risk, policy table, simulated
+- Gateway: signed-request identity, authorization checks, three-tier risk, policy table, simulated
   execution (decisions 0006, 0007).
 - Evidence record for every decision.
 - Evaluation run across the four configurations in `docs/strategy/evaluation.md`.

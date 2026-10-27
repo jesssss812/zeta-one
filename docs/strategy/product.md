@@ -56,7 +56,7 @@ signal, never proof of who the agent is or whom it represents.
 
 ### Delegated authorization
 
-A delegation (a "mandate") says what an agent may do: permitted actions, accounts, allowed or
+An authorization says what an agent may do: permitted actions, accounts, allowed or
 blocked recipients, per-payment and cumulative limits, time windows, expiry, revocation, and which
 actions need human approval. Every hard constraint is checked deterministically. No model can
 override one.
@@ -150,11 +150,11 @@ the differentiator; replacing human fraud analysts or support staff.
 3. **Legitimate payment:** a verified agent pays an established vendor within scope. Allow, with no
    friction.
 4. **Authorized but suspicious:** a verified agent pays a vendor whose bank details just changed; its
-   mandate technically allows it. Challenge. Shows why identity and authorization aren't enough.
+   authorization technically allows it. Challenge. Shows why identity and authorization aren't enough.
 5. **Prompt injection:** a legitimate agent picks up malicious payment instructions from an invoice.
    Detect the risk instead of trusting the document.
 6. **Human-assisted review (stretch):** a customer reports an unfamiliar payment; the assistant
-   assembles identity, mandate, risk assessment and evidence; a human decides.
+   assembles identity, authorization, risk assessment and evidence; a human decides.
 
 ## Open questions
 
@@ -183,8 +183,8 @@ the differentiator; replacing human fraud analysts or support staff.
 | First domain and action | Accounts payable; one action, `propose_payment`, with the agent stating counterparty, method and amount explicitly | [0005](../decisions/0005-stack-and-first-action.md) |
 | Stack | Python, FastAPI, SQLite, static HTML page | [0005](../decisions/0005-stack-and-first-action.md) |
 | Data | Local stand-in seeded from a staging snapshot when present, else a committed synthetic seed shaped like it | [0002](../decisions/0002-local-rho-stand-in.md), [0005](../decisions/0005-stack-and-first-action.md) |
-| Identity | Registered agents with Ed25519-signed requests; replay protection; revocation | [0006](../decisions/0006-identity-and-mandate.md) |
-| Mandate | JSON per (business, agent): actions, accounts, method types, counterparty list, per-payment and rolling limits, expiry, human-approval threshold; checked in code | [0006](../decisions/0006-identity-and-mandate.md) |
+| Identity | Registered agents with Ed25519-signed requests; replay protection; revocation | [0006](../decisions/0006-identity-and-authorization.md) |
+| Authorization | JSON per (business, agent): actions, accounts, method types, counterparty list, per-payment and rolling limits, expiry, human-approval threshold; checked in code | [0006](../decisions/0006-identity-and-authorization.md) |
 | Risk | Tier 0 deterministic features, tier 1 Jev, tier 2 Claude on escalation; Haiku fallback for tier 1 | [0007](../decisions/0007-risk-tiers.md) |
 | Scenarios and dataset | Six categories, ~60 labelled synthetic cases generated from the seed, written before the engine | [implementation-plan.md](implementation-plan.md) |
 | Review assistant | Designed for, not built; the evidence record is its input | this doc |

@@ -19,7 +19,7 @@ connection. Payment execution is labelled simulated everywhere.
                  signed request                       ┌──────────────────────────────┐
   Agent  ───────────────────────────▶  Gateway (FastAPI)                               │
  (customer's                            │  1 identity   registry + Ed25519 verify      │
-  or 3rd party)                         │  2 mandate    deterministic checks           │
+  or 3rd party)                         │  2 authorization    deterministic checks           │
                                         │  3 risk       tier0 → Jev → Claude           │
                                         │  4 policy     allow / challenge / block      │
                                         │  5 evidence   record, policy version         │
@@ -43,7 +43,7 @@ zeta_one/
   rho/        models.py (Counterparty, PaymentMethod, Bill, Transaction, Account, Money)
               store.py (Protocol)  snapshot.py (SQLite)  live.py (httpx, read-only)  seed.py
   identity/   registry.py  signing.py
-  mandate/    schema.py  check.py
+  authorization/    schema.py  check.py
   risk/       features.py  tier0.py  jev.py  claude.py  escalation.py  schema.py
   decide/     policy.py  evidence.py
   gateway/    app.py (FastAPI)  execute.py  scenarios.py
@@ -56,7 +56,7 @@ data/         seed/ (committed, synthetic)  snapshots/ (gitignored)  eval/ (case
 
 Stand-in tables beyond Rho's shapes: `payment_method_history(counterparty_id, method_id, change,
 changed_at, changed_by)`, `bill_documents(bill_id, text)`, `payments(id, proposal, decision_id,
-status, executed_at)`, `agents`, `mandates`, `nonces`, `decisions`.
+status, executed_at)`, `agents`, `authorizations`, `nonces`, `decisions`.
 
 ## Gateway API
 
@@ -66,7 +66,7 @@ status, executed_at)`, `agents`, `mandates`, `nonces`, `decisions`.
 | `GET /v1/decisions/{id}` | evidence record | none (demo) |
 | `GET /v1/decisions` | recent decisions for the UI | none |
 | `POST /v1/agents`, `POST /v1/agents/{id}/revoke` | registry | none (demo; admin in reality) |
-| `POST /v1/mandates`, `POST /v1/mandates/{id}/revoke` | mandates | none |
+| `POST /v1/authorizations`, `POST /v1/authorizations/{id}/revoke` | authorizations | none |
 | `POST /v1/challenges/{id}/resolve` | a human approves or rejects a challenged action; recorded with provenance | none |
 | `POST /v1/scenarios/{name}/run` | runs a named demo scenario end to end using a built-in signed agent | none |
 | `GET /v1/eval/latest` | the last evaluation report as JSON | none |
@@ -75,7 +75,7 @@ status, executed_at)`, `agents`, `mandates`, `nonces`, `decisions`.
 ## Decision flow and policy (policy version `2026-10-28.1`)
 
 1. **Identity.** Not `verified` → **block**, reason `identity:<result>`. Stop.
-2. **Mandate.** Any violation → **block**, reasons `mandate:<field>`. Stop. Violations are listed in
+2. **Authorization.** Any violation → **block**, reasons `authorization:<field>`. Stop. Violations are listed in
    full even though the first one suffices.
 3. **Risk.** Tier 0 always; tiers 1 and 2 per the active configuration and the escalation rule
    ([0007](../decisions/0007-risk-tiers.md)). Result: `level` (low / elevated / high), `signals[]`,
@@ -86,8 +86,8 @@ status, executed_at)`, `agents`, `mandates`, `nonces`, `decisions`.
    | --- | --- | --- |
    | risk high **and** (`bill_mismatch` or `document_targets_agent` or `lookalike_counterparty`) | block | `risk:high_with_redirect_pattern` |
    | risk high | challenge | `risk:high` |
-   | `counterparty_is_new` and mandate `allow_new_counterparties` is false | challenge | `mandate:new_counterparty_requires_approval` |
-   | amount > mandate `human_approval_above` | challenge | `mandate:human_approval_threshold` |
+   | `counterparty_is_new` and authorization `allow_new_counterparties` is false | challenge | `authorization:new_counterparty_requires_approval` |
+   | amount > authorization `human_approval_above` | challenge | `authorization:human_approval_threshold` |
    | risk elevated | challenge | `risk:elevated` |
    | otherwise | allow | `clean` |
 
@@ -103,7 +103,7 @@ status, executed_at)`, `agents`, `mandates`, `nonces`, `decisions`.
   "action": { "...the proposal as received..." },
   "identity": {"claimed_agent_id": "...", "result": "verified", "business_id": "...",
                "owner": "...", "key_id": "...", "checked": ["known", "active", "timestamp", "nonce", "signature"]},
-  "mandate": {"mandate_id": "...", "version": 1, "violations": [], "snapshot": { "...as stored..." }},
+  "authorization": {"authorization_id": "...", "version": 1, "violations": [], "snapshot": { "...as stored..." }},
   "risk": {"level": "elevated", "tiers_run": [0, 1],
            "features": {"payment_method_changed_days_ago": {"value": 3, "evidence": ["pmh_42"]}, "...": "..."},
            "tier1": {"model": "typesafe/jev-1.14", "answers": {"...": "..."}, "latency_ms": 95},
@@ -112,7 +112,7 @@ status, executed_at)`, `agents`, `mandates`, `nonces`, `decisions`.
   "decision": "challenge", "reasons": ["risk:elevated"],
   "execution": {"status": "held", "simulated": true},
   "cost": {"input_tokens": 410, "output_tokens": 0, "usd": 0.000017},
-  "latency_ms": {"identity": 1, "mandate": 2, "risk": 97, "total": 104},
+  "latency_ms": {"identity": 1, "authorization": 2, "risk": 97, "total": 104},
   "review": null
 }
 ```
@@ -136,12 +136,12 @@ text"), `proposal`, `agent` (which built-in agent signs, or how the signature is
 
 | Category | Count | Expected | Examples |
 | --- | --- | --- | --- |
-| A legitimate routine | 15 | allow | established vendor, typical amount, bill matches, inside mandate |
-| B authorization violations | 12 | block | over per-payment cap, over rolling cap, expired, revoked mandate, denylisted counterparty, wrong source account, disallowed method type |
+| A legitimate routine | 15 | allow | established vendor, typical amount, bill matches, inside authorization |
+| B authorization violations | 12 | block | over per-payment cap, over rolling cap, expired, revoked authorization, denylisted counterparty, wrong source account, disallowed method type |
 | C identity failures | 8 | block | unknown agent, bad signature, replayed nonce, stale timestamp, revoked agent, unsigned |
 | D authorized but suspicious | 12 | challenge | method changed <7 days, amount 5× vendor median, duplicate invoice, lookalike vendor name, first wire to an old ACH vendor |
 | E adversarial | 8 | block (challenge acceptable) | invoice text instructing "remit to new account", proposal counterparty ≠ bill counterparty, rationale citing "updated instructions", amount matches bill but method is a new international wire |
-| F ambiguous | 5 | challenge (allow acceptable for the cleanest) | new vendor, small amount, clean documents, inside mandate |
+| F ambiguous | 5 | challenge (allow acceptable for the cleanest) | new vendor, small amount, clean documents, inside authorization |
 
 The six **demo scenarios** are one hand-picked case from each category, exposed as
 `POST /v1/scenarios/{name}/run` and as buttons in the UI.
@@ -164,7 +164,7 @@ negligible. Ten full runs during development stay under $15.
 
 One page, three panes: **Scenarios** (six buttons plus a free-form proposal editor), **Decision**
 (a large allow / challenge / block card with reasons, the three dimensions shown as separate rows:
-identity, mandate, risk; a "resolve challenge" control), **Evidence** (the record as a collapsible
+identity, authorization, risk; a "resolve challenge" control), **Evidence** (the record as a collapsible
 tree). A fourth tab, **Evaluation**, renders `report.json` as a comparison table and a cost-versus-
 accuracy chart. A persistent banner reads "Payments are simulated. Rho data: seed | snapshot |
 live (read-only)". Styling follows [messaging.md](messaging.md): the ζ = 1 mark, a decaying
@@ -172,7 +172,7 @@ oscillation, restrained colour.
 
 ## Testing
 
-`pytest` on: signature verify (good, bad, replay, stale, revoked); each mandate field (one violation
+`pytest` on: signature verify (good, bad, replay, stale, revoked); each authorization field (one violation
 each); tier 0 features on fixtures; the policy table row by row; evidence record completeness
 (every required key present, `simulated: true`); the eval runner on three cases with model tiers
 stubbed. Model tiers are stubbed in tests; a `--live-models` flag runs them for real.
@@ -183,7 +183,7 @@ stubbed. Model tiers are stubbed in tests; a `--live-models` flag runs them for 
 | --- | --- | --- |
 | **Tue evening** | This plan. Locally: VPN + `GET /business`; run `snapshot_staging.py`; note counts in `reference/rho-api.md`. Sign up for Jev (or OpenRouter), make one call, correct `reference/jev.md`. Confirm the Console key works | snapshot summary committed as text; Jev request shape known |
 | **Wed morning** | `rho/models.py`, `store.py`, `snapshot.py`, `seed.py`, `make_seed.py`; `eval/cases.py` and the cases file; tests for the store | `data/seed/` and `cases.jsonl` committed |
-| **Wed midday** | `identity/`, `mandate/`, `decide/policy.py`, `decide/evidence.py`; gateway endpoints; `execute.py`; tests | categories B and C pass end to end with tier 0 only |
+| **Wed midday** | `identity/`, `authorization/`, `decide/policy.py`, `decide/evidence.py`; gateway endpoints; `execute.py`; tests | categories B and C pass end to end with tier 0 only |
 | **Wed afternoon** | `risk/features.py`, `tier0.py`, `jev.py`, `claude.py`, `escalation.py`; tests with stubs; first real model calls | all six categories produce sensible decisions in the cascade |
 | **Wed evening** | `eval/run.py`, `report.py`; first full four-arm run; `ui/index.html` scenario and decision panes | `report.md` exists with real numbers |
 | **Thu morning** | UI evidence and evaluation panes; `live.py` and `/v1/rho/health`; README (quick start, diagram, reproduction, data provenance, limitations, next steps); `.env.example` | a stranger can run it from the README |
@@ -197,7 +197,7 @@ If behind schedule, drop from the bottom up: live Rho backend in the demo (keep 
 evaluation chart (keep the table) → lookalike-vendor and off-hours features → rolling limit →
 category F → Jev tier (Haiku fallback becomes the cheap arm) → the free-form proposal editor.
 
-Never cut: signatures, mandate checks, the policy table, the evidence record, the four-arm
+Never cut: signatures, authorization checks, the policy table, the evidence record, the four-arm
 evaluation, the simulated label, the README.
 
 ## Risks
