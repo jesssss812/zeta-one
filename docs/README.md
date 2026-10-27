@@ -33,7 +33,8 @@ What is not done yet is in [roadmap.md](roadmap.md). Every document under `docs/
 | Doc | What it covers |
 | --- | --- |
 | [strategy/product.md](strategy/product.md) | The problem, who acts, the decision model, where enforcement runs, scope, demo scenarios, open questions |
-| [strategy/evaluation.md](strategy/evaluation.md) | How Zeta One is measured: case categories, comparisons, metrics |
+| [strategy/evaluation.md](strategy/evaluation.md) | How Zeta One is measured: labels, case sets, labelling, comparisons, metrics, and what waits until after the hackathon |
+| [strategy/security.md](strategy/security.md) | Where Zeta One adds risk of its own (models, design, build, claims), the guardrails for each, and the detailed work |
 | [strategy/messaging.md](strategy/messaging.md) | Tagline, project explanation, design philosophy, visual identity |
 | [strategy/implementation-plan.md](strategy/implementation-plan.md) | Architecture, modules, API, policy table, evidence record, seed and scenarios, schedule and cut list |
 | [strategy/vision.md](strategy/vision.md) | The narrative for judges and Rho, and the draft submission write-up |
@@ -48,6 +49,7 @@ What is not done yet is in [roadmap.md](roadmap.md). Every document under `docs/
 | [decisions/0004-name-zeta-one.md](decisions/0004-name-zeta-one.md) | The name, and how to show it |
 | [decisions/0005-stack-and-first-action.md](decisions/0005-stack-and-first-action.md) | Python/FastAPI/SQLite; one action, `propose_payment`; a committed synthetic seed for reproducibility |
 | [decisions/0006-identity-and-authorization.md](decisions/0006-identity-and-authorization.md) | Ed25519-signed requests for identity; a JSON authorization checked in code |
-| [decisions/0007-risk-tiers.md](decisions/0007-risk-tiers.md) | Deterministic features, then Jev, then Claude on escalation; Haiku fallback |
+| [decisions/0007-risk-tiers.md](decisions/0007-risk-tiers.md) | Deterministic features, then Jev, then Claude on escalation; tier-0 hard flags are a floor no model can lower |
 | [decisions/0008-friction-ladder.md](decisions/0008-friction-ladder.md) | A challenge is a typed step-up (confirm, renew authorization, verify payee); friction scales with risk and is measured |
 | [decisions/0009-engineered-escalation.md](decisions/0009-engineered-escalation.md) | Cost savings from engineered escalation, not weaker models; the cheap tier is Jev or nothing |
+| [decisions/0010-gateway-guardrails.md](decisions/0010-gateway-guardrails.md) | Guardrails on the gateway's own weak points: recorded model lowering, fail closed, no re-rolling, admin token, gateway-side bill lookup, rolling limit, recheck on resolve |

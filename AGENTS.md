@@ -116,6 +116,8 @@ frontmatter, once that code exists.
 - [docs/strategy/product.md](docs/strategy/product.md): the problem, the decision model, scope,
   demo scenarios and open questions.
 - [docs/strategy/evaluation.md](docs/strategy/evaluation.md): how it is measured.
+- [docs/strategy/security.md](docs/strategy/security.md): where Zeta One adds risk of its own, and
+  the guardrails.
 - [docs/reference/rho-api.md](docs/reference/rho-api.md): what the Rho API allows.
 - [docs/reference/staging-data.md](docs/reference/staging-data.md): what Rho staging holds.
 - [docs/reference/hackathon.md](docs/reference/hackathon.md): deadline, submission checklist and
