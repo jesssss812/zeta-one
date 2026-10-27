@@ -1,0 +1,26 @@
+# Secrets: the Rho staging token and the VPN profile never enter git
+.env
+.env.local
+*.ovpn
+
+# Local Rho staging snapshots: reviewed before anything derived from them is committed
+data/snapshots/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+
+# OS and editors
+.DS_Store
+.idea/
+.vscode/
+
+# Claude Code local state
+.claude/settings.local.json
+.claude/worktrees/
