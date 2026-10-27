@@ -43,5 +43,5 @@ What is not done yet is in [roadmap.md](roadmap.md). Every document under `docs/
 | [decisions/0003-customer-side-gateway.md](decisions/0003-customer-side-gateway.md) | Enforce at a gateway that alone holds the execution credentials |
 | [decisions/0004-name-zeta-one.md](decisions/0004-name-zeta-one.md) | The name, and how to show it |
 | [decisions/0005-stack-and-first-action.md](decisions/0005-stack-and-first-action.md) | Python/FastAPI/SQLite; one action, `propose_payment`; a committed synthetic seed for reproducibility |
-| [decisions/0006-identity-and-mandate.md](decisions/0006-identity-and-mandate.md) | Ed25519-signed requests for identity; a JSON mandate checked in code |
+| [decisions/0006-identity-and-authorization.md](decisions/0006-identity-and-authorization.md) | Ed25519-signed requests for identity; a JSON authorization checked in code |
 | [decisions/0007-risk-tiers.md](decisions/0007-risk-tiers.md) | Deterministic features, then Jev, then Claude on escalation; Haiku fallback |

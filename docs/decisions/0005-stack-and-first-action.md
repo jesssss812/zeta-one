@@ -43,7 +43,7 @@ seed, so anyone can reproduce them. The live backend is shown only to prove the 
 - **TypeScript/Next.js:** better-looking UI faster, but the owner is faster in Python and the
   scored parts (engine, evaluation) are not UI.
 - **Several actions** (create counterparty, change bank details, pay): more realistic, but each
-  needs its own mandate fields, checks and scenarios. Bank-detail changes and bills still exist in the
+  needs its own authorization fields, checks and scenarios. Bank-detail changes and bills still exist in the
   stand-in as *events* that the one action reacts to.
 - **Run the eval on the staging snapshot:** truer, but unreproducible by judges and unpublishable.
 
@@ -52,5 +52,5 @@ seed, so anyone can reproduce them. The live backend is shown only to prove the 
 - `data/seed/` is labelled synthetic in the README, with the generator script beside it.
 - Any number reported from the live backend is shown as "live, read-only" and never used in the
   evaluation.
-- Adding a second action later means a new mandate `actions` entry and a new checker; the policy
+- Adding a second action later means a new authorization `actions` entry and a new checker; the policy
   and evidence record don't change.
