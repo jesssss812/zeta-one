@@ -59,13 +59,16 @@ rules that decide, and an engine that already runs end to end on stand-in stages
 6. **AGENTS.md applies in full**: Rho is read-only; no credentials outside `.env`; simulated
    execution says so; no model can lift a deterministic block.
 
-Setup in a fresh worktree:
+Setup in a fresh worktree (the pre-push hook setting is shared by all worktrees and already on;
+don't set it again):
 
 ```bash
 uv venv .venv && uv pip install --python .venv/bin/python -r requirements-dev.txt
-git config core.hooksPath .githooks
 .venv/bin/python -m pytest
 ```
+
+Start as soon as you have your brief; the times below are when the pieces must meet, not when work
+may begin.
 
 ## Order and handoffs
 
@@ -96,9 +99,17 @@ Each brief can be pasted to an agent as it stands.
 - A `Store` over SQLite loaded from `data/seed/`, plus the stand-in tables Rho lacks:
   payment-method history, bill document text.
 - `make_seed.py`: deterministic from a fixed random seed, two-hour box; the shape in
-  [implementation-plan.md](implementation-plan.md#seed-data-and-scenarios). The seed must contain
-  the five demo scenarios' entities **with the fixtures' ids** (`cp_0007`, `cp_0051`, `bill_0194`,
-  `pm_0007_03`, `acct_seed_checking_01`, ...).
+  [implementation-plan.md](implementation-plan.md#seed-data-and-scenarios). The five demo
+  scenarios' entities are **written by hand with the fixtures' ids and values** (`cp_0007`,
+  `cp_0051`, `bill_0194`, `pm_0007_03`, `acct_seed_checking_01`, the payment counts, medians and
+  transaction ids); only the filler is generated.
+- **The seed's clock:** `SEED_NOW = 2026-10-27T22:00:00Z` (the fixtures' `created_at`), a constant
+  in `zeta_one/rho/seed.py`. Every seed date is relative to it; W5's scenarios and W6's runner pass
+  it as `now`.
+- **Storage:** the seed is JSON files in `data/seed/`. A `Store` loads them into its own in-memory
+  SQLite database (tables prefixed `rho_`), so each evaluation case gets a fresh copy cheaply.
+  `snapshot.py` is that `Store`; it never reads `data/snapshots/`, and nothing in W1 needs the VPN
+  or `.env`.
 - `view.context_for(store)`: a `ContextSource`. Builds `Context` for a proposal, including
   `open_bills` for the proposed counterparty, payment history joined through paid bills, and
   `bill_counterparty` when the bill's payee differs. Raises `InvalidProposal` for an unknown
@@ -107,9 +118,11 @@ Each brief can be pasted to an agent as it stands.
   `change_payment_method`, `set_bill_text`, `add_counterparty`, `add_bill`, `add_payments`. Document
   each op's args in the module docstring; that is W6's reference.
 
-**Done when:** for each fixture, `context_for(store)(fixture.proposal, ...)` matches the fixture's
-`context` (ids, amounts, counts, methods; timestamps may differ in seconds); a seed hash is
-available as `seed_version`; tests cover each mutation and each `InvalidProposal` case.
+**Done when:** for each fixture, `context_for(store)(fixture.proposal, ...)` at `SEED_NOW` matches
+the fixture's `context` (ids, amounts, counts, methods; timestamps may differ in seconds), leaving
+out `open_bills`, which the fixtures don't carry and which has its own tests; `Store.seed_version`
+is a hash of `data/seed/`, which W5 passes to the `Engine`; tests cover each mutation and each
+`InvalidProposal` case.
 
 ### W2: identity and authorization
 
