@@ -240,10 +240,14 @@ Wilson intervals, a confusion matrix per configuration, the discordant-case tabl
 `hard` side by side, failures by stage, label agreement, and the seed, set hashes, model ids and
 prices. The site reads `report.json`.
 
-Budget on the owner's Console key: one model call at roughly 2k input and 300 output tokens costs
-about $0.01–0.015 on Opus 5.5. A full `strong` run over all risk sets (~170 cases) is about $2–3;
-`engineered` is a fraction of that; generating and labelling the sets once is about $3–5. Three
-repeat runs of the model arms add about $10. Development and final runs stay under $40.
+Budget on the owner's Console key, at Opus 5.5's $4 / $20 per million input / output tokens: one
+call at roughly 2k input and 300 output tokens, plus thinking at effort `medium` (it can't be turned
+off), costs about $0.015–0.03. A full `strong` run over all risk sets (~170 cases) is about $3–5;
+`engineered` is a fraction of that. Repeat runs don't need latency, so they go through the Message
+Batches API at half price. Generating and labelling the sets once is about $3–5 on the API, or runs
+as Claude Code subagents on the owner's subscription with the prompts committed. Development and
+final runs stay under $40. The subscription doesn't cover the gateway's own model calls: those need
+the Console key, which is also what a judge reproducing the run would use.
 
 ## Site and integration
 
