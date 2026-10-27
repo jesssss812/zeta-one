@@ -1,24 +1,30 @@
 # What Jev is
 
-Found 2026-10-27 from web search, because the vendor's own pages (`jevai.net`, `docs.typesafe.ai`)
-could not be fetched from the planning session. Everything below is **unverified against official
-docs**: confirm the endpoint, request shape and price on the first real call, then correct this
-file.
+Compiled 2026-10-27 from search results quoting TypeSafe AI's own pages (the
+[announcement](https://typesafe.ai/blog/introducing-system-one-models-and-jev),
+[homepage](https://typesafe.ai/) and [docs](https://docs.typesafe.ai/introduction)); the planning
+session could not open those pages directly. `jevai.net` is not the vendor. Prices and latency are
+**vendor claims**; the request shape and rate limits are **unverified**: confirm on the first real
+call, then correct this file.
 
-## Confirmed by several independent sources
+## From TypeSafe's own material
 
-- **Jev** is a "decision model" (TypeSafe AI calls the product line *System One*) that never
-  generates free text. A request carries a `state` string (the context) and a set of typed
-  questions; the answer to each question is a typed value with a confidence.
+- **Jev** is TypeSafe AI's first public model, in early access, in a class they call **System One
+  models**. It gives up text generation entirely: a request carries a `state` string (the context)
+  and typed questions, and each answer is a typed value with a **calibrated probability**, trained
+  with what they call Reinforcement Learning for Calibrated Decisions. Their own framing: set
+  thresholds for when software acts on its own and when it asks for review.
 - Three question types: **choice** (one of N labels), **noul** (yes/no), **score** (an ordinal
   level against criteria).
-- Current version is **Jev 1.14**; `jev-latest` is an alias to it. There is also an open-weights
-  variant, *Jev-Omni*, which is a different model.
-- **Price:** OpenRouter lists `typesafe/jev-1.14` at **$0.042 per million input tokens, output
-  free**; the vendor site lists $0.084 per million. Either way a decision over a few hundred tokens
+- Current release **Jev 1.14** (October 14, 2026), served as `jev-latest`. *Jev-Omni* is a separate
+  open-weights model.
+- **Price:** **$0.042 per million input tokens, output free.** A decision over a few hundred tokens
   costs well under a hundredth of a cent.
-- **Latency:** ~0.09 s P50 on OpenRouter's listing; the vendor claims 70–500 ms. One independent
-  benchmark measured 5–6× faster than an LLM at the median, with p95 under 500 ms.
+- **Latency:** 70–500 ms end to end (vendor figure); ~0.09 s P50 on OpenRouter's listing. One
+  independent benchmark measured 5–6× faster than an LLM at the median, with p95 under 500 ms.
+- **Access:** an API key created in the TypeSafe console; a late-October update says no waitlist
+  approval is needed although the homepage still shows a waitlist link. Rate limits are quoted
+  differently by every secondary source; read them from the console.
 - **Accuracy (community benchmarks, not ours):** ~94% on simple multi-class choices, ~79% when there
   are many options; a Jev-first cascade matched a frontier LLM on a spam task while sending one
   message in nine to the LLM, and lost 1.6 points on Banking77 for a 5.5× cost cut.
@@ -47,8 +53,9 @@ sources differ on whether a choice takes `options` or `criteria` and whether a s
 
 ## Sources
 
-Search results of 2026-10-27: [OpenRouter listing](https://openrouter.ai/typesafe/jev-1.14),
-[jevai.net](https://jevai.net/), [TypeSafe quickstart](https://docs.typesafe.ai/introduction/quickstart),
+TypeSafe's [announcement](https://typesafe.ai/blog/introducing-system-one-models-and-jev),
+[homepage](https://typesafe.ai/) and [quickstart](https://docs.typesafe.ai/introduction/quickstart),
+as quoted in search results of 2026-10-27; [OpenRouter listing](https://openrouter.ai/typesafe/jev-1.14),
 [unofficial System One guide](https://github.com/typesafe-docs/typesafeai),
 [jev-measured benchmark](https://github.com/WallerChen/jev-measured),
 [independent benchmark](https://medium.com/@pravvich/typesafes-jev-beyond-the-hype-an-independent-benchmark-8bdc1c99d000),
