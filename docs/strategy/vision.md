@@ -109,8 +109,8 @@ says so.
 > design, and Rho's API spec names the next scope: initiating accounts-payable payments. When an
 > agent can pay, a valid token says nothing about which agent acted, what the business meant to
 > allow, or whether the invoice it just read was written by an attacker for an AI reader. Vendor
-> impersonation, changed bank details and malicious invoices are old fraud; agents are a new, fast
-> way to fall for them.
+> impersonation, changed bank details and malicious invoices are old fraud; agents are a new way to
+> fall for them.
 >
 > **Who it helps.** Platforms like Rho that will receive these actions, the finance teams that want
 > agents to pay routine bills without friction, and the people who review what goes wrong.
