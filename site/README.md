@@ -19,6 +19,7 @@ Open http://localhost:4173. FastAPI can also serve this directory unchanged. All
 - `index.html`: project story, synthetic decision example, engineering approach, evaluation space,
   and demo video space. Replace the labeled video placeholder with an accessible video/embed once
   a recording exists; add a link to the actual app when it is ready.
+- `fonts.html`: four wordmark studies for choosing the name and ζ typography; separate from the submission page.
 - `styles.css`: responsive presentation, keyboard focus, and reduced-motion support.
 - The decision example is drawn from the engine-owned
   [vendor payment-method change fixture](../data/fixtures/vendor_payment_method_changed.json).
