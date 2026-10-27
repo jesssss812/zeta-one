@@ -6,18 +6,21 @@ What is not done, as of 2026-10-27. Remove a line when it is done.
 
 - Check what Rho staging holds (counterparties, bills, transactions, history, filled fields) and
   record a summary in `docs/reference/`. Needs the VPN, so it runs locally.
-- Find out what Jev is, and whether it is available, before designing the classifier around it.
-- Plan the implementation: language and stack, the mandate format, the identity mechanism, the risk
-  signals the data supports, and the narrowest payment action to support first.
-- Write the labelled evaluation scenarios before building the engine.
+- Get a Jev (or OpenRouter) key, make one call, and correct `docs/reference/jev.md`.
+- Write the labelled evaluation scenarios before building the engine (`eval/cases.py`).
+
+The build order, schedule and cut list are in
+[strategy/implementation-plan.md](strategy/implementation-plan.md).
 
 ## Build (P0, P1)
 
-- Local Rho stand-in with live and snapshot backends (decision 0002).
-- Gateway: identity check, mandate check, risk scoring, allow/challenge/block, simulated execution.
+- Local Rho stand-in with snapshot and live backends, and the committed synthetic seed
+  (decisions 0002, 0005).
+- Gateway: signed-request identity, mandate checks, three-tier risk, policy table, simulated
+  execution (decisions 0006, 0007).
 - Evidence record for every decision.
-- Evaluation run across the four comparisons in `docs/strategy/evaluation.md`.
-- A UI that shows a decision and its evidence.
+- Evaluation run across the four configurations in `docs/strategy/evaluation.md`.
+- A UI that shows the scenarios, a decision, its evidence and the evaluation table.
 
 ## Stretch
 
