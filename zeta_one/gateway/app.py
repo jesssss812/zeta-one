@@ -4,26 +4,37 @@ Translates HTTP to and from the service; holds no decision logic. Run it on 127.
 `python -m zeta_one.gateway.app`, or uvicorn without `--host`.
 """
 
+from typing import Literal
+
 from fastapi import FastAPI, Request
 from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from pydantic import BaseModel, ConfigDict, ValidationError
 
 from zeta_one import db
 from zeta_one.contracts import POLICY_VERSION, InvalidProposal, SignedRequest
-from zeta_one.gateway import scenarios
+from zeta_one.gateway import admin, scenarios
 from zeta_one.gateway.ledger import Ledger
-from zeta_one.gateway.service import EngineNotReady, Gateway
+from zeta_one.gateway.service import EngineNotReady, Gateway, NotHeld, UnknownChallenge
 from zeta_one.gateway.wiring import engine_version, real_stages
 
 HOST = "127.0.0.1"
+
+
+class Resolution(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    outcome: Literal["approve", "reject"]
+    by: str
+    note: str | None = None
 
 
 def _error(status: int, code: str, message: str) -> JSONResponse:
     return JSONResponse(status_code=status, content={"error": {"code": code, "message": message}})
 
 
-def create_app(gateway: Gateway) -> FastAPI:
+def create_app(gateway: Gateway, token: str | None) -> FastAPI:
     app = FastAPI(title="Zeta One gateway")
     app.add_middleware(
         CORSMiddleware,
@@ -31,6 +42,10 @@ def create_app(gateway: Gateway) -> FastAPI:
         allow_methods=["GET", "POST"],
         allow_headers=["*"],
     )
+
+    @app.exception_handler(admin.AdminRefused)
+    def refused(request: Request, error: admin.AdminRefused) -> JSONResponse:
+        return _error(error.status, error.code, error.message)
 
     @app.get("/v1/health")
     def health() -> dict:
@@ -52,6 +67,22 @@ def create_app(gateway: Gateway) -> FastAPI:
             return _error(400, "invalid_proposal", str(error))
         except EngineNotReady as error:
             return _error(503, "engine_not_ready", str(error))
+
+    @app.post("/v1/challenges/{challenge_id}/resolve")
+    async def resolve(challenge_id: str, request: Request):
+        admin.require_admin(request.headers, token)
+        try:
+            resolution = Resolution.model_validate_json(await request.body())
+        except ValidationError as error:
+            return _error(400, "invalid_resolution", str(error))
+        try:
+            return await run_in_threadpool(
+                gateway.resolve, challenge_id, resolution.outcome, resolution.by, resolution.note
+            )
+        except UnknownChallenge:
+            return _error(404, "unknown_challenge", f"no challenge {challenge_id}")
+        except NotHeld as error:
+            return _error(409, "not_held", str(error))
 
     @app.get("/v1/decisions")
     def list_decisions(limit: int = 50) -> list[dict]:
@@ -88,7 +119,7 @@ def default_gateway() -> Gateway:
     return Gateway(stages=real_stages(), ledger=Ledger(db.connect()), version=engine_version())
 
 
-app = create_app(default_gateway())
+app = create_app(default_gateway(), admin.admin_token())
 
 
 if __name__ == "__main__":

@@ -6,15 +6,24 @@ The HTTP layer in app.py only translates to and from JSON; this holds the order 
 from collections.abc import Callable
 from dataclasses import dataclass, replace
 from datetime import UTC, datetime
-from typing import Any
+from typing import Any, Literal
 
-from zeta_one.contracts import SignedRequest
+from zeta_one.contracts import IdentityEvidence, SignedRequest
+from zeta_one.gateway import admin
 from zeta_one.gateway.ledger import Ledger
 from zeta_one.gateway.pipeline import Engine
 from zeta_one.gateway.wiring import ContextCapture, Stages, build_engine
 
 
 class EngineNotReady(RuntimeError):
+    pass
+
+
+class UnknownChallenge(KeyError):
+    pass
+
+
+class NotHeld(RuntimeError):
     pass
 
 
@@ -57,3 +66,39 @@ class Gateway:
             record, proposal = engine.evaluate(request)
         challenge_id = self.ledger.record(record, proposal, context=seen[-1] if seen else None)
         return {"decision": record.decision, "decision_id": record.decision_id, "challenge_id": challenge_id}
+
+    def resolve(
+        self, challenge_id: str, outcome: Literal["approve", "reject"], by: str, note: str | None = None
+    ) -> dict[str, Any]:
+        """A person approves or rejects a held payment. Approval executes it only if nothing changed."""
+        held = self.ledger.held(challenge_id)
+        if held is None:
+            raise UnknownChallenge(challenge_id)
+        if held.status != "held":
+            raise NotHeld(f"challenge {challenge_id} is already {held.status}")
+        now = self.clock()
+        reasons: list[str] = []
+        changes: list[str] = []
+        if outcome == "reject":
+            status, result = "blocked", "rejected"
+        else:
+            identity = IdentityEvidence.model_validate(self.ledger.decision(held.decision_id)["identity"])
+            changes = admin.recheck(held, identity, self.stages, self.ledger, now)
+            if changes:
+                status, result, reasons = "blocked", "blocked", ["resolve:state_changed"]
+            else:
+                status, result = "executed", "approved"
+        review = {
+            "by": by,
+            "at": now.isoformat(),
+            "outcome": result,
+            "note": note,
+            "provenance": "admin_token",
+            "challenge_id": challenge_id,
+            "reasons": reasons,
+            "changes": changes,
+        }
+        if not self.ledger.resolve(held, status, review, now):
+            raise NotHeld(f"challenge {challenge_id} was resolved meanwhile")
+        return {"decision_id": held.decision_id, "challenge_id": challenge_id, "status": status, "reasons": reasons}
+

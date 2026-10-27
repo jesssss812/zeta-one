@@ -1,15 +1,17 @@
-"""The agent endpoint on fake stages: a minimal response (S4), decisions recorded in the ledger."""
+"""The agent endpoint (S4), admin access (S6) and the recheck on resolve (S9), on fake stages."""
 
 import sqlite3
 
 import pytest
 from fastapi.testclient import TestClient
 
-from tests.gateway.fakes import NOW, FakeWorld, agent_headers, held_proposal, routine_proposal
+from tests.gateway.fakes import AGENT, NOW, FakeWorld, agent_headers, held_proposal, routine_proposal
 from zeta_one.gateway.app import create_app
 from zeta_one.gateway.ledger import Ledger
 from zeta_one.gateway.service import Gateway
 
+TOKEN = "test-admin-token"
+ADMIN = {"Authorization": f"Bearer {TOKEN}"}
 PROPOSE = "/v1/actions/propose_payment"
 
 
@@ -27,11 +29,21 @@ def gateway(world) -> Gateway:
 
 @pytest.fixture
 def client(gateway) -> TestClient:
-    return TestClient(create_app(gateway))
+    return TestClient(create_app(gateway, TOKEN))
 
 
 def propose(client, proposal, headers=None):
     return client.post(PROPOSE, content=proposal.model_dump_json(), headers=headers or agent_headers())
+
+
+def hold(client) -> dict:
+    body = propose(client, held_proposal()).json()
+    assert body["decision"] == "challenge" and body["challenge_id"]
+    return body
+
+
+def resolve(client, challenge_id, outcome="approve", headers=ADMIN):
+    return client.post(f"/v1/challenges/{challenge_id}/resolve", json={"outcome": outcome, "by": "owner"}, headers=headers)
 
 
 # --- S4: the agent learns only the decision and its ids ---
@@ -73,7 +85,7 @@ def test_engine_not_ready_without_every_stage(world):
     connection = sqlite3.connect(":memory:", check_same_thread=False)
     stages = world.stages()
     stages.tier0 = None
-    client = TestClient(create_app(Gateway(stages=stages, ledger=Ledger(connection))))
+    client = TestClient(create_app(Gateway(stages=stages, ledger=Ledger(connection)), TOKEN))
     response = propose(client, routine_proposal())
     assert response.status_code == 503 and "tier0" in response.json()["error"]["message"]
 
@@ -82,3 +94,85 @@ def test_rolling_limit_counts_earlier_payments(client, world):
     world.set_rolling_limit(300000)
     assert propose(client, routine_proposal()).json()["decision"] == "allow"
     assert propose(client, routine_proposal()).json()["decision"] == "block"
+
+
+# --- S6: admin token, and no agent can approve ---
+
+
+def test_agent_signed_resolve_of_its_own_challenge_is_refused_and_stays_held(client):
+    held = hold(client)
+    response = resolve(client, held["challenge_id"], headers={**ADMIN, **agent_headers()})
+    assert response.status_code == 403
+    assert response.json()["error"]["code"] == "agent_signed"
+    assert client.get(f"/v1/decisions/{held['decision_id']}").json()["execution"]["status"] == "held"
+
+
+@pytest.mark.parametrize("headers", [{}, {"Authorization": "Bearer wrong"}, {"Authorization": TOKEN}])
+def test_resolve_needs_the_admin_token(client, headers):
+    held = hold(client)
+    assert resolve(client, held["challenge_id"], headers=headers).status_code == 401
+
+
+def test_admin_endpoints_are_off_without_a_token(gateway):
+    client = TestClient(create_app(gateway, None))
+    held = hold(client)
+    assert resolve(client, held["challenge_id"]).status_code == 503
+
+
+# --- S9: approve reruns the deterministic checks ---
+
+
+def test_approve_with_nothing_changed_executes(client):
+    held = hold(client)
+    body = resolve(client, held["challenge_id"]).json()
+    assert body["status"] == "executed" and body["reasons"] == []
+    record = client.get(f"/v1/decisions/{held['decision_id']}").json()
+    assert record["execution"] == {"status": "executed", "simulated": True}
+    assert record["review"]["outcome"] == "approved" and record["review"]["provenance"] == "admin_token"
+
+
+def test_reject_blocks(client):
+    held = hold(client)
+    assert resolve(client, held["challenge_id"], "reject").json()["status"] == "blocked"
+
+
+def test_revoking_the_authorization_while_held_blocks_on_approve(client, world):
+    held = hold(client)
+    world.authorization = world.authorization.model_copy(update={"status": "revoked", "version": 2})
+    body = resolve(client, held["challenge_id"]).json()
+    assert body == {**body, "status": "blocked", "reasons": ["resolve:state_changed"]}
+    review = client.get(f"/v1/decisions/{held['decision_id']}").json()["review"]
+    assert "authorization:version" in review["changes"] and "authorization:status" in review["changes"]
+
+
+def test_revoking_the_agent_while_held_blocks_on_approve(client, world):
+    held = hold(client)
+    world.agents[AGENT] = "revoked"
+    assert resolve(client, held["challenge_id"]).json()["status"] == "blocked"
+
+
+def test_changing_the_payment_method_while_held_blocks_on_approve(client, world):
+    held = hold(client)
+    world.change_payment_method()
+    body = resolve(client, held["challenge_id"]).json()
+    assert body["status"] == "blocked"
+
+
+def test_held_payment_is_not_counted_against_its_own_rolling_limit(client, world):
+    amount = held_proposal().amount.amount
+    world.set_rolling_limit(amount)
+    held = hold(client)
+    assert resolve(client, held["challenge_id"]).json()["status"] == "executed"
+
+
+def test_resolving_twice_is_409_and_unknown_is_404(client):
+    held = hold(client)
+    resolve(client, held["challenge_id"])
+    assert resolve(client, held["challenge_id"]).status_code == 409
+    assert resolve(client, "chl_nope").status_code == 404
+
+
+def test_bad_resolution_body_is_400(client):
+    held = hold(client)
+    response = client.post(f"/v1/challenges/{held['challenge_id']}/resolve", json={"outcome": "maybe"}, headers=ADMIN)
+    assert response.status_code == 400
