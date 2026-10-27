@@ -18,7 +18,7 @@ dataset.
 
 A judge clones the repo, runs two commands, opens one page, clicks through five scenarios and sees
 each proposed agent payment decided (allow / challenge / block) with an evidence record showing the
-three questions answered separately, then opens an evaluation table with four configurations side
+three questions answered separately, then opens an evaluation table with the configurations side
 by side: accuracy, hard-constraint accuracy, detection, challenge rate, cost per action, latency.
 The Loom shows the same. Payment execution is labelled simulated everywhere.
 
@@ -50,17 +50,17 @@ signing key and nothing else.
 | Layer | In the first version | Extension |
 | --- | --- | --- |
 | Identity | registered agents, Ed25519 signature, timestamp + nonce, `active` / `revoked` | automation-detection signals |
-| Authorization | `actions`, `counterparties` (any / allowlist / denylist), `limits.per_payment`, `expires_at`, `status`, `human_approval_above` | `limits.rolling`, `source_accounts`, `payment_method_types`, `allow_new_counterparties`, signed grants |
-| Risk | tier 0 with five features: `counterparty_is_new`, `payment_method_changed_days_ago`, `amount_ratio_to_vendor_median`, `bill_mismatch`, `document_instruction_patterns`; tier 2 `claude-opus-5-5` structured output; cheap tier `claude-haiku-5-5`; cascade on tier-0 band and cheap-tier confidence | Jev as the cheap tier; `lookalike_counterparty`, `off_hours`, `agent_velocity`, `duplicate_candidate` |
+| Authorization | `actions`, `counterparties` (any / allowlist / denylist), `allow_new_counterparties`, `limits.per_payment` (currency-strict), `expires_at`, `status`, `human_approval_above`; `source_account_id` ∈ business always | `limits.rolling` (ext. 2), `source_accounts`, `payment_method_types`, signed grants |
+| Risk | tier 0 with five features: `counterparty_is_new`, `payment_method_changed_days_ago`, `amount_ratio_to_vendor_median`, `bill_mismatch`, `document_instruction_patterns`; the merge rule (tier-0 flags are a floor); strong tier `claude-opus-5-5` structured output; **engineered escalation**: strong runs only when tier 0 is not clean (decision 0009) | Jev as the cheap tier (ext. 3); `duplicate_candidate`, `lookalike_counterparty`, `off_hours`, `agent_velocity`; an open-weight comparison arm |
 | Policy | `allow` / `challenge` (type `confirm`) / `block`; versioned ordered rule table | challenge types `renew_authorization`, `verify_payee`, `notify` (decision 0008) |
 | Evidence | the full schema below, from the first commit | nothing: the schema is the extensibility |
 | Execution | simulated; `held` on challenge; `POST /v1/challenges/{id}/resolve` | observe mode |
 | Data | committed synthetic seed, deterministic from a fixed random seed, minor-unit amounts | live Rho backend (shows one vendor and one deposit: the connection, not the data) |
-| Evaluation | ~40 cases in categories A–E; four configurations; `report.md` and `report.json` | category F, friction score, chart |
+| Evaluation | the five demo cases first, then ~40 in categories A–E; three configurations (rules, engineered cascade, strong everywhere); per-category `report.md` and `report.json` | the Jev arm, the open-weight arm, category F, friction score, chart |
 | Interface | the demo API in [../reference/demo-api.md](../reference/demo-api.md), served with CORS; the site in `site/` renders it | registration and grant endpoints for the site; resolve with type; evaluation JSON |
 
-Haiku standing in for Jev keeps all four evaluation configurations meaningful even if Jev never
-arrives; the report names what ran.
+Nothing on Wednesday's path depends on Jev: the engineered cascade is the default configuration,
+and the Jev arm joins on Thursday when its call works.
 
 ## The seven seams
 
@@ -68,8 +68,10 @@ Designed once, so each extension is additive:
 
 1. `rho.store.Store` protocol; `snapshot.py` implements it now, `live.py` later.
 2. `risk.RiskTier` protocol: `assess(ctx) -> TierResult {level, confidence, signals, model_id,
-   usage, latency_ms}`; the active configuration is a list of tier names; Jev, Haiku and Opus are
-   adapters of one shape.
+   usage, latency_ms}`; the active configuration is a list of tier names plus an escalation rule
+   per tier kind; Jev, Claude and an OpenAI-compatible adapter are three implementations of one
+   shape. `escalation.merge()` applies the floor rule from 0007 and is the only place a level is
+   combined.
 3. `authorization.check` is an ordered list of `check_<field>` functions, each returning a
    violation `{field, kind: scope | limit, limit, observed}` or nothing; unknown fields in a stored
    authorization are ignored.
@@ -86,7 +88,7 @@ zeta_one/
   rho/            models.py  store.py  snapshot.py  seed.py  live.py (ext. 1)
   identity/       registry.py  signing.py
   authorization/  schema.py  check.py
-  risk/           features.py  tier0.py  tiers.py (protocol)  claude.py  jev.py (ext. 2)  escalation.py
+  risk/           features.py  tier0.py  tiers.py (protocol)  escalation.py (merge + rules)  claude.py  jev.py (ext. 3)  openai_compat.py (optional)
   decide/         policy.py  evidence.py
   gateway/        app.py  execute.py  scenarios.py
 eval/             cases.py  run.py  report.py
@@ -117,19 +119,26 @@ status, executed_at)`, `agents`, `authorizations`, `nonces`, `decisions`.
 
 1. **Identity.** Not `verified` → **block**, reason `identity:<result>`. Stop.
 2. **Authorization.** Any violation → **block**, reasons `authorization:<field>`, all violations
-   listed. Stop. (Extension 3 moves `limit` violations to `challenge: renew_authorization`.)
-3. **Risk.** Tier 0 always; the cheap tier and tier 2 per the active configuration and the
-   escalation rule ([0007](../decisions/0007-risk-tiers.md)). Result: `level`, `signals[]`,
-   `tiers_run[]`, `model_ids[]`, `usage`, `latency_ms`.
+   listed. Stop. (Extension 4 moves `limit` violations to `challenge: renew_authorization`.)
+3. **Risk.** The request is first validated (payment method belongs to the counterparty, else
+   rejected). Tier 0 always; later tiers per the active configuration and its escalation rules;
+   the final level comes from the merge rule, with tier-0 flags as a floor
+   ([0007](../decisions/0007-risk-tiers.md)). Result: `level`, `level_set_by`, `floor`,
+   `signals[]`, `tiers_run[]`, `tier_results[]`.
 4. **Policy table**, first match:
 
    | Condition | Decision | Challenge type | Reason code |
    | --- | --- | --- | --- |
    | risk high **and** (`bill_mismatch` or `document_instruction_patterns` or model `injection_detected`) | block | | `risk:high_with_redirect_pattern` |
-   | risk high | challenge | `confirm` (`verify_payee` in ext. 3) | `risk:high` |
+   | risk high | challenge | `confirm` (`verify_payee` in ext. 4) | `risk:high` |
+   | `counterparty_is_new` and `allow_new_counterparties` is false | challenge | `confirm` | `authorization:new_counterparty_requires_approval` |
    | amount > `human_approval_above` | challenge | `confirm` | `authorization:human_approval_threshold` |
-   | risk elevated | challenge | `confirm` (`verify_payee` in ext. 3) | `risk:elevated` |
+   | risk elevated | challenge | `confirm` (`verify_payee` in ext. 4) | `risk:elevated` |
    | otherwise | allow | | `clean` |
+
+   The table is data: a list of rows under `policy_version`, evaluated in order. Rows that depend on
+   risk read the merged level, which a model cannot lower below the tier-0 floor, so the first row
+   holds whenever tier 0 saw a redirect pattern.
 
 5. **Execute.** `allow` → simulated payment `executed`; `challenge` → `held` until resolved; `block`
    → `blocked`. The evidence record is written before any of these.
@@ -139,45 +148,61 @@ status, executed_at)`, `agents`, `authorizations`, `nonces`, `decisions`.
 ```json
 {
   "schema_version": 1, "decision_id": "...", "created_at": "...", "policy_version": "2026-10-28.1",
-  "configuration": {"tiers": ["tier0", "haiku", "opus"], "escalation": {"confidence_min": 0.8}},
+  "engine_version": "<git sha>", "seed_version": "<sha256 of data/seed>",
+  "configuration": {"tiers": ["tier0", "strong"], "escalation": "engineered"},
   "action": { "...the proposal as received..." },
   "identity": {"claimed_agent_id": "...", "result": "verified", "business_id": "...", "owner": "...",
-               "key_id": "...", "checked": ["known", "active", "timestamp", "nonce", "signature"]},
+               "key_id": "...", "timestamp": "...", "nonce": "...",
+               "checked": ["present", "known", "active", "timestamp", "nonce", "signature"]},
   "authorization": {"authorization_id": "...", "version": 1, "violations": [], "snapshot": { "...as stored..." }},
-  "risk": {"level": "elevated", "tiers_run": ["tier0", "haiku"],
+  "risk": {"level": "elevated", "level_set_by": "tier0", "floor": {"level": "elevated", "flags": ["payment_method_changed_days_ago"]},
+           "tiers_run": ["tier0"],
            "features": {"payment_method_changed_days_ago": {"value": 3, "evidence": ["pmh_42"]}},
-           "tier_results": [{"tier": "haiku", "model": "claude-haiku-5-5", "level": "elevated", "confidence": 0.71, "latency_ms": 640}],
-           "signals": [{"name": "payment_method_changed", "severity": "elevated", "evidence": ["pmh_42"]}],
+           "tier_results": [{"tier": "tier0", "model": null, "level": "elevated", "confidence": null, "signals": ["payment_method_changed"], "latency_ms": 2, "usage": null}],
+           "signals": [{"name": "payment_method_changed", "severity": "elevated", "evidence": ["pmh_42"], "source": "tier0"}],
            "model_rationale": null},
   "decision": "challenge", "reasons": ["risk:elevated"],
   "challenge": {"type": "confirm", "routed_to": "owner", "user_sees": "one approve / reject"},
   "friction_rung": 2,
   "execution": {"status": "held", "simulated": true},
-  "cost": {"input_tokens": 1900, "output_tokens": 120, "usd": 0.00025},
-  "latency_ms": {"identity": 1, "authorization": 2, "risk": 644, "total": 650},
+  "cost": {"input_tokens": 0, "output_tokens": 0, "usd": 0.0, "prices_used": {}},
+  "latency_ms": {"identity": 1, "authorization": 2, "risk": 2, "total": 6},
   "review": null
 }
 ```
 
-`review`, once a human resolves a challenge, holds `{by, at, outcome, note, provenance:
-"human_ui"}`. `model_rationale` is model output and labelled so by the site.
+Tier roles are `tier0`, `cheap` (Jev, or an open-weight model in that arm) and `strong`; the model
+id lives in `model`. `review`, once a human resolves a challenge, holds `{by, at, outcome, note,
+provenance: "human_ui"}`. `model_rationale` and `action.agent_rationale` are both text an attacker
+can influence and are labelled so by the site. A pytest loads every fixture in `data/fixtures/`
+into the evidence-record model, so the contract and the engine can't drift silently.
 
 ## Seed data and scenarios
 
-`scripts/make_seed.py` writes `data/seed/`: one business, 3 accounts, ~40 counterparties (1–2
-payment methods each, created dates), ~400 outgoing transactions over 12 months with per-vendor
-amount distributions, ~60 bills with short invoice texts, a payment-method history. Deterministic
-from a fixed random seed. Staging holds one vendor, no bills and a single funding deposit
-([../reference/staging-data.md](../reference/staging-data.md)), so the seed is shaped from
-assumptions about a small business's payables, not from staging statistics, and the README says so.
-Amounts follow Rho's `Money` shape: integer minor units with a currency code. The one real vendor's
-shape (five payment methods: ACH, wire, check, two international) is a useful template for
-synthetic counterparties.
+`scripts/make_seed.py` writes `data/seed/`, **time-boxed to two hours**: one business, 3 accounts,
+the ~8 counterparties the five scenarios need plus ~15 filler (1–2 payment methods each), ~150
+outgoing transactions over 12 months with per-vendor amount distributions, ~30 bills with short
+invoice texts, a payment-method history. Deterministic from a fixed random seed; a hash of the
+directory is the `seed_version` in every record. Staging holds one vendor, no bills and a single
+funding deposit ([../reference/staging-data.md](../reference/staging-data.md)), so the seed is
+shaped from assumptions about a small business's payables, not from staging statistics, and the
+README says so. The one real vendor's shape (five payment methods: ACH, wire, check, two
+international) is the template for synthetic counterparties.
+
+The seed follows Rho's shapes where Rho has them and says where it doesn't: `Money` is integer
+minor units with a currency code; a transaction carries `counterparty_name` and no counterparty id,
+so **vendor payment history is joined through bills** (`Bill.counterparty.id` → `Bill.transaction.id`)
+and `method_type` is derived from `transaction_type` (`ach_debit`, `wire_out`, `check_payment`,
+`international_wire_out`); payment methods carry no timestamps in Rho, so `added_at` and the
+payment-method history are stand-in tables; bill document text is a stand-in table. `rho/models.py`
+follows Rho; everything served to the site is a derived view and the contract says so.
 
 `eval/cases.py` writes `data/eval/cases.jsonl`. Each case: `category`, `setup` (mutations applied
 to a fresh seed, e.g. "change method 3 days ago", "insert invoice text"), `agent` (which built-in
 agent signs, or how the signature is broken), `proposal`, `expected`, `also_acceptable`,
-`provenance: "synthetic:eval/cases.py@<git sha>"`.
+`provenance: "synthetic:eval/cases.py@<git sha>"`. The five demo cases are written first, Wednesday
+morning; the rest once the engine runs. Only `proposal` and the data reach a model tier; `category`,
+`setup` and the name never do.
 
 | Category | Count | Expected | Examples |
 | --- | --- | --- | --- |
@@ -193,14 +218,15 @@ The five **demo scenarios** are one hand-picked case from each of A–E, exposed
 
 ## Evaluation runner
 
-`eval/run.py --config rules|cheap|strong|cascade` applies each case's `setup` to a fresh copy of
-the seed, signs and sends the proposal, records the decision and evidence, and restores. Output:
-`data/eval/results/<config>.jsonl` and a combined `report.json` / `report.md` with the metrics in
-[evaluation.md](evaluation.md) and a confusion matrix per configuration. The site
-reads `report.json`.
+`eval/run.py --config rules|engineered|jev|strong|openweight` applies each case's `setup` to a
+fresh copy of the seed, signs and sends the proposal, records the decision and evidence, and
+restores. Cases within an arm run concurrently (a few at a time); model calls are never cached
+across runs. Output: `data/eval/results/<config>.jsonl` and a combined `report.json` /
+`report.md` with the per-category metrics in [evaluation.md](evaluation.md), a confusion matrix per
+configuration, and Jev's reliability table when that arm ran. The site reads `report.json`.
 
 Budget on the owner's Console key: the `strong` arm is ~40 calls to Opus 5.5 at roughly 2k input
-and 300 output tokens, about $0.40–0.60 per run; `cheap` and `cascade` are a fraction of that.
+and 300 output tokens, about $0.40–0.60 per run; `engineered` and `jev` are a fraction of that.
 Ten full runs during development stay under $10.
 
 ## Site and integration
@@ -227,24 +253,27 @@ hasn't added them by the Loom, they stay reachable through the API and the fallb
 5. Invoice says "remit to new account", proposal follows it → **block**; bill mismatch, instruction
    pattern, model signal; rationale labelled as model output.
 
-Then the evaluation tab: four configurations, accuracy against cost and latency.
+Then the evaluation: configurations side by side, per category, accuracy against cost and latency.
 
 ## Testing
 
-`pytest` on: signature verify (good, bad, replay, stale, revoked); each authorization check (one
-violation each); tier 0 features on fixtures; the policy table row by row; evidence record required
-keys and `simulated: true`; the eval runner on three cases with model tiers stubbed. Model tiers
-are stubbed in tests; `--live-models` runs them for real.
+`pytest` on: signature verify (good, bad, replay, stale, revoked, nonce recorded only after
+verify); each authorization check (one violation each, plus a wrong-currency and an equal-to-cap
+case); tier 0 features on fixtures; the merge rule (a model answer of `low` cannot lower a tier-0
+floor); the policy table row by row; evidence record required keys and `simulated: true`; every
+file in `data/fixtures/` loads into the evidence-record model; the eval runner on three cases with
+model tiers stubbed. Model tiers are stubbed in tests; `--live-models` runs them for real.
 
 ## Schedule
 
 | When | Build | Done means |
 | --- | --- | --- |
-| **Tue evening** | This plan. Staging checked (`scripts/staging_check.py`, done). Create a TypeSafe key, make one call, correct `reference/jev.md`. Confirm the Console key | Jev request shape known, or Haiku stays |
-| **Wed morning** | `rho/models.py`, `store.py`, `snapshot.py`, `seed.py`, `make_seed.py`; `eval/cases.py` and `cases.jsonl`; store tests | `data/seed/` and `cases.jsonl` committed |
-| **Wed midday** | `identity/`, `authorization/`, `decide/policy.py`, `decide/evidence.py`; gateway endpoints; `execute.py`; tests | categories B and C pass end to end with tier 0 only |
-| **Wed afternoon** | `risk/features.py`, `tier0.py`, `tiers.py`, `claude.py` (Haiku and Opus adapters), `escalation.py`; stubbed tests; first real model calls | all five categories decide sensibly in the cascade |
-| **Wed evening** | `eval/run.py`, `report.py`; first full four-arm run; `/v1/scenarios` and `/v1/health` match the contract; replace the fixture with a real run | `report.md` with real numbers; the site runs against the live engine |
+| **Tue evening** | This plan. Staging checked (done). Create a TypeSafe key, make one Jev call, correct `reference/jev.md`. Confirm the Console key, the Claude model ids and `messages.parse` with one request. Test Rho's MCP connector in claude.ai and note the tool list | Jev request shape known or the arm waits; Rho connector facts recorded |
+| **Wed 08:00–10:00** | `rho/models.py`, `store.py`, `snapshot.py`, `seed.py`, `make_seed.py` (two-hour box); the five demo cases in `eval/cases.py` | `data/seed/` and the five cases committed |
+| **Wed 10:00–13:00** | `risk/features.py`, `tier0.py`, `escalation.merge`, `decide/policy.py`, `decide/evidence.py`, `execute.py`; `gateway/app.py` with `/v1/health`, `/v1/scenarios`, `/v1/scenarios/{name}/run`, identity and authorization **stubbed** as verified / no violations; fixture-vs-schema test | **the first judge-visible slice**: five scenarios decide over the API on tier 0 alone; the site can switch from fixtures to live |
+| **Wed 13:00–15:30** | `identity/` (real signatures, replay, revocation), `authorization/` (real checks), `/v1/actions/propose_payment`; tests; `scenarios.py` signs with built-in agents | categories B and C pass end to end; scenarios 3 and 4 now fail for the right reason |
+| **Wed 15:30–18:00** | `tiers.py`, `claude.py` (Opus, structured output), escalation rules; stubbed tests; first real model calls on the redirect scenario | the engineered cascade runs; scenario 5 blocks with a model signal |
+| **Wed evening** | the rest of the ~40 cases; `eval/run.py`, `report.py`; first full run of rules / engineered / strong; replace the fixtures' numbers with a real run | per-category `report.md` with real numbers; the site runs against the live engine |
 | **Thu 08:00–11:30** | README first (quick start, diagram, reproduction, provenance, limitations, next steps); then extensions in order below; fallback page only if the site isn't integrated by 10:00 | a stranger can run it; extensions in as time allows |
 | **Thu 11:30** | hard stop on extensions; smoke-run the five scenarios and the eval | |
 | **Thu 12:00–14:00** | Loom: problem (30 s), the site's scenario (1 min), the other four via API or fallback page (1 min), evaluation table (45 s), live Rho read if ext. 1 landed (30 s), limits and next steps (30 s) | video uploaded |
@@ -256,31 +285,38 @@ are stubbed in tests; `--live-models` runs them for real.
 Each is ≤ 1 hour and droppable on its own; stop wherever 11:30 lands.
 
 1. **Live Rho read**: `live.py` reusing `staging_check.py`'s client (named user agent, token from
-   `.env`), `/v1/rho/health`, backend name in the banner.
-2. **Jev as the cheap tier**: `jev.py` adapter; the configuration names it; Haiku stays as fallback.
-3. **Challenge types** `renew_authorization` (limit violations by a verified agent) and
+   `.env`) for `/v1/rho/health` and a counterparty read; backend name in the banner. The live
+   backend cannot supply history or bill text, so it is a connection proof, not a `Store`.
+2. **`limits.rolling`**: a sum over executed and held payments in the window; closes the
+   split-payment gap.
+3. **Jev as the cheap tier**: `jev.py` adapter, its escalation rule, the reliability table in the
+   report; the `jev` arm in the evaluation.
+4. **Challenge types** `renew_authorization` (limit violations by a verified agent) and
    `verify_payee` (payee-side risk); friction score in the report (decision 0008).
-4. **Grant-authorization opening beat**: `POST /v1/agents` and `POST /v1/authorizations` exposed
+5. **Grant-authorization opening beat**: `POST /v1/agents` and `POST /v1/authorizations` exposed
    for the site to show registration, grant, then scenario 1.
-5. `limits.rolling`, `lookalike_counterparty`, `off_hours`, `duplicate_candidate`.
-6. Category F and the `notify` rung.
-7. Observe mode: decide and record, execute regardless.
-8. Evaluation chart.
+6. `duplicate_candidate` (incl. `Bill.status == paid`), `lookalike_counterparty`, `off_hours`.
+7. Category F and the `notify` rung.
+8. Observe mode: decide and record, execute regardless.
+9. Open-weight comparison arm through `openai_compat.py` (decision 0009).
+10. Evaluation chart.
 
 ## Cut list for the first version
 
 If Wednesday slips, drop in this order: `GET /v1/eval/latest` (the site shows `report.md` as a
-link) → the resolve endpoint (challenges stay held) → category E down to 4 cases → the cheap tier
-(three arms: rules, strong, strong-on-tier0-band).
+link) → the resolve endpoint (challenges stay held) → the `strong` arm of the evaluation (keep the
+engineered cascade's model calls on the demo scenarios) → category E down to 4 cases.
 
-Never cut: signatures, authorization checks, the policy table, the evidence record, the four-arm
-evaluation (or three if cut above), the simulated label, the README.
+Never cut: the five scenario endpoints and `/v1/health` (the site's whole surface), signatures,
+authorization checks, the policy table and merge rule, the evidence record, the rules and
+engineered arms of the evaluation, the simulated label, the README.
 
 ## Risks
 
 | Risk | Mitigation |
 | --- | --- |
 | Staging is nearly empty (confirmed) | The seed is shaped from assumptions and says so; the live read in extension 1 shows the connection, and the video says the data is synthetic |
-| Jev's request shape differs from the guides | One adapter file; Haiku is in the first version regardless |
+| Jev's request shape differs from the guides, or no key arrives | One adapter file on Thursday; nothing on Wednesday's path uses it |
+| The Wednesday-morning seed and cases eat the day | Two-hour box; the five demo cases only; filler later |
 | Model tiers disagree with hand labels on D and E | Report it; those categories exist to show where the strong tier earns its cost |
 | Time | The first version is scoped to Wednesday; everything on Thursday morning is droppable |

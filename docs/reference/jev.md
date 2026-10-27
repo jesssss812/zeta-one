@@ -48,8 +48,9 @@ sources differ on whether a choice takes `options` or `criteria` and whether a s
   bill", each with a confidence that gates escalation. See
   [../decisions/0007-risk-tiers.md](../decisions/0007-risk-tiers.md).
 - Jev is a risk signal, never identity or authorization (AGENTS.md rules 7 and 9).
-- If an API key or a working call isn't in hand by the end of Tue Oct 28, the cheap tier falls back
-  to Claude Haiku 5.5 behind the same interface. The evaluation reports whichever ran.
+- If an API key or a working call isn't in hand by the end of Tue Oct 27, the Jev arm waits; the
+  engineered cascade (tier 0, then the strong model only on escalation) is the default and needs
+  no cheap model (decision 0009). There is no language-model stand-in for Jev.
 
 ## Sources
 
