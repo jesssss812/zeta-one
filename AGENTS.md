@@ -69,10 +69,12 @@ Settled; the reasoning is in [docs/strategy/product.md](docs/strategy/product.md
 
 18. **One logical change per commit**: one concern a reviewer can hold in mind, such as a feature with
     its tests and docs. Commit as each unit lands. Keep renames, moves and formatting apart from
-    behaviour changes. Every commit builds and passes the tests on its own. Before review, fold
-    fixes into the commit they correct. Each message says what that commit does.
-19. **Work on a branch** and open a pull request into `main`. Don't push or open a PR until the owner
-    says so.
+    behaviour changes. Every commit builds and passes the checks on its own. Each message says what
+    that commit does. Never rewrite history that is already on `main`.
+19. **Until the hackathon ends, commit straight to `main`**: no branches or pull requests. Run
+    `python3 scripts/check.py` before every push; the pre-push hook runs it too and blocks the push
+    if it fails. Push once the checks pass, without asking. After the hackathon, go back to a branch
+    and a pull request into `main` for every change.
 20. **Reasoning lives in docs, not code.** `docs/strategy/` and `docs/decisions/` keep the reasons
     behind choices; when a decision changes, add a decision record that supersedes the old one rather
     than editing history away. Code and comments state only the current decisions: no thought process,
@@ -87,8 +89,14 @@ Settled; the reasoning is in [docs/strategy/product.md](docs/strategy/product.md
 ## Commands
 
 ```bash
-python3 scripts/staging_check.py   # read-only Rho staging check; needs the VPN and RHO_API_TOKEN in .env
+git config core.hooksPath .githooks  # once per clone: turns on the pre-push check
+python3 scripts/check.py             # checks that must pass before every push to main
+python3 scripts/staging_check.py     # read-only Rho staging check; needs the VPN and RHO_API_TOKEN in .env
 ```
+
+`scripts/check.py` compiles every Python file, refuses tracked secrets and raw staging data, and
+checks that every Markdown link resolves and every doc is in `docs/README.md`. Add each new kind of
+check (tests, lint) to it as the code grows.
 
 When the app lands, its real commands live in the build files and CI, and this section lists them.
 

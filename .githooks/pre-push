@@ -1,0 +1,6 @@
+#!/bin/sh
+# Blocks a push when the fast checks fail.
+python3 -I scripts/check.py || {
+  echo "pre-push: checks failed; fix them before pushing." >&2
+  exit 1
+}
