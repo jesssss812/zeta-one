@@ -28,6 +28,8 @@ from zeta_one.contracts import (
     TierName,
 )
 from zeta_one.gateway.pipeline import Engine
+from zeta_one.risk import claude
+from zeta_one.risk.claude import StrongTier
 from zeta_one.testing.replay import replay_engine
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -59,7 +61,7 @@ class Stages:
 
 def real_stages() -> Stages:
     """The real stages that have landed. Replay stands in for the rest in demo scenarios."""
-    return Stages()
+    return Stages(tiers={"strong": StrongTier()}, prices=dict(claude.PRICES))
 
 
 class StagesMissing(RuntimeError):
