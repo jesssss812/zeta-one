@@ -35,6 +35,7 @@ What is not done yet is in [roadmap.md](roadmap.md). Every document under `docs/
 | [strategy/evaluation.md](strategy/evaluation.md) | How Zeta One is measured: case categories, comparisons, metrics |
 | [strategy/messaging.md](strategy/messaging.md) | Tagline, project explanation, design philosophy, visual identity |
 | [strategy/implementation-plan.md](strategy/implementation-plan.md) | Architecture, modules, API, policy table, evidence record, seed and scenarios, schedule and cut list |
+| [strategy/vision.md](strategy/vision.md) | The narrative for judges and Rho, and the draft submission write-up |
 
 ## Decisions
 
