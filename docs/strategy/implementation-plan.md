@@ -55,7 +55,7 @@ signing key and nothing else.
 | Policy | `allow` / `challenge` (type `confirm`) / `block`; versioned ordered rule table | challenge types `renew_authorization`, `verify_payee`, `notify` (decision 0008) |
 | Evidence | the full schema below, from the first commit | nothing: the schema is the extensibility |
 | Execution | simulated; `held` on challenge; `POST /v1/challenges/{id}/resolve` | observe mode |
-| Data | committed synthetic seed, deterministic from a fixed random seed | snapshot-shaped seed, live Rho backend |
+| Data | committed synthetic seed, deterministic from a fixed random seed, minor-unit amounts | live Rho backend (shows one vendor and one deposit: the connection, not the data) |
 | Evaluation | ~40 cases in categories A–E; four configurations; `report.md` and `report.json` | category F, friction score, chart |
 | UI | scenario buttons, decision card with three rows, evidence as JSON, evaluation table, "simulated" banner | grant-authorization beat, resolve with type, chart |
 
@@ -91,7 +91,7 @@ zeta_one/
   gateway/        app.py  execute.py  scenarios.py
   ui/             index.html  app.js  style.css
 eval/             cases.py  run.py  report.py
-scripts/          make_seed.py  keygen.py  snapshot_staging.py (local, VPN)
+scripts/          check.py  staging_check.py (exist)  make_seed.py  keygen.py
 tests/
 data/             seed/ (committed, synthetic)  eval/ (cases.jsonl, results/)  snapshots/ (gitignored)
 ```
@@ -167,8 +167,12 @@ status, executed_at)`, `agents`, `authorizations`, `nonces`, `decisions`.
 `scripts/make_seed.py` writes `data/seed/`: one business, 3 accounts, ~40 counterparties (1–2
 payment methods each, created dates), ~400 outgoing transactions over 12 months with per-vendor
 amount distributions, ~60 bills with short invoice texts, a payment-method history. Deterministic
-from a fixed random seed. If `data/snapshots/` exists locally (extension), the script reads its
-summary statistics to shape the seed and the README says so.
+from a fixed random seed. Staging holds one vendor, no bills and a single funding deposit
+([../reference/staging-data.md](../reference/staging-data.md)), so the seed is shaped from
+assumptions about a small business's payables, not from staging statistics, and the README says so.
+Amounts follow Rho's `Money` shape: integer minor units with a currency code. The one real vendor's
+shape (five payment methods: ACH, wire, check, two international) is a useful template for
+synthetic counterparties.
 
 `eval/cases.py` writes `data/eval/cases.jsonl`. Each case: `category`, `setup` (mutations applied
 to a fresh seed, e.g. "change method 3 days ago", "insert invoice text"), `agent` (which built-in
@@ -230,7 +234,7 @@ are stubbed in tests; `--live-models` runs them for real.
 
 | When | Build | Done means |
 | --- | --- | --- |
-| **Tue evening** | This plan. Locally: VPN + `GET /business`; run `snapshot_staging.py`; counts into `reference/rho-api.md`. Create a TypeSafe key, make one call, correct `reference/jev.md`. Confirm the Console key | snapshot summary as text; Jev request shape known or Haiku stays |
+| **Tue evening** | This plan. Staging checked (`scripts/staging_check.py`, done). Create a TypeSafe key, make one call, correct `reference/jev.md`. Confirm the Console key | Jev request shape known, or Haiku stays |
 | **Wed morning** | `rho/models.py`, `store.py`, `snapshot.py`, `seed.py`, `make_seed.py`; `eval/cases.py` and `cases.jsonl`; store tests | `data/seed/` and `cases.jsonl` committed |
 | **Wed midday** | `identity/`, `authorization/`, `decide/policy.py`, `decide/evidence.py`; gateway endpoints; `execute.py`; tests | categories B and C pass end to end with tier 0 only |
 | **Wed afternoon** | `risk/features.py`, `tier0.py`, `tiers.py`, `claude.py` (Haiku and Opus adapters), `escalation.py`; stubbed tests; first real model calls | all five categories decide sensibly in the cascade |
@@ -245,7 +249,8 @@ are stubbed in tests; `--live-models` runs them for real.
 
 Each is ≤ 1 hour and droppable on its own; stop wherever 11:30 lands.
 
-1. **Live Rho read**: `live.py`, `/v1/rho/health`, backend name in the banner.
+1. **Live Rho read**: `live.py` reusing `staging_check.py`'s client (named user agent, token from
+   `.env`), `/v1/rho/health`, backend name in the banner.
 2. **Jev as the cheap tier**: `jev.py` adapter; the configuration names it; Haiku stays as fallback.
 3. **Challenge types** `renew_authorization` (limit violations by a verified agent) and
    `verify_payee` (payee-side risk); friction score in the report (decision 0008).
@@ -268,7 +273,7 @@ evaluation (or three if cut above), the simulated label, the README.
 
 | Risk | Mitigation |
 | --- | --- |
-| Staging is sparse or the VPN fails | The seed is shaped from assumptions and says so; the live read is extension 1 |
+| Staging is nearly empty (confirmed) | The seed is shaped from assumptions and says so; the live read in extension 1 shows the connection, and the video says the data is synthetic |
 | Jev's request shape differs from the guides | One adapter file; Haiku is in the first version regardless |
 | Model tiers disagree with hand labels on D and E | Report it; those categories exist to show where the strong tier earns its cost |
 | Time | The first version is scoped to Wednesday; everything on Thursday morning is droppable |

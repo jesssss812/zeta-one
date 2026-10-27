@@ -22,7 +22,7 @@ served by FastAPI, no build step. Quick start is `pip install -r requirements.tx
   "bill_id": "optional Rho bill id",
   "counterparty_id": "...", "payment_method_id": "...",
   "source_account_id": "...",
-  "amount": {"value": "1250.00", "currency": "USD"},
+  "amount": {"amount": 125000, "currency": "USD"},
   "memo": "...",
   "agent_rationale": "why the agent proposes this, in its own words",
   "source_document_ids": ["bill file ids the agent read"]
@@ -30,13 +30,15 @@ served by FastAPI, no build step. Quick start is `pip install -r requirements.tx
 ```
 
 The agent states counterparty, payment method and amount explicitly even when a bill is given, so
-"proposal disagrees with the bill" is observable and becomes a risk signal.
+"proposal disagrees with the bill" is observable and becomes a risk signal. Amounts use Rho's
+`Money` shape: integer minor units and an ISO 4217 code.
 
-**Data.** The snapshot backend seeds from `data/snapshots/` when present (local, gitignored,
-produced over the VPN) and otherwise from `data/seed/`, a **committed synthetic dataset generated to
-match the shape and rough statistics of the staging snapshot** (entity counts, amount ranges, vendor
-payment frequencies), with no real names, ids or amounts. The evaluation and the demo run on the
-seed, so anyone can reproduce them. The live backend is shown only to prove the Rho connection.
+**Data.** The snapshot backend seeds from `data/seed/`, a **committed synthetic dataset in Rho's
+shapes**, with no real names, ids or amounts. Staging was checked the same day and holds one
+vendor and no payment history ([../reference/staging-data.md](../reference/staging-data.md)), so
+the seed's statistics come from assumptions about a small business's payables rather than from
+staging, and the README says so. The evaluation and the demo run on the seed, so anyone can
+reproduce them. The live backend is shown only to prove the Rho connection.
 
 ## Alternatives
 
