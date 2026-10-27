@@ -142,6 +142,9 @@ Rules the site can count on:
 - `execution.simulated` is always `true` in this build.
 - Evidence ids in `features` and `signals` refer to records in `context` (payment-method history
   ids, transaction ids, bill ids) so the site can link a signal to the row it came from.
+- `amount_ratio_to_vendor_median` may also carry `raw_value`, the unrounded ratio used for
+  risk thresholds. Its `value` remains rounded to two decimals for display; older records
+  without `raw_value` use `value` for thresholds.
 
 ## Scenarios
 

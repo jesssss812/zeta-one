@@ -66,7 +66,8 @@ def soft_signals(features: dict[str, Feature]) -> list[str]:
     if _true(features, "counterparty_is_new"):
         found.append("counterparty_is_new")
     ratio = features.get("amount_ratio_to_vendor_median")
-    if ratio and ratio.value is not None and not (TYPICAL_AMOUNT_RATIO[0] <= ratio.value <= TYPICAL_AMOUNT_RATIO[1]):
+    ratio_value = getattr(ratio, "raw_value", ratio.value) if ratio else None
+    if ratio_value is not None and not (TYPICAL_AMOUNT_RATIO[0] <= ratio_value <= TYPICAL_AMOUNT_RATIO[1]):
         found.append("amount_ratio_to_vendor_median")
     days = _changed_days_ago(features)
     if days is not None and days > RECENT_CHANGE_DAYS:

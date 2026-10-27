@@ -91,3 +91,13 @@ def test_clean_tier0_does_not_escalate_and_soft_signal_does():
     config = Configuration()
     assert not escalation.should_escalate(config, _tier0("low", clean))
     assert escalation.should_escalate(config, _tier0("low", soft))
+
+
+def test_ratio_rounding_does_not_hide_soft_signal_at_threshold():
+    for displayed, raw in ((2.0, 2.004), (0.5, 0.496)):
+        feats = {"amount_ratio_to_vendor_median": Feature(value=displayed, raw_value=raw)}
+        assert escalation.should_escalate(Configuration(), _tier0("low", feats))
+        lowered = escalation.merge(_tier0("elevated", feats), [
+            TierOutput(result=TierResult(tier="strong", level="low"))
+        ])
+        assert lowered.lowered.signals == ["amount_ratio_to_vendor_median"]
