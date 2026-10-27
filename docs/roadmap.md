@@ -28,20 +28,15 @@ The plan is in [strategy/evaluation.md](strategy/evaluation.md); the times are i
 [strategy/implementation-plan.md](strategy/implementation-plan.md#schedule). Items marked
 **owner** need the owner's own time.
 
-Tuesday evening:
-
-- **Owner:** decide whether case wording and labelling run on the Console key or as Claude Code
-  subagents on the subscription, and which model family writes the wording.
-
 Wednesday:
 
 - ~14 identity and authorization cases in `eval/cases.py`, one per check, labels by construction.
 - Rule-7 property tests: a hostile model stub never lowers the tier-0 floor or lifts a block.
 - **Owner:** write the `hard` set, 15–20 risk cases outside the generator's templates (~1.5 h).
-- `eval/generate.py`: dimensions, combinations, harmless look-alikes, one wording call per case;
-  `dev` ~50.
+- `eval/generate.py` and `eval/prompts/wording.md`: dimensions, combinations, harmless
+  look-alikes; wording by a Claude Haiku 5.5 subagent; `dev` ~50.
 - **Owner:** read ~20 `dev` cases and write the one-page labelling guide (~30 min).
-- `eval/label.py`: one blind AI labeller on `dev`.
+- `eval/label.py` and `eval/prompts/label.md`: a blind Claude Sonnet 5.5 subagent labels `dev`.
 - `eval/run.py` with the trivial baselines, rules, engineered and strong; `eval/stats.py` (Wilson
   intervals, discordant table, pooled McNemar, κ with bootstrap); `eval/report.py`.
 - Runs on `dev`; failures-by-stage table; tune on `dev` only.

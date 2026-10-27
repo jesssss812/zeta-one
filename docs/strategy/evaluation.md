@@ -78,7 +78,8 @@ agent's stated rationale (plain, citing "updated instructions"), and whether a c
 with the vendor.
 
 1. Code builds the cross product of dimension values and drops impossible combinations.
-2. A separate model call turns each combination into invoice text and an agent rationale.
+2. A Claude Code subagent on the owner's subscription turns each combination into invoice text and
+   an agent rationale, from the committed prompt `eval/prompts/wording.md`, in batches of ~20.
 3. Code applies each case's setup to a fresh copy of the seed.
 
 The dimensions are close to tier 0's features, so the rules would look near-perfect by construction
@@ -93,15 +94,20 @@ if nothing stopped it. Against that:
 - **The `hard` set** is the headline for the risk categories, because nothing in it came from the
   generator.
 
-The wording model and the strong tier should come from different model families; if both are
-Claude, the report says so.
+Wording, labelling and the strong tier all use Claude, with three different models: Claude Haiku
+5.5 writes the wording, Claude Sonnet 5.5 labels, and Claude Opus 5.5 is the strong tier. The
+report says that all three are from one family.
 
 ### Labelling
 
 1. **The guide comes after reading.** The owner reads and notes ~20 generated `dev` cases, then
    writes a one-page labelling guide.
-2. **One AI labeller, blind.** It sees only what the system sees, plus the guide; never `truth`,
-   the category or the dimension values. It is not the model used as the strong tier.
+2. **One AI labeller, blind.** Claude Sonnet 5.5, run as a Claude Code subagent on the owner's
+   subscription from the committed prompt `eval/prompts/label.md`. It receives, inside its prompt,
+   only what the system sees plus the guide; never `truth`, the category or the dimension values.
+   It is told not to open repository files, and each batch's tool-call count is checked to be zero
+   so the blindness is shown, not assumed. Its labels are committed; a rerun may label differently,
+   which is why the committed file is the record.
 3. **The owner labels** the whole `hard` set and 40 suspicious, adversarial and ambiguous cases
    from `test`, stratified, without seeing the AI label.
 4. **Agreement is reported on those 40**: raw agreement, and Cohen's κ with a bootstrap 95%

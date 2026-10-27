@@ -92,7 +92,7 @@ zeta_one/
   risk/           features.py  tier0.py  tiers.py (protocol)  escalation.py (merge + rules)  claude.py  jev.py (ext. 5)  openai_compat.py (optional)
   decide/         policy.py  evidence.py
   gateway/        app.py  execute.py  scenarios.py
-eval/             cases.py  generate.py  label.py  run.py  stats.py  report.py  attack.py (ext. 3)
+eval/             cases.py  generate.py  label.py  run.py  stats.py  report.py  attack.py (ext. 3)  prompts/
 site/             the demo site, separate effort (see Site and integration)
 scripts/          check.py  staging_check.py (exist)  make_seed.py  keygen.py
 tests/
@@ -207,12 +207,15 @@ labelled, and why, is in [evaluation.md](evaluation.md).
 
 - `eval/cases.py` holds the five demo cases and ~14 identity and authorization cases, one per
   check, written by hand with labels by construction.
-- `eval/generate.py` builds the risk sets from dimensions: code picks the combinations, one model
-  call per case writes the invoice text and rationale. `dev` ~50 and `test` ~100 use different
+- `eval/generate.py combos` writes the dimension combinations for a set; a Claude Code subagent
+  (Claude Haiku 5.5, prompt `eval/prompts/wording.md`) writes the invoice text and rationale for
+  each; `eval/generate.py assemble` merges them into cases. `dev` ~50 and `test` ~100 use different
   seeds and wording; `test` is hashed and frozen before its first scored run.
 - `data/eval/hard/` holds 15–20 risk cases the owner writes by hand.
-- `eval/label.py` runs one AI labeller, blind to `truth` and the dimensions, and merges the owner's
-  labels and adjudications.
+- `eval/label.py export` writes the blind view of a set (what the system sees, nothing else); a
+  Claude Code subagent (Claude Sonnet 5.5, prompt `eval/prompts/label.md` plus the guide) labels it
+  with the cases inside its prompt and no file access; `eval/label.py merge` adds the AI labels,
+  the owner's labels and adjudications.
 
 | Category | Expected | Examples |
 | --- | --- | --- |
@@ -244,9 +247,9 @@ Budget on the owner's Console key, at Opus 5.5's $4 / $20 per million input / ou
 call at roughly 2k input and 300 output tokens, plus thinking at effort `medium` (it can't be turned
 off), costs about $0.015–0.03. A full `strong` run over all risk sets (~170 cases) is about $3–5;
 `engineered` is a fraction of that. Repeat runs don't need latency, so they go through the Message
-Batches API at half price. Generating and labelling the sets once is about $3–5 on the API, or runs
-as Claude Code subagents on the owner's subscription with the prompts committed. Development and
-final runs stay under $40. The subscription doesn't cover the gateway's own model calls: those need
+Batches API at half price. Wording and labelling run as Claude Code subagents on the owner's
+subscription, with the prompts committed, so they cost nothing on the key. Development and final
+runs stay under $35. The subscription doesn't cover the gateway's own model calls: those need
 the Console key, which is also what a judge reproducing the run would use.
 
 ## Site and integration
