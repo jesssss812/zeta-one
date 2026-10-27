@@ -191,7 +191,7 @@ the differentiator; replacing human fraud analysts or support staff.
 | Data | Local stand-in seeded from a staging snapshot when present, else a committed synthetic seed shaped like it | [0002](../decisions/0002-local-rho-stand-in.md), [0005](../decisions/0005-stack-and-first-action.md) |
 | Identity | Registered agents with Ed25519-signed requests; replay protection; revocation | [0006](../decisions/0006-identity-and-authorization.md) |
 | Authorization | JSON per (business, agent): actions, counterparty list, per-payment limit, expiry, human-approval threshold in the first version; accounts, method types and rolling limits later; checked in code | [0006](../decisions/0006-identity-and-authorization.md) |
-| Risk | Tier 0 deterministic features, tier 1 Jev, tier 2 Claude on escalation; Haiku stands in for tier 1 until Jev runs | [0007](../decisions/0007-risk-tiers.md) |
+| Risk | Tier 0 deterministic features, tier 1 Jev, tier 2 Claude on escalation; no smaller model stands in for Jev, so until it runs tier 0 escalates straight to Claude | [0007](../decisions/0007-risk-tiers.md), [0009](../decisions/0009-engineered-escalation.md) |
 | Scenarios and dataset | Hand-written identity and authorization cases; generated risk sets (`dev`, frozen `test`) and a hand-written `hard` set, labelled with AI help and checked by the owner | [implementation-plan.md](implementation-plan.md) |
 | Build order | A thin end-to-end first version with every principle in it, seven extension seams, then ordered extensions | [implementation-plan.md](implementation-plan.md) |
 | Review assistant | Designed for, not built; the evidence record is its input | this doc |
