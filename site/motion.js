@@ -3,8 +3,31 @@
   if (!('IntersectionObserver' in window) || !Element.prototype.animate) return;
   const preference = window.matchMedia('(prefers-reduced-motion: reduce)');
   const running = new Set();
+  const toggle = document.querySelector('.motion-toggle');
+  let userPaused = false;
+  let heroVisible = true;
+  const updatePause = () => document.documentElement.classList.toggle(
+    'motion-paused', userPaused || document.hidden || !heroVisible || preference.matches
+  );
+  if (toggle) {
+    toggle.hidden = false;
+    toggle.addEventListener('click', () => {
+      userPaused = !userPaused;
+      toggle.setAttribute('aria-pressed', String(userPaused));
+      toggle.textContent = userPaused ? 'Resume motion' : 'Pause motion';
+      updatePause();
+    });
+  }
+  const heroObserver = new IntersectionObserver((entries) => {
+    heroVisible = entries[0].isIntersecting;
+    updatePause();
+  });
+  const hero = document.querySelector('.hero');
+  if (hero) heroObserver.observe(hero);
+  updatePause();
+  document.documentElement.classList.add('motion-enabled');
   const details = document.querySelectorAll(
-    '.section-top > p, .console, .engineering-steps article, .outcomes > div, ' +
+    '#demo .section-top, section:not(#demo) > .section-top > p, .console, .engineering-steps article, .outcomes > div, ' +
     '.platform-evidence > div, .learning-copy > p, .learning-flow, ' +
     '.comparison, .eval-principles > div, .video-placeholder'
   );
@@ -30,10 +53,10 @@
     for (const animation of running) animation.cancel();
     running.clear();
   };
-  preference.addEventListener('change', () => { if (preference.matches) finishMotion(); });
+  preference.addEventListener('change', () => { if (preference.matches) finishMotion(); updatePause(); });
   document.addEventListener('focusin', finishMotion);
   document.addEventListener('visibilitychange', () => {
-    document.documentElement.classList.toggle('motion-paused', document.hidden);
+    updatePause();
     if (document.hidden) finishMotion();
   });
   window.addEventListener('beforeprint', finishMotion);

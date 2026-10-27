@@ -20,8 +20,8 @@ Open http://localhost:4173. FastAPI can also serve this directory unchanged. All
   and demo video space. Replace the labeled video placeholder with an accessible video/embed once
   a recording exists; add a link to the actual app when it is ready.
 - `fonts.html`: four wordmark studies for choosing the name and ζ typography; separate from the submission page.
-- `styles.css`: responsive presentation, keyboard focus, reduced-motion support, and brief decorative curve/background animation.
-- `motion.js`: one-time scroll reveals using IntersectionObserver and opacity/transform animations. Headlines stay visible; content remains readable without JavaScript. Keyboard focus and reduced-motion preferences cancel reveals. No libraries, scroll listeners, or delayed content fetching.
+- `styles.css`: responsive presentation, keyboard focus, reduced-motion support, and decorative curve/background animation. The wave loops with a pause control and pauses offscreen; reduced-motion disables it.
+- `motion.js`: one-time scroll reveals using IntersectionObserver and opacity/transform animations. Section 01 and supporting content reveal on entry; the compact example uses a native disclosure for evidence. content remains readable without JavaScript. Keyboard focus and reduced-motion preferences cancel reveals. No libraries, scroll listeners, or delayed content fetching.
 - The decision example is drawn from the engine-owned
   [vendor payment-method change fixture](../data/fixtures/vendor_payment_method_changed.json).
   It is authored synthetic data, not a live engine result. No latency, savings, or accuracy figures
