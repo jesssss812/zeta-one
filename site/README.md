@@ -1,9 +1,8 @@
 # Zeta One submission site
 
-Static, dependency-free frontend. The decision engine owns decisions; this site renders the
-[demo API contract](../docs/reference/demo-api.md). No Rho calls, keys, or decision logic live here.
-Payment execution is simulated. The initial scenario is synthetic and illustrative, with no
-model run or measured cost/latency.
+Static, dependency-free presentation site. No JavaScript, API calls, model runs, or payment actions.
+The page explains the project and shows one labeled illustrative decision. Payment execution is
+simulated throughout the project.
 
 ## Preview
 
@@ -13,36 +12,26 @@ From the repository root:
 python3 -m http.server 4173 --bind 127.0.0.1 --directory site
 ```
 
-Open http://localhost:4173. Select **Decision engine** and run the scenario to call the local engine
-at http://localhost:8000. When FastAPI serves this directory on its own origin, select that origin
-in the engine URL field. Static assets use relative URLs; mount the whole directory, not just HTML.
-Only same-origin or loopback engine URLs are accepted. Failed engine requests remain errors and
-never silently fall back to fixtures. The engine must permit the frontend origin through CORS.
+Open http://localhost:4173. FastAPI can also serve this directory unchanged. All assets are relative.
 
-## Content and integration
+## Content
 
-- `index.html`: presentation, demo video space, and evaluation space. Replace the labeled video
-  placeholder with an accessible video/embed once a recording exists. No video or benchmark is
-  currently fabricated.
-- `styles.css`: responsive layouts, keyboard focus, and reduced-motion support.
-- `app.js`: fixture loading, explicit engine requests, evidence rendering, accessible stage tabs.
-- `fixtures/vendor_payment_method_changed.json`: verbatim copy of the engine-owned fixture in
-  `data/fixtures/`, authored synthetically to illustrate a vendor payment-method change. Sync it
-  from the canonical fixture when the engine team changes it; do not edit the copy independently.
+- `index.html`: project story, synthetic decision example, engineering approach, evaluation space,
+  and demo video space. Replace the labeled video placeholder with an accessible video/embed once
+  a recording exists; add a link to the actual app when it is ready.
+- `styles.css`: responsive presentation, keyboard focus, and reduced-motion support.
+- The decision example is drawn from the engine-owned
+  [vendor payment-method change fixture](../data/fixtures/vendor_payment_method_changed.json).
+  It is authored synthetic data, not a live engine result. No latency, savings, or accuracy figures
+  are invented. Update the example if the canonical scenario changes.
 
-Checks: `node --check site/app.js` and `python3 scripts/check.py` from the repository root.
-Manual checks: fixture reveal and replay, evidence disclosures/links, all three stage tabs via
-keyboard, engine failure, narrow viewport, and integration with the running engine when available.
+The site prioritizes a fast, coherent presentation over an interactive demo. Engine decisions and
+API integration remain in the actual application. The video and evaluation areas explicitly show
+that their content is forthcoming. The review assistant and learning loop are planned extensions.
 
-## Implementation scope
+Checks: `python3 scripts/check.py` from the repository root. Manually verify page anchors, desktop
+and narrow layouts, visible focus, and absence of missing assets. There is no frontend build step.
 
-The unified site introduces the product and opens directly into one guided decision. A static
-implementation matches the chosen FastAPI stack and avoids a frontend build dependency. A separate
-marketing site plus separate app was considered but adds duplicated presentation and integration.
-The first version intentionally focuses on one scenario; review workflows and additional scenarios
-remain later work. Inference savings, review savings, and challenge reduction require evaluation.
-
-All frontend changes are contained in `site/`. The root README and docs belong to the engine side.
-Suggested root README addition: “Preview the submission site with
-`python3 -m http.server 4173 --bind 127.0.0.1 --directory site`. The guided demo uses a labeled
-synthetic fixture or the local decision engine. Payment execution is simulated.”
+All changes stay in `site/`; the engine owns the root README and docs. Suggested root README text:
+“Preview the submission site with `python3 -m http.server 4173 --bind 127.0.0.1 --directory site`.
+It includes a labeled synthetic decision example. Payment execution is simulated.”
