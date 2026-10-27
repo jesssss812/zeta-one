@@ -8,8 +8,8 @@ What is not done, as of 2026-10-27. Remove a line when it is done.
 - Confirm the Console key, the Claude model ids and the `messages.parse` call with one request.
 - Test Rho's MCP connector in claude.ai (Connectors → Rho): does it connect, and what tools does
   it list? Record the answer in `docs/reference/rho-api.md`.
-- Write the five demo scenario cases before building the engine (`eval/cases.py`); the rest of the
-  ~40 follow once the engine runs.
+- Write the five demo scenario cases before building the engine (`eval/cases.py`); the generated
+  and hand-written evaluation sets follow once the engine runs.
 
 The build order, schedule and cut list are in
 [strategy/implementation-plan.md](strategy/implementation-plan.md).
@@ -25,9 +25,10 @@ The build order, schedule and cut list are in
 
 ## Extensions (Thursday morning, in the plan's order)
 
-Live Rho read; rolling limit; Jev as the cheap tier; `renew_authorization` and `verify_payee`
-challenge types with the friction score; grant-authorization beat; extra tier-0 features; category
-F and `notify`; observe mode; open-weight comparison arm; evaluation chart.
+Live Rho read; repeat runs with pass^3; attacking model; rolling limit; Jev as the cheap tier;
+`renew_authorization` and `verify_payee` challenge types with the friction score;
+grant-authorization beat; extra tier-0 features; `notify`; observe mode; open-weight comparison
+arm; expected cost and an evaluation chart.
 
 ## Stretch (after the hackathon)
 

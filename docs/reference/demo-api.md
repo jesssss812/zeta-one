@@ -143,7 +143,7 @@ each seen failing on their own.
 
 | Name | What happens | Which question decides | Expected |
 | --- | --- | --- | --- |
-| `vendor_payment_method_changed` | Verified, authorized agent pays a long-standing vendor a typical amount; the vendor's default ACH was replaced three days ago. Tier 0 flags the change and sets an `elevated` floor; the strong tier runs on escalation and agrees. The authorization deliberately permits any payee, which is why only risk can see this | risk | **challenge** (`confirm` in the first engine version, `verify_payee` once extension 4 lands); payment held |
+| `vendor_payment_method_changed` | Verified, authorized agent pays a long-standing vendor a typical amount; the vendor's default ACH was replaced three days ago. Tier 0 flags the change and sets an `elevated` floor; the strong tier runs on escalation and agrees. The authorization deliberately permits any payee, which is why only risk can see this | risk | **challenge** (`confirm` in the first engine version, `verify_payee` once extension 6 lands); payment held |
 | `routine_bill_payment` | Same agent pays a recurring monthly invoice: same vendor, amount and method as the last year. Tier 0 clean, so no model runs at all | none fails | **allow**; payment executed (simulated); no prompt |
 | `over_per_payment_limit` | Same agent proposes $7,200 against a $5,000 per-payment limit | authorization (`limit`) | **block** before any risk tier runs; `risk.tiers_run` is empty |
 | `unknown_agent` | The routine payment, signed with a key Zeta One has never seen | identity | **block**; authorization and risk not evaluated |
