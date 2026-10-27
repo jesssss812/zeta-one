@@ -64,7 +64,7 @@ depends on which features exist today, so the list must not quietly excuse misse
 | Deterministic | ~20 | One case per identity and authorization check, plus one per guardrail in [security.md](security.md) (self-approval refused, model failure challenged, a repeated proposal not re-rolled, a missing bill reference caught, split payments limited, approval after revocation blocked); labels by construction; every case must pass; no statistics |
 | Risk `dev` | ~50 | Legitimate, suspicious, adversarial and ambiguous cases, including the five demo cases. Thresholds, prompts and rules are tuned here only |
 | Risk `test` | ~100 | About 35 legitimate, 35 suspicious, 30 adversarial; a different random seed and different wording from `dev`; frozen and hashed before the first scored run; never used for tuning |
-| Risk `hard` | 15–20 | Written by hand by the owner, outside the generator's templates |
+| Risk `hard` | 15–20 | Written by hand by the owner, outside the generator's templates: unfamiliar impersonation styles, instructions arriving through the real vendor's compromised channel, subtle injection, and legitimate urgent payments that look like fraud |
 
 With about 30 cases in a class, a rate near 85% has a 95% interval of roughly ±12 points: enough to
 tell configurations apart in aggregate, not to rank them within a category.
@@ -74,8 +74,9 @@ tell configurations apart in aggregate, not to rank them within a category.
 Cases are generated from **dimensions**, each with a few values: vendor tenure, payment-method
 change age, amount relative to the vendor's median, whether the proposal matches its bill, invoice
 text (clean, urgency, redirect instruction, a legitimate notice of changed bank details), the
-agent's stated rationale (plain, citing "updated instructions"), and whether a change was verified
-with the vendor.
+agent's stated rationale (plain, citing "updated instructions"), where the request came from (a
+lookalike sender or the real vendor's compromised channel), and whether a change was verified with
+the vendor.
 
 1. Code builds the cross product of dimension values and drops impossible combinations.
 2. A Claude Code subagent on the owner's subscription turns each combination into invoice text and
@@ -138,7 +139,8 @@ must score 100%, so an overall accuracy would be inflated by them. Per configura
 - n, accuracy against the expected decision, and separately accuracy counting also-acceptable
   decisions, each with a Wilson 95% interval
 - detection: the share of detectable suspicious and adversarial cases not allowed
-- challenge rate on legitimate cases
+- challenge rate on legitimate cases, which is the review workload: detection is always reported
+  next to the workload it took
 - a confusion matrix
 - lowerings: how often a model lowered soft-signal risk, split by legitimate cases (friction it
   saved) and fraudulent ones (risk it added)
@@ -189,13 +191,20 @@ list of failure kinds grouped from the notes.
    redirected payment **allowed**, about 20 attempts per configuration. It aims first at the path
    where a model may lower soft-signal risk (decision 0010), because that is where model judgement
    can turn into an allow. It is graded on the outcome:
-   did the simulated payment execute to the attacker's account. Reported as a count with its
-   interval, never as a robustness claim. This is a capability measure: a rate above zero is
-   expected and reported as it is.
+   did the simulated payment execute to the attacker's account. Following NIST's lessons on agent
+   hijacking evaluations ([NIST, 2025](https://www.nist.gov/news-events/news/2025/01/technical-blog-strengthening-ai-agent-hijacking-evaluations)):
+   the attacker adapts to this system rather than replaying known attacks; results are reported per
+   attack kind, not only in aggregate; and each attack is retried several times, because retrying
+   raises success against a model. Here retries should gain nothing, since a repeated proposal
+   reuses its risk result (decision 0010), and the report shows whether that holds. Reported as
+   counts with intervals, never as a robustness claim. This is a capability measure: a rate above
+   zero is expected and reported as it is.
 3. **Expected cost.** A cost matrix weights each (expected, actual) pair: a missed detectable fraud
    costs most, blocking a legitimate payment less, and challenging one costs its friction weight.
    The weights are chosen, not derived, and recorded; the result is also shown with the missed-fraud
-   weight halved and doubled. Reported as expected cost per 1,000 actions next to model spend.
+   weight halved and doubled. Reported as expected cost per 1,000 actions next to model spend. A
+   dollar figure for missed fraud uses the synthetic amounts and states them; it is exposure on
+   synthetic cases, never money saved.
 4. **Friction score**, once more than one challenge type exists (decision 0008): each rung carries a
    weight (allow 0, notify 0.1, confirm 1, renew authorization 2, verify payee 3; chosen, not
    derived); the score is the mean weight over legitimate cases, reported with the share of
@@ -224,3 +233,8 @@ accuracy.
   check (Web Bot Auth signature, user agent, the host's verified-bot field), tested against its
   published test vectors. Its browser-side checks don't apply to agents calling an API.
 - A labelled set from real data, which is the only way to a production accuracy.
+- **Feedback into evaluation.** Verified human outcomes (a reviewer confirms or clears a payment, a
+  payee is confirmed as attacker-controlled) become evaluation cases with their provenance, and any
+  proposed change to rules or models is re-evaluated against the baselines before a person approves
+  it. A complaint alone is not a fraud label ([product.md](product.md)). Hard constraints apply
+  whatever a model learns.

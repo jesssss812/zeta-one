@@ -93,9 +93,10 @@ over-limit proposals, unknown agents, and invoice instructions redirecting payme
 [demo API scenarios](../reference/demo-api.md#scenarios) for expected results. The website illustrates
 one category rather than suggesting vendor changes are the whole product.
 
-Future evaluation ideas from the discussion include unfamiliar impersonation styles, compromised
-legitimate vendor communications, subtle instruction injection, and legitimate urgent payments
-that resemble fraud. These are candidate held-out variations, not completed benchmark results.
+The variations the discussion raised (unfamiliar impersonation styles, compromised legitimate
+vendor communications, subtle instruction injection, legitimate urgent payments that resemble
+fraud) are now part of the [evaluation plan](evaluation.md#sets): the hand-written `hard` set and
+the generator's dimensions. They are planned cases, not results.
 
 ## Adaptation and feedback
 
@@ -104,6 +105,6 @@ rules or models. Automate capture, evaluation, and monitoring while retaining hu
 consequential decisions and policy changes. A complaint is not a verified fraud label. Independent
 hard constraints continue to apply regardless of model improvements.
 
-Measure useful detection at a stated review workload alongside inference cost and latency. Any
-synthetic loss-exposure metric must disclose assumed amounts and labels; it is not money actually
-saved. Follow the current [evaluation plan](evaluation.md) for implementation status and methodology.
+How this is measured, including detection at a stated review workload, synthetic loss exposure,
+and verified outcomes as evaluation cases, is in the [evaluation plan](evaluation.md); this doc
+doesn't restate it.
