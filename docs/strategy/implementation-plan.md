@@ -51,13 +51,13 @@ signing key and nothing else.
 | Layer | In the first version | Extension |
 | --- | --- | --- |
 | Identity | registered agents, Ed25519 signature, timestamp + nonce, `active` / `revoked` | automation-detection signals |
-| Authorization | `actions`, `counterparties` (any / allowlist / denylist), `allow_new_counterparties`, `limits.per_payment` (currency-strict), `expires_at`, `status`, `human_approval_above`; `source_account_id` ∈ business always | `limits.rolling` (ext. 4), `source_accounts`, `payment_method_types`, signed grants |
-| Risk | tier 0 with five features: `counterparty_is_new`, `payment_method_changed_days_ago`, `amount_ratio_to_vendor_median`, `bill_mismatch`, `document_instruction_patterns`; the merge rule (tier-0 flags are a floor); strong tier `claude-opus-5-5` structured output; **engineered escalation**: strong runs only when tier 0 is not clean (decision 0009) | Jev as the cheap tier (ext. 5); `duplicate_candidate`, `lookalike_counterparty`, `off_hours`, `agent_velocity`; an open-weight comparison arm |
+| Authorization | `actions`, `counterparties` (any / allowlist / denylist), `allow_new_counterparties`, `limits.per_payment` (currency-strict), `expires_at`, `status`, `human_approval_above`, `limits.rolling`; `source_account_id` ∈ business always | `source_accounts`, `payment_method_types`, signed grants |
+| Risk | tier 0 with five features: `counterparty_is_new`, `payment_method_changed_days_ago`, `amount_ratio_to_vendor_median`, `bill_mismatch`, `document_instruction_patterns`, plus `bill_not_referenced` from the gateway's own bill lookup; the merge rule (tier-0 flags are a floor; a model may lower soft signals, recorded as `risk.lowered`); fail closed on model failure; a risk result reused for a repeated proposal; strong tier `claude-opus-5-5` structured output; **engineered escalation**: strong runs only when tier 0 is not clean (decision 0009) | Jev as the cheap tier (ext. 4); `duplicate_candidate`, `lookalike_counterparty`, `off_hours`, `agent_velocity`; an open-weight comparison arm |
 | Policy | `allow` / `challenge` (type `confirm`) / `block`; versioned ordered rule table | challenge types `renew_authorization`, `verify_payee`, `notify` (decision 0008) |
 | Evidence | the full schema below, from the first commit | nothing: the schema is the extensibility |
-| Execution | simulated; `held` on challenge; `POST /v1/challenges/{id}/resolve` | observe mode |
+| Execution | simulated; `held` on challenge; `POST /v1/challenges/{id}/resolve` behind the admin token, rechecking state before executing | observe mode |
 | Data | committed synthetic seed, deterministic from a fixed random seed, minor-unit amounts | live Rho backend (shows one vendor and one deposit: the connection, not the data) |
-| Evaluation | the five demo cases first; ~14 identity and authorization cases; generated risk sets `dev` ~50 and `test` ~100 plus a hand-written `hard` set; one AI labeller checked by the owner; trivial baselines and three configurations (rules, engineered cascade, strong everywhere); per-category `report.md` and `report.json` with intervals; property tests for rule 7 | repeat runs, attacking model, expected cost, the Jev and open-weight arms, friction score |
+| Evaluation | the five demo cases first; ~20 deterministic cases (identity, authorization and the guardrails in [security.md](security.md)); generated risk sets `dev` ~50 and `test` ~100 plus a hand-written `hard` set; one AI labeller checked by the owner; trivial baselines and three configurations (rules, engineered cascade, strong everywhere); per-category `report.md` and `report.json` with intervals; property tests for rule 7 | repeat runs, attacking model, expected cost, the Jev and open-weight arms, friction score |
 | Interface | the demo API in [../reference/demo-api.md](../reference/demo-api.md), served with CORS; the site in `site/` renders it | registration and grant endpoints for the site; resolve with type; evaluation JSON |
 
 Nothing on Wednesday's path depends on Jev: the engineered cascade is the default configuration,
@@ -89,7 +89,7 @@ zeta_one/
   rho/            models.py  store.py  snapshot.py  seed.py  live.py (ext. 1)
   identity/       registry.py  signing.py
   authorization/  schema.py  check.py
-  risk/           features.py  tier0.py  tiers.py (protocol)  escalation.py (merge + rules)  claude.py  jev.py (ext. 5)  openai_compat.py (optional)
+  risk/           features.py  tier0.py  tiers.py (protocol)  escalation.py (merge + rules)  claude.py  jev.py (ext. 4)  openai_compat.py (optional)
   decide/         policy.py  evidence.py
   gateway/        app.py  execute.py  scenarios.py
 eval/             cases.py  generate.py  label.py  run.py  stats.py  report.py  attack.py (ext. 3)  prompts/
@@ -107,42 +107,51 @@ status, executed_at)`, `agents`, `authorizations`, `nonces`, `decisions`.
 
 | Method and path | Purpose | Auth |
 | --- | --- | --- |
-| `POST /v1/actions/propose_payment` | the one agent action; returns the decision and evidence id | signed |
-| `GET /v1/decisions/{id}`, `GET /v1/decisions` | evidence records | none (demo) |
-| `POST /v1/agents`, `POST /v1/agents/{id}/revoke` | registry | none (demo; admin in reality) |
-| `POST /v1/authorizations`, `POST /v1/authorizations/{id}/revoke` | authorizations | none |
-| `POST /v1/challenges/{id}/resolve` | a human approves or rejects a held action; recorded with provenance | none |
+| `POST /v1/actions/propose_payment` | the one agent action; returns only `{decision, decision_id, challenge_id}` | signed |
+| `GET /v1/decisions/{id}`, `GET /v1/decisions` | evidence records, for people | none (demo, localhost) |
+| `POST /v1/agents`, `POST /v1/agents/{id}/revoke` | registry | admin token; agent-signed requests refused |
+| `POST /v1/authorizations`, `POST /v1/authorizations/{id}/revoke` | authorizations | admin token; agent-signed requests refused |
+| `POST /v1/challenges/{id}/resolve` | a human approves or rejects a held action; state rechecked before executing; recorded with provenance | admin token; agent-signed requests refused |
 | `POST /v1/scenarios/{name}/run` | runs a named demo scenario end to end with a built-in signed agent | none |
 | `GET /v1/eval/latest` | the last evaluation report as JSON | none |
 | `GET /v1/rho/health` | active backend; in live mode, counts from one read call (ext. 1) | none |
+
+The server binds to 127.0.0.1. The admin token is `ZETA_ADMIN_TOKEN` in `.env`, written by
+`scripts/keygen.py` if absent. Why each guardrail exists is in [security.md](security.md).
 
 ## Decision flow and policy (policy version `2026-10-28.1`)
 
 1. **Identity.** Not `verified` → **block**, reason `identity:<result>`. Stop.
 2. **Authorization.** Any violation → **block**, reasons `authorization:<field>`, all violations
-   listed. Stop. (Extension 6 moves `limit` violations to `challenge: renew_authorization`.)
+   listed. Stop. (Extension 5 moves `limit` violations to `challenge: renew_authorization`.)
 3. **Risk.** The request is first validated (payment method belongs to the counterparty, else
    rejected). Tier 0 always; later tiers per the active configuration and its escalation rules;
    the final level comes from the merge rule, with tier-0 flags as a floor
-   ([0007](../decisions/0007-risk-tiers.md)). Result: `level`, `level_set_by`, `floor`,
-   `signals[]`, `tiers_run[]`, `tier_results[]`.
+   ([0007](../decisions/0007-risk-tiers.md)); a model may lower soft signals, and the record says
+   so ([0010](../decisions/0010-gateway-guardrails.md)). A proposal with the same fingerprint
+   within 24 hours reuses the earlier risk result. Result: `level`, `level_set_by`, `floor`,
+   `lowered`, `reused_from`, `signals[]`, `tiers_run[]`, `tier_results[]`.
 4. **Policy table**, first match:
 
    | Condition | Decision | Challenge type | Reason code |
    | --- | --- | --- | --- |
    | risk high **and** (`bill_mismatch` or `document_instruction_patterns` or model `injection_detected`) | block | | `risk:high_with_redirect_pattern` |
-   | risk high | challenge | `confirm` (`verify_payee` in ext. 6) | `risk:high` |
+   | a required model tier failed, timed out, returned invalid output or refused | challenge | `confirm` | `risk:model_unavailable` |
+   | risk high | challenge | `confirm` (`verify_payee` in ext. 5) | `risk:high` |
    | `counterparty_is_new` and `allow_new_counterparties` is false | challenge | `confirm` | `authorization:new_counterparty_requires_approval` |
    | amount > `human_approval_above` | challenge | `confirm` | `authorization:human_approval_threshold` |
-   | risk elevated | challenge | `confirm` (`verify_payee` in ext. 6) | `risk:elevated` |
+   | risk elevated | challenge | `confirm` (`verify_payee` in ext. 5) | `risk:elevated` |
    | otherwise | allow | | `clean` |
 
    The table is data: a list of rows under `policy_version`, evaluated in order. Rows that depend on
    risk read the merged level, which a model cannot lower below the tier-0 floor, so the first row
-   holds whenever tier 0 saw a redirect pattern.
+   holds whenever tier 0 saw a redirect pattern. When a model lowered the level, the reasons also
+   carry `risk:lowered_by_model`.
 
 5. **Execute.** `allow` → simulated payment `executed`; `challenge` → `held` until resolved; `block`
-   → `blocked`. The evidence record is written before any of these.
+   → `blocked`. The evidence record is written before any of these. A held payment records the
+   authorization version and payment-method state it was decided on; approving it reruns the
+   deterministic checks, and any change blocks it with reason `resolve:state_changed`.
 
 ## Evidence record
 
@@ -161,6 +170,7 @@ status, executed_at)`, `agents`, `authorizations`, `nonces`, `decisions`.
            "features": {"payment_method_changed_days_ago": {"value": 3, "evidence": ["pmh_42"]}},
            "tier_results": [{"tier": "tier0", "model": null, "level": "elevated", "confidence": null, "signals": ["payment_method_changed"], "latency_ms": 2, "usage": null}],
            "signals": [{"name": "payment_method_changed", "severity": "elevated", "evidence": ["pmh_42"], "source": "tier0"}],
+           "lowered": null, "reused_from": null,
            "model_rationale": null},
   "decision": "challenge", "reasons": ["risk:elevated"],
   "challenge": {"type": "confirm", "routed_to": "owner", "user_sees": "one approve / reject"},
@@ -174,7 +184,10 @@ status, executed_at)`, `agents`, `authorizations`, `nonces`, `decisions`.
 
 Tier roles are `tier0`, `cheap` (Jev, or an open-weight model in that arm) and `strong`; the model
 id lives in `model`. `review`, once a human resolves a challenge, holds `{by, at, outcome, note,
-provenance: "human_ui"}`. `model_rationale` and `action.agent_rationale` are both text an attacker
+provenance: "human_ui"}`, plus `recheck` when approving reran the deterministic checks.
+`risk.lowered`, when a model lowered soft signals, holds `{from, to, by, signals}`;
+`risk.reused_from` names the decision whose risk result was reused; a failed model tier's entry in
+`tier_results` carries `error`. `model_rationale` and `action.agent_rationale` are both text an attacker
 can influence and are labelled so by the site. A pytest loads every fixture in `data/fixtures/`
 into the evidence-record model, so the contract and the engine can't drift silently.
 
@@ -260,7 +273,10 @@ no decision logic. The engine's job is to serve that contract: `GET /v1/health`,
 `GET /v1/scenarios`, `POST /v1/scenarios/{name}/run` returning the scenario result (context,
 proposal, evidence record), `GET /v1/decisions/{id}`, `GET /v1/eval/latest`, with CORS for a local
 dev server. `zeta_one/ui/` is **not** built unless integration slips past Thursday 10:00; then a
-single plain page that renders the same JSON is the fallback, and the Loom shows that.
+single plain page that renders the same JSON is the fallback, and the Loom shows that. Whichever
+page shows evidence sets attacker-influenced text (rationales, memo, invoice text, payee names) as
+text, never HTML, and on a challenge puts the cited evidence before the model's rationale
+([security.md](security.md)).
 
 The site's first version shows one scenario, `vendor_payment_method_changed`; the other four
 follow as a fast follow on the site, each with a fixture already in `data/fixtures/`. If the site
@@ -287,7 +303,12 @@ floor); the policy table row by row; evidence record required keys and `simulate
 file in `data/fixtures/` loads into the evidence-record model; the eval runner on three cases with
 model tiers stubbed; Wilson intervals and the discordant table against known values. Property tests
 (Hypothesis) with a hostile model stub that always answers `low` and `allow`: the merged level
-never falls below the tier-0 floor and no identity or authorization block is lifted. Model tiers are stubbed in tests; `--live-models` runs them for real.
+never falls below the tier-0 floor and no identity or authorization block is lifted. Guardrails
+([security.md](security.md)): each model failure kind gives `challenge`; a lowering is recorded; a
+repeated proposal makes one model call; the agent's response has only its three keys; admin
+endpoints refuse a missing token and agent-signed requests; the redirect case without `bill_id` is
+still caught; split payments hit the rolling limit; approving after revocation blocks; nonces
+survive a restart; the live Rho client has no method but GET. Model tiers are stubbed in tests; `--live-models` runs them for real.
 
 ## Schedule
 
@@ -295,9 +316,9 @@ never falls below the tier-0 floor and no identity or authorization block is lif
 | --- | --- | --- |
 | **Tue evening** | This plan. Staging checked (done). Create a TypeSafe key, make one Jev call, correct `reference/jev.md`. Confirm the Console key, the Claude model ids and `messages.parse` with one request. Test Rho's MCP connector in claude.ai and note the tool list | Jev request shape known or the arm waits; Rho connector facts recorded |
 | **Wed 08:00–10:00** | `rho/models.py`, `store.py`, `snapshot.py`, `seed.py`, `make_seed.py` (two-hour box); the five demo cases in `eval/cases.py` | `data/seed/` and the five cases committed |
-| **Wed 10:00–13:00** | `risk/features.py`, `tier0.py`, `escalation.merge`, `decide/policy.py`, `decide/evidence.py`, `execute.py`; `gateway/app.py` with `/v1/health`, `/v1/scenarios`, `/v1/scenarios/{name}/run`, identity and authorization **stubbed** as verified / no violations; fixture-vs-schema test | **the first judge-visible slice**: five scenarios decide over the API on tier 0 alone; the site can switch from fixtures to live |
-| **Wed 13:00–15:30** | `identity/` (real signatures, replay, revocation), `authorization/` (real checks), `/v1/actions/propose_payment`; tests; `scenarios.py` signs with built-in agents; the ~14 identity and authorization cases | categories B and C pass end to end; scenarios 3 and 4 now fail for the right reason |
-| **Wed 15:30–18:00** | `tiers.py`, `claude.py` (Opus, structured output), escalation rules; stubbed tests and the rule-7 property tests; first real model calls on the redirect scenario. Owner, in a break: write the `hard` set (~1.5 h) | the engineered cascade runs; scenario 5 blocks with a model signal; `hard` committed |
+| **Wed 10:00–13:00** | `risk/features.py` (with the gateway's own bill lookup and `bill_not_referenced`), `tier0.py`, `escalation.merge` (with `lowered` and the fingerprint reuse), `decide/policy.py`, `decide/evidence.py`, `execute.py`; `gateway/app.py` with `/v1/health`, `/v1/scenarios`, `/v1/scenarios/{name}/run`, identity and authorization **stubbed** as verified / no violations; fixture-vs-schema test | **the first judge-visible slice**: five scenarios decide over the API on tier 0 alone; the site can switch from fixtures to live |
+| **Wed 13:00–15:30** | `identity/` (real signatures, replay with nonces in SQLite, revocation), `authorization/` (real checks, including `limits.rolling`), `/v1/actions/propose_payment` with the minimal response; admin token on the admin and resolve endpoints, resolve recheck; `keygen.py` keys into gitignored `data/keys/`; tests; `scenarios.py` signs with built-in agents; the ~14 identity and authorization cases | categories B and C pass end to end; scenarios 3 and 4 now fail for the right reason |
+| **Wed 15:30–18:00** | `tiers.py`, `claude.py` (Opus, structured output), escalation rules, fail closed on model failure; stubbed tests, the rule-7 property tests and the guardrail tests; first real model calls on the redirect scenario. Owner, in a break: write the `hard` set (~1.5 h) | the engineered cascade runs; scenario 5 blocks with a model signal; `hard` committed |
 | **Wed evening** | `generate.py` and `dev`; owner reads ~20 `dev` cases and writes the labelling guide; `label.py` on `dev`; `run.py`, `stats.py`, `report.py`; runs on `dev` and failures by stage; tune on `dev` only; then generate and freeze `test`, run the AI labeller on it | `dev` report with real numbers; `test` frozen and AI-labelled; the site runs against the live engine |
 | **Thu 08:00–09:30** | Owner labels 40 `test` risk cases and adjudicates (~1 h); κ; the scored run of every configuration on `test`, `hard` and the identity and authorization cases; replace the fixtures' numbers with this run | the final `report.md`, with intervals, agreement and limitations |
 | **Thu 09:30–11:30** | README first (quick start, diagram, reproduction, provenance, limitations, next steps); then extensions in order below; fallback page only if the site isn't integrated by 10:00 | a stranger can run it; extensions in as time allows |
@@ -312,24 +333,24 @@ Each is ≤ 1 hour and droppable on its own; stop wherever 11:30 lands.
 
 1. **Live Rho read**: `live.py` reusing `staging_check.py`'s client (named user agent, token from
    `.env`) for `/v1/rho/health` and a counterparty read; backend name in the banner. The live
-   backend cannot supply history or bill text, so it is a connection proof, not a `Store`.
+   backend cannot supply history or bill text, so it is a connection proof, not a `Store`. The
+   client implements GET only, and a test asserts it.
 2. **Repeat runs**: the model arms 3 times on the risk sets; decision changes and pass^3 in the
    report.
 3. **Attacking model**: `eval/attack.py`, ~20 attempts per configuration to get a redirected
-   payment allowed; the count and its interval in the report.
-4. **`limits.rolling`**: a sum over executed and held payments in the window; closes the
-   split-payment gap.
-5. **Jev as the cheap tier**: `jev.py` adapter, its escalation rule, its raw probabilities in the
+   payment allowed, aimed first at the soft-signal path a model may lower; the count and its
+   interval in the report.
+4. **Jev as the cheap tier**: `jev.py` adapter, its escalation rule, its raw probabilities in the
    report; the `jev` arm in the evaluation.
-6. **Challenge types** `renew_authorization` (limit violations by a verified agent) and
+5. **Challenge types** `renew_authorization` (limit violations by a verified agent) and
    `verify_payee` (payee-side risk); friction score in the report (decision 0008).
-7. **Grant-authorization opening beat**: `POST /v1/agents` and `POST /v1/authorizations` exposed
+6. **Grant-authorization opening beat**: `POST /v1/agents` and `POST /v1/authorizations` exposed
    for the site to show registration, grant, then scenario 1.
-8. `duplicate_candidate` (incl. `Bill.status == paid`), `lookalike_counterparty`, `off_hours`.
-9. The `notify` rung.
-10. Observe mode: decide and record, execute regardless.
-11. Open-weight comparison arm through `openai_compat.py` (decision 0009).
-12. Expected cost in the report, and an evaluation chart.
+7. `duplicate_candidate` (incl. `Bill.status == paid`), `lookalike_counterparty`, `off_hours`.
+8. The `notify` rung.
+9. Observe mode: decide and record, execute regardless.
+10. Open-weight comparison arm through `openai_compat.py` (decision 0009).
+11. Expected cost in the report, and an evaluation chart.
 
 ## Cut list for the first version
 
@@ -339,7 +360,8 @@ engineered cascade's model calls on the demo scenarios) → `test` down to ~60 c
 sample down to 25 cases.
 
 Never cut: the five scenario endpoints and `/v1/health` (the site's whole surface), signatures,
-authorization checks, the policy table and merge rule, the rule-7 property tests, the evidence
+authorization checks, the policy table and merge rule, the rule-7 property tests, fail closed on
+model failure, the admin token on resolve, the gateway's own bill lookup, the evidence
 record, the rules and engineered arms of the evaluation, the frozen `test` and the `hard` set, the
 owner's check of the AI labels, intervals on every rate, the simulated label, the README.
 
@@ -353,4 +375,6 @@ owner's check of the AI labels, intervals on every rate, the simulated label, th
 | The generator mirrors tier 0's features, so the rules look near-perfect by construction | Harmless look-alikes in the sets; the lexicon frozen before `test`; the `hard` set as the headline for risk; the limitation stated in the report |
 | The owner's labelling time competes with the build | Guide from ~20 cases, 40 labelled cases, `hard` written in a break; ~3–4 h in all |
 | Model tiers disagree with hand labels on D and E | Report it; those categories exist to show where the strong tier earns its cost |
+| The guardrails add ~4 h to Wednesday | Each is small and lands inside the module it protects; Thursday's extensions shrink to make room |
+| Zeta One's own weak points: a model reading attacker text, model failures, open demo endpoints | The guardrails in [security.md](security.md); the README's limits section names what isn't covered |
 | Time | The first version is scoped to Wednesday; everything on Thursday morning is droppable |

@@ -22,6 +22,25 @@ The build order, schedule and cut list are in
   adapter with engineered escalation; simulated execution throughout (decisions 0006–0009).
 - The demo API in `docs/reference/demo-api.md` serving the site; no UI of its own.
 
+## Security guardrails (Wednesday, with the module each protects)
+
+Detail, tests and estimates are in [strategy/security.md](strategy/security.md); the decisions in
+[decisions/0010-gateway-guardrails.md](decisions/0010-gateway-guardrails.md).
+
+- Model failure, timeout, invalid output or refusal gives `challenge` (fail closed).
+- A model's lowering of soft-signal risk is recorded in the evidence and the reasons.
+- The same proposal within 24 hours reuses its risk result: no re-rolling.
+- The agent gets back only the decision and ids.
+- Admin token on granting, revoking and resolving; agent-signed requests refused; bound to
+  127.0.0.1.
+- The gateway looks up open bills itself; `bill_not_referenced` is a hard flag.
+- `limits.rolling` checked in the first version.
+- Approving a held payment rechecks authorization and the payment method first.
+- Nonces in SQLite; demo agent keys generated into gitignored `data/keys/`; live Rho client GET
+  only; site renders untrusted text as text.
+- A Claude Code hook refusing shell commands that touch `.env` or `*.ovpn`.
+- The README's limits section: what Zeta One doesn't cover.
+
 ## Evaluation
 
 The plan is in [strategy/evaluation.md](strategy/evaluation.md); the times are in the schedule in
@@ -30,7 +49,8 @@ The plan is in [strategy/evaluation.md](strategy/evaluation.md); the times are i
 
 Wednesday:
 
-- ~14 identity and authorization cases in `eval/cases.py`, one per check, labels by construction.
+- ~20 deterministic cases in `eval/cases.py`: one per identity, authorization and guardrail
+  check, labels by construction.
 - Rule-7 property tests: a hostile model stub never lowers the tier-0 floor or lifts a block.
 - **Owner:** write the `hard` set, 15–20 risk cases outside the generator's templates (~1.5 h).
 - `eval/generate.py` and `eval/prompts/wording.md`: dimensions, combinations, harmless
@@ -52,15 +72,16 @@ Thursday 08:00–09:30:
   `hard` side by side, agreement, cost and latency, limitations.
 - Replace the fixtures' numbers with this run.
 
-If time allows (extensions 2 and 3 below, then 12):
+If time allows (extensions 2 and 3 below, then 11):
 
 - Repeat runs (3×, through the Batches API) with pass^3.
-- Attacking model, ~20 attempts per configuration.
+- Attacking model, ~20 attempts per configuration, aimed first at model lowering of soft
+  signals.
 - Expected cost with the halved and doubled missed-fraud weight.
 
 ## Extensions (Thursday morning, in the plan's order)
 
-Live Rho read; repeat runs with pass^3; attacking model; rolling limit; Jev as the cheap tier;
+Live Rho read; repeat runs with pass^3; attacking model; Jev as the cheap tier;
 `renew_authorization` and `verify_payee` challenge types with the friction score;
 grant-authorization beat; extra tier-0 features; `notify`; observe mode; open-weight comparison
 arm; expected cost and an evaluation chart.
@@ -68,6 +89,9 @@ arm; expected cost and an evaluation chart.
 ## Stretch (after the hackathon)
 
 - Evaluation follow-ups listed in [strategy/evaluation.md](strategy/evaluation.md#after-the-hackathon).
+- Security follow-ups listed in [strategy/security.md](strategy/security.md#later): snapshot
+  comparison of payment methods, signed authorizations, hash-chained evidence, rate limits, key
+  rotation.
 - Approval side panel: poll Rho items waiting for approval and score them (decision 0003).
 - AI-assisted case review (P2).
 

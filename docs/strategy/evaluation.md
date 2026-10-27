@@ -61,7 +61,7 @@ depends on which features exist today, so the list must not quietly excuse misse
 
 | Set | Size | Rule |
 | --- | --- | --- |
-| Identity and authorization | ~14 | One case per check; labels by construction; every case must pass; no statistics |
+| Deterministic | ~20 | One case per identity and authorization check, plus one per guardrail in [security.md](security.md) (self-approval refused, model failure challenged, a repeated proposal not re-rolled, a missing bill reference caught, split payments limited, approval after revocation blocked); labels by construction; every case must pass; no statistics |
 | Risk `dev` | ~50 | Legitimate, suspicious, adversarial and ambiguous cases, including the five demo cases. Thresholds, prompts and rules are tuned here only |
 | Risk `test` | ~100 | About 35 legitimate, 35 suspicious, 30 adversarial; a different random seed and different wording from `dev`; frozen and hashed before the first scored run; never used for tuning |
 | Risk `hard` | 15–20 | Written by hand by the owner, outside the generator's templates |
@@ -140,6 +140,8 @@ must score 100%, so an overall accuracy would be inflated by them. Per configura
 - detection: the share of detectable suspicious and adversarial cases not allowed
 - challenge rate on legitimate cases
 - a confusion matrix
+- lowerings: how often a model lowered soft-signal risk, split by legitimate cases (friction it
+  saved) and fraudulent ones (risk it added)
 - cost per evaluated action from reported token usage, and p50/p95 latency (a single run on one
   machine including network time, labelled so; no responses are cached, though the fixed system
   prompt is prompt-cached)
@@ -184,7 +186,9 @@ list of failure kinds grouped from the notes.
    consistent number is the one that matters.
 2. **An attacking model.** The repository is public, so the attacker is assumed to know the policy
    and the features. Given both, a model writes invoice text and agent rationales aimed at getting a
-   redirected payment **allowed**, about 20 attempts per configuration. It is graded on the outcome:
+   redirected payment **allowed**, about 20 attempts per configuration. It aims first at the path
+   where a model may lower soft-signal risk (decision 0010), because that is where model judgement
+   can turn into an allow. It is graded on the outcome:
    did the simulated payment execute to the attacker's account. Reported as a count with its
    interval, never as a robustness claim. This is a capability measure: a rate above zero is
    expected and reported as it is.

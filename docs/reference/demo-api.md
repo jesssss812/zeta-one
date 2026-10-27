@@ -100,6 +100,8 @@ describes how it is produced). Fields the site should rely on:
     "features": {"<name>": {"value", "evidence": ["<record id>"]}},
     "tier_results": [{"tier": "tier0" | "cheap" | "strong", "model": "<model id>" | null, "level", "confidence": 0.0-1.0 | null, "signals": ["<signal name>"], "latency_ms", "usage": null | {"input_tokens", "output_tokens"}}],
     "signals": [{"name", "severity": "low" | "elevated" | "high", "evidence": ["<record id>"], "source": "tier0" | "cheap" | "strong"}],
+    "lowered": null | {"from": "elevated" | "high", "to": "low" | "elevated", "by": "cheap" | "strong", "signals": ["<soft signal name>"]},
+    "reused_from": null | "dec_...",
     "model_rationale": null | "..."
   },
   "execution": {"status": "executed" | "held" | "blocked", "simulated": true},
@@ -122,6 +124,11 @@ Rules the site can count on:
   can be written by an attacker. Label both as untrusted text, never as findings.
 - `friction_rung` is `0` for allow, `2`–`4` for the challenge types, `5` for block
   ([../decisions/0008-friction-ladder.md](../decisions/0008-friction-ladder.md)).
+- `risk.lowered` is set when a model lowered soft signals below tier 0's level, and the reasons
+  then include `risk:lowered_by_model`; show it, since an allow a model cleared is not the same as
+  a clean one. `risk.reused_from` names an earlier decision whose risk result was reused for the
+  same proposal. A `tier_results` entry may carry `error` when that tier failed; the decision is
+  then `challenge` with `risk:model_unavailable`. All three are optional; fixtures omit them.
 - `risk.floor` names the tier-0 facts no model was allowed to lower; `risk.level_set_by` names the
   tier that set the final level. `tier_results[].confidence` is non-null only for a calibrated
   tier (Jev); language-model tiers report `null`, because their self-reported confidence is not
@@ -143,7 +150,7 @@ each seen failing on their own.
 
 | Name | What happens | Which question decides | Expected |
 | --- | --- | --- | --- |
-| `vendor_payment_method_changed` | Verified, authorized agent pays a long-standing vendor a typical amount; the vendor's default ACH was replaced three days ago. Tier 0 flags the change and sets an `elevated` floor; the strong tier runs on escalation and agrees. The authorization deliberately permits any payee, which is why only risk can see this | risk | **challenge** (`confirm` in the first engine version, `verify_payee` once extension 6 lands); payment held |
+| `vendor_payment_method_changed` | Verified, authorized agent pays a long-standing vendor a typical amount; the vendor's default ACH was replaced three days ago. Tier 0 flags the change and sets an `elevated` floor; the strong tier runs on escalation and agrees. The authorization deliberately permits any payee, which is why only risk can see this | risk | **challenge** (`confirm` in the first engine version, `verify_payee` once extension 5 lands); payment held |
 | `routine_bill_payment` | Same agent pays a recurring monthly invoice: same vendor, amount and method as the last year. Tier 0 clean, so no model runs at all | none fails | **allow**; payment executed (simulated); no prompt |
 | `over_per_payment_limit` | Same agent proposes $7,200 against a $5,000 per-payment limit | authorization (`limit`) | **block** before any risk tier runs; `risk.tiers_run` is empty |
 | `unknown_agent` | The routine payment, signed with a key Zeta One has never seen | identity | **block**; authorization and risk not evaluated |
