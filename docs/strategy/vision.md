@@ -62,11 +62,12 @@ the step-up proves the payee or the authorization rather than the human behind t
 Promises are enforced in code. Judgement is tiered, and the savings come from engineering: most
 legitimate actions are decided by deterministic checks and never reach a model; a frontier model
 reads the documents only where judgement is needed, and a typed decision model (Jev, which its
-maker says returns calibrated probabilities at low cost) can sit between them, with its calibration
-measured on our own cases rather than assumed. No decision is routed to a weaker general-purpose
-model to save money. The evaluation compares rules alone, engineered escalation, the Jev cascade
-and a strong model on everything, with accuracy, friction, cost and latency side by side, per
-category. That is critical damping made measurable: enough control, no oscillation.
+maker says returns calibrated probabilities at low cost) can sit between them; until our own cases
+can measure its calibration, its probabilities are reported as uncalibrated. No decision is routed
+to a weaker general-purpose model to save money. The evaluation compares rules alone, engineered
+escalation and a strong model on everything against trivial baselines, with the Jev cascade added
+when that tier runs: accuracy, friction, cost and latency side by side, per category, with
+confidence intervals. That is critical damping made measurable: enough control, no oscillation.
 
 ## Why it matters to Rho
 
@@ -118,15 +119,15 @@ says so.
 > **Solution.** Zeta One is the layer a platform runs before executing an agent's action, shown here
 > as a gateway in front of simulated payments on Rho's data shapes. Every proposal is signed by a
 > registered agent and checked against the authorization the business granted (actions, payees,
-> limits, expiry). Then it is assessed against ground truth: vendor history, recent payment-method
-> changes, disagreement with the bill, and invoice text aimed at an automated reader. Hard limits are
-> enforced in code; most routine actions never reach a model, and a frontier model reads documents
+> limits, expiry). Then it is assessed against the business's own records: vendor history, recent
+> payment-method changes, disagreement with the bill, and invoice text aimed at an automated reader.
+> Hard limits are enforced in code; most routine actions never reach a model, and a frontier model reads documents
 > only where judgement is needed. The result is allow, challenge or block, with the step-up matched
 > to the risk and an evidence record a person can audit.
 >
-> **Impact.** On labelled synthetic scenarios across five categories, the evaluation compares rules
-> only, engineered escalation, a typed decision model in the loop, and a strong model everywhere,
-> reporting per category: accuracy, unnecessary challenges, cost per action and latency. It shows
+> **Impact.** On labelled synthetic cases, including a hand-written held-out set, the evaluation
+> compares rules only, engineered escalation and a strong model everywhere, reporting per category
+> with confidence intervals: accuracy, unnecessary challenges, cost per action and latency. It shows
 > how much control is enough: critical damping for agentic finance. ζ = 1.
 
 (Fill in the measured numbers on Thursday; keep the counts honest.)

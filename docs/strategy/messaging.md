@@ -27,7 +27,8 @@ Use this to settle product decisions. In damping terms:
   what is clearly unauthorized.
 
 The challenge ladder ([../decisions/0008-friction-ladder.md](../decisions/0008-friction-ladder.md))
-is the damping made concrete, and the evaluation's friction score is how ζ is measured.
+is the damping made concrete. The evaluation measures ζ as detection next to unnecessary
+challenges, and as a friction score once there is more than one challenge type.
 
 ## One-line answers
 
@@ -41,7 +42,8 @@ is the damping made concrete, and the evaluation's friction score is how ζ is m
   and the ones that do are a small, measurable fraction. The evaluation shows the fraction.
 - *Why not a cheaper model?* Savings should come from engineering, not from routing money decisions
   to a less capable model. The only cheap model in the loop is a typed decision model built for
-  calibrated answers, and its calibration is measured, not assumed.
+  calibrated answers, and its calibration is never assumed: until our cases can measure it, its
+  probabilities are reported as uncalibrated.
 - *Can agents pay on Rho today?* No: Rho's API and MCP server are read-only by design. The spec
   names the payments-write scope as the next step, and that is the step Zeta One is built for.
 
