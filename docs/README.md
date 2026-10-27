@@ -38,6 +38,7 @@ What is not done yet is in [roadmap.md](roadmap.md). Every document under `docs/
 | [strategy/security.md](strategy/security.md) | Where Zeta One adds risk of its own (models, design, build, claims), the guardrails for each, and the detailed work |
 | [strategy/messaging.md](strategy/messaging.md) | Tagline, project explanation, design philosophy, visual identity |
 | [strategy/implementation-plan.md](strategy/implementation-plan.md) | Architecture, modules, API, policy table, evidence record, seed and scenarios, schedule and cut list |
+| [strategy/parallel-build.md](strategy/parallel-build.md) | The engine's kernel, six workstreams with their files, seams and briefs, and how coding agents land work together |
 | [strategy/vision.md](strategy/vision.md) | The narrative for judges and Rho, and the draft submission write-up |
 
 ## Decisions
