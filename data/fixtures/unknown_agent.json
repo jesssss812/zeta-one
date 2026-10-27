@@ -1,0 +1,152 @@
+{
+  "illustrative": true,
+  "_note": "Illustrative result. Synthetic data in Rho's shapes; no model was run; latency and cost are unmeasured (null). Replace with a live POST /v1/scenarios/{name}/run response once the engine exists. See docs/reference/demo-api.md.",
+  "scenario": {
+    "name": "unknown_agent",
+    "title": "Unregistered agent proposes a payment",
+    "summary": "A request signed with a key Zeta One has never seen proposes the same routine payment. Identity fails; nothing else is evaluated.",
+    "expected": "block"
+  },
+  "context": {
+    "business": {
+      "id": "biz_seed_01",
+      "name": "Larkspur Analytics (synthetic)"
+    },
+    "counterparty": {
+      "id": "cp_0012",
+      "name": "Cedar Ridge Cleaning Services",
+      "status": "active",
+      "created_at": "2025-03-04T17:20:00Z",
+      "payment_methods": [
+        {
+          "id": "pm_0012_01",
+          "type": "ach",
+          "bank_name": "Bluewater Community Bank",
+          "is_default": true,
+          "added_at": "2025-03-04T17:20:00Z"
+        }
+      ]
+    },
+    "payment_method_history": [],
+    "bill": {
+      "id": "bill_0201",
+      "counterparty_id": "cp_0012",
+      "counterparty_name": "Cedar Ridge Cleaning Services",
+      "invoice_number": "CRC-2026-10",
+      "invoice_date": "2026-10-25",
+      "due_date": "2026-11-08",
+      "amount": {
+        "amount": 185000,
+        "currency": "USD"
+      },
+      "memo": "October cleaning services",
+      "document_excerpt": "Invoice CRC-2026-10. Monthly cleaning services, October 2026. Total due $1,850.00 by Nov 8, 2026."
+    },
+    "payment_history": {
+      "count": 19,
+      "first_at": "2025-04-01T13:00:00Z",
+      "last_at": "2026-10-01T13:02:00Z",
+      "median_amount": {
+        "amount": 185000,
+        "currency": "USD"
+      },
+      "recent": [
+        {
+          "id": "txn_0815",
+          "posted_at": "2026-10-01T13:02:00Z",
+          "amount": {
+            "amount": 185000,
+            "currency": "USD"
+          },
+          "method_type": "ach"
+        },
+        {
+          "id": "txn_0783",
+          "posted_at": "2026-09-01T13:04:00Z",
+          "amount": {
+            "amount": 185000,
+            "currency": "USD"
+          },
+          "method_type": "ach"
+        },
+        {
+          "id": "txn_0752",
+          "posted_at": "2026-08-01T13:01:00Z",
+          "amount": {
+            "amount": 185000,
+            "currency": "USD"
+          },
+          "method_type": "ach"
+        }
+      ]
+    }
+  },
+  "proposal": {
+    "bill_id": "bill_0201",
+    "counterparty_id": "cp_0012",
+    "payment_method_id": "pm_0012_01",
+    "source_account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "memo": "Invoice CRC-2026-10",
+    "agent_rationale": "Recurring monthly cleaning invoice, same amount as the last twelve months, paid to the vendor's long-standing ACH method.",
+    "source_document_ids": [
+      "bill_0201"
+    ]
+  },
+  "decision_record": {
+    "schema_version": 1,
+    "decision_id": "dec_illustrative_0004",
+    "created_at": "2026-10-27T22:00:00Z",
+    "policy_version": "2026-10-28.1",
+    "configuration": {
+      "tiers": [
+        "tier0",
+        "cheap",
+        "strong"
+      ],
+      "escalation": {
+        "confidence_min": 0.8
+      }
+    },
+    "decision": "block",
+    "reasons": [
+      "identity:unknown_agent"
+    ],
+    "challenge": null,
+    "friction_rung": 0,
+    "identity": {
+      "result": "unknown_agent",
+      "claimed_agent_id": "agent_unregistered_77",
+      "business_id": null,
+      "owner": null,
+      "key_id": null,
+      "checked": [
+        "known"
+      ]
+    },
+    "authorization": {
+      "authorization_id": null,
+      "version": null,
+      "violations": [],
+      "snapshot": null
+    },
+    "risk": {
+      "level": null,
+      "tiers_run": [],
+      "features": {},
+      "tier_results": [],
+      "signals": [],
+      "model_rationale": null
+    },
+    "execution": {
+      "status": "blocked",
+      "simulated": true
+    },
+    "cost": null,
+    "latency_ms": null,
+    "review": null
+  }
+}

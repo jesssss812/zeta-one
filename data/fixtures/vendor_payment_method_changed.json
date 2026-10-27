@@ -32,6 +32,8 @@
     ],
     "bill": {
       "id": "bill_0193",
+      "counterparty_id": "cp_0007",
+      "counterparty_name": "Harbor Office Supply Co.",
       "invoice_number": "HOS-10488",
       "invoice_date": "2026-10-20",
       "due_date": "2026-11-03",

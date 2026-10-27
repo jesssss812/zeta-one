@@ -214,8 +214,8 @@ dev server. `zeta_one/ui/` is **not** built unless integration slips past Thursd
 single plain page that renders the same JSON is the fallback, and the Loom shows that.
 
 The site's first version shows one scenario, `vendor_payment_method_changed`; the other four
-scenarios stay reachable through the API and the evaluation report, and the Loom can show them
-with the fallback page or `curl` if the site hasn't added them.
+follow as a fast follow on the site, each with a fixture already in `data/fixtures/`. If the site
+hasn't added them by the Loom, they stay reachable through the API and the fallback page.
 
 ## What the judge sees (five clicks, or one on the site)
 

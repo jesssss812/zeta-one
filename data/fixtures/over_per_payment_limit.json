@@ -1,0 +1,178 @@
+{
+  "illustrative": true,
+  "_note": "Illustrative result. Synthetic data in Rho's shapes; no model was run; latency and cost are unmeasured (null). Replace with a live POST /v1/scenarios/{name}/run response once the engine exists. See docs/reference/demo-api.md.",
+  "scenario": {
+    "name": "over_per_payment_limit",
+    "title": "Verified agent exceeds its per-payment limit",
+    "summary": "A verified agent proposes a $7,200 payment; its authorization caps single payments at $5,000. Identity passes; the authorization check blocks before any risk model runs.",
+    "expected": "block"
+  },
+  "context": {
+    "business": {
+      "id": "biz_seed_01",
+      "name": "Larkspur Analytics (synthetic)"
+    },
+    "counterparty": {
+      "id": "cp_0019",
+      "name": "Pinecrest IT Services",
+      "status": "active",
+      "created_at": "2025-09-15T16:00:00Z",
+      "payment_methods": [
+        {
+          "id": "pm_0019_01",
+          "type": "ach",
+          "bank_name": "Summit National Bank",
+          "is_default": true,
+          "added_at": "2025-09-15T16:00:00Z"
+        }
+      ]
+    },
+    "payment_method_history": [],
+    "bill": {
+      "id": "bill_0207",
+      "counterparty_id": "cp_0019",
+      "counterparty_name": "Pinecrest IT Services",
+      "invoice_number": "PIT-4471",
+      "invoice_date": "2026-10-22",
+      "due_date": "2026-11-05",
+      "amount": {
+        "amount": 720000,
+        "currency": "USD"
+      },
+      "memo": "Network hardware refresh",
+      "document_excerpt": "Invoice PIT-4471. Network hardware refresh: 2 switches, installation. Total due $7,200.00 by Nov 5, 2026."
+    },
+    "payment_history": {
+      "count": 5,
+      "first_at": "2025-10-03T15:00:00Z",
+      "last_at": "2026-08-14T15:30:00Z",
+      "median_amount": {
+        "amount": 240000,
+        "currency": "USD"
+      },
+      "recent": [
+        {
+          "id": "txn_0770",
+          "posted_at": "2026-08-14T15:30:00Z",
+          "amount": {
+            "amount": 260000,
+            "currency": "USD"
+          },
+          "method_type": "ach"
+        }
+      ]
+    }
+  },
+  "proposal": {
+    "bill_id": "bill_0207",
+    "counterparty_id": "cp_0019",
+    "payment_method_id": "pm_0019_01",
+    "source_account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 720000,
+      "currency": "USD"
+    },
+    "memo": "Invoice PIT-4471",
+    "agent_rationale": "Approved hardware refresh invoice from our IT vendor; paying in full before the due date.",
+    "source_document_ids": [
+      "bill_0207"
+    ]
+  },
+  "decision_record": {
+    "schema_version": 1,
+    "decision_id": "dec_illustrative_0003",
+    "created_at": "2026-10-27T22:00:00Z",
+    "policy_version": "2026-10-28.1",
+    "configuration": {
+      "tiers": [
+        "tier0",
+        "cheap",
+        "strong"
+      ],
+      "escalation": {
+        "confidence_min": 0.8
+      }
+    },
+    "decision": "block",
+    "reasons": [
+      "authorization:limits.per_payment"
+    ],
+    "challenge": null,
+    "friction_rung": 0,
+    "identity": {
+      "result": "verified",
+      "claimed_agent_id": "agent_ap_assistant_01",
+      "business_id": "biz_seed_01",
+      "owner": "finance-owner@larkspur.example",
+      "key_id": "key_01",
+      "checked": [
+        "known",
+        "active",
+        "timestamp",
+        "nonce",
+        "signature"
+      ]
+    },
+    "authorization": {
+      "authorization_id": "auth_0001",
+      "version": 1,
+      "violations": [
+        {
+          "field": "limits.per_payment",
+          "kind": "limit",
+          "limit": {
+            "amount": 500000,
+            "currency": "USD"
+          },
+          "observed": {
+            "amount": 720000,
+            "currency": "USD"
+          }
+        }
+      ],
+      "snapshot": {
+        "authorization_id": "auth_0001",
+        "version": 1,
+        "policy_version": "2026-10-28.1",
+        "business_id": "biz_seed_01",
+        "agent_id": "agent_ap_assistant_01",
+        "granted_by": "finance-owner@larkspur.example",
+        "granted_at": "2026-10-01T16:00:00Z",
+        "expires_at": "2026-12-31T23:59:59Z",
+        "status": "active",
+        "actions": [
+          "propose_payment"
+        ],
+        "counterparties": {
+          "mode": "any",
+          "ids": []
+        },
+        "limits": {
+          "per_payment": {
+            "amount": 500000,
+            "currency": "USD"
+          }
+        },
+        "human_approval_above": {
+          "amount": 1000000,
+          "currency": "USD"
+        }
+      }
+    },
+    "risk": {
+      "level": null,
+      "tiers_run": [],
+      "features": {},
+      "tier_results": [],
+      "signals": [],
+      "model_rationale": null
+    },
+    "execution": {
+      "status": "blocked",
+      "simulated": true
+    },
+    "cost": null,
+    "latency_ms": null,
+    "review": null
+  }
+}
