@@ -16,7 +16,7 @@ What is not done yet is in [roadmap.md](roadmap.md). Every document under `docs/
 | Doc | What it covers |
 | --- | --- |
 | [reference/hackathon.md](reference/hackathon.md) | Dates, tracks, the submission checklist and the judging criteria |
-| [reference/rho-api.md](reference/rho-api.md) | What the Rho staging API allows: read endpoints, auth, and the confirmed limits (read-only, no approvals, no webhooks, no pre-execution hook) |
+| [reference/rho-api.md](reference/rho-api.md) | What the Rho API allows: hosts, auth, read endpoints, the confirmed limits (read-only by design, no payments write yet, no webhooks or pre-execution hook), the MCP server and the `x-mcp-*` annotations, and what that means for Zeta One |
 | [reference/staging-data.md](reference/staging-data.md) | What the Rho staging business holds: record counts and field coverage per endpoint |
 | [reference/rho-openapi.json](reference/rho-openapi.json) | Rho's public OpenAPI description, copied 2026-10-27 |
 | [reference/jev.md](reference/jev.md) | What Jev (TypeSafe's typed decision model) is, how it is called and priced; unverified until the first call |
@@ -50,3 +50,4 @@ What is not done yet is in [roadmap.md](roadmap.md). Every document under `docs/
 | [decisions/0006-identity-and-authorization.md](decisions/0006-identity-and-authorization.md) | Ed25519-signed requests for identity; a JSON authorization checked in code |
 | [decisions/0007-risk-tiers.md](decisions/0007-risk-tiers.md) | Deterministic features, then Jev, then Claude on escalation; Haiku fallback |
 | [decisions/0008-friction-ladder.md](decisions/0008-friction-ladder.md) | A challenge is a typed step-up (confirm, renew authorization, verify payee); friction scales with risk and is measured |
+| [decisions/0009-engineered-escalation.md](decisions/0009-engineered-escalation.md) | Cost savings from engineered escalation, not weaker models; the cheap tier is Jev or nothing |

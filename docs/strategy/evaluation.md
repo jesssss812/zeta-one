@@ -39,22 +39,32 @@ Each case carries its expected decision (allow, challenge or block) and where it
 Run the same cases through:
 
 1. deterministic rules only
-2. rules plus a fast, cheap classifier (Jev; Claude Haiku stands in until Jev runs)
-3. a stronger LLM on every request
-4. selective escalation: the cheap classifier first, the stronger model only when needed
+2. rules, then the strong model only on engineered escalation (decision 0009)
+3. rules, then Jev, then the strong model only when Jev's probability is low
+4. the strong model on every request
+5. optionally: rules, then an open-weight model of Opus/Sonnet class, then the strong model
 
-The report names the models and prices that actually ran.
+The report names the models and prices that actually ran. The language-model tiers see only the
+proposal and its context, never a case's category, setup or name.
 
 ## Metrics
 
-Per configuration: accuracy against the expected decision (and counting also-acceptable
-decisions), accuracy on known authorization violations and identity failures (must be 100%),
-detection (share of suspicious and adversarial cases not allowed), challenge rate on legitimate
-cases, cost per evaluated action from reported token usage, and p50/p95 latency.
+Reported **per category**, never as one headline number: the identity and authorization categories
+are deterministic and must score 100%, so an overall accuracy would be inflated by them. Per
+configuration and category: accuracy against the expected decision, and separately accuracy
+counting also-acceptable decisions; detection (share of suspicious and adversarial cases not
+allowed); challenge rate on legitimate cases; cost per evaluated action from reported token usage;
+p50/p95 latency. Every rate states its n (a category of 10 moves 10 points per case). Latency is a
+single run on one machine including network time, and is labelled so; model calls are never cached
+across runs.
+
+**Calibration of Jev** is measured, not assumed: its `risk_level` probability against the expected
+decision across all cases, as a reliability table with the sample size, so the escalation threshold
+can be judged.
 
 **Friction score** (once challenge types exist, decision 0008): each rung carries a weight (allow 0,
-notify 0.1, confirm 1, renew authorization 2, verify payee 3); the score is the mean weight over
-legitimate cases, reported with the share of legitimate actions that saw no prompt. Detection and
+notify 0.1, confirm 1, renew authorization 2, verify payee 3; chosen, not derived); the score is the
+mean weight over legitimate cases, reported with the share of legitimate actions that saw no prompt. Detection and
 friction together are the critical-damping trade-off; a configuration that lowers one by raising
 the other hasn't improved.
 
