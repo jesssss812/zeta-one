@@ -20,6 +20,7 @@ What is not done yet is in [roadmap.md](roadmap.md). Every document under `docs/
 | [reference/staging-data.md](reference/staging-data.md) | What the Rho staging business holds: record counts and field coverage per endpoint |
 | [reference/rho-openapi.json](reference/rho-openapi.json) | Rho's public OpenAPI description, copied 2026-10-27 |
 | [reference/jev.md](reference/jev.md) | What Jev (TypeSafe's typed decision model) is, how it is called and priced; unverified until the first call |
+| [reference/demo-api.md](reference/demo-api.md) | The contract between the engine and the demo site: endpoints, scenario result, evidence record, ownership of directories |
 
 ## Runbooks
 

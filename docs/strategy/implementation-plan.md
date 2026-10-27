@@ -57,7 +57,7 @@ signing key and nothing else.
 | Execution | simulated; `held` on challenge; `POST /v1/challenges/{id}/resolve` | observe mode |
 | Data | committed synthetic seed, deterministic from a fixed random seed, minor-unit amounts | live Rho backend (shows one vendor and one deposit: the connection, not the data) |
 | Evaluation | ~40 cases in categories A–E; four configurations; `report.md` and `report.json` | category F, friction score, chart |
-| UI | scenario buttons, decision card with three rows, evidence as JSON, evaluation table, "simulated" banner | grant-authorization beat, resolve with type, chart |
+| Interface | the demo API in [../reference/demo-api.md](../reference/demo-api.md), served with CORS; the site in `site/` renders it | registration and grant endpoints for the site; resolve with type; evaluation JSON |
 
 Haiku standing in for Jev keeps all four evaluation configurations meaningful even if Jev never
 arrives; the report names what ran.
@@ -89,11 +89,11 @@ zeta_one/
   risk/           features.py  tier0.py  tiers.py (protocol)  claude.py  jev.py (ext. 2)  escalation.py
   decide/         policy.py  evidence.py
   gateway/        app.py  execute.py  scenarios.py
-  ui/             index.html  app.js  style.css
 eval/             cases.py  run.py  report.py
+site/             the demo site, separate effort (see Site and integration)
 scripts/          check.py  staging_check.py (exist)  make_seed.py  keygen.py
 tests/
-data/             seed/ (committed, synthetic)  eval/ (cases.jsonl, results/)  snapshots/ (gitignored)
+data/             seed/ (committed, synthetic)  fixtures/ (illustrative API responses)  eval/ (cases.jsonl, results/)  snapshots/ (gitignored)
 ```
 
 Stand-in tables beyond Rho's shapes: `payment_method_history(counterparty_id, method_id, change,
@@ -160,7 +160,7 @@ status, executed_at)`, `agents`, `authorizations`, `nonces`, `decisions`.
 ```
 
 `review`, once a human resolves a challenge, holds `{by, at, outcome, note, provenance:
-"human_ui"}`. `model_rationale` is model output and labelled so in the UI.
+"human_ui"}`. `model_rationale` is model output and labelled so by the site.
 
 ## Seed data and scenarios
 
@@ -189,29 +189,35 @@ agent signs, or how the signature is broken), `proposal`, `expected`, `also_acce
 | F ambiguous (ext. 6) | 5 | challenge (allow acceptable) | new vendor, small amount, clean documents |
 
 The five **demo scenarios** are one hand-picked case from each of A–E, exposed as
-`POST /v1/scenarios/{name}/run` and as buttons in the UI.
+`POST /v1/scenarios/{name}/run` and to the site through the demo API.
 
 ## Evaluation runner
 
 `eval/run.py --config rules|cheap|strong|cascade` applies each case's `setup` to a fresh copy of
 the seed, signs and sends the proposal, records the decision and evidence, and restores. Output:
 `data/eval/results/<config>.jsonl` and a combined `report.json` / `report.md` with the metrics in
-[evaluation.md](evaluation.md) and a confusion matrix per configuration. The UI's evaluation tab
+[evaluation.md](evaluation.md) and a confusion matrix per configuration. The site
 reads `report.json`.
 
 Budget on the owner's Console key: the `strong` arm is ~40 calls to Opus 5.5 at roughly 2k input
 and 300 output tokens, about $0.40–0.60 per run; `cheap` and `cascade` are a fraction of that.
 Ten full runs during development stay under $10.
 
-## UI
+## Site and integration
 
-One page, three panes: **Scenarios** (five buttons), **Decision** (a large allow / challenge /
-block card; three rows for identity, authorization, risk, each green / amber / red with its reason
-codes; a resolve control when held), **Evidence** (the record as JSON, collapsible). A fourth tab,
-**Evaluation**, renders `report.json` as a table. A persistent banner: "Payments are simulated.
-Rho data: seed | snapshot | live (read-only)". Styling per [messaging.md](messaging.md).
+The demo interface is a separate effort in `site/`, built in parallel against
+[../reference/demo-api.md](../reference/demo-api.md) and the fixture in `data/fixtures/`; it holds
+no decision logic. The engine's job is to serve that contract: `GET /v1/health`,
+`GET /v1/scenarios`, `POST /v1/scenarios/{name}/run` returning the scenario result (context,
+proposal, evidence record), `GET /v1/decisions/{id}`, `GET /v1/eval/latest`, with CORS for a local
+dev server. `zeta_one/ui/` is **not** built unless integration slips past Thursday 10:00; then a
+single plain page that renders the same JSON is the fallback, and the Loom shows that.
 
-## What the judge sees (five clicks)
+The site's first version shows one scenario, `vendor_payment_method_changed`; the other four
+scenarios stay reachable through the API and the evaluation report, and the Loom can show them
+with the fallback page or `curl` if the site hasn't added them.
+
+## What the judge sees (five clicks, or one on the site)
 
 1. Routine bill → **allow**; three rows green; no prompt.
 2. Same agent, over its per-payment limit → **block**; authorization row red; no model ran.
@@ -238,10 +244,10 @@ are stubbed in tests; `--live-models` runs them for real.
 | **Wed morning** | `rho/models.py`, `store.py`, `snapshot.py`, `seed.py`, `make_seed.py`; `eval/cases.py` and `cases.jsonl`; store tests | `data/seed/` and `cases.jsonl` committed |
 | **Wed midday** | `identity/`, `authorization/`, `decide/policy.py`, `decide/evidence.py`; gateway endpoints; `execute.py`; tests | categories B and C pass end to end with tier 0 only |
 | **Wed afternoon** | `risk/features.py`, `tier0.py`, `tiers.py`, `claude.py` (Haiku and Opus adapters), `escalation.py`; stubbed tests; first real model calls | all five categories decide sensibly in the cascade |
-| **Wed evening** | `eval/run.py`, `report.py`; first full four-arm run; `ui/` scenario and decision panes | `report.md` with real numbers; the first version runs end to end |
-| **Thu 08:00–11:30** | README first (quick start, diagram, reproduction, provenance, limitations, next steps); then extensions in order below | a stranger can run it; extensions in as time allows |
+| **Wed evening** | `eval/run.py`, `report.py`; first full four-arm run; `/v1/scenarios` and `/v1/health` match the contract; replace the fixture with a real run | `report.md` with real numbers; the site runs against the live engine |
+| **Thu 08:00–11:30** | README first (quick start, diagram, reproduction, provenance, limitations, next steps); then extensions in order below; fallback page only if the site isn't integrated by 10:00 | a stranger can run it; extensions in as time allows |
 | **Thu 11:30** | hard stop on extensions; smoke-run the five scenarios and the eval | |
-| **Thu 12:00–14:00** | Loom: problem (30 s), five scenarios (2 min), evaluation table (45 s), live Rho read if ext. 1 landed (30 s), limits and next steps (30 s) | video uploaded |
+| **Thu 12:00–14:00** | Loom: problem (30 s), the site's scenario (1 min), the other four via API or fallback page (1 min), evaluation table (45 s), live Rho read if ext. 1 landed (30 s), limits and next steps (30 s) | video uploaded |
 | **Thu 14:00–16:00** | write-up from [vision.md](vision.md); repo audit (no `.env`, no snapshots, no personal data); make public; submit | form submitted by 16:30 |
 | **Thu 16:30–17:00** | buffer | |
 
@@ -254,7 +260,8 @@ Each is ≤ 1 hour and droppable on its own; stop wherever 11:30 lands.
 2. **Jev as the cheap tier**: `jev.py` adapter; the configuration names it; Haiku stays as fallback.
 3. **Challenge types** `renew_authorization` (limit violations by a verified agent) and
    `verify_payee` (payee-side risk); friction score in the report (decision 0008).
-4. **Grant-authorization opening beat** in the UI: register the agent, grant, then scenario 1.
+4. **Grant-authorization opening beat**: `POST /v1/agents` and `POST /v1/authorizations` exposed
+   for the site to show registration, grant, then scenario 1.
 5. `limits.rolling`, `lookalike_counterparty`, `off_hours`, `duplicate_candidate`.
 6. Category F and the `notify` rung.
 7. Observe mode: decide and record, execute regardless.
@@ -262,9 +269,9 @@ Each is ≤ 1 hour and droppable on its own; stop wherever 11:30 lands.
 
 ## Cut list for the first version
 
-If Wednesday slips, drop in this order: the evaluation tab in the UI (keep `report.md`) → the
-resolve control (challenges stay held) → category E down to 4 cases → the cheap tier (three arms:
-rules, strong, strong-on-tier0-band).
+If Wednesday slips, drop in this order: `GET /v1/eval/latest` (the site shows `report.md` as a
+link) → the resolve endpoint (challenges stay held) → category E down to 4 cases → the cheap tier
+(three arms: rules, strong, strong-on-tier0-band).
 
 Never cut: signatures, authorization checks, the policy table, the evidence record, the four-arm
 evaluation (or three if cut above), the simulated label, the README.

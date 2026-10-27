@@ -13,8 +13,12 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 
-# Node
+# Node (the site lives in site/)
 node_modules/
+site/dist/
+site/.next/
+site/.svelte-kit/
+site/build/
 
 # OS and editors
 .DS_Store
