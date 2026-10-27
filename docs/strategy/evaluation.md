@@ -39,14 +39,24 @@ Each case carries its expected decision (allow, challenge or block) and where it
 Run the same cases through:
 
 1. deterministic rules only
-2. rules plus a fast, cheap classifier
+2. rules plus a fast, cheap classifier (Jev; Claude Haiku stands in until Jev runs)
 3. a stronger LLM on every request
 4. selective escalation: the cheap classifier first, the stronger model only when needed
 
+The report names the models and prices that actually ran.
+
 ## Metrics
 
-Detection recall, false-positive rate, challenge or review rate, accuracy on known authorization
-violations, performance on adversarial cases, cost per evaluated action, and latency.
+Per configuration: accuracy against the expected decision (and counting also-acceptable
+decisions), accuracy on known authorization violations and identity failures (must be 100%),
+detection (share of suspicious and adversarial cases not allowed), challenge rate on legitimate
+cases, cost per evaluated action from reported token usage, and p50/p95 latency.
+
+**Friction score** (once challenge types exist, decision 0008): each rung carries a weight (allow 0,
+notify 0.1, confirm 1, renew authorization 2, verify payee 3); the score is the mean weight over
+legitimate cases, reported with the share of legitimate actions that saw no prompt. Detection and
+friction together are the critical-damping trade-off; a configuration that lowers one by raising
+the other hasn't improved.
 
 The judges score "performance: did they optimize for speed or scale?"
 ([../reference/hackathon.md](../reference/hackathon.md)), so cost and latency are worth reporting

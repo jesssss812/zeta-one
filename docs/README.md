@@ -48,3 +48,4 @@ What is not done yet is in [roadmap.md](roadmap.md). Every document under `docs/
 | [decisions/0005-stack-and-first-action.md](decisions/0005-stack-and-first-action.md) | Python/FastAPI/SQLite; one action, `propose_payment`; a committed synthetic seed for reproducibility |
 | [decisions/0006-identity-and-authorization.md](decisions/0006-identity-and-authorization.md) | Ed25519-signed requests for identity; a JSON authorization checked in code |
 | [decisions/0007-risk-tiers.md](decisions/0007-risk-tiers.md) | Deterministic features, then Jev, then Claude on escalation; Haiku fallback |
+| [decisions/0008-friction-ladder.md](decisions/0008-friction-ladder.md) | A challenge is a typed step-up (confirm, renew authorization, verify payee); friction scales with risk and is measured |
