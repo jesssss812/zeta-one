@@ -54,9 +54,11 @@ confirmed on the first Console call.
 
 The final `risk.level` is computed, not taken from the last tier:
 
-1. Tier-0 **hard flags** (`bill_mismatch`, `document_instruction_patterns`, and when present
-   `lookalike_counterparty`, `duplicate_candidate`) set a **floor**: `high` for `bill_mismatch` with
-   a new or changed payee, `elevated` otherwise. No later tier can lower the level below the floor.
+1. Tier-0 **hard flags** set a **floor** no later tier can lower: `high` for `bill_mismatch` with
+   a new or changed payee; `elevated` for `bill_mismatch` otherwise, `document_instruction_patterns`,
+   `payment_method_changed_days_ago` within 30 days, and when present `lookalike_counterparty` and
+   `duplicate_candidate`. A recent bank-detail change is exactly the fact a model must not be able
+   to wave away.
 2. Above the floor, a later tier may raise or lower the level; the latest tier that ran decides,
    because it saw the most.
 3. The record names `level_set_by` (the tier) and `floor` (the level and the flags that set it).

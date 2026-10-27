@@ -62,10 +62,16 @@ Error responses are `{"error": {"code", "message"}}` with a 4xx or 5xx status.
 }
 ```
 
-`context` is what the engine looked at, in Rho's shapes, with money as integer minor units and an
-ISO 4217 code. `context.counterparty` is always the **proposed** payee. `bill` and
-`payment_method_history` may be `null` or empty for scenarios without them; `payment_history.count`
-is `0` with `median_amount: null` for a payee never paid before.
+`context` is a **derived view** of what the engine looked at, with money as integer minor units
+and an ISO 4217 code. Only `zeta_one/rho/models.py` follows Rho's schemas exactly; the view adds
+fields Rho doesn't have, from the stand-in's own tables: `payment_methods[].added_at` and the
+whole `payment_method_history` (Rho exposes no method timestamps), `bill.document_excerpt` (bill
+text), `payment_history.recent[].method_type` (derived from Rho's `transaction_type`), and
+`counterparty.name` (Rho's `legal_name`). Vendor payment history is joined through paid bills,
+because Rho's transactions carry a counterparty name and no id. `context.counterparty` is always
+the **proposed** payee. `bill` and `payment_method_history` may be `null` or empty for scenarios
+without them; `payment_history.count` is `0` with `median_amount: null` for a payee never paid
+before.
 
 ## Evidence record
 
@@ -76,19 +82,23 @@ describes how it is produced). Fields the site should rely on:
 {
   "schema_version": 1,
   "decision_id": "dec_...", "created_at": "...", "policy_version": "2026-10-28.1",
-  "configuration": {"tiers": ["tier0", "cheap", "strong"], "escalation": {"confidence_min": 0.8}},
+  "engine_version": "<git sha>" | null, "seed_version": "<hash>" | null,
+  "configuration": {"tiers": ["tier0", "strong"], "escalation": "engineered" | "jev" | "always"},
   "decision": "allow" | "challenge" | "block",
   "reasons": ["risk:elevated"],
   "challenge": null | {"type": "confirm" | "renew_authorization" | "verify_payee", "routed_to": "...", "user_sees": "..."},
-  "friction_rung": 0,
+  "friction_rung": 0 | 1 | 2 | 3 | 4 | 5,
   "identity": {"result": "verified" | "unsigned" | "unknown_agent" | "revoked" | "stale_timestamp" | "replay" | "invalid_signature",
-               "claimed_agent_id", "business_id", "owner", "key_id", "checked": ["known", "active", "timestamp", "nonce", "signature"]},
+               "claimed_agent_id", "business_id", "owner", "key_id", "timestamp", "nonce",
+               "checked": ["present", "known", "active", "timestamp", "nonce", "signature"]},
   "authorization": {"authorization_id", "version", "violations": [{"field", "kind": "scope" | "limit", "limit", "observed"}], "snapshot": {"...as stored..."}},
   "risk": {
-    "level": "low" | "elevated" | "high",
-    "tiers_run": ["tier0", "cheap"],
+    "level": "low" | "elevated" | "high" | null,
+    "level_set_by": "tier0" | "cheap" | "strong" | null,
+    "floor": null | {"level": "elevated" | "high", "flags": ["<feature name>"]},
+    "tiers_run": ["tier0", "strong"],
     "features": {"<name>": {"value", "evidence": ["<record id>"]}},
-    "tier_results": [{"tier", "model", "level", "confidence", "signals": [...], "latency_ms", "usage": {"input_tokens", "output_tokens"}}],
+    "tier_results": [{"tier": "tier0" | "cheap" | "strong", "model": "<model id>" | null, "level", "confidence": 0.0-1.0 | null, "signals": ["<signal name>"], "latency_ms", "usage": null | {"input_tokens", "output_tokens"}}],
     "signals": [{"name", "severity": "low" | "elevated" | "high", "evidence": ["<record id>"], "source": "tier0" | "cheap" | "strong"}],
     "model_rationale": null | "..."
   },
@@ -108,7 +118,19 @@ Rules the site can count on:
   "passed".
 - `cost` and `latency_ms` are `null` when not measured. The site shows "not measured", never a
   placeholder number. Fixtures always have them `null`.
-- `model_rationale` is model output; label it so.
+- `model_rationale` is model output, and `proposal.agent_rationale` is the agent's own text; both
+  can be written by an attacker. Label both as untrusted text, never as findings.
+- `friction_rung` is `0` for allow, `2`–`4` for the challenge types, `5` for block
+  ([../decisions/0008-friction-ladder.md](../decisions/0008-friction-ladder.md)).
+- `risk.floor` names the tier-0 facts no model was allowed to lower; `risk.level_set_by` names the
+  tier that set the final level. `tier_results[].confidence` is non-null only for a calibrated
+  tier (Jev); language-model tiers report `null`, because their self-reported confidence is not
+  calibrated and never gates a decision. `tier_results[].signals` is a list of signal names, which
+  index into `risk.signals`.
+- Tier roles are `tier0`, `cheap` (Jev, or an open-weight model in that comparison arm) and
+  `strong`; the model id is in `model`. In the first engine version the configuration is
+  `["tier0", "strong"]` with engineered escalation: the strong tier runs only when tier 0 isn't
+  clean, so a routine payment shows `tiers_run: ["tier0"]` and no model.
 - `execution.simulated` is always `true` in this build.
 - Evidence ids in `features` and `signals` refer to records in `context` (payment-method history
   ids, transaction ids, bill ids) so the site can link a signal to the row it came from.
@@ -121,11 +143,11 @@ each seen failing on their own.
 
 | Name | What happens | Which question decides | Expected |
 | --- | --- | --- | --- |
-| `vendor_payment_method_changed` | Verified, authorized agent pays a long-standing vendor a typical amount; the vendor's default ACH was replaced three days ago. Tier 0 flags the change, the cheap tier agrees at moderate confidence, the strong tier isn't needed | risk | **challenge** (`confirm` in the first engine version, `verify_payee` once extension 3 lands); payment held |
-| `routine_bill_payment` | Same agent pays a recurring monthly invoice: same vendor, amount and method as the last year. Tier 0 clean, cheap tier confident | none fails | **allow**; payment executed (simulated); no prompt |
+| `vendor_payment_method_changed` | Verified, authorized agent pays a long-standing vendor a typical amount; the vendor's default ACH was replaced three days ago. Tier 0 flags the change and sets an `elevated` floor; the strong tier runs on escalation and agrees. The authorization deliberately permits any payee, which is why only risk can see this | risk | **challenge** (`confirm` in the first engine version, `verify_payee` once extension 4 lands); payment held |
+| `routine_bill_payment` | Same agent pays a recurring monthly invoice: same vendor, amount and method as the last year. Tier 0 clean, so no model runs at all | none fails | **allow**; payment executed (simulated); no prompt |
 | `over_per_payment_limit` | Same agent proposes $7,200 against a $5,000 per-payment limit | authorization (`limit`) | **block** before any risk tier runs; `risk.tiers_run` is empty |
 | `unknown_agent` | The routine payment, signed with a key Zeta One has never seen | identity | **block**; authorization and risk not evaluated |
-| `invoice_redirect_instructions` | The invoice carries instructions aimed at automated AP systems to pay a day-old lookalike payee; the agent follows them. Authorization permits any payee, so only risk can catch it: proposal disagrees with the bill, instruction patterns in the document, new payee, strong tier confirms | risk | **block**, `risk:high_with_redirect_pattern`; `context.bill_counterparty` holds the real vendor |
+| `invoice_redirect_instructions` | The invoice carries instructions aimed at automated AP systems to pay a day-old lookalike payee; the agent follows them. Authorization permits any payee, so only risk can catch it: proposal disagrees with the bill, instruction patterns in the document, new payee; the strong tier runs on escalation and confirms | risk | **block**, `risk:high_with_redirect_pattern`; `context.bill_counterparty` holds the real vendor |
 
 Fixtures:
 [`vendor_payment_method_changed`](../../data/fixtures/vendor_payment_method_changed.json),

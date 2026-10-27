@@ -83,22 +83,21 @@
     "decision_id": "dec_illustrative_0003",
     "created_at": "2026-10-27T22:00:00Z",
     "policy_version": "2026-10-28.1",
+    "engine_version": null,
+    "seed_version": null,
     "configuration": {
       "tiers": [
         "tier0",
-        "cheap",
         "strong"
       ],
-      "escalation": {
-        "confidence_min": 0.8
-      }
+      "escalation": "engineered"
     },
     "decision": "block",
     "reasons": [
       "authorization:limits.per_payment"
     ],
     "challenge": null,
-    "friction_rung": 0,
+    "friction_rung": 5,
     "identity": {
       "result": "verified",
       "claimed_agent_id": "agent_ap_assistant_01",
@@ -106,12 +105,15 @@
       "owner": "finance-owner@larkspur.example",
       "key_id": "key_01",
       "checked": [
+        "present",
         "known",
         "active",
         "timestamp",
         "nonce",
         "signature"
-      ]
+      ],
+      "timestamp": "2026-10-27T22:00:00Z",
+      "nonce": "illustrative-nonce-over_per_payment_limit"
     },
     "authorization": {
       "authorization_id": "auth_0001",
@@ -161,6 +163,8 @@
     },
     "risk": {
       "level": null,
+      "level_set_by": null,
+      "floor": null,
       "tiers_run": [],
       "features": {},
       "tier_results": [],
