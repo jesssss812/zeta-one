@@ -105,11 +105,12 @@ Don't present a gateway that agents use voluntarily as universal protection of R
 
 ## Fast classification and escalation
 
-The idea: deterministic identity and authorization checks first, then a fast, cheap classifier for
-contextual risk, and a stronger model only for the cases that need it. "Jev" was named as the cheap
-classifier, but it isn't mentioned in the hackathon materials and its APIs, models and limits are
-unverified. Confirm what it is before designing around it. A classifier never proves identity or
-enforces authorization.
+Deterministic identity and authorization checks first, then a fast, cheap classifier for contextual
+risk, and a stronger model only for the cases that need it. The cheap classifier is Jev, TypeSafe
+AI's typed decision model ([../reference/jev.md](../reference/jev.md)); the strong tier is Claude.
+How the tiers combine and when escalation happens is in
+[../decisions/0007-risk-tiers.md](../decisions/0007-risk-tiers.md). A classifier never proves
+identity or enforces authorization.
 
 ## Review and learning (stretch)
 
@@ -174,13 +175,22 @@ the differentiator; replacing human fraud analysts or support staff.
 - **Execution:** which sponsor track fits best, what to simulate versus integrate, and what minimal
   benchmark makes the demo technically credible.
 
-## Not decided
+## Decided since (2026-10-27, evening)
 
-Architecture, identity protocol, mandate format, which payment action the MVP supports, the risk
-classification schema, Jev's role, the review assistant's design, the exact demo scenarios and the
-evaluation dataset. Leaning towards: authorization-first framing (identity and risk as inputs to
-the authorization decision), accounts-payable payments as the first domain, and selective
-escalation rather than a strong model on every request.
+| Question | Decision | Where |
+| --- | --- | --- |
+| Framing | Authorization-first: identity and risk are inputs to one enforceable decision | this doc |
+| First domain and action | Accounts payable; one action, `propose_payment`, with the agent stating counterparty, method and amount explicitly | [0005](../decisions/0005-stack-and-first-action.md) |
+| Stack | Python, FastAPI, SQLite, static HTML page | [0005](../decisions/0005-stack-and-first-action.md) |
+| Data | Local stand-in seeded from a staging snapshot when present, else a committed synthetic seed shaped like it | [0002](../decisions/0002-local-rho-stand-in.md), [0005](../decisions/0005-stack-and-first-action.md) |
+| Identity | Registered agents with Ed25519-signed requests; replay protection; revocation | [0006](../decisions/0006-identity-and-mandate.md) |
+| Mandate | JSON per (business, agent): actions, accounts, method types, counterparty list, per-payment and rolling limits, expiry, human-approval threshold; checked in code | [0006](../decisions/0006-identity-and-mandate.md) |
+| Risk | Tier 0 deterministic features, tier 1 Jev, tier 2 Claude on escalation; Haiku fallback for tier 1 | [0007](../decisions/0007-risk-tiers.md) |
+| Scenarios and dataset | Six categories, ~60 labelled synthetic cases generated from the seed, written before the engine | [implementation-plan.md](implementation-plan.md) |
+| Review assistant | Designed for, not built; the evidence record is its input | this doc |
+
+Still open: the exact Jev request shape (verify on first call), and whether the staging snapshot is
+rich enough to shape the seed from, or the seed has to be shaped from assumptions and say so.
 
 ## Goals of this build
 
