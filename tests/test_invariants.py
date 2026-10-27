@@ -1,0 +1,93 @@
+"""AGENTS.md rule 7 as properties: whatever a model answers, it cannot lower a tier-0 floor, lift an
+identity or authorization block, or turn its own failure into an allow."""
+
+
+from hypothesis import given, strategies as st
+
+from zeta_one.contracts import (
+    LEVEL_ORDER,
+    AuthorizationEvidence,
+    Configuration,
+    Feature,
+    IdentityEvidence,
+    Proposal,
+    Tier0Output,
+    TierOutput,
+    TierResult,
+    Violation,
+)
+from zeta_one.decide import policy
+from zeta_one.risk import escalation
+from zeta_one.rho.models import Money
+
+levels = st.sampled_from(["low", "elevated", "high"])
+features = st.fixed_dictionaries({
+    "counterparty_is_new": st.builds(Feature, value=st.booleans()),
+    "payment_method_changed_days_ago": st.builds(Feature, value=st.none() | st.integers(0, 400)),
+    "amount_ratio_to_vendor_median": st.builds(Feature, value=st.none() | st.floats(0, 20)),
+    "bill_mismatch": st.builds(Feature, value=st.booleans()),
+    "document_instruction_patterns": st.builds(Feature, value=st.booleans()),
+    "bill_not_referenced": st.builds(Feature, value=st.booleans()),
+})
+model_answers = st.lists(
+    st.builds(lambda level, error: TierOutput(result=TierResult(tier="strong", level=level, error=error)),
+              levels, st.none() | st.just("timeout")),
+    max_size=2,
+)
+PROPOSAL = Proposal(counterparty_id="cp", payment_method_id="pm", source_account_id="acct",
+                    amount=Money(amount=100, currency="USD"))
+VERIFIED = IdentityEvidence(result="verified", claimed_agent_id="agent", business_id="biz")
+
+
+def _tier0(level, feats) -> Tier0Output:
+    return Tier0Output(result=TierResult(tier="tier0", level=level), features=feats)
+
+
+@given(levels, features, model_answers)
+def test_no_model_answer_lowers_the_floor(tier0_level, feats, answers):
+    risk = escalation.merge(_tier0(tier0_level, feats), answers)
+    floor = escalation.floor(feats)
+    if floor:
+        assert LEVEL_ORDER[risk.level] >= LEVEL_ORDER[floor.level]
+
+
+@given(levels, features, model_answers)
+def test_every_lowering_is_recorded_and_flagged_in_reasons(tier0_level, feats, answers):
+    risk = escalation.merge(_tier0(tier0_level, feats), answers)
+    lowered = LEVEL_ORDER[risk.level] < LEVEL_ORDER[tier0_level]
+    assert (risk.lowered is not None) == lowered
+    outcome = policy.decide(policy.PolicyInput(VERIFIED, AuthorizationEvidence(), None, risk, PROPOSAL))
+    assert ("risk:lowered_by_model" in outcome.reasons) == lowered
+
+
+@given(levels, features, model_answers)
+def test_a_failed_model_never_ends_in_allow(tier0_level, feats, answers):
+    risk = escalation.merge(_tier0(tier0_level, feats), answers)
+    outcome = policy.decide(policy.PolicyInput(VERIFIED, AuthorizationEvidence(), None, risk, PROPOSAL))
+    if any(answer.result.error for answer in answers):
+        assert outcome.decision != "allow"
+
+
+@given(levels, features, model_answers, st.sampled_from(["unsigned", "unknown_agent", "revoked", "replay"]))
+def test_identity_failure_blocks_whatever_risk_says(tier0_level, feats, answers, status):
+    risk = escalation.merge(_tier0(tier0_level, feats), answers)
+    identity = IdentityEvidence(result=status)
+    outcome = policy.decide(policy.PolicyInput(identity, AuthorizationEvidence(), None, risk, PROPOSAL))
+    assert outcome.decision == "block" and outcome.reasons == [f"identity:{status}"]
+
+
+@given(levels, features, model_answers)
+def test_authorization_violation_blocks_whatever_risk_says(tier0_level, feats, answers):
+    risk = escalation.merge(_tier0(tier0_level, feats), answers)
+    violation = Violation(field="limits.per_payment", kind="limit")
+    authorization = AuthorizationEvidence(violations=[violation])
+    outcome = policy.decide(policy.PolicyInput(VERIFIED, authorization, None, risk, PROPOSAL))
+    assert outcome.decision == "block" and outcome.reasons == ["authorization:limits.per_payment"]
+
+
+def test_clean_tier0_does_not_escalate_and_soft_signal_does():
+    clean = {"counterparty_is_new": Feature(value=False), "amount_ratio_to_vendor_median": Feature(value=1.0)}
+    soft = {**clean, "amount_ratio_to_vendor_median": Feature(value=5.0)}
+    config = Configuration()
+    assert not escalation.should_escalate(config, _tier0("low", clean))
+    assert escalation.should_escalate(config, _tier0("low", soft))

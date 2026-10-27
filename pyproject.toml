@@ -1,0 +1,10 @@
+[project]
+name = "zeta-one"
+version = "0.1.0"
+description = "Trust and risk checks for AI agents that move money"
+requires-python = ">=3.13"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"

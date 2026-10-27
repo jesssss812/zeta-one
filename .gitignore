@@ -6,6 +6,10 @@
 # Local Rho staging snapshots: reviewed before anything derived from them is committed
 data/snapshots/
 
+# The gateway's local database and the demo agents' private keys, created on first start
+data/zeta.db
+data/keys/
+
 # Python
 __pycache__/
 *.py[cod]

@@ -55,7 +55,8 @@ Error responses are `{"error": {"code", "message"}}` with a 4xx or 5xx status.
     "bill": {"id", "counterparty_id", "counterparty_name", "invoice_number", "invoice_date", "due_date", "amount": {"amount", "currency"}, "memo", "document_excerpt"},
     "payment_history": {"count", "first_at", "last_at", "median_amount": {"amount", "currency"}, "recent": [{"id", "posted_at", "amount", "method_type"}]},
     "bill_counterparty": "present only when the proposal's counterparty differs from the bill's: that counterparty, same shape as `counterparty`",
-    "bill_counterparty_payment_history": "present with `bill_counterparty`: its payment history, same shape as `payment_history`"
+    "bill_counterparty_payment_history": "present with `bill_counterparty`: its payment history, same shape as `payment_history`",
+    "open_bills": "the proposed counterparty's unpaid bills as the engine found them itself, same shape as `bill`; may be empty"
   },
   "proposal": {"bill_id", "counterparty_id", "payment_method_id", "source_account_id", "amount": {"amount", "currency"}, "memo", "agent_rationale", "source_document_ids"},
   "decision_record": { "...the evidence record below..." }
