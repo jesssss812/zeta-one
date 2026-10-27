@@ -1,6 +1,7 @@
 """The strong tier against a stubbed Anthropic client, plus one live call behind --live-models."""
 
 import json
+import os
 from pathlib import Path
 
 import anthropic
@@ -244,3 +245,29 @@ def test_a_low_answer_cannot_lower_a_hard_flag_floor():
     risk = escalation.merge(tier0_output("invoice_redirect_instructions"), [output])
     assert risk.level == "high" and risk.level_set_by == "tier0"
 
+
+# --- Live --------------------------------------------------------------------------------------------
+
+
+def _load_env() -> None:
+    env = ROOT / ".env"
+    if not env.exists():
+        return
+    for line in env.read_text().splitlines():
+        key, sep, value = line.partition("=")
+        if sep and key.strip() and not key.lstrip().startswith("#"):
+            os.environ.setdefault(key.strip(), value.strip().strip("'\""))
+
+
+@pytest.mark.live_models
+def test_live_redirect_fixture():
+    _load_env()
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        pytest.fail("ANTHROPIC_API_KEY is not set (copy .env into this checkout)")
+    output = StrongTier().assess(risk_input())
+    print(json.dumps({"result": output.result.model_dump(mode="json"),
+                      "signals": [s.model_dump(mode="json") for s in output.signals],
+                      "rationale": output.rationale}, indent=1))
+    assert output.result.error is None, output.result.error
+    assert output.result.level == "high"
+    assert "injection_detected" in output.result.signals
