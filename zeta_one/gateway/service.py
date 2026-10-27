@@ -12,6 +12,7 @@ from zeta_one.contracts import IdentityEvidence, SignedRequest
 from zeta_one.gateway import admin
 from zeta_one.gateway.ledger import Ledger
 from zeta_one.gateway.pipeline import Engine
+from zeta_one.gateway.reuse import RiskReuse
 from zeta_one.gateway.wiring import ContextCapture, Stages, build_engine
 
 
@@ -36,7 +37,7 @@ class Gateway:
     stages: Stages
     ledger: Ledger
     clock: Callable[[], datetime] = _now
-    assess_risk: Callable | None = None
+    reuse: RiskReuse | None = None
     version: str | None = None
 
     def __post_init__(self) -> None:
@@ -47,7 +48,7 @@ class Gateway:
             self._capture = ContextCapture(self.stages.load_context)
             captured = replace(self.stages, load_context=self._capture)
             self._engine = build_engine(
-                captured, self.ledger.spend_source(), assess_risk=self.assess_risk, clock=self.clock, version=self.version
+                captured, self.ledger.spend_source(), assess_risk=self.reuse, clock=self.clock, version=self.version
             )
 
     @property
@@ -64,7 +65,10 @@ class Gateway:
         engine = self.engine
         with self._capture.recording() as seen:
             record, proposal = engine.evaluate(request)
-        challenge_id = self.ledger.record(record, proposal, context=seen[-1] if seen else None)
+        context = seen[-1] if seen else None
+        challenge_id = self.ledger.record(record, proposal, context=context)
+        if self.reuse:
+            self.reuse.remember(record, proposal, context)
         return {"decision": record.decision, "decision_id": record.decision_id, "challenge_id": challenge_id}
 
     def resolve(

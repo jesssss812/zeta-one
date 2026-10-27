@@ -1,0 +1,97 @@
+"""S3: the same proposal within 24 hours reuses the earlier risk result, so it can't be re-rolled."""
+
+import sqlite3
+from datetime import timedelta
+
+import pytest
+
+from tests.gateway.fakes import NOW, FakeWorld, agent_headers, held_proposal, routine_proposal
+from zeta_one.contracts import Money, SignedRequest
+from zeta_one.gateway.ledger import Ledger
+from zeta_one.gateway.reuse import RiskReuse, fingerprint
+from zeta_one.gateway.service import Gateway
+
+
+class Clock:
+    def __init__(self):
+        self.now = NOW
+
+    def __call__(self):
+        return self.now
+
+
+@pytest.fixture
+def world() -> FakeWorld:
+    return FakeWorld()
+
+
+@pytest.fixture
+def clock() -> Clock:
+    return Clock()
+
+
+@pytest.fixture
+def gateway(world, clock) -> Gateway:
+    connection = sqlite3.connect(":memory:", check_same_thread=False)
+    connection.row_factory = sqlite3.Row
+    return Gateway(stages=world.stages(), ledger=Ledger(connection), reuse=RiskReuse(connection), clock=clock)
+
+
+def send(gateway, proposal) -> dict:
+    response = gateway.propose(
+        SignedRequest(method="POST", path="/v1/actions/propose_payment", headers=agent_headers(), body=proposal.model_dump_json().encode())
+    )
+    return gateway.ledger.decision(response["decision_id"])
+
+
+def test_same_adversarial_proposal_five_times_gets_one_model_call_and_one_decision(gateway, world, clock):
+    records = []
+    for _ in range(5):
+        records.append(send(gateway, held_proposal()))
+        clock.now += timedelta(minutes=1)
+    assert world.strong_calls == 1
+    assert {r["decision"] for r in records} == {"challenge"}
+    first = records[0]
+    assert first["risk"]["reused_from"] is None
+    assert all(r["risk"]["reused_from"] == first["decision_id"] for r in records[1:])
+    assert all(r["risk"]["level"] == first["risk"]["level"] for r in records)
+    assert all(r["cost"]["input_tokens"] == 0 for r in records[1:])
+
+
+def test_reuse_ends_after_24_hours(gateway, world, clock):
+    send(gateway, held_proposal())
+    clock.now += timedelta(hours=24, seconds=1)
+    assert send(gateway, held_proposal())["risk"]["reused_from"] is None
+    assert world.strong_calls == 2
+
+
+def test_a_changed_payment_method_means_a_fresh_assessment(gateway, world):
+    send(gateway, held_proposal())
+    world.change_payment_method()
+    assert send(gateway, held_proposal())["risk"]["reused_from"] is None
+    assert world.strong_calls == 2
+
+
+def test_a_different_amount_is_a_different_proposal(gateway, world):
+    send(gateway, held_proposal())
+    other = held_proposal(amount=Money(amount=251501, currency="USD"))
+    assert send(gateway, other)["risk"]["reused_from"] is None
+
+
+def test_identity_and_authorization_still_run_on_a_repeat(gateway, world):
+    send(gateway, held_proposal())
+    world.authorization = world.authorization.model_copy(update={"status": "revoked"})
+    record = send(gateway, held_proposal())
+    assert record["decision"] == "block" and record["reasons"] == ["authorization:status"]
+
+
+def test_clean_results_are_reused_too(gateway):
+    first = send(gateway, routine_proposal())
+    assert send(gateway, routine_proposal())["risk"]["reused_from"] == first["decision_id"]
+
+
+def test_fingerprint_covers_agent_and_bill():
+    proposal = held_proposal()
+    assert fingerprint("a", proposal) != fingerprint("b", proposal)
+    assert fingerprint("a", proposal) != fingerprint("a", held_proposal(bill_id=None))
+    assert fingerprint("a", proposal) == fingerprint("a", held_proposal(memo="different words"))

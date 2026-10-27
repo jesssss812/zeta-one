@@ -16,6 +16,7 @@ from zeta_one import db
 from zeta_one.contracts import POLICY_VERSION, InvalidProposal, SignedRequest
 from zeta_one.gateway import admin, scenarios
 from zeta_one.gateway.ledger import Ledger
+from zeta_one.gateway.reuse import RiskReuse
 from zeta_one.gateway.service import EngineNotReady, Gateway, NotHeld, UnknownChallenge
 from zeta_one.gateway.wiring import engine_version, real_stages
 
@@ -116,7 +117,8 @@ def create_app(gateway: Gateway, token: str | None) -> FastAPI:
 
 
 def default_gateway() -> Gateway:
-    return Gateway(stages=real_stages(), ledger=Ledger(db.connect()), version=engine_version())
+    connection = db.connect()
+    return Gateway(stages=real_stages(), ledger=Ledger(connection), reuse=RiskReuse(connection), version=engine_version())
 
 
 app = create_app(default_gateway(), admin.admin_token())
