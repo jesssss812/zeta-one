@@ -26,6 +26,19 @@ Use this to settle product decisions. In damping terms:
 - **Critically damped:** allow low-risk actions without friction, challenge what is uncertain, block
   what is clearly unauthorized.
 
+The challenge ladder ([../decisions/0008-friction-ladder.md](../decisions/0008-friction-ladder.md))
+is the damping made concrete, and the evaluation's friction score is how ζ is measured.
+
+## One-line answers
+
+- *How is this different from approvals?* Approvals are per bill, by a person, after the fact. An
+  authorization is per agent, granted up front, bounded and revocable; the engine decides within it.
+- *How is this different from "know your agent"?* Knowing the agent and checking its authorization
+  are two of the three questions. The third is the one a trusted, authorized agent still fails:
+  is this payment fraud anyway?
+- *Why not a strong model on everything?* Because most legitimate actions need no judgement at all,
+  and the ones that do are a small, measurable fraction. The evaluation shows the fraction.
+
 ## Visual identity
 
 A logo of a decaying oscillation that settles flat, with "ζ=1".
