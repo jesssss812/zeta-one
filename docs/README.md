@@ -32,6 +32,7 @@ What is not done yet is in [roadmap.md](roadmap.md). Every document under `docs/
 
 | Doc | What it covers |
 | --- | --- |
+| [strategy/why-agent-risk.md](strategy/why-agent-risk.md) | Research-backed rationale, claim limits, and reusable copy for the site, write-up, and slides |
 | [strategy/product.md](strategy/product.md) | The problem, who acts, the decision model, where enforcement runs, scope, demo scenarios, open questions |
 | [strategy/evaluation.md](strategy/evaluation.md) | How Zeta One is measured: labels, case sets, labelling, comparisons, metrics, and what waits until after the hackathon |
 | [strategy/security.md](strategy/security.md) | Where Zeta One adds risk of its own (models, design, build, claims), the guardrails for each, and the detailed work |

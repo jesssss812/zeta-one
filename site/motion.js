@@ -29,12 +29,13 @@
   const details = document.querySelectorAll(
     '#demo .section-top, section:not(#demo) > .section-top > p, .console, .engineering-steps article, .outcomes > div, ' +
     '.platform-evidence > div, .learning-copy > p, .learning-flow, ' +
-    '.comparison, .eval-principles > div, .video-placeholder'
+    '.comparison, .eval-summary, .video-placeholder, .why-grid article, .why-thesis, .other-cases'
   );
   const observer = new IntersectionObserver((entries) => {
     for (const entry of entries) {
       if (!entry.isIntersecting) continue;
       observer.unobserve(entry.target);
+      entry.target.classList.remove('reveal-pending');
       if (preference.matches || entry.target.contains(document.activeElement)) continue;
       const animation = entry.target.animate(
         [{opacity: 0.2, transform: 'translateY(14px)'}, {opacity: 1, transform: 'translateY(0)'}],
@@ -47,14 +48,27 @@
   for (const detail of details) {
     // Keep initial viewport content immediately visible, including deep links.
     const box = detail.getBoundingClientRect();
-    if (box.top >= window.innerHeight) observer.observe(detail);
+    if (box.top >= window.innerHeight && !preference.matches) {
+      observer.observe(detail);
+      detail.classList.add('reveal-pending');
+    }
   }
   const finishMotion = () => {
     for (const animation of running) animation.cancel();
     running.clear();
   };
-  preference.addEventListener('change', () => { if (preference.matches) finishMotion(); updatePause(); });
-  document.addEventListener('focusin', finishMotion);
+  preference.addEventListener('change', () => {
+    if (preference.matches) {
+      finishMotion();
+      details.forEach(detail => detail.classList.remove('reveal-pending'));
+      observer.disconnect();
+    }
+    updatePause();
+  });
+  document.addEventListener('focusin', (event) => {
+    finishMotion();
+    event.target.closest('.reveal-pending')?.classList.remove('reveal-pending');
+  });
   document.addEventListener('visibilitychange', () => {
     updatePause();
     if (document.hidden) finishMotion();
