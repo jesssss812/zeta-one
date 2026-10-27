@@ -11,7 +11,11 @@ our questions on 2026-10-27. Anything not listed here as confirmed is not confir
 - **Staging app:** `https://app.rho-staging.co/`. Reaching staging requires the OpenVPN profile Rho
   assigned. See [../runbooks/staging-access.md](../runbooks/staging-access.md).
 - **Auth:** `Authorization: Bearer <token>`. Tokens are issued in Rho settings with a chosen subset
-  of scopes.
+  of scopes. The hackathon staging token reads every list endpoint `scripts/staging_check.py` calls
+  except `/fields`, which returns `403` for a missing scope.
+- **Cloudflare sits in front of staging** and rejects some client signatures with `403` error 1010
+  before the token is checked. Python's default `Python-urllib` user agent is rejected; a named user
+  agent such as `zeta-one-staging-check/0.1` is accepted.
 - **Read-only.** Rho asked that all hackathon API use be treated as read-only unless they announce
   more staging capabilities. The only documented write is `PATCH /transactions/{id}/note`, which
   needs the `transactions:note:write` scope.
@@ -37,7 +41,6 @@ our questions on 2026-10-27. Anything not listed here as confirmed is not confir
 | Invoicing | `GET /invoicing/customers`, `/invoicing/customers/{customer_id}`, `/invoicing/invoices`, `/invoicing/invoices/{invoice_id}`, `/invoicing/invoices/{invoice_id}/files/{file_id}` |
 | Other | `GET /statements`, `/statements/{id}`, `/credit-programs` (+ `/{credit_program_id}`, `/{credit_program_id}/balance`), `/insights/cashflow`, `/insights/money-movement`, `/fields` |
 
-## Not yet known
+## Staging data
 
-What data the staging business actually holds: how many counterparties, bills and transactions,
-how much history, and which fields are filled.
+What the staging business holds is in [staging-data.md](staging-data.md).

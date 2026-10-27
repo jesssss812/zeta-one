@@ -5,7 +5,7 @@ live in `docs/`.
 
 **Zeta One: trust and risk checks for AI agents that move money.** A solo hackathon project, aimed
 at the Rho fintech track. Submissions close **Thu Oct 29, 2026, 5:00 PM CT**; the live demo is at the Hack
-Fair on Fri Oct 30. No code exists yet.
+Fair on Fri Oct 30. The app isn't built yet; the only code is the read-only staging check.
 
 ## Safety rules
 
@@ -86,8 +86,11 @@ Settled; the reasoning is in [docs/strategy/product.md](docs/strategy/product.md
 
 ## Commands
 
-None yet. When code lands, the real commands live in the build files and CI, and this section lists
-them.
+```bash
+python3 scripts/staging_check.py   # read-only Rho staging check; needs the VPN and RHO_API_TOKEN in .env
+```
+
+When the app lands, its real commands live in the build files and CI, and this section lists them.
 
 ## Keeping docs true
 
@@ -106,6 +109,7 @@ frontmatter, once that code exists.
   demo scenarios and open questions.
 - [docs/strategy/evaluation.md](docs/strategy/evaluation.md): how it is measured.
 - [docs/reference/rho-api.md](docs/reference/rho-api.md): what the Rho API allows.
+- [docs/reference/staging-data.md](docs/reference/staging-data.md): what Rho staging holds.
 - [docs/reference/hackathon.md](docs/reference/hackathon.md): deadline, submission checklist and
   judging criteria.
 - [docs/decisions/](docs/decisions/): why things are the way they are.

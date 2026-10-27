@@ -15,7 +15,7 @@ track, on Rho's API. It is not a Rho product.
 
 ## Status
 
-In planning; no code yet. The quick start, architecture diagram, reproduction steps, data
+In planning; the app isn't built yet. The quick start, architecture diagram, reproduction steps, data
 provenance and known limitations will be added here as they are built.
 
 ## Documentation

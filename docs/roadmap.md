@@ -4,8 +4,6 @@ What is not done, as of 2026-10-27. Remove a line when it is done.
 
 ## Before implementation
 
-- Check what Rho staging holds (counterparties, bills, transactions, history, filled fields) and
-  record a summary in `docs/reference/`. Needs the VPN, so it runs locally.
 - Find out what Jev is, and whether it is available, before designing the classifier around it.
 - Plan the implementation: language and stack, the mandate format, the identity mechanism, the risk
   signals the data supports, and the narrowest payment action to support first.
