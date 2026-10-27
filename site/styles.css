@@ -187,3 +187,17 @@ footer p{display:none}
 }
 
 .inline-link{text-decoration:underline;text-underline-offset:3px}.platform-evidence{display:grid;grid-template-columns:1fr 1fr;gap:70px;border-top:1px solid var(--line);padding-top:30px}.platform-evidence p,.learning-copy p,.eval-principles p{font-size:15px;color:var(--muted)}.platform-evidence h3{font-size:27px}.evidence-stack{background:#edf1e5;border-radius:5px;padding:12px 28px}.evidence-stack>div{display:grid;grid-template-columns:30px 1fr;gap:4px 12px;padding:22px 0;border-bottom:1px solid #d3dcc7}.evidence-stack>div:last-child{border-bottom:0}.evidence-stack span{font:12px monospace;padding-top:5px;color:var(--muted)}.evidence-stack strong{font-size:18px;font-weight:500}.evidence-stack small{grid-column:2;color:var(--muted);font-size:12px}.learning-section,.evaluation-section{border-top:1px solid var(--line);margin-top:80px;padding-top:65px}.learning-section h2{max-width:780px}.learning-copy{display:grid;grid-template-columns:1fr 1fr;gap:70px;margin:25px 0}.learning-flow{display:flex;align-items:center;justify-content:space-between;gap:15px;background:#edf1e5;padding:24px;font-size:12px}.eval-principles{display:grid;grid-template-columns:repeat(3,1fr);gap:35px;margin-top:30px}.eval-principles h3{font-size:23px}.engineering-steps .text-link{font-size:12px;display:inline-block}@media(max-width:800px){.platform-evidence,.learning-copy,.eval-principles{grid-template-columns:1fr;gap:20px}.learning-flow{flex-wrap:wrap;justify-content:flex-start}.learning-section,.evaluation-section{margin-top:55px;padding-top:45px}}
+
+/* Decorative motion settles within four seconds; content never depends on it. */
+.hero-benefits{max-width:680px;margin:22px auto;color:var(--muted);font-size:15px}
+.hero-benefits p{margin:7px 0}.hero-benefits strong{color:var(--ink);font-weight:500}
+.hero::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background-image:radial-gradient(#71826540 .7px,transparent .9px);background-size:25px 25px;mask-image:linear-gradient(90deg,#000,transparent 28%,transparent 72%,#000);animation:field-arrive 3.8s ease-out both}
+.hero{isolation:isolate}
+.curve .ghost{transform-origin:50% 80.55%;animation:damp-wave 3.8s ease-in-out both}
+.curve .settle{stroke-dasharray:1400;stroke-dashoffset:0;animation:trace-curve 3s ease-out both}
+.motion-paused .hero::before,.motion-paused .curve path{animation-play-state:paused}
+@keyframes damp-wave{0%{transform:scaleY(.25);opacity:.3}20%{transform:scaleY(1.2);opacity:.85}40%{transform:scaleY(-.35)}60%{transform:scaleY(.7)}80%{transform:scaleY(.9)}100%{transform:scaleY(1);opacity:1}}
+@keyframes trace-curve{from{stroke-dashoffset:1400;opacity:.3}to{stroke-dashoffset:0;opacity:1}}
+@keyframes field-arrive{from{transform:translateY(12px);opacity:0}to{transform:translateY(0);opacity:1}}
+@media(prefers-reduced-motion:reduce){.hero::before,.curve .ghost,.curve .settle{animation:none!important}}
+@media print{.hero::before{display:none}*{animation:none!important;transition:none!important}}

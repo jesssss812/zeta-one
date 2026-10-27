@@ -1,6 +1,6 @@
 # Zeta One submission site
 
-Static, dependency-free presentation site. No JavaScript, API calls, model runs, or payment actions.
+Static, dependency-free presentation site with optional lightweight motion. No API calls, model runs, or payment actions.
 The page explains the project and shows one labeled illustrative decision. Payment execution is
 simulated throughout the project.
 
@@ -20,7 +20,8 @@ Open http://localhost:4173. FastAPI can also serve this directory unchanged. All
   and demo video space. Replace the labeled video placeholder with an accessible video/embed once
   a recording exists; add a link to the actual app when it is ready.
 - `fonts.html`: four wordmark studies for choosing the name and ζ typography; separate from the submission page.
-- `styles.css`: responsive presentation, keyboard focus, and reduced-motion support.
+- `styles.css`: responsive presentation, keyboard focus, reduced-motion support, and brief decorative curve/background animation.
+- `motion.js`: one-time scroll reveals using IntersectionObserver and opacity/transform animations. Headlines stay visible; content remains readable without JavaScript. Keyboard focus and reduced-motion preferences cancel reveals. No libraries, scroll listeners, or delayed content fetching.
 - The decision example is drawn from the engine-owned
   [vendor payment-method change fixture](../data/fixtures/vendor_payment_method_changed.json).
   It is authored synthetic data, not a live engine result. No latency, savings, or accuracy figures
@@ -31,7 +32,7 @@ API integration remain in the actual application. The video and evaluation areas
 that their content is forthcoming. The review assistant and learning loop are planned extensions.
 
 Checks: `python3 scripts/check.py` from the repository root. Manually verify page anchors, desktop
-and narrow layouts, visible focus, and absence of missing assets. There is no frontend build step.
+and narrow layouts, visible focus, and absence of missing assets. Run `node --check site/motion.js` for JavaScript syntax. There is no frontend build step.
 
 All changes stay in `site/`; the engine owns the root README and docs. Suggested root README text:
 “Preview the submission site with `python3 -m http.server 4173 --bind 127.0.0.1 --directory site`.
