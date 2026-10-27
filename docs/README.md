@@ -34,6 +34,8 @@ What is not done yet is in [roadmap.md](roadmap.md). Every document under `docs/
 | [strategy/product.md](strategy/product.md) | The problem, who acts, the decision model, where enforcement runs, scope, demo scenarios, open questions |
 | [strategy/evaluation.md](strategy/evaluation.md) | How Zeta One is measured: case categories, comparisons, metrics |
 | [strategy/messaging.md](strategy/messaging.md) | Tagline, project explanation, design philosophy, visual identity |
+| [strategy/implementation-plan.md](strategy/implementation-plan.md) | Architecture, modules, API, policy table, evidence record, seed and scenarios, schedule and cut list |
+
 ## Decisions
 
 | Doc | What it decided |
