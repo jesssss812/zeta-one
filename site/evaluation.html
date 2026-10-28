@@ -29,7 +29,7 @@
 body { background: var(--bg); color: var(--fg); font: 15px/1.55 var(--body); margin: 0;
   padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
 .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
-.top a, .links a { color: var(--fg); }
+.top a, .links a, .note a { color: var(--fg); }
 .wrap { max-width: 1240px; margin: 0 auto; padding-block: 32px 64px; display: grid; gap: 40px; }
 header { display: grid; gap: 10px; max-width: 780px; }
 .eyebrow { font: 11px/1.4 var(--mono); letter-spacing: .12em; color: var(--muted); text-transform: uppercase; }
@@ -82,6 +82,18 @@ td code, .mono { font: 12.5px var(--mono); }
 .col.code { background: color-mix(in srgb, var(--code) 70%, var(--panel)); }
 .note { font-size: 13px; color: var(--muted); max-width: 80ch; }
 section { display: grid; gap: 14px; }
+.dims { display: grid; grid-template-columns: minmax(150px, 220px) minmax(0, 1fr); border: 1px solid var(--line); border-radius: 12px; background: var(--panel); overflow: hidden; }
+.dims > div { padding: 9px 14px; border-top: 1px solid var(--line); min-width: 0; }
+.dims > div:nth-child(-n+2) { border-top: 0; }
+.dims .dim { font-weight: 600; font-size: 14px; }
+.dims .vals { display: flex; flex-wrap: wrap; gap: 6px; }
+.val { background: var(--code); color: var(--code-ink); border-radius: 999px; padding: 2px 10px; font-size: 13px; }
+.steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; counter-reset: step; }
+.steps > div { border-radius: 10px; padding: 12px 14px; display: grid; gap: 4px; min-width: 0; }
+.steps b { font: 600 10.5px var(--mono); letter-spacing: .09em; text-transform: uppercase; }
+.steps span { font-size: 13.5px; }
+.sources td:last-child a { color: var(--fg); }
+@media (max-width: 860px) { .steps { grid-template-columns: 1fr 1fr; } .dims { grid-template-columns: 1fr; } .dims > div:nth-child(2) { border-top: 1px solid var(--line); } .dims .dim { padding-bottom: 0; } .dims .vals { border-top: 0; } }
 @media (max-width: 860px) { .legend, .cols { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 480px) { .legend, .cols { grid-template-columns: 1fr; } }
 </style>
@@ -290,6 +302,52 @@ section { display: grid; gap: 14px; }
   </div>
   <figcaption>Cases are made by code and Claude Haiku. Claude Sonnet labels every case blind, and a person labels 40 test cases without seeing its labels; the two are compared for agreement and the person settles every disagreement. Code then freezes the labelled sets, runs each case through all seven configurations in a fresh sandbox, and writes the report.</figcaption>
 </figure>
+
+<section>
+  <div>
+    <h2>How the cases are built</h2>
+    <p class="note">Each generated case is one combination of eight dimensions, each with a few values. Code builds every combination and drops the ones that can't happen, such as a bank change older than the vendor, or invoice text on a case with no bill. A model only writes the words. Whether a case is fraud follows from where the money would go: it is payee fraud only when the payment would reach someone other than the real vendor.</p>
+  </div>
+  <div class="dims" aria-label="The eight dimensions and their values">
+    <div class="dim">Vendor tenure</div><div class="vals"><span class="val">established</span><span class="val">recent</span><span class="val">new</span></div>
+    <div class="dim">Bank details changed</div><div class="vals"><span class="val">never</span><span class="val">3 days ago</span><span class="val">20 days ago</span><span class="val">90 days ago</span></div>
+    <div class="dim">Change confirmed</div><div class="vals"><span class="val">not applicable</span><span class="val">yes, by call-back</span><span class="val">no</span></div>
+    <div class="dim">Amount vs usual</div><div class="vals"><span class="val">1×</span><span class="val">2.5×</span><span class="val">5×</span></div>
+    <div class="dim">Bill</div><div class="vals"><span class="val">matches</span><span class="val">another vendor's</span><span class="val">none named</span></div>
+    <div class="dim">Invoice text</div><div class="vals"><span class="val">clean</span><span class="val">urgency</span><span class="val">redirect instruction</span><span class="val">honest change notice</span></div>
+    <div class="dim">Agent's rationale</div><div class="vals"><span class="val">plain</span><span class="val">cites "updated instructions"</span></div>
+    <div class="dim">Request channel</div><div class="vals"><span class="val">real vendor</span><span class="val">lookalike sender</span><span class="val">compromised vendor channel</span></div>
+  </div>
+  <div class="steps">
+    <div class="code"><b class="t-code">1 · Code</b><span>3 × 4 × 3 × 3 × 3 × 4 × 2 × 3 = 7,776 combinations, impossible ones dropped</span></div>
+    <div class="code"><b class="t-code">2 · Code</b><span>Seeded sample per class: legitimate, suspicious, adversarial, ambiguous</span></div>
+    <div class="model"><b class="t-model">3 · Model</b><span>Claude Haiku 5.5 writes the invoice text and the agent's rationale, never seeing the truth</span></div>
+    <div class="code"><b class="t-code">4 · Code</b><span>Each case's records are applied to a fresh copy of the synthetic data</span></div>
+  </div>
+  <p class="note">Harmless look-alikes are built in on purpose: honest urgent invoices, confirmed bank changes and real change notices, so a warning sign alone is never the answer. Because the dimensions resemble the rules' own features, the hand-written hard set, which comes from none of them, is the headline.</p>
+</section>
+
+<section>
+  <div>
+    <h2>Where the methods come from</h2>
+    <p class="note">The method follows published practice for evaluating AI systems, adapted to a decision that code can grade.</p>
+  </div>
+  <div class="tablewrap">
+  <table class="sources">
+    <thead><tr><th>What we do</th><th>Why</th><th>Source</th></tr></thead>
+    <tbody>
+      <tr><td>Build cases from dimensions and their combinations, with a model writing only the wording</td><td>Covers the space on purpose instead of by whatever examples come to mind</td><td><a href="https://hamel.dev/blog/posts/evals">Hamel Husain, Your AI product needs evals</a></td></tr>
+      <tr><td>Write the labelling guide only after reading 20 generated cases</td><td>What counts as a good decision shifts once you read real cases</td><td><a href="https://hamel.dev/blog/posts/evals-faq/">Hamel Husain, Evals FAQ</a></td></tr>
+      <tr><td>Check the AI labeller against a person labelling blind, and let the person settle disagreements</td><td>An AI label is a measurement with its own error, not ground truth</td><td><a href="https://hamel.dev/blog/posts/evals-faq/">Hamel Husain, Evals FAQ</a></td></tr>
+      <tr><td>Report agreement as Cohen's κ with an interval, and say how the labels were made</td><td>Scores built on model-made labels have to carry that labeller's error</td><td><a href="https://arxiv.org/abs/2511.21140">How to correctly report LLM-as-a-judge evaluations (arXiv 2511.21140)</a></td></tr>
+      <tr><td>Grade with code: the decision against its label, with no model as judge</td><td>The outcome here is a decision, so it can be checked exactly</td><td><a href="https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents">Anthropic, Demystifying evals for AI agents</a></td></tr>
+      <tr><td>Read every wrong decision on dev and tag the first stage that went wrong</td><td>Error analysis on the evidence records finds what to fix; rates alone don't</td><td><a href="https://hamel.dev/blog/posts/evals">Hamel Husain, Your AI product needs evals</a></td></tr>
+      <tr><td>Every rate with its count and a Wilson 95% interval; paired comparisons with exact McNemar</td><td>At about 30 cases per class, one case moves a rate by several points</td><td>Standard statistics</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="note">Not yet run: repeat runs reporting pass^3, the share of fraud caught in all three runs (<a href="https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents">Anthropic</a>), and an attacking model that adapts to this system and is reported per attack kind (<a href="https://www.nist.gov/news-events/news/2025/01/technical-blog-strengthening-ai-agent-hijacking-evaluations">NIST, agent hijacking evaluations</a>).</p>
+</section>
 
 <section>
   <div>

@@ -71,6 +71,46 @@ flowchart LR
 | Blue | A model alone | Case wording, the blind AI labels, and the risk tiers being measured |
 | Grey | Code | Every step that has to be repeatable: sampling, assembly, agreement, freezing, runs, the report |
 
+## How the cases are built
+
+Each generated case is one combination of eight dimensions. Code builds every combination
+(3 × 4 × 3 × 3 × 3 × 4 × 2 × 3 = 7,776), drops the ones that can't happen, such as a bank change
+older than the vendor or invoice text on a case with no bill, and draws a seeded sample per class:
+legitimate, suspicious, adversarial and ambiguous. Claude Haiku 5.5 then writes the invoice text
+and the agent's rationale, without seeing the truth. Whether a case is fraud follows from where the
+money would go: payee fraud only when the payment would reach someone other than the real vendor.
+
+| Dimension | Values |
+| --- | --- |
+| Vendor tenure | established, recent, new |
+| Bank details changed | never, 3, 20 or 90 days ago |
+| Change confirmed | not applicable, yes (by call-back), no |
+| Amount vs usual | 1×, 2.5×, 5× |
+| Bill | matches, another vendor's, none named |
+| Invoice text | clean, urgency, redirect instruction, honest change notice |
+| Agent's rationale | plain, cites "updated instructions" |
+| Request channel | real vendor, lookalike sender, compromised vendor channel |
+
+Harmless look-alikes are built in on purpose (honest urgent invoices, confirmed bank changes, real
+change notices), so a warning sign alone is never the answer. Because the dimensions resemble the
+rules' own features, the hand-written hard set, which comes from none of them, is the headline.
+
+## Where the methods come from
+
+| What we do | Source |
+| --- | --- |
+| Build cases from dimensions and their combinations, with a model writing only the wording | Hamel Husain, [Your AI product needs evals](https://hamel.dev/blog/posts/evals) |
+| Write the labelling guide only after reading 20 generated cases | Hamel Husain, [Evals FAQ](https://hamel.dev/blog/posts/evals-faq/) |
+| Check the AI labeller against a person labelling blind; the person settles disagreements | Hamel Husain, [Evals FAQ](https://hamel.dev/blog/posts/evals-faq/) |
+| Report agreement as Cohen's κ with an interval, and how the labels were made | [How to correctly report LLM-as-a-judge evaluations](https://arxiv.org/abs/2511.21140) (arXiv 2511.21140) |
+| Grade with code, the decision against its label, with no model as judge | Anthropic, [Demystifying evals for AI agents](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents) |
+| Read every wrong decision on `dev` and tag the first stage that went wrong | Hamel Husain, [Your AI product needs evals](https://hamel.dev/blog/posts/evals) |
+| Every rate with its count and a Wilson 95% interval; paired comparisons with exact McNemar | Standard statistics |
+
+Not yet run: repeat runs reporting pass^3, the share of fraud caught in all three runs (Anthropic,
+above), and an attacking model that adapts to this system and is reported per attack kind
+([NIST, agent hijacking evaluations](https://www.nist.gov/news-events/news/2025/01/technical-blog-strengthening-ai-agent-hijacking-evaluations)).
+
 ## What the comparison measures
 
 The rules run first in every engine configuration. A model may lower only a soft signal: it can
