@@ -1,7 +1,8 @@
 """When the next risk tier runs, and how tier results combine into one level (decisions 0007, 0010).
 
 `merge` is the only place a risk level is combined. Tier-0 hard flags set a floor no later tier can
-lower; above the floor the latest tier that ran decides, and a lowering of soft signals is recorded.
+lower; above the floor the latest tier that succeeded decides, and a lowering of soft signals is
+recorded with the model tier that lowered it.
 """
 
 from zeta_one.contracts import (
@@ -66,7 +67,10 @@ def soft_signals(features: dict[str, Feature]) -> list[str]:
     if _true(features, "counterparty_is_new"):
         found.append("counterparty_is_new")
     ratio = features.get("amount_ratio_to_vendor_median")
-    ratio_value = getattr(ratio, "raw_value", ratio.value) if ratio else None
+    ratio_value = None
+    if ratio:
+        raw = getattr(ratio, "raw_value", None)
+        ratio_value = raw if raw is not None else ratio.value
     if ratio_value is not None and not (TYPICAL_AMOUNT_RATIO[0] <= ratio_value <= TYPICAL_AMOUNT_RATIO[1]):
         found.append("amount_ratio_to_vendor_median")
     days = _changed_days_ago(features)
@@ -98,8 +102,10 @@ def merge(tier0: Tier0Output, later: list[TierOutput]) -> RiskEvidence:
         level, level_set_by = hard.level, "tier0"
 
     lowered = None
-    if LEVEL_ORDER[level] < LEVEL_ORDER[base]:
-        lowered = Lowered(from_=base, to=level, by=level_set_by, signals=soft_signals(tier0.features))
+    if succeeded and LEVEL_ORDER[level] < LEVEL_ORDER[base]:
+        # Only a model lowers; when the floor clamps it back up, tier 0 set the level but the
+        # lowering is still the model's.
+        lowered = Lowered(from_=base, to=level, by=succeeded[-1].result.tier, signals=soft_signals(tier0.features))
 
     return RiskEvidence(
         level=level,

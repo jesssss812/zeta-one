@@ -25,14 +25,17 @@ levels = st.sampled_from(["low", "elevated", "high"])
 features = st.fixed_dictionaries({
     "counterparty_is_new": st.builds(Feature, value=st.booleans()),
     "payment_method_changed_days_ago": st.builds(Feature, value=st.none() | st.integers(0, 400)),
-    "amount_ratio_to_vendor_median": st.builds(Feature, value=st.none() | st.floats(0, 20)),
+    "amount_ratio_to_vendor_median": st.builds(Feature, value=st.none() | st.floats(0, 20),
+                                               raw_value=st.none() | st.floats(0, 20)),
     "bill_mismatch": st.builds(Feature, value=st.booleans()),
     "document_instruction_patterns": st.builds(Feature, value=st.booleans()),
     "bill_not_referenced": st.builds(Feature, value=st.booleans()),
+    "lookalike_counterparty": st.builds(Feature, value=st.booleans()),
+    "duplicate_candidate": st.builds(Feature, value=st.booleans()),
 })
 model_answers = st.lists(
-    st.builds(lambda level, error: TierOutput(result=TierResult(tier="strong", level=level, error=error)),
-              levels, st.none() | st.just("timeout")),
+    st.builds(lambda tier, level, error: TierOutput(result=TierResult(tier=tier, level=level, error=error)),
+              st.sampled_from(["cheap", "strong"]), levels, st.none() | st.just("timeout")),
     max_size=2,
 )
 PROPOSAL = Proposal(counterparty_id="cp", payment_method_id="pm", source_account_id="acct",
@@ -93,6 +96,27 @@ def test_no_authorization_document_blocks_whatever_risk_says(tier0_level, feats,
     risk = escalation.merge(_tier0(tier0_level, feats), answers)
     outcome = policy.decide(policy.PolicyInput(VERIFIED, AuthorizationEvidence(), None, risk, PROPOSAL))
     assert outcome.decision == "block" and outcome.reasons == ["authorization:authorization"]
+
+
+@given(levels, features, model_answers)
+def test_a_lowering_names_the_model_and_its_soft_signals(tier0_level, feats, answers):
+    risk = escalation.merge(_tier0(tier0_level, feats), answers)
+    if risk.lowered:
+        assert risk.lowered.by in ("cheap", "strong")
+        assert risk.lowered.signals == escalation.soft_signals(feats)
+
+
+def test_a_lowering_the_floor_clamped_is_still_the_models():
+    feats = {"payment_method_changed_days_ago": Feature(value=3, evidence=["pmc_1"])}
+    strong = TierOutput(result=TierResult(tier="strong", level="low"))
+    risk = escalation.merge(_tier0("high", feats), [strong])
+    assert (risk.level, risk.level_set_by) == ("elevated", "tier0")
+    assert (risk.lowered.from_, risk.lowered.to, risk.lowered.by) == ("high", "elevated", "strong")
+
+
+def test_an_unrounded_ratio_missing_falls_back_to_the_rounded_one():
+    feats = {"amount_ratio_to_vendor_median": Feature(value=9.0, raw_value=None)}
+    assert escalation.soft_signals(feats) == ["amount_ratio_to_vendor_median"]
 
 
 def test_clean_tier0_does_not_escalate_and_soft_signal_does():
