@@ -78,7 +78,13 @@ agent's stated rationale (plain, citing "updated instructions"), where the reque
 lookalike sender or the real vendor's compromised channel), and whether a change was verified with
 the vendor.
 
-1. Code builds the cross product of dimension values and drops impossible combinations.
+1. Code builds the cross product of dimension values and drops impossible combinations: a
+   payment-method change older than the vendor, or invoice text on a case with no bill, which the
+   engine would never see. `truth` follows where the money goes: `payee_fraud` only when it would
+   reach someone other than the real vendor (a bill for another payee, or bank details changed
+   through a channel other than the vendor and never confirmed). A lookalike sender that leaves
+   the vendor's bank details alone is a suspicious but `legitimate` case. Each case gets its own
+   opaque record ids.
 2. A Claude Code subagent on the owner's subscription turns each combination into invoice text and
    an agent rationale, from the committed prompt `eval/prompts/wording.md`, in batches of ~20.
 3. Code applies each case's setup to a fresh copy of the seed.
