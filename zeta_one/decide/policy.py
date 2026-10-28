@@ -75,6 +75,8 @@ def _above_approval_threshold(p: PolicyInput) -> bool:
 
 ROWS: list[Row] = [
     Row(lambda p: _level_at_least("high")(p) and _redirect_pattern(p), "block", None, "risk:high_with_redirect_pattern"),
+    Row(lambda p: p.risk.tier0_failed(), "challenge", ChallengeType.CONFIRM, "risk:tier0_unavailable",
+        "The risk check could not complete; confirm this payment before it is sent."),
     Row(lambda p: p.risk.model_failed(), "challenge", ChallengeType.CONFIRM, "risk:model_unavailable",
         "The risk check could not complete; confirm this payment before it is sent."),
     Row(_level_at_least("high"), "challenge", ChallengeType.CONFIRM, "risk:high",

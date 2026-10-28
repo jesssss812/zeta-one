@@ -215,3 +215,25 @@ def test_reading_records_needs_the_admin_token_and_refuses_agents(client, path):
     assert client.get(url, headers=agent_headers()).status_code == 403
     assert client.get(url, headers={**ADMIN, **agent_headers()}).status_code == 403
     assert client.get(url, headers=ADMIN).status_code == 200
+
+
+@pytest.mark.parametrize("method, path, status", [
+    ("get", "/nope", 404),
+    ("get", "/v1/decisions?limit=abc", 422),
+    ("put", "/v1/health", 405),
+])
+def test_framework_errors_have_the_api_error_shape(client, method, path, status):
+    response = getattr(client, method)(path, headers=ADMIN)
+    assert response.status_code == status
+    assert set(response.json()["error"]) == {"code", "message"}
+
+
+def test_an_unexpected_crash_is_a_500_in_the_api_error_shape(gateway):
+    def broken(request):
+        raise RuntimeError("secret detail")
+
+    gateway.propose = broken
+    client = TestClient(create_app(gateway, TOKEN), raise_server_exceptions=False)
+    response = propose(client, routine_proposal())
+    assert response.status_code == 500
+    assert response.json() == {"error": {"code": "internal_error", "message": "RuntimeError"}}

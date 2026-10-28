@@ -1,4 +1,8 @@
-"""Run the risk tiers for one proposal under a configuration."""
+"""Run the risk tiers for one proposal under a configuration.
+
+Nothing here raises: a tier, tier 0 or the escalation rule that fails is recorded as an error on its
+tier result, and the policy challenges the payment (decision 0010).
+"""
 
 from datetime import datetime
 
@@ -25,10 +29,18 @@ def assess(
     tiers: dict[TierName, RiskTier],
     configuration: Configuration,
 ) -> RiskEvidence:
-    first = tier0(proposal, context, now)
+    try:
+        first = tier0(proposal, context, now)
+    except Exception as error:
+        return failed_tier0(f"{type(error).__name__}: {error}")
     later: list[TierOutput] = []
     model_tiers = [name for name in configuration.tiers if name != "tier0"]
-    if model_tiers and escalation.should_escalate(configuration, first):
+    try:
+        escalate = bool(model_tiers) and escalation.should_escalate(configuration, first)
+    except Exception as error:
+        message = f"escalation: {type(error).__name__}: {error}"
+        return escalation.merge(first, [TierOutput(result=TierResult(tier=name, error=message)) for name in model_tiers])
+    if escalate:
         risk_input = RiskInput(proposal=proposal, context=context, features=first.features, tier0=first.result)
         # One model tier in the first version; the Jev rule decides between cheap and strong later.
         for name in model_tiers:
@@ -43,3 +55,8 @@ def _run(tier: RiskTier | None, name: TierName, risk_input: RiskInput) -> TierOu
         return tier.assess(risk_input)
     except Exception as error:  # a tier must not raise; if one does, it counts as a failure
         return TierOutput(result=TierResult(tier=name, error=f"{type(error).__name__}: {error}"))
+
+
+def failed_tier0(error: str) -> RiskEvidence:
+    """Risk evidence when tier 0 (or the context it reads) couldn't run: no level, one error."""
+    return RiskEvidence(tiers_run=["tier0"], tier_results=[TierResult(tier="tier0", error=error)])

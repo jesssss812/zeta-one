@@ -67,3 +67,9 @@ def test_approval_threshold_is_inclusive_and_currency_strict():
                    amount=Money(amount=10, currency="EUR"))
     outcome = policy.decide(policy.PolicyInput(VERIFIED, AuthorizationEvidence(), auth, RiskEvidence(level="low"), eur))
     assert outcome.reasons == ["authorization:human_approval_threshold"]
+
+
+def test_a_tier0_failure_is_a_challenge_not_an_allow():
+    risk = RiskEvidence(tiers_run=["tier0"], tier_results=[TierResult(tier="tier0", error="boom")])
+    outcome = _decide(risk)
+    assert (outcome.decision, outcome.reasons) == ("challenge", ["risk:tier0_unavailable"])

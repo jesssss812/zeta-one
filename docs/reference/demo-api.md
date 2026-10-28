@@ -44,7 +44,8 @@ endpoints. A scenario run returns its record in full.
 | `GET /v1/decisions/{decision_id}` | the **evidence record** of an earlier run (admin token) |
 | `GET /v1/eval/latest` | the evaluation report as JSON once one exists; `404` before |
 
-Error responses are `{"error": {"code", "message"}}` with a 4xx or 5xx status.
+Error responses are `{"error": {"code", "message"}}` with a 4xx or 5xx status, framework errors
+(unknown route, bad parameter, wrong method) and unexpected crashes included.
 A signed proposal that is malformed or names records that don't exist or don't belong together is
 `400 invalid_proposal` and is not recorded; this is checked before authorization, so the response
 is the same whatever the amount.
@@ -135,8 +136,10 @@ Rules the site can count on:
 - `risk.lowered` is set when a model lowered soft signals below tier 0's level, and the reasons
   then include `risk:lowered_by_model`; show it, since an allow a model cleared is not the same as
   a clean one. `risk.reused_from` names an earlier decision whose risk result was reused for the
-  same proposal, after tier 0 ran again and found the same. A `tier_results` entry may carry `error` when that tier failed; the decision is
-  then `challenge` with `risk:model_unavailable`. All three are optional; fixtures omit them.
+  same proposal, after tier 0 ran again and found the same. A `tier_results` entry may carry
+  `error` when that tier failed; the decision is then `challenge`, with `risk:model_unavailable`
+  for a model tier or `risk:tier0_unavailable` when tier 0 or the context it reads failed (the
+  risk `level` is then null). All three are optional; fixtures omit them.
 - `risk.floor` names the tier-0 facts no model was allowed to lower; `risk.level_set_by` names the
   tier that set the final level. `tier_results[].confidence` is non-null only for a calibrated
   tier (Jev); language-model tiers report `null`, because their self-reported confidence is not

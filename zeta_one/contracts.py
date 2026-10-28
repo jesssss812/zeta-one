@@ -261,7 +261,10 @@ class RiskEvidence(_Open):
         return any(signal.name == name for signal in self.signals)
 
     def model_failed(self) -> bool:
-        return any(result.error for result in self.tier_results)
+        return any(result.error for result in self.tier_results if result.tier != "tier0")
+
+    def tier0_failed(self) -> bool:
+        return any(result.error for result in self.tier_results if result.tier == "tier0")
 
 
 class Challenge(_Open):

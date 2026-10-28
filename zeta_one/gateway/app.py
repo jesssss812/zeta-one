@@ -7,10 +7,12 @@ Translates HTTP to and from the service; holds no decision logic. Run it on 127.
 from typing import Literal
 
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, ValidationError
+from starlette.exceptions import HTTPException
 
 from zeta_one import db
 from zeta_one.contracts import POLICY_VERSION, InvalidProposal, SignedRequest
@@ -47,6 +49,19 @@ def create_app(gateway: Gateway, token: str | None) -> FastAPI:
     @app.exception_handler(admin.AdminRefused)
     def refused(request: Request, error: admin.AdminRefused) -> JSONResponse:
         return _error(error.status, error.code, error.message)
+
+    # Every error, the framework's included, has the demo API's shape.
+    @app.exception_handler(HTTPException)
+    def http_error(request: Request, error: HTTPException) -> JSONResponse:
+        return _error(error.status_code, f"http_{error.status_code}", str(error.detail))
+
+    @app.exception_handler(RequestValidationError)
+    def invalid_request(request: Request, error: RequestValidationError) -> JSONResponse:
+        return _error(422, "invalid_request", f"{len(error.errors())} invalid parameters")
+
+    @app.exception_handler(Exception)
+    def internal_error(request: Request, error: Exception) -> JSONResponse:
+        return _error(500, "internal_error", type(error).__name__)
 
     @app.get("/v1/health")
     def health() -> dict:

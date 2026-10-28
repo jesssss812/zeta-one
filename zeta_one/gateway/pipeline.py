@@ -83,7 +83,14 @@ class Engine:
             # exist is refused the same way whatever its amount: a 400 can't tell an agent whether
             # an amount was within its limits (security.md, S8).
             step = time.perf_counter()
-            context = self.load_context(proposal, identity.business_id, now)
+            context: Context | None = None
+            context_error = None
+            try:
+                context = self.load_context(proposal, identity.business_id, now)
+            except InvalidProposal:
+                raise
+            except Exception as error:  # the data store failed: risk can't run, so the policy challenges
+                context_error = f"context: {type(error).__name__}: {error}"
             context_ms = _ms_since(step)
             step = time.perf_counter()
             authorization_doc = self.load_authorization(identity.business_id, identity.claimed_agent_id)
@@ -92,7 +99,10 @@ class Engine:
 
             if not authorization.violations:
                 step = time.perf_counter()
-                risk = (self.assess_risk or Engine.run_tiers)(self, proposal, context, now, identity)
+                if context is None:
+                    risk = assess.failed_tier0(context_error)
+                else:
+                    risk = (self.assess_risk or Engine.run_tiers)(self, proposal, context, now, identity)
                 latency["risk"] = context_ms + _ms_since(step)
 
         outcome = policy.decide(policy.PolicyInput(identity, authorization, authorization_doc, risk, proposal))
