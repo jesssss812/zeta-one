@@ -105,13 +105,18 @@ def should_escalate(configuration: Configuration, tier0: Tier0Output) -> bool:
 
 
 def should_escalate_after_cheap(configuration: Configuration, tier0: Tier0Output, cheap: TierOutput) -> bool:
-    """Whether the strong tier runs after Jev (decision 0007): Jev isn't confident enough in its level,
-    or says elevated, or is more than one band from tier 0, or found something it isn't sure of. A Jev
+    """Whether the strong tier runs after Jev (decisions 0007, 0016): Jev isn't confident enough in its
+    level, or says elevated, or is more than one band from tier 0, or found something it isn't sure
+    of, or a finding raised its level above its own answer. Never when tier 0's floor is already high:
+    no tier can lower a floor or go above high, so the strong tier could not change the level. A Jev
     that failed escalates nothing: the policy challenges a failed model tier whatever comes after."""
     if configuration.escalation == "always":
         return True
     result = cheap.result
     if result.error or result.level is None:
+        return False
+    hard = floor(tier0.features)
+    if hard and hard.level == "high":
         return False
     tier0_level = tier0.result.level or "low"
     unsure_findings = any(
@@ -119,11 +124,13 @@ def should_escalate_after_cheap(configuration: Configuration, tier0: Tier0Output
         for name, probability in (getattr(result, "probabilities", None) or {}).items()
         if name != "risk_level" and name in _finding_names(result)
     )
+    answered = getattr(result, "answered_level", None)
     return (
         (result.confidence is None or result.confidence < configuration.jev_min_confidence)
         or result.level == "elevated"
         or abs(LEVEL_ORDER[result.level] - LEVEL_ORDER[tier0_level]) > 1
         or unsure_findings
+        or (answered is not None and answered != result.level)
     )
 
 

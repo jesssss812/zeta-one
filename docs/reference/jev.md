@@ -83,7 +83,8 @@ the probability of the chosen option; a noul is yes from 0.5, with confidence `m
 Anything else is invalid output, which fails closed. One live call:
 `.venv/bin/python -m pytest tests/risk/test_jev.py --live-models -k live`. The live gateway uses Jev when `ZETA_RISK_CONFIGURATION=jev`; the evaluation
 has a `jev` arm. The escalation rule after Jev is in
-[../decisions/0007-risk-tiers.md](../decisions/0007-risk-tiers.md), with thresholds 0.8 and 0.9
+[../decisions/0007-risk-tiers.md](../decisions/0007-risk-tiers.md) as amended by
+[../decisions/0016-jev-rule-after-tuning.md](../decisions/0016-jev-rule-after-tuning.md), with thresholds 0.8 and 0.9
 recorded in each decision's configuration.
 
 ## Sources

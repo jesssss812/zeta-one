@@ -231,8 +231,25 @@ def test_the_strong_tier_runs_after_jev_on_the_rule(answer, escalates):
 
 
 def test_jev_far_from_tier_0_escalates():
-    tier0 = tier0_output("invoice_redirect_instructions")  # high
+    from zeta_one.contracts import Feature, Tier0Output, TierResult
+    tier0 = Tier0Output(result=TierResult(tier="tier0", level="high"),
+                        features={"counterparty_is_new": Feature(value=True)})  # high, with no high floor
     assert escalation.should_escalate_after_cheap(JEV, tier0, cheap(level="low", p=0.99)) is True
+
+
+@pytest.mark.parametrize("answer", [dict(level="low", p=0.99), dict(level="elevated", p=0.5)])
+def test_a_high_floor_never_escalates_because_no_tier_could_change_the_level(answer):
+    tier0 = tier0_output("invoice_redirect_instructions")  # floor high: bill mismatch, instruction patterns
+    assert escalation.floor(tier0.features).level == "high"
+    assert escalation.should_escalate_after_cheap(JEV, tier0, cheap(**answer)) is False
+
+
+def test_a_finding_that_contradicts_jevs_own_level_escalates():
+    """Jev says low but is sure the document instructs the payer: its answers disagree."""
+    tier0 = tier0_output("vendor_payment_method_changed")  # elevated
+    output = cheap(level="low", p=0.95, targets=True)
+    assert (output.result.answered_level, output.result.level) == ("low", "high")
+    assert escalation.should_escalate_after_cheap(JEV, tier0, output) is True
 
 
 def test_a_failed_jev_escalates_nothing_and_is_challenged():

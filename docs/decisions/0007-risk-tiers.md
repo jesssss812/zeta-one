@@ -2,7 +2,7 @@
 
 Date: 2026-10-27. Status: accepted. Amended the same evening after the architecture review: the
 merge rule, the escalation rules per tier kind, and the removal of the Haiku fallback (decision
-0009).
+0009). The "After Jev" escalation row is superseded by decision 0016.
 
 ## Context
 
