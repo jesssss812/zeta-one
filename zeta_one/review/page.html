@@ -314,7 +314,9 @@ function show(c) {
   const inferences = card("Suggested, not shown", list(f.inferences, (x) => [linked(x.statement), el("div", { class: "note" }, linked(x.basis))], "No inferences."));
   const story = card("What happened", el("p", { class: "lead", text: f.summary || "The assistant couldn't write a summary; the evidence is below." }),
     (f.timeline || []).length ? el("ol", { class: "timeline" }, f.timeline.map((e) => el("li", {}, el("time", { text: e.at }), linked(e.event)))) : null);
-  const errors = (c.errors || []).map((e) => el("p", { class: "warn", text: "Assistant: " + e }));
+  const modelsOff = (c.errors || []).some((e) => e.includes("ModelsOff"));
+  const errors = modelsOff ? [el("p", { class: "note", text: "Models are off in this demo, so the assistant didn't research or summarise; the gathered records are below." })]
+    : (c.errors || []).map((e) => el("p", { class: "warn", text: "Assistant: " + e }));
   $("case").replaceChildren(hero(c), ...errors,
     el("div", { class: "layout" },
       el("div", { class: "stack" }, attention(c), story, el("div", { class: "two" }, facts, inferences), web(c), evidence(c),
@@ -342,9 +344,13 @@ function why(row) {
 
 async function openRow(row) {
   const status = $("status");
-  const back = el("button", { type: "button", text: "← Inbox" }); back.addEventListener("click", loadInbox);
+  const back = el("button", { type: "button", text: "← Inbox" });
+  back.addEventListener("click", () => { history.replaceState(null, "", location.pathname); loadInbox(); });
+  let fromDemo = false; try { fromDemo = sessionStorage.getItem("zeta-demo") === "1"; } catch (e) {}
+  const toolbar = () => el("div", { class: "toolbar" }, back, fromDemo ? el("a", { href: "/demo", text: "← Demo" }) : null,
+    el("strong", { text: `${row.vendor} · ${money(row.amount)}` }));
   const progress = el("p", { class: "note" });
-  $("case").replaceChildren(el("div", { class: "toolbar" }, back, el("strong", { text: `${row.vendor} · ${money(row.amount)}` })), why(row), progress);
+  $("case").replaceChildren(toolbar(), why(row), progress);
   try {
     let found;
     if (row.case_ids.length) found = await api("/v1/cases/" + encodeURIComponent(row.case_ids[row.case_ids.length - 1]));
@@ -353,7 +359,7 @@ async function openRow(row) {
       found = await api("/v1/cases", { decision_id: row.decision_id, by: $("by").value });
     }
     show(found);
-    $("case").prepend(el("div", { class: "toolbar" }, back, el("strong", { text: `${row.vendor} · ${money(row.amount)}` })), why(row));
+    $("case").prepend(toolbar(), why(row));
     status.textContent = "";
   } catch (e) { progress.className = "warn"; progress.textContent = "Couldn't assemble the case: " + e.message; }
 }
@@ -384,6 +390,8 @@ async function loadInbox() {
       rows.length ? table : el("p", { class: "empty", text: "No decisions yet. Run a scenario or the demo to make some." }),
       el("p", { class: "note", text: "Open a row to see its records. Opening one without a case file asks the assistant to assemble it, which calls a model." })));
     status.textContent = "";
+    const wanted = rows.find((row) => row.decision_id === location.hash.slice(1));
+    if (wanted) openRow(wanted);
   } catch (e) { status.textContent = "Couldn't load the inbox: " + e.message; }
 }
 

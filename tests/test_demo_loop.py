@@ -21,3 +21,16 @@ def test_the_loop_blocks_a_verified_fraud_account_and_lifts_a_confirmed_change_f
     stats = steps["What the business sees"]["stats"]
     assert stats["missed_fraud"] == [steps["A routine payment"]["decision"]["decision_id"]]
     assert stats["unneeded_challenges"] == [held["decision_id"]] and stats["unverified_reports"] == 1
+
+
+def test_the_story_runs_one_step_at_a_time_under_the_titles_it_announces():
+    from zeta_one.demo.story import TITLES, Story
+
+    story = Story("t")
+    try:
+        first = story.next()
+        assert first["title"] == TITLES[0] and not story.done
+        story.run_all()
+        assert [step["title"] for step in story.steps] == list(TITLES) and story.next() is None
+    finally:
+        story.close()

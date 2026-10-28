@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>Zeta One live demo</title>
+<style>
+  :root {
+    --bg: #f6f5f1; --card: #ffffff; --ink: #1c1c1a; --muted: #6b6a65; --line: #e4e1d8;
+    --chip: #efede6; --accent: #24456b; --amber: #9a5b00; --amber-bg: #fdf3e2; --red: #9b2c2c; --red-bg: #fbeaea;
+    --green: #2d6a3e; --green-bg: #e8f4ec; --blue-bg: #e8eff7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #141413; --card: #1d1d1b; --ink: #ecebe6; --muted: #a09f99; --line: #33322e; --chip: #2a2926;
+      --accent: #9cc3ec; --amber: #f0b36a; --amber-bg: #2e2416; --red: #f19a9a; --red-bg: #2f1c1c;
+      --green: #8fd3a3; --green-bg: #18291e; --blue-bg: #1b2533; }
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, sans-serif; margin: 0; }
+  header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+    padding: 12px 24px; border-bottom: 1px solid var(--line); background: var(--card); position: sticky; top: 0; z-index: 2; }
+  .brand { font: 22px Georgia, serif; } .brand small { font: 11px ui-monospace, monospace; color: var(--muted); margin-left: 10px; letter-spacing: .05em; }
+  .controls { display: flex; gap: 8px; align-items: center; }
+  button { font: inherit; padding: 8px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: inherit; cursor: pointer; }
+  button.primary { background: var(--accent); color: var(--card); border-color: var(--accent); font-weight: 600; }
+  button:disabled { opacity: .5; cursor: default; }
+  main { max-width: 1240px; margin: 0 auto; padding: 18px 24px 60px; display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 20px; align-items: start; }
+  .intro { grid-column: 1 / -1; margin: 0; color: var(--muted); max-width: 900px; }
+  .intro strong { color: var(--ink); }
+  ol.steps { list-style: none; margin: 0; padding: 0; position: sticky; top: 80px; }
+  ol.steps li { padding: 8px 10px 8px 34px; position: relative; border-radius: 8px; color: var(--muted); font-size: 14px; }
+  ol.steps li::before { content: attr(data-n); position: absolute; left: 8px; top: 8px; width: 18px; height: 18px; border-radius: 50%;
+    border: 1px solid var(--line); font-size: 11px; display: grid; place-items: center; background: var(--card); }
+  ol.steps li.done { color: var(--ink); } ol.steps li.done::before { content: "✓"; background: var(--green-bg); color: var(--green); border-color: transparent; }
+  ol.steps li.next { background: var(--card); color: var(--ink); font-weight: 600; box-shadow: 0 0 0 1px var(--accent) inset; }
+  .feed { display: grid; gap: 14px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+  .card.latest { box-shadow: 0 0 0 2px var(--accent); }
+  .card h2 { font-size: 18px; margin: 0; } .card .what { color: var(--muted); margin: 2px 0 12px; }
+  .stepno { font: 11px ui-monospace, monospace; color: var(--muted); letter-spacing: .05em; }
+  .why { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(150px, .8fr); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .why > div { padding: 10px 12px; border-left: 1px solid var(--line); } .why > div:first-child { border-left: 0; }
+  .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .answer { font-weight: 600; margin-top: 3px; }
+  .ok .answer::before { content: "✓ "; color: var(--green); } .bad { background: var(--amber-bg); } .bad .answer::before { content: "! "; color: var(--red); }
+  .verdict { background: var(--chip); }
+  .badge { display: inline-block; border-radius: 6px; padding: 2px 8px; font-weight: 600; font-size: 13px; }
+  .allow { background: var(--green-bg); color: var(--green); } .challenge { background: var(--amber-bg); color: var(--amber); }
+  .block { background: var(--red-bg); color: var(--red); } .claim { background: var(--blue-bg); color: var(--accent); }
+  .note { color: var(--muted); font-size: 13px; }
+  .facts { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 10px; font-size: 14px; align-items: center; }
+  .code { font: 12px ui-monospace, monospace; background: var(--chip); padding: 1px 6px; border-radius: 999px; }
+  .effect { margin-top: 10px; padding: 10px 12px; border-radius: 8px; font-weight: 600; }
+  .effect.none { background: var(--chip); } .effect.changed { background: var(--green-bg); color: var(--green); }
+  .tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  .tile { background: var(--chip); border-radius: 10px; padding: 10px 12px; } .tile strong { font-size: 24px; display: block; }
+  a.open { color: var(--accent); font-weight: 600; text-decoration: none; } a.open:hover { text-decoration: underline; }
+  .empty { color: var(--muted); }
+  .earlier { opacity: .78; }
+  @media (max-width: 860px) { main { grid-template-columns: 1fr; } ol.steps { position: static; display: none; }
+    .why, .tiles { grid-template-columns: 1fr 1fr; } .why > div { border-left: 0; border-top: 1px solid var(--line); } }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">ζ Zeta One<small>LIVE DEMO · SANDBOX · SYNTHETIC DATA · PAYMENTS SIMULATED</small></div>
+  <div class="controls">
+    <span id="mode" class="note"></span>
+    <button id="reset" type="button">Reset</button>
+    <button id="next" type="button" class="primary">Next step →</button>
+  </div>
+</header>
+<main>
+  <p class="intro">You review payments at a financial platform. An AI agent pays bills for <strong>Larkspur Analytics</strong>.
+    For each payment, Zeta One answers three questions: <strong>who is acting, whether it was authorized, and whether the payment
+    itself looks wrong</strong>. Then a person records what turned out to be true, and the next decision changes.</p>
+  <ol class="steps" id="steps"></ol>
+  <div class="feed" id="feed"><p class="empty">Press <strong>Next step</strong> to start.</p></div>
+</main>
+<script>
+// Every value is set as text, never as HTML.
+const $ = (id) => document.getElementById(id);
+function el(tag, attrs, ...children) {
+  const node = document.createElement(tag);
+  for (const [key, value] of Object.entries(attrs || {})) {
+    if (key === "class") node.className = value; else if (key === "text") node.textContent = value; else node.setAttribute(key, value);
+  }
+  for (const child of children.flat()) if (child != null) node.append(child instanceof Node ? child : document.createTextNode(String(child)));
+  return node;
+}
+const money = (a) => a ? (a.currency === "USD" ? "$" : "") + (a.amount / 100).toLocaleString(undefined, { minimumFractionDigits: 2 }) + (a.currency === "USD" ? "" : " " + a.currency) : "–";
+const cap = (text) => text.charAt(0).toUpperCase() + text.slice(1);
+const KINDS = { blocked_payment_method: "this bank account is blocked for the business", confirmed_method_change: "this bank change is confirmed for 90 days" };
+const VERIFICATION = { customer_report: "a customer's report", bank_confirmation: "confirmation from the bank", callback_known_number: "a call-back on a number already on file",
+  vendor_portal: "the vendor's portal", signed_customer_attestation: "a signed attestation", none: "nothing" };
+let state = null;
+
+async function call(path, method) {
+  const response = await fetch(path, method ? { method, headers: { "Content-Type": "application/json" }, body: "{}" } : {});
+  const data = await response.json();
+  if (!response.ok) throw new Error((data.error && data.error.message) || response.status);
+  return data;
+}
+
+function openEvidence(decisionId) {
+  try { sessionStorage.setItem("zeta-admin", state.review_token); sessionStorage.setItem("zeta-by", "Demo reviewer"); sessionStorage.setItem("zeta-demo", "1"); } catch (e) {}
+  location.href = "/review#" + decisionId;
+}
+
+function why(s) {
+  const parts = Object.fromEntries(s.parts.map((p) => [p.question, p]));
+  const column = (question, label) => parts[question]
+    ? el("div", { class: parts[question].ok ? "ok" : "bad" }, el("div", { class: "label", text: label }), el("div", { class: "answer", text: cap(parts[question].text) }))
+    : el("div", {}, el("div", { class: "label", text: label }), el("div", { class: "note", text: "Not reached" }));
+  const timing = Object.values(s.stages).reduce((a, b) => a + b, 0);
+  return el("div", { class: "why" }, column("identity", "Who is acting"), column("authorization", "Authorized?"), column("risk", "About the payment"),
+    el("div", { class: "verdict" }, el("div", { class: "label", text: "Zeta One decided" }),
+      el("div", { class: "answer" }, el("span", { class: `badge ${s.decision}`, text: s.action })),
+      el("div", { class: "note", text: `${timing} ms · ${s.models.length ? "model: " + s.models.join(", ") : "no model needed"}` })));
+}
+
+function adjustmentsLine(adjustments) {  // the newest adjustment is the one this step made
+  const newest = adjustments[adjustments.length - 1];
+  return cap(KINDS[newest.kind] || newest.kind);
+}
+
+function stepCard(step, index, latest) {
+  const card = el("section", { class: "card" + (latest ? " latest" : " earlier") },
+    el("div", { class: "stepno", text: `STEP ${index + 1} OF ${state.titles.length}` }),
+    el("h2", { text: step.title }), el("p", { class: "what", text: step.what }));
+  if (step.summary) {
+    const s = step.summary, d = step.decision;
+    card.append(why(s));
+    const facts = el("div", { class: "facts" }, el("span", {}, el("strong", { text: s.vendor }), " · ", money(s.amount)));
+    if (d.floor) facts.append(el("span", {}, "Hard floor: ", d.floor.flags.map((f) => el("span", { class: "code", text: f })), el("span", { class: "note", text: " no model may lower it" })));
+    if (d.adjustments.length) facts.append(el("span", {}, "Cites the finding: ", d.adjustments.map((a) => el("span", { class: "code", text: a }))));
+    const link = el("a", { class: "open", href: "/review#" + s.decision_id, text: "Open the evidence →" });
+    link.addEventListener("click", (event) => { event.preventDefault(); openEvidence(s.decision_id); });
+    facts.append(link);
+    card.append(facts);
+  }
+  if (step.outcome) {
+    const o = step.outcome;
+    card.append(el("div", { class: "facts" },
+      el("span", { class: `badge ${o.verified ? "block" : "claim"}`, text: `${o.finding.replace("_", " ")}${o.verified ? " · verified" : " · claim"}` }),
+      el("span", { text: `How it was established: ${VERIFICATION[o.verification] || o.verification}` }),
+      o.note ? el("span", { class: "note", text: `“${o.note}”` }) : null));
+  }
+  if (step.resolution) {
+    card.append(el("div", { class: "facts" }, el("span", { class: "badge allow", text: "Approved · paid (simulated)" }),
+      el("span", { text: "How it was established: a call-back on a number already on file" })));
+  }
+  if (step.adjustments) {
+    const changed = step.adjustments.length > 0 && (step.outcome ? step.outcome.verified : true);
+    card.append(el("div", { class: "effect " + (changed ? "changed" : "none"),
+      text: changed ? "What changed for the next payment: " + adjustmentsLine(step.adjustments) + "." : "What changed for the next payment: nothing. A report alone is not a fraud label." }));
+  }
+  if (step.stats) {
+    const st = step.stats, c = st.challenges || {};
+    card.append(el("div", { class: "tiles" },
+      el("div", { class: "tile" }, el("strong", { text: Object.values(st.decisions || {}).reduce((a, b) => a + b, 0) }), "decisions"),
+      el("div", { class: "tile" }, el("strong", { text: c.approval_rate == null ? "–" : Math.round(c.approval_rate * 100) + "%" }), "of challenges approved"),
+      el("div", { class: "tile" }, el("strong", { text: (st.missed_fraud || []).length }), "fraud allowed, found later"),
+      el("div", { class: "tile" }, el("strong", { text: (st.unneeded_challenges || []).length }), "challenges that weren't needed")),
+      el("p", { class: "note", text: "Friction and missed fraud are counted from verified findings, side by side: too little control lets fraud through, too much slows honest payments." }));
+  }
+  return card;
+}
+
+function render() {
+  const done = state.steps.length;
+  $("steps").replaceChildren(...state.titles.map((title, i) => el("li", { "data-n": String(i + 1), class: i < done ? "done" : i === done ? "next" : "", text: title })));
+  $("feed").replaceChildren(...(done ? state.steps.map((step, i) => stepCard(step, i, i === done - 1)).reverse()
+    : [el("p", { class: "empty" }, "Press ", el("strong", { text: "Next step" }), " to start.")]));
+  $("next").disabled = state.done;
+  $("next").textContent = state.done ? "Story complete" : done ? "Next step →" : "Start →";
+  $("mode").textContent = state.live_models ? "Models: live (paid)" : "Models: off (escalations held for a person)";
+}
+
+async function act(path) {
+  $("next").disabled = true; $("reset").disabled = true;
+  try { state = await call(path, "POST"); render(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+  catch (e) { $("feed").prepend(el("p", { class: "note", text: "Couldn't run the step: " + e.message })); }
+  finally { $("reset").disabled = false; if (state) $("next").disabled = state.done; }
+}
+$("next").addEventListener("click", () => act("/v1/demo/next"));
+$("reset").addEventListener("click", () => act("/v1/demo/reset"));
+document.addEventListener("keydown", (event) => { if (event.key === "ArrowRight" && !$("next").disabled) act("/v1/demo/next"); });
+call("/v1/demo").then((s) => { state = s; render(); });
+</script>
+</body>
+</html>

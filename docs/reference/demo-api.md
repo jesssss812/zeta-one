@@ -241,3 +241,21 @@ Fixtures:
 [`invoice_redirect_instructions`](../../data/fixtures/invoice_redirect_instructions.json).
 Fixture `tier_results[].model` is `"illustrative"`; `model_rationale`, where present, starts with
 `[illustrative model output]`. Live runs replace both.
+
+## The one-screen demo
+
+`zeta_one.demo.app:app` (`uvicorn … --port 8001`) runs the feedback-loop story of
+`zeta_one/demo/story.py` one step per click, on a sandbox gateway of its own: an in-memory
+database, a fresh seed and a one-off agent key. `GET /demo` is the page. Every other path is that
+sandbox gateway, so `/review` and the endpoints above show the sandbox's decisions.
+
+| Method and path | Does |
+| --- | --- |
+| `GET /v1/demo` | the story so far: `titles`, `steps` (each decision step with its `summary`, as in the inbox), `done`, `live_models`, and `review_token` |
+| `POST /v1/demo/next` | runs the next step; JSON content type only, like scenario runs |
+| `POST /v1/demo/reset` | a fresh sandbox, the story from the start |
+
+`review_token` is the sandbox's admin token, made for that process, so the page can open the review
+page without setup. It is never the gateway's `ZETA_ADMIN_TOKEN`, and the sandbox holds only
+synthetic data. Models are called only when the server was started with `ZETA_DEMO_LIVE=1`; with
+models off, escalations are held for a person and the case assistant makes no call.

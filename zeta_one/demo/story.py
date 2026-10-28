@@ -33,6 +33,9 @@ from zeta_one.rho.seed import SEED_NOW
 from zeta_one.rho.snapshot import Store as SeedStore
 
 PATH = "/v1/actions/propose_payment"
+TITLES = ("A routine payment", "A customer reports fraud", "A reviewer verifies it", "The agent pays that account again",
+          "A payment after a recent bank change", "The reviewer confirms the change", "That vendor's next payment",
+          "What the business sees")
 
 
 class Story:
