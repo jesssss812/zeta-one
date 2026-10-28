@@ -1,7 +1,8 @@
 """Where each set of cases lives, how it is hashed and how `test` is frozen.
 
 deterministic: eval/cases.py. dev: the demo cases there plus data/eval/dev/cases.jsonl. test:
-data/eval/test/cases.jsonl. hard: data/eval/hard/*.jsonl, written by the owner.
+data/eval/test/cases.jsonl. hard: data/eval/hard/*.jsonl, written by the owner. feedback:
+data/eval/feedback/cases.jsonl, from verified outcomes (eval/feedback.py).
 """
 
 import hashlib
@@ -15,7 +16,7 @@ from zeta_one.contracts import Case
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data" / "eval"
-SETS = ("deterministic", "dev", "test", "hard")
+SETS = ("deterministic", "dev", "test", "hard", "feedback")
 
 
 class FrozenSetChanged(RuntimeError):

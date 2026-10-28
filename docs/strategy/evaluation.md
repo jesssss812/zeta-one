@@ -67,6 +67,7 @@ none undetectable; such cases come from the hand-written `hard` set.
 | Risk `dev` | ~50 | Legitimate, suspicious, adversarial and ambiguous cases, including the five demo cases. Thresholds, prompts and rules are tuned here only |
 | Risk `test` | ~100 | About 35 legitimate, 35 suspicious, 30 adversarial; a different random seed and different wording from `dev`; frozen and hashed before the first scored run; never used for tuning |
 | Risk `hard` | 15–20 | Written by hand by the owner, outside the generator's templates: unfamiliar impersonation styles, instructions arriving through the real vendor's compromised channel, subtle injection, and legitimate urgent payments that look like fraud |
+| `feedback` | grows with use | Real decisions whose verified outcome (decision 0012) is a finding, labelled by it, exported by `eval/feedback.py`; claims are left out. Replayed on the seed, so the context is today's, not the decision's |
 
 With about 30 cases in a class, a rate near 85% has a 95% interval of roughly ±12 points: enough to
 tell configurations apart in aggregate, not to rank them within a category.

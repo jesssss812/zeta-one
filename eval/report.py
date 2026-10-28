@@ -24,7 +24,7 @@ from zeta_one.contracts import Case
 RISK_CATEGORIES = ("A", "D", "E", "F")
 EXACT_CATEGORIES = ("B", "C")
 DECISIONS = ("allow", "challenge", "block")
-SIDE_BY_SIDE = ("dev", "test", "hard")
+SIDE_BY_SIDE = ("dev", "test", "hard", "feedback")
 LIMITATIONS = [
     "The data is synthetic; no rate here is a production rate, and the sets say nothing about how often "
     "each case occurs.",
