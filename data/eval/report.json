@@ -92,15 +92,15 @@
         },
         "F": {
           "both": 3,
-          "neither": 0,
+          "neither": 1,
           "only_a": 0,
-          "only_b": 4
+          "only_b": 3
         }
       },
       "pooled_risk": {
         "only_a": 0,
-        "only_b": 30,
-        "p": 1.862645149230957e-09
+        "only_b": 29,
+        "p": 3.725290298461914e-09
       }
     },
     "always_allow vs open_weight on dev": {
@@ -256,16 +256,16 @@
           "only_b": 11
         },
         "F": {
-          "both": 4,
+          "both": 3,
           "neither": 0,
-          "only_a": 0,
+          "only_a": 1,
           "only_b": 3
         }
       },
       "pooled_risk": {
-        "only_a": 2,
+        "only_a": 3,
         "only_b": 29,
-        "p": 4.628673195838928e-07
+        "p": 2.5560148060321808e-06
       }
     },
     "always_challenge vs open_weight on dev": {
@@ -389,14 +389,14 @@
         },
         "F": {
           "both": 6,
-          "neither": 0,
+          "neither": 1,
           "only_a": 0,
-          "only_b": 1
+          "only_b": 0
         }
       },
       "pooled_risk": {
         "only_a": 0,
-        "only_b": 1,
+        "only_b": 0,
         "p": 1.0
       }
     },
@@ -487,16 +487,16 @@
           "only_b": 1
         },
         "F": {
-          "both": 5,
+          "both": 4,
           "neither": 0,
           "only_a": 2,
-          "only_b": 0
+          "only_b": 1
         }
       },
       "pooled_risk": {
         "only_a": 15,
-        "only_b": 2,
-        "p": 0.002349853515625
+        "only_b": 3,
+        "p": 0.007537841796875
       }
     },
     "jev vs strong on dev": {
@@ -521,13 +521,13 @@
         },
         "F": {
           "both": 6,
-          "neither": 0,
-          "only_a": 1,
+          "neither": 1,
+          "only_a": 0,
           "only_b": 0
         }
       },
       "pooled_risk": {
-        "only_a": 1,
+        "only_a": 0,
         "only_b": 0,
         "p": 1.0
       }
@@ -619,16 +619,16 @@
           "only_b": 2
         },
         "F": {
-          "both": 5,
+          "both": 4,
           "neither": 0,
-          "only_a": 0,
+          "only_a": 1,
           "only_b": 2
         }
       },
       "pooled_risk": {
-        "only_a": 2,
+        "only_a": 3,
         "only_b": 12,
-        "p": 0.012939453125
+        "p": 0.03515625
       }
     },
     "rules vs open_weight on dev": {
@@ -2667,10 +2667,10 @@
               "rate": 0.5625
             },
             "unpriced_models": [],
-            "usd_per_1000_decisions": 13.4607565,
+            "usd_per_1000_decisions": 6.353968,
             "usd_per_fraud_caught": null
           },
-          "cost_per_action_usd": 0.0134607565,
+          "cost_per_action_usd": 0.006353968,
           "detection": {
             "high": 1.0,
             "k": 0,
@@ -2679,8 +2679,8 @@
             "rate": null
           },
           "latency_ms": {
-            "p50": 5488.0,
-            "p95": 8658.25
+            "p50": 211.0,
+            "p95": 7751.5
           },
           "legit_block_rate": {
             "high": 0.1936076805344365,
@@ -2748,10 +2748,10 @@
               "rate": 1.0
             },
             "unpriced_models": [],
-            "usd_per_1000_decisions": 24.534229733333337,
-            "usd_per_fraud_caught": 0.0368013446
+            "usd_per_1000_decisions": 19.238085866666665,
+            "usd_per_fraud_caught": 0.0288571288
           },
-          "cost_per_action_usd": 0.024534229733333336,
+          "cost_per_action_usd": 0.019238085866666664,
           "detection": {
             "high": 0.9999999999999999,
             "k": 10,
@@ -2760,8 +2760,8 @@
             "rate": 1.0
           },
           "latency_ms": {
-            "p50": 7361.0,
-            "p95": 10780.900000000001
+            "p50": 7341.0,
+            "p95": 9869.9
           },
           "legit_block_rate": {
             "high": 0.43448246478317476,
@@ -2829,10 +2829,10 @@
               "rate": 1.0
             },
             "unpriced_models": [],
-            "usd_per_1000_decisions": 24.06081169230769,
-            "usd_per_fraud_caught": 0.026065879333333333
+            "usd_per_1000_decisions": 9.685467384615386,
+            "usd_per_fraud_caught": 0.010492589666666668
           },
-          "cost_per_action_usd": 0.02406081169230769,
+          "cost_per_action_usd": 0.009685467384615386,
           "detection": {
             "high": 1.0,
             "k": 12,
@@ -2841,8 +2841,8 @@
             "rate": 1.0
           },
           "latency_ms": {
-            "p50": 8770.0,
-            "p95": 10468.6
+            "p50": 327.0,
+            "p95": 10165.6
           },
           "legit_block_rate": {
             "high": 0.7934506856227626,
@@ -2869,11 +2869,11 @@
         },
         "F": {
           "accuracy": {
-            "high": 1.0,
-            "k": 7,
-            "low": 0.6456695649333126,
+            "high": 0.9743203756552565,
+            "k": 6,
+            "low": 0.4868721707256811,
             "n": 7,
-            "rate": 1.0
+            "rate": 0.8571428571428571
           },
           "accuracy_with_acceptable": {
             "high": 1.0,
@@ -2894,9 +2894,9 @@
               "challenge": 0
             },
             "challenge": {
-              "allow": 0,
+              "allow": 1,
               "block": 0,
-              "challenge": 4
+              "challenge": 3
             }
           },
           "cost": {
@@ -2910,10 +2910,10 @@
               "rate": 0.8571428571428571
             },
             "unpriced_models": [],
-            "usd_per_1000_decisions": 17.522111142857142,
+            "usd_per_1000_decisions": 14.705954571428574,
             "usd_per_fraud_caught": null
           },
-          "cost_per_action_usd": 0.017522111142857143,
+          "cost_per_action_usd": 0.014705954571428573,
           "detection": {
             "high": 1.0,
             "k": 0,
@@ -2922,8 +2922,8 @@
             "rate": null
           },
           "latency_ms": {
-            "p50": 8175.0,
-            "p95": 10521.4
+            "p50": 7056.0,
+            "p95": 8437.4
           },
           "legit_block_rate": {
             "high": 0.35433043506668743,
@@ -2933,14 +2933,14 @@
             "rate": 0.0
           },
           "legit_challenge_rate": {
-            "high": 0.8417801447485302,
-            "k": 4,
-            "low": 0.2504583645276572,
+            "high": 0.7495416354723428,
+            "k": 3,
+            "low": 0.15821985525146975,
             "n": 7,
-            "rate": 0.5714285714285714
+            "rate": 0.42857142857142855
           },
           "lowerings": {
-            "legitimate": 2,
+            "legitimate": 3,
             "not_legitimate": 0
           },
           "n": 7,
@@ -2950,11 +2950,11 @@
         },
         "risk (A, D, E, F)": {
           "accuracy": {
-            "high": 0.9797933605775353,
-            "k": 48,
-            "low": 0.8407537395119957,
+            "high": 0.9690778032115107,
+            "k": 47,
+            "low": 0.8150005368740411,
             "n": 51,
-            "rate": 0.9411764705882353
+            "rate": 0.9215686274509803
           },
           "accuracy_with_acceptable": {
             "high": 0.9891789166471329,
@@ -2975,9 +2975,9 @@
               "challenge": 1
             },
             "challenge": {
-              "allow": 1,
+              "allow": 2,
               "block": 1,
-              "challenge": 19
+              "challenge": 18
             }
           },
           "cost": {
@@ -2991,10 +2991,10 @@
               "rate": 0.8431372549019608
             },
             "unpriced_models": [],
-            "usd_per_1000_decisions": 19.977076078431377,
-            "usd_per_fraud_caught": 0.04631049454545455
+            "usd_per_1000_decisions": 12.138971254901959,
+            "usd_per_fraud_caught": 0.028140342454545452
           },
-          "cost_per_action_usd": 0.019977076078431376,
+          "cost_per_action_usd": 0.012138971254901959,
           "detection": {
             "high": 1.0,
             "k": 22,
@@ -3003,8 +3003,8 @@
             "rate": 1.0
           },
           "latency_ms": {
-            "p50": 7231.0,
-            "p95": 10597.0
+            "p50": 371.0,
+            "p95": 9920.5
           },
           "legit_block_rate": {
             "high": 0.11696979849974075,
@@ -3014,14 +3014,14 @@
             "rate": 0.0
           },
           "legit_challenge_rate": {
-            "high": 0.5265489590952386,
-            "k": 10,
-            "low": 0.19940718526674994,
+            "high": 0.4923013423309317,
+            "k": 9,
+            "low": 0.17275616744483216,
             "n": 29,
-            "rate": 0.3448275862068966
+            "rate": 0.3103448275862069
           },
           "lowerings": {
-            "legitimate": 11,
+            "legitimate": 12,
             "not_legitimate": 0
           },
           "n": 51,
@@ -4923,11 +4923,11 @@
     "jev": {
       "dev": {
         "accuracy": {
-          "high": 0.9797933605775353,
-          "k": 48,
-          "low": 0.8407537395119957,
+          "high": 0.9690778032115107,
+          "k": 47,
+          "low": 0.8150005368740411,
           "n": 51,
-          "rate": 0.9411764705882353
+          "rate": 0.9215686274509803
         },
         "accuracy_with_acceptable": {
           "high": 0.9891789166471329,
@@ -4948,9 +4948,9 @@
             "challenge": 1
           },
           "challenge": {
-            "allow": 1,
+            "allow": 2,
             "block": 1,
-            "challenge": 19
+            "challenge": 18
           }
         },
         "cost": {
@@ -4964,10 +4964,10 @@
             "rate": 0.8431372549019608
           },
           "unpriced_models": [],
-          "usd_per_1000_decisions": 19.977076078431377,
-          "usd_per_fraud_caught": 0.04631049454545455
+          "usd_per_1000_decisions": 12.138971254901959,
+          "usd_per_fraud_caught": 0.028140342454545452
         },
-        "cost_per_action_usd": 0.019977076078431376,
+        "cost_per_action_usd": 0.012138971254901959,
         "detection": {
           "high": 1.0,
           "k": 22,
@@ -4976,8 +4976,8 @@
           "rate": 1.0
         },
         "latency_ms": {
-          "p50": 7231.0,
-          "p95": 10597.0
+          "p50": 371.0,
+          "p95": 9920.5
         },
         "legit_block_rate": {
           "high": 0.11696979849974075,
@@ -4987,14 +4987,14 @@
           "rate": 0.0
         },
         "legit_challenge_rate": {
-          "high": 0.5265489590952386,
-          "k": 10,
-          "low": 0.19940718526674994,
+          "high": 0.4923013423309317,
+          "k": 9,
+          "low": 0.17275616744483216,
           "n": 29,
-          "rate": 0.3448275862068966
+          "rate": 0.3103448275862069
         },
         "lowerings": {
-          "legitimate": 11,
+          "legitimate": 12,
           "not_legitimate": 0
         },
         "n": 51,
@@ -5262,6 +5262,7 @@
     "engine_version": [
       "7ba6857",
       "d40bade",
+      "e4a4e41",
       "e853f63"
     ],
     "policy_version": [

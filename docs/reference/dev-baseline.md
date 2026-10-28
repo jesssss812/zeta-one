@@ -3,7 +3,8 @@
 The first runs of every configuration on the labelled `dev` set, before any tuning. Later changes to
 thresholds, prompts or rules are measured against this. `dev` is the tuning set, so these numbers
 are not a score of the system: the score comes from the frozen `test` and `hard` sets
-([evaluation-system.md](evaluation-system.md)).
+([evaluation-system.md](evaluation-system.md)). Changes made since, and what they did, are in
+[dev-tuning.md](dev-tuning.md).
 
 The per-case record is [data/eval/baselines/dev-2026-10-28/](../../data/eval/baselines/dev-2026-10-28/):
 `decisions.jsonl` has one row per case and configuration (label, decision, reasons, tiers run, cost,
