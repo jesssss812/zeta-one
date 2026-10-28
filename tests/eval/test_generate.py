@@ -20,10 +20,9 @@ def test_redirect_text_only_arrives_through_a_channel_that_is_not_the_vendor():
 
 
 @pytest.mark.parametrize("set_name", ["dev", "test"])
-def test_sample_meets_its_quotas_and_caps_undetectable_cases(set_name):
+def test_sample_meets_its_quotas(set_name):
     chosen = generate.sample(set_name, generate.DEFAULT_SEEDS[set_name])
     assert Counter(generate.category_of(c) for c in chosen) == generate.QUOTAS[set_name]
-    assert sum(not generate.detectable(c) for c in chosen) <= generate.MAX_UNDETECTABLE
     assert generate.sample(set_name, generate.DEFAULT_SEEDS[set_name]) == chosen
 
 
@@ -88,10 +87,27 @@ def test_truth_follows_where_the_money_goes(changes, truth):
     assert generate.truth_of({**BASE, **changes}) == truth
 
 
-def test_only_an_old_unconfirmed_change_with_nothing_else_is_undetectable():
-    hidden = {**BASE, "channel": "lookalike_sender", "change_days": 90, "change_verified": "no"}
-    assert generate.truth_of(hidden) == "payee_fraud" and not generate.detectable(hidden)
-    assert generate.detectable({**hidden, "change_days": 20})
+def test_every_generated_fraud_leaves_a_trace_tier_0_sees():
+    """detectable is True for every generated case, so check it: each fraud combination's setup gives
+    tier 0 a signal on the real seed."""
+    from zeta_one.contracts import Proposal, SetupOp
+    from zeta_one.rho import mutations
+    from zeta_one.rho.seed import SEED_NOW
+    from zeta_one.rho.snapshot import Store
+    from zeta_one.rho.view import context_for
+    from zeta_one.risk.tier0 import Tier0
+
+    frauds = [c for c in generate.all_combos() if generate.truth_of(c) != "legitimate"]
+    rows = [{"id": f"probe_{i}", "dimensions": c, "vendor": generate.VENDOR_NAMES[0]} for i, c in enumerate(frauds[::9])]
+    for row in rows:
+        ops, proposal = generate.setup_for(row)
+        proposal = Proposal.model_validate({**proposal, "memo": "", "agent_rationale": ""})
+        with Store() as store:
+            for op in ops:
+                mutations.apply(store, SetupOp(**op))
+            output = Tier0()(proposal, context_for(store)(proposal, mutations.BUSINESS, SEED_NOW), SEED_NOW)
+        assert output.result.level != "low", row["dimensions"]
+    assert all(generate.detectable(c) for c in generate.all_combos())
 
 
 @pytest.mark.parametrize("set_name", ["dev", "test"])

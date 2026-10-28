@@ -56,6 +56,8 @@ They differ on purpose. A fraud that leaves no observable trace has `truth: paye
 `expected_decision: allow`, and is marked `detectable: false`. Such cases are kept few, each one is
 listed by name in the report, and they are counted apart from accuracy: what counts as observable
 depends on which features exist today, so the list must not quietly excuse misses.
+With today's features every generated fraud leaves a trace tier 0 flags, so the generator marks
+none undetectable; such cases come from the hand-written `hard` set.
 
 ### Sets
 
