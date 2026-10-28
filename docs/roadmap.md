@@ -15,7 +15,6 @@ owner's own time or accounts.
 The plan is in [strategy/evaluation.md](strategy/evaluation.md). `dev` (48 cases) and `test` (100)
 are generated; the report so far covers only the deterministic cases.
 
-- **Owner:** edit `eval/prompts/label_guide.draft.md` and rename it to `label_guide.md` (~20 min).
 - AI-label `dev` and `test` with the guide, blind.
 - **Owner:** write the `hard` set, 15–20 risk cases outside the generator's templates (~1.5 h).
 - **Owner:** label 40 stratified `test` cases blind, then adjudicate disagreements (~1 h).
