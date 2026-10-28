@@ -2,6 +2,7 @@
   "backends": [
     "real"
   ],
+  "dev_is_demo_only": true,
   "discordant": {
     "always_allow vs always_challenge on dev": {
       "per_category": {
@@ -103,7 +104,7 @@
     "The generator's dimensions resemble tier 0's features, so the rules look better on dev and test than they would on cases the generator did not write; the hard set is the check on that.",
     "The plan has Claude Haiku 5.5 write the case wording, Claude Sonnet 5.5 label, and Claude Opus 5.5 serve as the strong tier: all three from one family. The Run section lists the models that actually ran.",
     "With about 30 cases in a class a rate near 85% has a 95% interval of roughly \u00b112 points: enough to tell configurations apart in aggregate, not to rank them within a category.",
-    "Latency is a single run on one machine including network time, and is shown only for backends that measure the engine; no responses are cached, though the fixed system prompt is prompt-cached.",
+    "Latency, where shown, is a single run on one machine, including network time when a model ran. A repeated proposal reuses its earlier risk result (decision 0010), and the strong tier's fixed system prompt is prompt-cached; nothing else is cached.",
     "Payments are simulated."
   ],
   "metrics": {
@@ -1234,8 +1235,8 @@
             "rate": 1.0
           },
           "latency_ms": {
-            "p50": 19.0,
-            "p95": 25.0
+            "p50": 22.0,
+            "p95": 25.8
           },
           "legit_block_rate": {
             "high": 0.6576197724933469,
@@ -1302,7 +1303,7 @@
           },
           "latency_ms": {
             "p50": 0.0,
-            "p95": 10.800000000000002
+            "p95": 3.8000000000000007
           },
           "legit_block_rate": {
             "high": 1.0,
@@ -1330,17 +1331,17 @@
         "D": {
           "accuracy": {
             "high": 1.0,
-            "k": 1,
-            "low": 0.20654931437723745,
-            "n": 1,
-            "rate": 1.0
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
           },
           "accuracy_with_acceptable": {
             "high": 1.0,
-            "k": 1,
-            "low": 0.20654931437723745,
-            "n": 1,
-            "rate": 1.0
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
           },
           "confusion": {
             "allow": {
@@ -1356,10 +1357,10 @@
             "challenge": {
               "allow": 0,
               "block": 0,
-              "challenge": 1
+              "challenge": 0
             }
           },
-          "cost_per_action_usd": 0.0,
+          "cost_per_action_usd": null,
           "detection": {
             "high": 1.0,
             "k": 0,
@@ -1368,45 +1369,45 @@
             "rate": null
           },
           "latency_ms": {
-            "p50": 23.0,
-            "p95": 23.0
+            "p50": null,
+            "p95": null
           },
           "legit_block_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "legit_challenge_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 0,
+          "not_run": 1,
+          "undetectable": 0,
+          "unstable": 0
+        },
+        "E": {
+          "accuracy": {
             "high": 0.7934506856227626,
             "k": 0,
             "low": 0.0,
             "n": 1,
             "rate": 0.0
           },
-          "legit_challenge_rate": {
+          "accuracy_with_acceptable": {
             "high": 1.0,
             "k": 1,
             "low": 0.20654931437723745,
             "n": 1,
-            "rate": 1.0
-          },
-          "lowerings": {
-            "legitimate": 0,
-            "not_legitimate": 0
-          },
-          "n": 1,
-          "not_run": 0,
-          "undetectable": 0,
-          "unstable": 0
-        },
-        "E": {
-          "accuracy": {
-            "high": 0.9054687942657693,
-            "k": 1,
-            "low": 0.09453120573423074,
-            "n": 2,
-            "rate": 0.5
-          },
-          "accuracy_with_acceptable": {
-            "high": 1.0,
-            "k": 2,
-            "low": 0.34238022750665303,
-            "n": 2,
             "rate": 1.0
           },
           "confusion": {
@@ -1417,7 +1418,7 @@
             },
             "block": {
               "allow": 0,
-              "block": 1,
+              "block": 0,
               "challenge": 1
             },
             "challenge": {
@@ -1429,14 +1430,14 @@
           "cost_per_action_usd": 0.0,
           "detection": {
             "high": 1.0,
-            "k": 2,
-            "low": 0.34238022750665303,
-            "n": 2,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
             "rate": 1.0
           },
           "latency_ms": {
-            "p50": 13.5,
-            "p95": 16.65
+            "p50": 14.0,
+            "p95": 14.0
           },
           "legit_block_rate": {
             "high": 1.0,
@@ -1456,8 +1457,8 @@
             "legitimate": 0,
             "not_legitimate": 0
           },
-          "n": 2,
-          "not_run": 0,
+          "n": 1,
+          "not_run": 1,
           "undetectable": 0,
           "unstable": 0
         }
@@ -1504,8 +1505,8 @@
             "rate": null
           },
           "latency_ms": {
-            "p50": 14.0,
-            "p95": 14.0
+            "p50": 12.0,
+            "p95": 12.0
           },
           "legit_block_rate": {
             "high": 0.7934506856227626,
@@ -1571,8 +1572,8 @@
             "rate": 1.0
           },
           "latency_ms": {
-            "p50": 12.0,
-            "p95": 12.0
+            "p50": 15.0,
+            "p95": 15.0
           },
           "legit_block_rate": {
             "high": 1.0,
@@ -1705,8 +1706,8 @@
             "rate": 1.0
           },
           "latency_ms": {
-            "p50": 14.0,
-            "p95": 15.8
+            "p50": 15.0,
+            "p95": 15.9
           },
           "legit_block_rate": {
             "high": 0.7934506856227626,
@@ -1745,7 +1746,7 @@
       "dev": 0
     },
     "rules": {
-      "deterministic": 0,
+      "deterministic": 2,
       "dev": 0
     }
   },
@@ -1753,10 +1754,10 @@
   "seeds": {},
   "set_hashes": {
     "deterministic": [
-      "606a655efc3a4c70409e33fbd19e6051b5d0eab7e5619e09053d9d6c826317ce"
+      "c6b67bcf16858b0b288d51ca87ff8746f41c5e822ef35f57b51aceee097a42e9"
     ],
     "dev": [
-      "9d15ddd937b02c1442bc440762efc535a0c51da603e1fea6701bd234aea4470c"
+      "d015f457ed5d92f7080071ef586e755b34c0a18c09a47febd252687c21aa7e46"
     ]
   },
   "sets": {
@@ -1953,8 +1954,8 @@
           "rate": 1.0
         },
         "latency_ms": {
-          "p50": 14.0,
-          "p95": 15.8
+          "p50": 15.0,
+          "p95": 15.9
         },
         "legit_block_rate": {
           "high": 0.7934506856227626,
@@ -1982,5 +1983,17 @@
     }
   },
   "stale_sets": [],
-  "undetectable": []
+  "test_combinations_shared_with_dev": null,
+  "undetectable": [],
+  "versions": {
+    "engine_version": [
+      "a41533b"
+    ],
+    "policy_version": [
+      "2026-10-28.3"
+    ],
+    "seed_version": [
+      "3574ce8f0cef1de72c159f3b2c98128410721da8c4016114bf90928e6958909c"
+    ]
+  }
 }

@@ -1,17 +1,22 @@
 # Evaluation report
 
-Generated 2026-10-28 from results made with the `real` backend.
+Generated 2026-10-28 (UTC) from results made with the `real` backend.
 
 Rates are shown as `rate (k/n, 95% Wilson interval)`. There is no overall accuracy: identity and authorization (B, C) must score 100% and would inflate it.
+
+> **dev holds only the hand-built demo cases** the rules were written around; no generated dev cases are labelled yet, so its rates say nothing about cases the rules weren't built for.
 
 ## Run
 
 - Models that ran: none
 - Prices used: `{}`
+- Engine version: `a41533b`
+- Policy version: `2026-10-28.3`
+- Seed version: `3574ce8f0cef1de72c159f3b2c98128410721da8c4016114bf90928e6958909c`
 - Generator seeds: none
 - Set hashes the results ran against:
-  - deterministic: `606a655efc3a4c70` (not frozen)
-  - dev: `9d15ddd937b02c14` (not frozen)
+  - deterministic: `c6b67bcf16858b0b` (not frozen)
+  - dev: `d015f457ed5d92f7` (not frozen)
 - Cases by category: deterministic: {'B': 13, 'C': 7, 'D': 1, 'E': 2}; dev: {'A': 1, 'D': 1, 'E': 1}
 
 ## Deterministic cases
@@ -28,8 +33,8 @@ Every case must pass; counts, not statistics. A case that repeats its request pa
 - always_challenge, E: 2/2 pass (0/2 exact), unstable 0, not run 0
 - rules, B: 13/13 pass (12/13 exact), unstable 0, not run 0
 - rules, C: 7/7 pass (7/7 exact), unstable 0, not run 0
-- rules, D: 1/1 pass (1/1 exact), unstable 0, not run 0
-- rules, E: 2/2 pass (1/2 exact), unstable 0, not run 0
+- rules, D: – pass (– exact), unstable 0, not run 1
+- rules, E: 1/1 pass (0/1 exact), unstable 0, not run 1
 
 ## Risk sets side by side (categories A, D, E, F)
 
@@ -81,10 +86,10 @@ Confusion matrix over the risk categories (rows expected, columns decided):
 
 | Category | n | Accuracy | With acceptable | Detection | Legit challenged | Lowerings (legit / other) | $ per action | p50 / p95 ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| A | 1 | 100% (1/1, 21%–100%) | 100% (1/1, 21%–100%) | – | 0% (0/1, 0%–79%) | 0 / 0 | 0.0000 | 14 / 14 |
-| D | 1 | 100% (1/1, 21%–100%) | 100% (1/1, 21%–100%) | 100% (1/1, 21%–100%) | – | 0 / 0 | 0.0000 | 12 / 12 |
+| A | 1 | 100% (1/1, 21%–100%) | 100% (1/1, 21%–100%) | – | 0% (0/1, 0%–79%) | 0 / 0 | 0.0000 | 12 / 12 |
+| D | 1 | 100% (1/1, 21%–100%) | 100% (1/1, 21%–100%) | 100% (1/1, 21%–100%) | – | 0 / 0 | 0.0000 | 15 / 15 |
 | E | 1 | 100% (1/1, 21%–100%) | 100% (1/1, 21%–100%) | 100% (1/1, 21%–100%) | – | 0 / 0 | 0.0000 | 16 / 16 |
-| risk (A, D, E, F) | 3 | 100% (3/3, 44%–100%) | 100% (3/3, 44%–100%) | 100% (2/2, 34%–100%) | 0% (0/1, 0%–79%) | 0 / 0 | 0.0000 | 14 / 16 |
+| risk (A, D, E, F) | 3 | 100% (3/3, 44%–100%) | 100% (3/3, 44%–100%) | 100% (2/2, 34%–100%) | 0% (0/1, 0%–79%) | 0 / 0 | 0.0000 | 15 / 16 |
 
 Confusion matrix over the risk categories (rows expected, columns decided):
 
@@ -123,6 +128,7 @@ Not yet measured.
 
 ## Not run
 
+- rules on deterministic: 2
 
 ## Cases marked undetectable
 
@@ -136,5 +142,5 @@ Kept few and left out of accuracy and detection: what is observable depends on w
 - The generator's dimensions resemble tier 0's features, so the rules look better on dev and test than they would on cases the generator did not write; the hard set is the check on that.
 - The plan has Claude Haiku 5.5 write the case wording, Claude Sonnet 5.5 label, and Claude Opus 5.5 serve as the strong tier: all three from one family. The Run section lists the models that actually ran.
 - With about 30 cases in a class a rate near 85% has a 95% interval of roughly ±12 points: enough to tell configurations apart in aggregate, not to rank them within a category.
-- Latency is a single run on one machine including network time, and is shown only for backends that measure the engine; no responses are cached, though the fixed system prompt is prompt-cached.
+- Latency, where shown, is a single run on one machine, including network time when a model ran. A repeated proposal reuses its earlier risk result (decision 0010), and the strong tier's fixed system prompt is prompt-cached; nothing else is cached.
 - Payments are simulated.
