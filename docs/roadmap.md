@@ -8,18 +8,15 @@ What is not done, as of 2026-10-27. Remove a line when it is done.
 - Confirm the Console key, the Claude model ids and the `messages.parse` call with one request.
 - Test Rho's MCP connector in claude.ai (Connectors → Rho): does it connect, and what tools does
   it list? Record the answer in `docs/reference/rho-api.md`.
-- Write the five demo scenario cases before building the engine (`eval/cases.py`); the generated
-  and hand-written evaluation sets follow once the engine runs.
 
 The build order, schedule and cut list are in
 [strategy/implementation-plan.md](strategy/implementation-plan.md).
 
 ## First version (Wednesday)
 
-- Local Rho stand-in on the committed synthetic seed (decisions 0002, 0005).
-- Gateway: tier-0 risk, policy table with `confirm` challenges, evidence record and the scenario
-  endpoints first; then signed-request identity and authorization checks; then the strong-model
-  adapter with engineered escalation; simulated execution throughout (decisions 0006–0009).
+- Wire the [implemented deterministic stages](reference/deterministic-stages.md) into the default
+  gateway and real evaluation backend, including signed demo requests and persistent admin state.
+  The five decisions already pass in direct engine integration tests; HTTP wiring remains.
 - The demo API in `docs/reference/demo-api.md` serving the site; no UI of its own.
 
 ## Security guardrails (Wednesday, with the module each protects)
@@ -27,19 +24,10 @@ The build order, schedule and cut list are in
 Detail, tests and estimates are in [strategy/security.md](strategy/security.md); the decisions in
 [decisions/0010-gateway-guardrails.md](decisions/0010-gateway-guardrails.md).
 
-- Model failure, timeout, invalid output or refusal gives `challenge` (fail closed).
-- A model's lowering of soft-signal risk is recorded in the evidence and the reasons.
-- The same proposal within 24 hours reuses its risk result: no re-rolling.
-- The agent gets back only the decision and ids.
-- Admin token on granting, revoking and resolving; agent-signed requests refused; bound to
-  127.0.0.1.
-- The gateway looks up open bills itself; `bill_not_referenced` is a hard flag.
-- `limits.rolling` checked in the first version.
-- Approving a held payment rechecks authorization and the payment method first.
-- Nonces in SQLite; demo agent keys generated into gitignored `data/keys/`; live Rho client GET
-  only; site renders untrusted text as text.
+- Exercise the implemented admin, resolve and risk-reuse guardrails with the default gateway
+  after the real identity, authorization and seed stages are wired in.
+- Live Rho client GET only; site renders untrusted text as text.
 - A Claude Code hook refusing shell commands that touch `.env` or `*.ovpn`.
-- The README's limits section: what Zeta One doesn't cover.
 
 ## Evaluation
 
@@ -49,18 +37,15 @@ The plan is in [strategy/evaluation.md](strategy/evaluation.md); the times are i
 
 Wednesday:
 
-- ~20 deterministic cases in `eval/cases.py`: one per identity, authorization and guardrail
-  check, labels by construction.
-- Rule-7 property tests: a hostile model stub never lowers the tier-0 floor or lifts a block.
 - **Owner:** write the `hard` set, 15–20 risk cases outside the generator's templates (~1.5 h).
-- `eval/generate.py` and `eval/prompts/wording.md`: dimensions, combinations, harmless
-  look-alikes; wording by a Claude Haiku 5.5 subagent; `dev` ~50.
+- Use the implemented case generator and wording prompt to assemble `dev` ~50 with
+  independently generated wording and harmless look-alikes.
 - **Owner:** read ~20 `dev` cases and write the one-page labelling guide (~30 min).
-- `eval/label.py` and `eval/prompts/label.md`: a blind Claude Sonnet 5.5 subagent labels `dev`.
-- `eval/run.py` with the trivial baselines, rules, engineered and strong; `eval/stats.py` (Wilson
-  intervals, discordant table, pooled McNemar, κ with bootstrap); `eval/report.py`.
+- Use the implemented blind export/merge workflow to label `dev`.
+- Connect the evaluation runner to a real backend; runner, statistics and reporting are
+  implemented against the replay backend.
 - Runs on `dev`; failures-by-stage table; tune on `dev` only.
-- Freeze the tier-0 instruction lexicon, then generate `test` ~100 with a new seed and wording;
+- Generate `test` ~100 with a new seed and wording against the frozen tier-0 lexicon;
   hash it; AI-label it.
 
 Thursday 08:00–09:30:

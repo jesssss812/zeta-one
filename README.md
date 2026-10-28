@@ -15,8 +15,22 @@ track, on Rho's API. It is not a Rho product.
 
 ## Status
 
-In planning; the app isn't built yet. The quick start, architecture diagram, reproduction steps, data
-provenance and known limitations will be added here as they are built.
+The decision kernel, synthetic data store, signed-agent identity, authorization checks and
+deterministic risk tier are implemented. Together they reproduce the five demo decisions in
+local tests. Payment execution is **simulated**. The default HTTP gateway still needs these
+stages wired in; see the [implemented interfaces and data provenance](docs/reference/deterministic-stages.md).
+
+Run the checks locally:
+
+```bash
+uv venv .venv
+uv pip install --python .venv/bin/python -r requirements-dev.txt
+python3 scripts/check.py
+```
+
+The seed is synthetic and is not evidence of production fraud accuracy. Agents bypassing the
+gateway are outside its protection. Authorization records are unsigned, evidence is editable,
+and bank-detail changes before monitoring began may be invisible.
 
 ## Documentation
 
