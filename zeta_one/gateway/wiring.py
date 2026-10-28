@@ -1,17 +1,20 @@
 """Which implementation runs each stage of the Engine.
 
-`real_stages()` names the real stages that exist. `build_engine` uses them and, given a fixture as
-`replay`, falls back stage by stage to that fixture's replay stand-ins. The live agent endpoint has
-no fixture to fall back to, so it runs only once every stage is real. Demo scenarios
-(`scenarios.run`) still replay their fixture whole.
+`real_stages(connection)` builds every real stage: the agent registry and authorization store on the
+gateway's SQLite connection, the synthetic Rho seed as the context source, tier 0 and the strong
+tier. `build_engine` uses them and, given a fixture as `replay`, falls back stage by stage to that
+fixture's replay stand-ins; demo scenarios use that to replay the model's recorded answer instead of
+calling it. `register_demo_agents` registers the built-in demo agent from its local key in
+`data/keys/` (made by `scripts/keygen.py`) and grants it the demo authorization.
 """
 
+import sqlite3
 import subprocess
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 
 from zeta_one.contracts import (
@@ -28,12 +31,24 @@ from zeta_one.contracts import (
     Tier0,
     TierName,
 )
+from cryptography.hazmat.primitives.serialization import load_pem_private_key
+
+from zeta_one.authorization.check import checker
+from zeta_one.authorization.store import Store as AuthorizationStore
 from zeta_one.gateway.pipeline import Engine
+from zeta_one.identity.registry import Registry
+from zeta_one.identity.signing import verifier
+from zeta_one.rho.snapshot import Store as SeedStore
+from zeta_one.rho.view import context_for
 from zeta_one.risk import claude
 from zeta_one.risk.claude import StrongTier
+from zeta_one.risk.tier0 import Tier0 as RealTier0
 from zeta_one.testing.replay import replay_engine
 
 ROOT = Path(__file__).resolve().parents[2]
+KEYS = ROOT / "data" / "keys"
+# Built-in demo agents: key file name -> the fixture whose identity and authorization they take.
+DEMO_AGENTS = {"ap_assistant": "routine_bill_payment"}
 
 # An agent's registry status ("active", "revoked") or None when unknown: what resolve rechecks.
 AgentStatus = Callable[[str], str | None]
@@ -52,6 +67,9 @@ class Stages:
     configuration: Configuration = field(default_factory=Configuration)
     prices: dict[str, tuple[float, float]] = field(default_factory=dict)
     seed_version: str | None = None
+    # Where admin endpoints register agents and grant authorizations; None when the stages are stand-ins.
+    registry: Registry | None = None
+    authorizations: AuthorizationStore | None = None
 
     def missing(self) -> list[str]:
         required = ["verify_identity", "load_authorization", "make_checker", "load_context", "tier0", "agent_status"]
@@ -60,9 +78,54 @@ class Stages:
         return missing
 
 
-def real_stages() -> Stages:
-    """The real stages that have landed. Replay stands in for the rest in demo scenarios."""
-    return Stages(tiers={"strong": StrongTier()}, prices=dict(claude.PRICES))
+def real_stages(connection: sqlite3.Connection, store: SeedStore | None = None) -> Stages:
+    """Every real stage, on the gateway's connection and a seed store (a fresh one by default)."""
+    store = store or SeedStore()
+    registry, authorizations = Registry(connection), AuthorizationStore(connection)
+
+    def agent_status(agent_id: str) -> str | None:
+        agent = registry.get(agent_id)
+        return agent.status if agent else None
+
+    return Stages(
+        verify_identity=verifier(registry),
+        load_authorization=authorizations.loader(),
+        make_checker=checker,
+        load_context=context_for(store),
+        tier0=RealTier0(),
+        tiers={"strong": StrongTier()},
+        agent_status=agent_status,
+        prices=dict(claude.PRICES),
+        seed_version=store.seed_version,
+        registry=registry,
+        authorizations=authorizations,
+    )
+
+
+def register_demo_agents(stages: Stages, keys: Path = KEYS, now: datetime | None = None) -> list[str]:
+    """Register each demo agent whose key exists and that isn't registered yet, and grant it the demo
+    authorization. Returns the agent ids it registered; never prints or logs key material."""
+    from zeta_one.gateway.scenarios import load_fixture
+
+    registered = []
+    now = now or datetime.now(UTC)
+    for name, fixture in DEMO_AGENTS.items():
+        path = keys / f"{name}.pem"
+        if not path.exists() or stages.registry is None or stages.authorizations is None:
+            continue
+        record = load_fixture(fixture).decision_record
+        agent_id, business_id = record.identity.claimed_agent_id, record.identity.business_id
+        if stages.registry.get(agent_id) is not None:
+            continue
+        key = load_pem_private_key(path.read_bytes(), password=None)
+        stages.registry.register(agent_id, business_id, record.identity.owner or "the business owner",
+                                 key.public_key(), now)
+        if stages.authorizations.load(business_id, agent_id) is None:
+            from zeta_one.contracts import Authorization
+
+            stages.authorizations.grant(Authorization.model_validate(record.authorization.snapshot))
+        registered.append(agent_id)
+    return registered
 
 
 class StagesMissing(RuntimeError):

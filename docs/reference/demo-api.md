@@ -27,8 +27,11 @@ uvicorn zeta_one.gateway.app:app --port 8000
 
 CORS allows `http://localhost:*` so a dev server for the site can call it. Base URL
 `http://localhost:8000`. The endpoints below are unauthenticated, except reading decision records:
-they are the demo surface, not the signed agent endpoint (`POST /v1/actions/propose_payment`,
-which the scenario runner calls internally with a built-in signed agent). A record names the
+they are the demo surface, not the signed agent endpoint (`POST /v1/actions/propose_payment`).
+A scenario run is a sandbox: a fresh seed, a one-off key for the scenario's agent, its
+authorization, and a request signed at the seed's clock, decided on the real identity,
+authorization, context and tier-0 stages. A model tier it escalates to replays the answer recorded
+in the fixture, so a demo button never calls a paid model. A record names the
 signals and the model's rationale that an agent's own response leaves out, so
 `GET /v1/decisions` and `GET /v1/decisions/{decision_id}` need
 `Authorization: Bearer $ZETA_ADMIN_TOKEN` and refuse agent-signed requests, like the other admin
@@ -55,6 +58,7 @@ is the same whatever the amount.
 ```json
 {
   "illustrative": false,
+  "replayed_stages": [],
   "scenario": {"name": "vendor_payment_method_changed", "title": "...", "summary": "...", "expected": "challenge"},
   "context": {
     "business": {"id", "name"},
@@ -160,6 +164,9 @@ Rules the site can count on:
   `escalation: "none"` runs tier 0 alone (the evaluation's rules-only arm); `"always"` runs the
   model tiers on every case.
 - `execution.simulated` is always `true` in this build.
+- A scenario result's `illustrative` is `true` when any stage replayed the fixture instead of
+  running, and `replayed_stages` names them (`["strong"]` for the two scenarios that escalate).
+  Show replayed model output as recorded, not as a live answer.
 - Proposal amounts must be positive integer minor units, at most 10^12 ($10 billion), in an
   uppercase three-letter ISO 4217 currency code. Ids are 1 to 128 characters, `memo` at most
   1,000, `agent_rationale` at most 4,000, and `source_document_ids` at most 20 ids. Anything else

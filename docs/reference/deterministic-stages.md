@@ -106,12 +106,14 @@ features produce elevated risk; no active feature produces low risk. The kernel'
 alone computes the enforced floor and merges model results. Integer method ages through day 30
 count as recent. An absent, zero or wrong-currency median yields no amount-ratio signal.
 
-## Gateway handoff and verification
+## Gateway wiring and verification
 
-The default `gateway.wiring.real_stages()` still needs these implementations registered, including
-persistent registry/grant administration and built-in signed demo requests. The scenario fallback
-and evaluation replay backend remain in place until that wiring lands. Do not describe the default
-HTTP path as fully using these stages yet.
+`gateway.wiring.real_stages(connection)` builds every stage on the gateway's SQLite connection: the
+registry and authorization store, the seed as the context source, tier 0 and the strong tier. The
+default app (`zeta_one.gateway.app:app`) uses it with `data/zeta.db` and registers the built-in demo
+agent from `data/keys/ap_assistant.pem` with the demo authorization, if the key exists (run
+`scripts/keygen.py` once). The live gateway's clock is the real time; demo scenarios and the evaluation use
+`SEED_NOW`.
 
 `tests/test_stage_integration.py` composes all four callables into `Engine`, uses the seed clock,
 and verifies the five expected decisions and reasons with `tiers=["tier0"]`. Stage-specific tests

@@ -1,14 +1,24 @@
-"""The five demo scenarios. Until the seed and the real stages land, each runs by replaying its
-fixture through the real merge and policy, so its result stays marked illustrative."""
+"""The five demo scenarios, each run in its own sandbox on the real stages.
+
+A run gets a fresh copy of the seed, a fresh registry with a one-off key for the scenario's agent
+(none for the unknown-agent scenario), the scenario's authorization, and a request signed at the
+seed's clock, `SEED_NOW`. Identity, authorization, context and tier 0 are real. A model tier the
+scenario escalates to replays the answer recorded in its fixture, so a demo button never calls a
+paid model; such a result is marked `illustrative` and names the replayed stages.
+"""
 
 import dataclasses
 import json
-from datetime import UTC, datetime
+import sqlite3
 from pathlib import Path
 
-from zeta_one.contracts import EvidenceRecord, ScenarioResult
+from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+
+from zeta_one.contracts import Authorization, EvidenceRecord, ScenarioResult, SignedRequest
 from zeta_one.gateway.pipeline import new_decision_id
-from zeta_one.testing.replay import replay_engine, request_for
+from zeta_one.identity.signing import sign
+from zeta_one.rho.seed import SEED_NOW
+from zeta_one.rho.snapshot import Store as SeedStore
 
 FIXTURES = Path(__file__).resolve().parents[2] / "data" / "fixtures"
 ORDER = [
@@ -18,6 +28,7 @@ ORDER = [
     "unknown_agent",
     "invoice_redirect_instructions",
 ]
+PATH = "/v1/actions/propose_payment"
 
 
 def load_fixture(name: str) -> ScenarioResult:
@@ -29,13 +40,33 @@ def list_scenarios() -> list[dict]:
 
 
 def run(name: str) -> ScenarioResult:
+    from zeta_one.gateway.wiring import build_engine, real_stages
+
     if name not in ORDER:
         raise KeyError(name)
     scenario = load_fixture(name)
-    # Each run is a new decision: its own id and the time it ran, not the fixture's.
-    engine = dataclasses.replace(replay_engine(scenario), new_id=new_decision_id, clock=lambda: datetime.now(UTC))
-    record, _ = engine.evaluate(request_for(scenario))
-    return scenario.model_copy(update={"decision_record": record, "illustrative": True})
+    identity = scenario.decision_record.identity
+    connection = sqlite3.connect(":memory:", check_same_thread=False)
+    key = Ed25519PrivateKey.generate()
+    with SeedStore() as store:
+        stages = real_stages(connection, store)
+        if identity.result != "unknown_agent":
+            stages.registry.register(identity.claimed_agent_id, identity.business_id,
+                                     identity.owner or "the business owner", key.public_key(), SEED_NOW)
+        if scenario.decision_record.authorization.snapshot:
+            stages.authorizations.grant(Authorization.model_validate(scenario.decision_record.authorization.snapshot))
+        replayed = sorted(stages.tiers)
+        stages.tiers = {}  # model tiers replay the fixture's recorded answer
+        engine = build_engine(stages, lambda *_: 0, replay=scenario, clock=lambda: SEED_NOW)
+        engine = dataclasses.replace(engine, new_id=new_decision_id)
+        body = scenario.proposal.model_dump_json().encode()
+        request = SignedRequest(method="POST", path=PATH, body=body,
+                                headers=sign(key, identity.claimed_agent_id, "POST", PATH, body, SEED_NOW))
+        record, _ = engine.evaluate(request)
+    connection.close()
+    ran_models = [name for name in replayed if name in record.risk.tiers_run]
+    return scenario.model_copy(update={"decision_record": record, "illustrative": bool(ran_models),
+                                       "replayed_stages": ran_models})
 
 
 def dump(record: EvidenceRecord | ScenarioResult) -> dict:

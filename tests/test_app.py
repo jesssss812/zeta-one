@@ -17,7 +17,7 @@ ADMIN = {"Authorization": f"Bearer {TOKEN}"}
 def client() -> TestClient:
     connection = sqlite3.connect(":memory:", check_same_thread=False)
     connection.row_factory = sqlite3.Row
-    return TestClient(create_app(Gateway(stages=real_stages(), ledger=Ledger(connection)), TOKEN))
+    return TestClient(create_app(Gateway(stages=real_stages(connection), ledger=Ledger(connection)), TOKEN))
 
 
 def test_health_says_simulated(client):
@@ -47,7 +47,6 @@ def test_each_scenario_run_is_a_new_decision(client):
     assert first["decision_id"] != second["decision_id"]
     fixture = load_fixture("routine_bill_payment").decision_record
     assert fixture.decision_id not in (first["decision_id"], second["decision_id"])
-    assert first["created_at"] != fixture.created_at.isoformat().replace("+00:00", "Z")
     assert len(client.get("/v1/decisions", headers=ADMIN).json()) == 2
 
 
@@ -70,8 +69,50 @@ def test_the_latest_evaluation_report_is_served(tmp_path):
     connection = sqlite3.connect(":memory:", check_same_thread=False)
     connection.row_factory = sqlite3.Row
     report = tmp_path / "report.json"
-    app = create_app(Gateway(stages=real_stages(), ledger=Ledger(connection)), TOKEN, eval_report=report)
+    app = create_app(Gateway(stages=real_stages(connection), ledger=Ledger(connection)), TOKEN, eval_report=report)
     client = TestClient(app)
     assert client.get("/v1/eval/latest").json()["error"]["code"] == "no_report"
     report.write_text('{"sets": {}}')
     assert client.get("/v1/eval/latest").json() == {"sets": {}}
+
+
+@pytest.mark.parametrize("name", ORDER)
+def test_scenarios_run_on_the_real_stages(client, name):
+    body = client.post(f"/v1/scenarios/{name}/run").json()
+    record = body["decision_record"]
+    fixture = load_fixture(name)
+    assert record["decision"] == fixture.scenario.expected
+    assert record["reasons"] == fixture.decision_record.reasons
+    assert record["seed_version"]
+    if "strong" in record["risk"]["tiers_run"]:
+        assert body["illustrative"] is True and body["replayed_stages"] == ["strong"]
+    else:
+        assert body["illustrative"] is False and body["replayed_stages"] == []
+
+
+def test_the_live_endpoint_decides_a_signed_demo_agent_request_on_the_real_stages(tmp_path):
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+    from cryptography.hazmat.primitives.serialization import Encoding, NoEncryption, PrivateFormat
+
+    from zeta_one.gateway.wiring import register_demo_agents
+    from zeta_one.identity.signing import sign
+    from zeta_one.rho.seed import SEED_NOW
+
+    key = Ed25519PrivateKey.generate()
+    (tmp_path / "ap_assistant.pem").write_bytes(key.private_bytes(Encoding.PEM, PrivateFormat.PKCS8, NoEncryption()))
+    connection = sqlite3.connect(":memory:", check_same_thread=False)
+    connection.row_factory = sqlite3.Row
+    stages = real_stages(connection)
+    register_demo_agents(stages, tmp_path, SEED_NOW)
+    client = TestClient(create_app(Gateway(stages=stages, ledger=Ledger(connection), clock=lambda: SEED_NOW), TOKEN))
+    body = load_fixture("routine_bill_payment").proposal.model_dump_json().encode()
+    path = "/v1/actions/propose_payment"
+    headers = sign(key, "agent_ap_assistant_01", "POST", path, body, SEED_NOW)
+    response = client.post(path, content=body, headers=headers)
+    assert response.status_code == 200
+    answer = response.json()
+    assert set(answer) == {"decision", "decision_id", "challenge_id"} and answer["decision"] == "allow"
+    record = client.get(f"/v1/decisions/{answer['decision_id']}", headers=ADMIN).json()
+    assert record["identity"]["result"] == "verified" and record["execution"]["status"] == "executed"
+    replayed = client.post(path, content=body, headers=headers).json()
+    assert client.get(f"/v1/decisions/{replayed['decision_id']}", headers=ADMIN).json()["reasons"] == ["identity:replay"]

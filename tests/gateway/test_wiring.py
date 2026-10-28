@@ -1,3 +1,5 @@
+import sqlite3
+
 import pytest
 
 from tests.gateway.fakes import HELD, NOW, FakeWorld
@@ -10,10 +12,35 @@ def _no_spend(agent_id, since, currency):
     return 0
 
 
-def test_real_stages_include_the_strong_tier_and_its_prices():
-    stages = real_stages()
+def test_real_stages_are_complete_and_include_the_strong_tier_and_its_prices():
+    stages = real_stages(sqlite3.connect(":memory:", check_same_thread=False))
+    assert stages.missing() == []
     assert isinstance(stages.tiers["strong"], StrongTier)
     assert stages.prices == PRICES
+    assert stages.seed_version
+
+
+def test_the_demo_agent_is_registered_once_from_its_local_key(tmp_path):
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+    from cryptography.hazmat.primitives.serialization import Encoding, NoEncryption, PrivateFormat
+
+    from zeta_one.gateway.wiring import register_demo_agents
+
+    key = Ed25519PrivateKey.generate()
+    (tmp_path / "ap_assistant.pem").write_bytes(key.private_bytes(Encoding.PEM, PrivateFormat.PKCS8, NoEncryption()))
+    stages = real_stages(sqlite3.connect(":memory:", check_same_thread=False))
+    assert register_demo_agents(stages, tmp_path, NOW) == ["agent_ap_assistant_01"]
+    assert register_demo_agents(stages, tmp_path, NOW) == []
+    agent = stages.registry.get("agent_ap_assistant_01")
+    assert agent.status == "active" and agent.public_key == key.public_key().public_bytes_raw()
+    assert stages.authorizations.load(agent.business_id, agent.agent_id).authorization_id == "auth_0001"
+
+
+def test_no_key_means_no_demo_agent(tmp_path):
+    from zeta_one.gateway.wiring import register_demo_agents
+
+    stages = real_stages(sqlite3.connect(":memory:", check_same_thread=False))
+    assert register_demo_agents(stages, tmp_path, NOW) == []
 
 
 def test_the_live_engine_needs_every_stage():

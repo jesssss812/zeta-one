@@ -23,7 +23,7 @@ from zeta_one.gateway import admin, scenarios
 from zeta_one.gateway.ledger import Ledger
 from zeta_one.gateway.reuse import RiskReuse
 from zeta_one.gateway.service import EngineNotReady, Gateway, NotHeld, UnknownChallenge
-from zeta_one.gateway.wiring import ROOT, engine_version, real_stages
+from zeta_one.gateway.wiring import ROOT, engine_version, real_stages, register_demo_agents
 
 HOST = "127.0.0.1"
 EVAL_REPORT = ROOT / "data" / "eval" / "report.json"
@@ -146,7 +146,9 @@ def create_app(gateway: Gateway, token: str | None, eval_report: Path = EVAL_REP
 
 def default_gateway() -> Gateway:
     connection = db.connect()
-    return Gateway(stages=real_stages(), ledger=Ledger(connection), reuse=RiskReuse(connection), version=engine_version())
+    stages = real_stages(connection)
+    register_demo_agents(stages)
+    return Gateway(stages=stages, ledger=Ledger(connection), reuse=RiskReuse(connection), version=engine_version())
 
 
 _app: FastAPI | None = None
