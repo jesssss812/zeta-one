@@ -1,7 +1,10 @@
 """The fixtures are the contract with the site: each must load, and replaying it through the real
 merge and policy must reproduce its decision."""
 
+import pytest
+
 from zeta_one.gateway import scenarios
+from zeta_one.gateway.scenarios import load_fixture
 from zeta_one.testing.replay import replay_engine, request_for
 
 REQUIRED = {
@@ -45,3 +48,18 @@ def test_a_case_names_its_setup_and_labels(scenario):
                 setup=[{"op": "change_payment_method", "args": {"counterparty_id": "cp_0007", "days_ago": 3}}],
                 provenance="synthetic:test")
     assert Case.model_validate_json(case.model_dump_json()) == case
+
+
+@pytest.mark.parametrize("field, value", [
+    ("set", "train"), ("category", "G"), ("truth", "fraud"), ("expected", "review"),
+    ("also_acceptable", ["maybe"]),
+])
+def test_a_case_with_an_unknown_label_is_refused(field, value):
+    from pydantic import ValidationError
+
+    from zeta_one.contracts import Case
+    fixture = load_fixture("routine_bill_payment")
+    fields = dict(id="c", set="dev", category="A", proposal=fixture.proposal, truth="legitimate",
+                  expected="allow", provenance="synthetic:test")
+    with pytest.raises(ValidationError):
+        Case(**{**fields, field: value})

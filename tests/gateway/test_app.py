@@ -159,6 +159,8 @@ def test_revoking_the_agent_while_held_blocks_on_approve(client, world):
     held = hold(client)
     world.agents[AGENT] = "revoked"
     assert resolve(client, held["challenge_id"]).json()["status"] == "blocked"
+    review = client.get(f"/v1/decisions/{held['decision_id']}", headers=ADMIN).json()["review"]
+    assert review["changes"] == ["agent:revoked"]
 
 
 def test_changing_the_payment_method_while_held_blocks_on_approve(client, world):
@@ -166,6 +168,8 @@ def test_changing_the_payment_method_while_held_blocks_on_approve(client, world)
     world.change_payment_method()
     body = resolve(client, held["challenge_id"]).json()
     assert body["status"] == "blocked"
+    review = client.get(f"/v1/decisions/{held['decision_id']}", headers=ADMIN).json()["review"]
+    assert review["changes"] == ["payment_method:changed"]
 
 
 def test_held_payment_is_not_counted_against_its_own_rolling_limit(client, world):
