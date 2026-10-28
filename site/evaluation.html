@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="How Zeta One is evaluated: how cases are made, labelled, frozen, run and reported, and whether a person, a model or code does each step.">
+<title>Zeta One · How it is evaluated</title>
+<style>
+/* Layout: one reading column; the flow diagram scrolls sideways on its own when narrow. */
+:root {
+  --bg: #f8f9f5; --fg: #17221f; --muted: #58665f; --line: #cfd6cb; --panel: #ffffff;
+  --you: #f6dca0; --you-ink: #7a4d00;
+  --assist: #dcedb0; --assist-ink: #3c5a12;
+  --model: #d3e0f4; --model-ink: #24456b;
+  --code: #eceee8; --code-ink: #4d5a53;
+  --display: Georgia, "Times New Roman", serif;
+  --body: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121815; --fg: #e8ece6; --muted: #9aa69e; --line: #34413a; --panel: #18201c;
+  --you: #4a3713; --you-ink: #f3c876; --assist: #2f4219; --assist-ink: #c6e48a;
+  --model: #1f3149; --model-ink: #9cc3ec; --code: #222a25; --code-ink: #b4beb7; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #121815; --fg: #e8ece6; --muted: #9aa69e; --line: #34413a; --panel: #18201c;
+  --you: #4a3713; --you-ink: #f3c876; --assist: #2f4219; --assist-ink: #c6e48a;
+  --model: #1f3149; --model-ink: #9cc3ec; --code: #222a25; --code-ink: #b4beb7; color-scheme: dark }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font: 15px/1.55 var(--body); margin: 0;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.top a, .links a { color: var(--fg); }
+.wrap { max-width: 1240px; margin: 0 auto; padding-block: 32px 64px; display: grid; gap: 40px; }
+header { display: grid; gap: 10px; max-width: 780px; }
+.eyebrow { font: 11px/1.4 var(--mono); letter-spacing: .12em; color: var(--muted); text-transform: uppercase; }
+h1 { font: 400 clamp(32px, 4.4vw, 48px)/1.05 var(--display); letter-spacing: -.02em; margin: 0; text-wrap: balance; }
+h2 { font: 400 26px/1.15 var(--display); margin: 0 0 6px; text-wrap: balance; }
+p { margin: 0; } .lede { font-size: 17px; color: var(--muted); max-width: 66ch; }
+.legend { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.role { border-radius: 10px; padding: 12px 14px; display: grid; gap: 4px; min-width: 0; }
+.role b { font: 600 11px/1.3 var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+.role span { font-size: 13.5px; }
+.you { background: var(--you); } .you b, .t-you { color: var(--you-ink); }
+.assist { background: var(--assist); } .assist b, .t-assist { color: var(--assist-ink); }
+.model { background: var(--model); } .model b, .t-model { color: var(--model-ink); }
+.code { background: var(--code); } .code b, .t-code { color: var(--code-ink); }
+figure { margin: 0; display: grid; gap: 10px; }
+.scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+.scroll svg { display: block; width: 100%; min-width: 980px; height: auto; color: var(--muted); }
+figcaption { color: var(--muted); font-size: 13.5px; max-width: 80ch; }
+svg text { font-family: var(--body); }
+.n-you { fill: var(--you); } .n-assist { fill: var(--assist); } .n-model { fill: var(--model); } .n-code { fill: var(--code); }
+.n-frame { fill: none; stroke: var(--line); }
+.b-you { fill: var(--you-ink); } .b-assist { fill: var(--assist-ink); } .b-model { fill: var(--model-ink); } .b-code { fill: var(--code-ink); }
+.badge { font: 600 9.5px var(--mono); letter-spacing: .09em; }
+.title { fill: var(--fg); font-size: 13.5px; font-weight: 600; }
+.sub { fill: var(--muted); font-size: 11.5px; }
+.status { font: 10px var(--mono); fill: var(--muted); }
+.st-you { fill: var(--you-ink); font-weight: 700; } .st-me { fill: var(--model-ink); font-weight: 700; }
+.stage { font: 600 11px var(--mono); letter-spacing: .12em; fill: var(--fg); }
+.edge { fill: none; stroke: currentColor; stroke-width: 1.4; }
+.elabel { fill: var(--muted); font-size: 10.5px; }
+.cfg-name { fill: var(--fg); font: 600 12.5px var(--mono); }
+.chip-t { font: 600 10.5px var(--body); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+th, td { text-align: left; padding: 10px 12px; border-top: 1px solid var(--line); vertical-align: top; }
+thead th { border-top: 0; font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+td code, .mono { font: 12.5px var(--mono); }
+.pill { display: inline-block; border-radius: 999px; padding: 2px 9px; font-size: 12.5px; font-weight: 600; white-space: nowrap; }
+.dash { color: var(--muted); }
+.cols { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; align-items: start; }
+.col { border-radius: 12px; padding: 16px; display: grid; gap: 10px; min-width: 0; }
+.col h3 { margin: 0; font: 600 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+.col .total { font: 400 22px/1.1 var(--display); }
+.col ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.col li { font-size: 13.5px; display: grid; gap: 1px; }
+.col li small { color: var(--muted); font-size: 12px; }
+.col.you { background: color-mix(in srgb, var(--you) 55%, var(--panel)); }
+.col.assist { background: color-mix(in srgb, var(--assist) 55%, var(--panel)); }
+.col.model { background: color-mix(in srgb, var(--model) 55%, var(--panel)); }
+.col.code { background: color-mix(in srgb, var(--code) 70%, var(--panel)); }
+.note { font-size: 13px; color: var(--muted); max-width: 80ch; }
+section { display: grid; gap: 14px; }
+@media (max-width: 860px) { .legend, .cols { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 480px) { .legend, .cols { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav class="top"><a href="./index.html">ζ Zeta One</a><span class="eyebrow">Synthetic data · payments simulated</span></nav>
+<header>
+  <div class="eyebrow">How Zeta One is evaluated</div>
+  <h1>How the evaluation is made, labelled, run and reported</h1>
+  <p class="lede">Every configuration of the engine is scored on the same labelled cases, so the trade between fraud caught, honest payments held up and model spend can be compared. Each box is one step, coloured by who does it. Code runs every step that has to be repeatable. Models write case text, label blind and are the system under test. A person makes the judgement calls the score depends on.</p>
+</header>
+
+<div class="legend" aria-label="Who does each part">
+  <div class="role you"><b>Person</b><span>Human judgement, never handed to a model.</span></div>
+  <div class="role assist"><b>Model-assisted</b><span>Claude drafts; a person edits and decides.</span></div>
+  <div class="role model"><b>Model</b><span>A model does it alone, under rules code enforces.</span></div>
+  <div class="role code"><b>Code</b><span>Deterministic and repeatable; no model involved.</span></div>
+</div>
+
+<figure>
+  <div class="scroll">
+  <svg viewBox="0 0 1200 640" role="img" aria-label="Evaluation flow in five stages: make cases, label, freeze, run, report. Each step is coloured by who does it: a person, model-assisted, model, or code.">
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+      </marker>
+    </defs>
+
+    <!-- stage headers -->
+    <text class="stage" x="20" y="36">1 · MAKE CASES</text>
+    <text class="stage" x="290" y="36">2 · LABEL</text>
+    <text class="stage" x="560" y="36">3 · FREEZE</text>
+    <text class="stage" x="750" y="36">4 · RUN</text>
+    <text class="stage" x="1010" y="36">5 · REPORT</text>
+
+    <!-- 1 · make cases -->
+    <rect class="n-code" x="20" y="56" width="220" height="58" rx="8"/>
+    <text class="badge b-code" x="32" y="73">CODE</text>
+    <text class="title" x="32" y="91">Pick combinations</text>
+    <text class="sub" x="32" y="106">seeded sampler: dev 7, test 11</text>
+
+    <rect class="n-model" x="20" y="132" width="220" height="58" rx="8"/>
+    <text class="badge b-model" x="32" y="149">MODEL</text>
+    <text class="title" x="32" y="167">Write invoice + rationale</text>
+    <text class="sub" x="32" y="182">Claude Haiku 5.5 · no labels seen</text>
+
+    <rect class="n-code" x="20" y="208" width="220" height="58" rx="8"/>
+    <text class="badge b-code" x="32" y="225">CODE</text>
+    <text class="title" x="32" y="243">Assemble cases</text>
+    <text class="sub" x="32" y="258">dev 48 · test 100, unlabelled</text>
+
+    <rect class="n-you" x="20" y="300" width="220" height="58" rx="8"/>
+    <text class="badge b-you" x="32" y="317">PERSON</text>
+    <text class="title" x="32" y="335">Write the hard set</text>
+    <text class="sub" x="32" y="350">15–20, outside the generator</text>
+
+    <rect class="n-assist" x="20" y="376" width="220" height="58" rx="8"/>
+    <text class="badge b-assist" x="32" y="393">MODEL-ASSISTED</text>
+    <text class="title" x="32" y="411">Turn specs into case files</text>
+    <text class="sub" x="32" y="426">Claude drafts · a person checks</text>
+
+    <rect class="n-code" x="20" y="468" width="220" height="58" rx="8"/>
+    <text class="badge b-code" x="32" y="485">CODE</text>
+    <text class="title" x="32" y="503">Identity + authorization</text>
+    <text class="sub" x="32" y="518">23 cases · labelled by design</text>
+
+    <rect class="n-code" x="20" y="544" width="220" height="58" rx="8"/>
+    <text class="badge b-code" x="32" y="561">CODE</text>
+    <text class="title" x="32" y="579">Feedback cases</text>
+    <text class="sub" x="32" y="594">labelled by verified findings</text>
+
+    <!-- 2 · label -->
+    <rect class="n-you" x="290" y="56" width="230" height="58" rx="8"/>
+    <text class="badge b-you" x="302" y="73">PERSON</text>
+    <text class="title" x="302" y="91">Read 20 dev cases</text>
+    <text class="sub" x="302" y="106">before the guide is written</text>
+
+    <rect class="n-assist" x="290" y="132" width="230" height="58" rx="8"/>
+    <text class="badge b-assist" x="302" y="149">MODEL-ASSISTED</text>
+    <text class="title" x="302" y="167">Labelling guide</text>
+    <text class="sub" x="302" y="182">Claude drafts · a person decides</text>
+
+    <rect class="n-model" x="290" y="208" width="230" height="58" rx="8"/>
+    <text class="badge b-model" x="302" y="225">MODEL</text>
+    <text class="title" x="302" y="243">Label every dev + test case</text>
+    <text class="sub" x="302" y="258">Claude Sonnet 5.5 · blind</text>
+
+    <rect class="n-you" x="290" y="300" width="230" height="58" rx="8"/>
+    <text class="badge b-you" x="302" y="317">PERSON</text>
+    <text class="title" x="302" y="335">Label 40 test cases</text>
+    <text class="sub" x="302" y="350">without seeing the AI's labels</text>
+
+    <rect class="n-code" x="290" y="376" width="230" height="58" rx="8"/>
+    <text class="badge b-code" x="302" y="393">CODE</text>
+    <text class="title" x="302" y="411">Merge + agreement</text>
+    <text class="sub" x="302" y="426">Cohen's κ with a 95% interval</text>
+
+    <rect class="n-you" x="290" y="452" width="230" height="58" rx="8"/>
+    <text class="badge b-you" x="302" y="469">PERSON</text>
+    <text class="title" x="302" y="487">Settle disagreements</text>
+    <text class="sub" x="302" y="502">the human label is final</text>
+
+    <!-- 3 · freeze -->
+    <rect class="n-code" x="560" y="300" width="150" height="58" rx="8"/>
+    <text class="badge b-code" x="572" y="317">CODE</text>
+    <text class="title" x="572" y="335">Freeze</text>
+    <text class="sub" x="572" y="350">hash sets + lexicon</text>
+
+    <!-- 4 · run -->
+    <rect class="n-code" x="750" y="56" width="230" height="540" rx="10"/>
+    <text class="badge b-code" x="762" y="73">CODE</text>
+    <text class="title" x="762" y="91">Run every case</text>
+    <text class="sub" x="762" y="106">fresh sandbox per case · spend cap</text>
+    <text class="sub" x="762" y="134">7 configurations, same cases:</text>
+
+    <g>
+      <rect fill="var(--panel)" x="762" y="146" width="206" height="54" rx="6"/>
+      <text class="cfg-name" x="772" y="166">always_allow</text>
+      <text class="sub" x="772" y="185">baseline: allows everything</text>
+
+      <rect fill="var(--panel)" x="762" y="208" width="206" height="54" rx="6"/>
+      <text class="cfg-name" x="772" y="228">always_challenge</text>
+      <text class="sub" x="772" y="247">baseline: holds everything</text>
+
+      <rect fill="var(--panel)" x="762" y="270" width="206" height="54" rx="6"/>
+      <text class="cfg-name" x="772" y="290">rules</text>
+      <text class="sub" x="772" y="309">tier-0 rules only, no model</text>
+
+      <rect fill="var(--panel)" x="762" y="332" width="206" height="54" rx="6"/>
+      <text class="cfg-name" x="772" y="352">engineered</text>
+      <rect class="n-model" x="886" y="340" width="74" height="18" rx="9"/><text class="chip-t b-model" x="923" y="353" text-anchor="middle">Opus 5.5</text>
+      <text class="sub" x="772" y="371">rules; model on uncertain only</text>
+
+      <rect fill="var(--panel)" x="762" y="394" width="206" height="54" rx="6"/>
+      <text class="cfg-name" x="772" y="414">jev</text>
+      <rect class="n-model" x="856" y="402" width="104" height="18" rx="9"/><text class="chip-t b-model" x="908" y="415" text-anchor="middle">Jev 1.14 → Opus</text>
+      <text class="sub" x="772" y="433">Jev first; Opus if Jev escalates</text>
+
+      <rect fill="var(--panel)" x="762" y="456" width="206" height="54" rx="6"/>
+      <text class="cfg-name" x="772" y="476">open_weight</text>
+      <rect class="n-model" x="886" y="464" width="74" height="18" rx="9"/><text class="chip-t b-model" x="923" y="477" text-anchor="middle">Qwen3 235B</text>
+      <text class="sub" x="772" y="495">open model in Opus's place</text>
+
+      <rect fill="var(--panel)" x="762" y="518" width="206" height="54" rx="6"/>
+      <text class="cfg-name" x="772" y="538">strong</text>
+      <rect class="n-model" x="886" y="526" width="74" height="18" rx="9"/><text class="chip-t b-model" x="923" y="539" text-anchor="middle">Opus 5.5</text>
+      <text class="sub" x="772" y="557">model on every case</text>
+    </g>
+
+    <!-- 5 · report -->
+    <rect class="n-code" x="1010" y="300" width="170" height="58" rx="8"/>
+    <text class="badge b-code" x="1022" y="317">CODE</text>
+    <text class="title" x="1022" y="335">Score + report</text>
+    <text class="sub" x="1022" y="350">rates, intervals, cost</text>
+
+    <rect class="n-code" x="1010" y="376" width="170" height="58" rx="8"/>
+    <text class="badge b-code" x="1022" y="393">CODE</text>
+    <text class="title" x="1022" y="411">Record for the site</text>
+    <text class="sub" x="1022" y="426">site/data/</text>
+
+    <rect class="n-you" x="1010" y="452" width="170" height="58" rx="8"/>
+    <text class="badge b-you" x="1022" y="469">PERSON</text>
+    <text class="title" x="1022" y="487">Read the results</text>
+    <text class="sub" x="1022" y="502">errors, not just rates</text>
+
+    <!-- edges: stage 1 -->
+    <path class="edge" d="M130 114 V130" marker-end="url(#arrow)"/>
+    <path class="edge" d="M130 190 V206" marker-end="url(#arrow)"/>
+    <path class="edge" d="M130 358 V374" marker-end="url(#arrow)"/>
+
+    <!-- assemble → read 20 / AI labeller / your 40 -->
+    <path class="edge" d="M240 222 H262 V85 H288" marker-end="url(#arrow)"/>
+    <path class="edge" d="M240 237 H288" marker-end="url(#arrow)"/>
+    <path class="edge" d="M240 252 H272 V329 H288" marker-end="url(#arrow)"/>
+    <text class="elabel" x="276" y="294">40 test</text>
+
+    <!-- label column -->
+    <path class="edge" d="M405 114 V130" marker-end="url(#arrow)"/>
+    <path class="edge" d="M405 190 V206" marker-end="url(#arrow)"/>
+    <text class="elabel" x="412" y="202">guide</text>
+    <path class="edge" d="M520 237 H540 V405 H522" marker-end="url(#arrow)"/>
+    <text class="elabel" x="544" y="272">AI labels</text>
+    <path class="edge" d="M405 358 V374" marker-end="url(#arrow)"/>
+    <path class="edge" d="M405 434 V450" marker-end="url(#arrow)"/>
+    <text class="elabel" x="412" y="446">disagreements</text>
+    <path class="edge" d="M520 481 H552 V340 H558" marker-end="url(#arrow)"/>
+    <text class="elabel" x="556" y="476">final labels</text>
+
+    <!-- hard set → freeze -->
+    <path class="edge" d="M240 405 H278 V530 H635 V360" marker-end="url(#arrow)"/>
+    <text class="elabel" x="440" y="524" text-anchor="middle">hard set, labelled by a person</text>
+
+    <!-- deterministic + feedback → run -->
+    <path class="edge" d="M240 497 H256 V614 H865 V598" marker-end="url(#arrow)"/>
+    <path class="edge" d="M240 573 H256"/>
+    <text class="elabel" x="560" y="608" text-anchor="middle">identity, authorization and feedback cases</text>
+
+    <!-- freeze → run → report -->
+    <path class="edge" d="M710 329 H748" marker-end="url(#arrow)"/>
+    <text class="elabel" x="729" y="321" text-anchor="middle">frozen</text>
+    <path class="edge" d="M980 329 H1008" marker-end="url(#arrow)"/>
+    <path class="edge" d="M1095 358 V374" marker-end="url(#arrow)"/>
+    <path class="edge" d="M1180 329 H1192 V481 H1182" marker-end="url(#arrow)"/>
+  </svg>
+  </div>
+  <figcaption>Cases are made by code and Claude Haiku. Claude Sonnet labels every case blind, and a person labels 40 test cases without seeing its labels; the two are compared for agreement and the person settles every disagreement. Code then freezes the labelled sets, runs each case through all seven configurations in a fresh sandbox, and writes the report.</figcaption>
+</figure>
+
+<section>
+  <div>
+    <h2>Where the models sit in each configuration</h2>
+    <p class="note">The rules run first in every engine configuration. A model may only lower a soft signal; no model can lower a hard floor, override identity or authorization, or turn a block into an allow.</p>
+  </div>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Configuration</th><th>Tier-0 rules (code)</th><th>Jev 1.14</th><th>Qwen3 235B</th><th>Claude Opus 5.5</th><th>Paid calls</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">always_allow</td><td class="dash">–</td><td class="dash">–</td><td class="dash">–</td><td class="dash">–</td><td>none</td></tr>
+      <tr><td class="mono">always_challenge</td><td class="dash">–</td><td class="dash">–</td><td class="dash">–</td><td class="dash">–</td><td>none</td></tr>
+      <tr><td class="mono">rules</td><td><span class="pill code t-code">every case</span></td><td class="dash">–</td><td class="dash">–</td><td class="dash">–</td><td>none</td></tr>
+      <tr><td class="mono">engineered</td><td><span class="pill code t-code">every case</span></td><td class="dash">–</td><td class="dash">–</td><td><span class="pill model t-model">uncertain only</span></td><td>a fraction of cases</td></tr>
+      <tr><td class="mono">jev</td><td><span class="pill code t-code">every case</span></td><td><span class="pill model t-model">uncertain</span></td><td class="dash">–</td><td><span class="pill model t-model">where Jev escalates</span></td><td>Jev cheap; Opus less often</td></tr>
+      <tr><td class="mono">open_weight</td><td><span class="pill code t-code">every case</span></td><td class="dash">–</td><td><span class="pill model t-model">uncertain only</span></td><td class="dash">–</td><td>a fraction, cheaper model</td></tr>
+      <tr><td class="mono">strong</td><td><span class="pill code t-code">every case</span></td><td class="dash">–</td><td class="dash">–</td><td><span class="pill model t-model">every case</span></td><td>every case</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <div>
+    <h2>The models, and what each one sees</h2>
+    <p class="note">The three Claude models come from one family, which the report lists as a limitation.</p>
+  </div>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Model</th><th>Job</th><th>Reached through</th><th>Sees</th></tr></thead>
+    <tbody>
+      <tr><td><span class="pill model t-model">Claude Haiku 5.5</span></td><td>Writes each case's invoice text and agent rationale</td><td>Claude Code subagents</td><td>The case's combination only: never its truth, category, label or the rules' lexicon</td></tr>
+      <tr><td><span class="pill model t-model">Claude Sonnet 5.5</span></td><td>Labels every dev and test case, blind</td><td>Claude Code subagents</td><td>What the engine sees, plus the labelling guide; it reports zero tool calls, checked per batch</td></tr>
+      <tr><td><span class="pill model t-model">Claude Opus 5.5</span></td><td>Strong tier under test</td><td>Anthropic API</td><td>The proposal and its context, with invoice text in marked untrusted blocks</td></tr>
+      <tr><td><span class="pill model t-model">Jev 1.14</span></td><td>Cheap typed-decision tier under test (TypeSafe)</td><td>OpenRouter; TypeSafe direct as the backup</td><td>The same as Opus</td></tr>
+      <tr><td><span class="pill model t-model">Qwen3 235B</span></td><td>Open-weight comparison arm, in Opus's place</td><td>OpenRouter</td><td>The same as Opus</td></tr>
+      <tr><td><span class="pill assist t-assist">Claude, assisting the author</span></td><td>Drafts the labelling guide and the hard set's case files, which a person edits</td><td>Claude Code</td><td>The repository, never credentials</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <div>
+    <h2>What keeps the scores honest</h2>
+    <p class="note">Each safeguard is enforced by code or recorded with the results, not left to good intentions.</p>
+  </div>
+  <div class="cols">
+    <div class="col code">
+      <h3 class="t-code">Tuned on dev, scored on test</h3>
+      <ul>
+        <li>Separate seeds and separately written wording<small>test shares only the routine combinations dev had too few of</small></li>
+        <li>test is frozen and hashed before scoring<small>a run refuses a set that changed, or an unfrozen test</small></li>
+        <li>The rules' lexicon was fixed before test was written<small>the wording model never saw it</small></li>
+      </ul>
+    </div>
+    <div class="col you">
+      <h3 class="t-you">The hard set is the headline</h3>
+      <ul>
+        <li>Generated cases resemble the rules' features<small>so the rules would look near-perfect on them</small></li>
+        <li>15–20 cases written by hand, outside the generator<small>unfamiliar impersonation, subtle injection, honest urgency</small></li>
+      </ul>
+    </div>
+    <div class="col model">
+      <h3 class="t-model">Labels are blind and checked</h3>
+      <ul>
+        <li>The AI labeller never sees the truth<small>only what the engine sees, plus the guide</small></li>
+        <li>A person labels 40 test cases blind<small>agreement reported as Cohen's κ with a 95% interval</small></li>
+        <li>The person settles every disagreement<small>each case records where its label came from</small></li>
+      </ul>
+    </div>
+    <div class="col assist">
+      <h3 class="t-assist">Friction counts as much as fraud</h3>
+      <ul>
+        <li>Unneeded challenges sit beside the catch rate<small>and the two baselines bound the trade</small></li>
+        <li>Cost per 1,000 decisions for every configuration<small>each result row records its model calls and cost</small></li>
+      </ul>
+    </div>
+  </div>
+  <p class="note links">All cases are synthetic, so no rate in the report is a production rate. Payments are simulated throughout.
+    The method in full: <a href="https://github.com/jesssss812/zeta-one/blob/main/docs/strategy/evaluation.md">evaluation.md</a>.
+    The latest results: <a href="https://github.com/jesssss812/zeta-one/blob/main/data/eval/report.md">report.md</a>.</p>
+</section>
+</div>
+</body>
+</html>

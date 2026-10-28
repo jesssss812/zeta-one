@@ -8,6 +8,7 @@ person, a model with a person checking, a model alone, or code. The full method 
 [../../data/eval/report.md](../../data/eval/report.md).
 
 All cases are synthetic. No rate in the report is a production rate, and payments are simulated.
+The same overview as a page, in the same colours, is [site/evaluation.html](../../site/evaluation.html).
 
 ## The flow
 

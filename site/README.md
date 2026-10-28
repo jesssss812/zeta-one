@@ -19,6 +19,8 @@ Open http://localhost:4173. FastAPI can also serve this directory unchanged. All
 - `index.html`: project story, the decision flow, synthetic decision example, engineering approach,
   the feedback loop, evaluation space and demo video space. Replace the labeled video placeholder with an accessible video/embed once
   a recording exists; add a link to the actual app when it is ready.
+- `evaluation.html`: how the evaluation works and who does each step (a person, a model, code), in
+  the same colours as the flow in `docs/reference/evaluation-system.md`; change the two together.
 - `fonts.html`: four wordmark studies for choosing the name and ζ typography; separate from the submission page.
 - `styles.css`: responsive presentation, keyboard focus, reduced-motion support, and decorative curve/background animation. The wave loops with a pause control and pauses offscreen; reduced-motion disables it.
 - `motion.js`: one-time scroll reveals using IntersectionObserver and opacity/transform animations. Section 01 and supporting content reveal on entry; the compact example uses a native disclosure for evidence. content remains readable without JavaScript. Keyboard focus and reduced-motion preferences cancel reveals. No libraries, scroll listeners, or delayed content fetching.
