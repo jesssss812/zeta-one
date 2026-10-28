@@ -7,7 +7,7 @@ required keys are checked, extra keys are allowed. A change here is a change to 
 import re
 from datetime import datetime
 from enum import StrEnum
-from typing import Any, Literal, Protocol
+from typing import Annotated, Any, Literal, Protocol
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -18,6 +18,13 @@ SCHEMA_VERSION = 1
 # The largest payment a proposal may name, in minor units: $10 billion, far inside SQLite's integer range.
 MAX_PAYMENT_MINOR_UNITS = 10**12
 CURRENCY_CODE = re.compile(r"^[A-Z]{3}$")
+# Size caps on what an agent sends: its free text reaches the paid strong tier (security.md, S1).
+MAX_ID_LENGTH = 128
+MAX_MEMO_LENGTH = 1000
+MAX_RATIONALE_LENGTH = 4000
+MAX_SOURCE_DOCUMENTS = 20
+
+RecordId = Annotated[str, Field(min_length=1, max_length=MAX_ID_LENGTH)]
 
 Level = Literal["low", "elevated", "high"]
 Decision = Literal["allow", "challenge", "block"]
@@ -52,14 +59,14 @@ class Proposal(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    bill_id: str | None = None
-    counterparty_id: str
-    payment_method_id: str
-    source_account_id: str
+    bill_id: RecordId | None = None
+    counterparty_id: RecordId
+    payment_method_id: RecordId
+    source_account_id: RecordId
     amount: Money
-    memo: str = ""
-    agent_rationale: str = ""
-    source_document_ids: list[str] = Field(default_factory=list)
+    memo: str = Field(default="", max_length=MAX_MEMO_LENGTH)
+    agent_rationale: str = Field(default="", max_length=MAX_RATIONALE_LENGTH)
+    source_document_ids: list[RecordId] = Field(default_factory=list, max_length=MAX_SOURCE_DOCUMENTS)
 
     @field_validator("amount")
     @classmethod

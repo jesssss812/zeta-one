@@ -27,6 +27,9 @@ EFFORT = "medium"
 MAX_TOKENS = 8192
 TIMEOUT_SECONDS = 60.0
 MAX_RETRIES = 1
+# Each untrusted field is cut to this many characters before it reaches the model. The proposal's
+# own fields are capped in contracts.Proposal; this bounds the business's records too (invoice text).
+MAX_UNTRUSTED_CHARS = 8000
 
 # USD per million tokens, (input, output), for evidence.build's cost. Anthropic list prices as of
 # 2026-10-06; cache reads and writes are billed differently and are reported in usage separately.
@@ -280,7 +283,10 @@ def _facts_json(facts: dict[str, Any]) -> str:
 
 
 def _neutralize(value: str) -> str:
-    """Untrusted text can't open or close a block: tags that look like ours are replaced."""
+    """Untrusted text can't open or close a block: tags that look like ours are replaced. Text past
+    MAX_UNTRUSTED_CHARS is cut, and the cut is said."""
+    if len(value) > MAX_UNTRUSTED_CHARS:
+        value = value[:MAX_UNTRUSTED_CHARS] + f"\n[cut by the gateway: {len(value) - MAX_UNTRUSTED_CHARS} more characters]"
     return _BLOCK_TAG.sub("[tag removed]", value)
 
 

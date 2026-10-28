@@ -148,8 +148,10 @@ Rules the site can count on:
   clean, so a routine payment shows `tiers_run: ["tier0"]` and no model.
 - `execution.simulated` is always `true` in this build.
 - Proposal amounts must be positive integer minor units, at most 10^12 ($10 billion), in an
-  uppercase three-letter ISO 4217 currency code. Anything else is a malformed request, rejected
-  before authorization or risk runs.
+  uppercase three-letter ISO 4217 currency code. Ids are 1 to 128 characters, `memo` at most
+  1,000, `agent_rationale` at most 4,000, and `source_document_ids` at most 20 ids. Anything else
+  is a malformed request, rejected before authorization or risk runs. The strong tier also cuts
+  each untrusted text field, invoice text included, to 8,000 characters and says so in the prompt.
 - Evidence ids in `features` and `signals` refer to records in `context` (payment-method history
   ids, transaction ids, bill ids) so the site can link a signal to the row it came from.
 - `amount_ratio_to_vendor_median` may also carry `raw_value`, the unrounded ratio used for

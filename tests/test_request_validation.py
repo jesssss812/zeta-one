@@ -3,12 +3,20 @@ import json
 
 import pytest
 
-from zeta_one.contracts import MAX_PAYMENT_MINOR_UNITS, InvalidProposal, Proposal
+from zeta_one.contracts import (
+    MAX_ID_LENGTH,
+    MAX_MEMO_LENGTH,
+    MAX_PAYMENT_MINOR_UNITS,
+    MAX_RATIONALE_LENGTH,
+    MAX_SOURCE_DOCUMENTS,
+    InvalidProposal,
+    Proposal,
+)
 from zeta_one.gateway.scenarios import load_fixture
 from zeta_one.testing.replay import replay_engine, request_for
 
 
-def _request_with(amount=None, currency=None):
+def _request_with(amount=None, currency=None, **fields):
     scenario = load_fixture('routine_bill_payment')
     request = request_for(scenario)
     body = json.loads(request.body)
@@ -16,6 +24,7 @@ def _request_with(amount=None, currency=None):
         body['amount']['amount'] = amount
     if currency is not None:
         body['amount']['currency'] = currency
+    body.update(fields)
     request.body = json.dumps(body).encode()
     return scenario, request
 
@@ -47,3 +56,19 @@ def test_the_largest_amount_is_accepted():
 @pytest.mark.parametrize('currency', ['usd', 'US', 'USDX', 'xyz', ''])
 def test_a_malformed_currency_is_rejected_before_authorization(currency):
     _rejected_before_authorization(*_request_with(currency=currency), match='ISO 4217')
+
+
+@pytest.mark.parametrize('field, value', [
+    ('memo', 'x' * (MAX_MEMO_LENGTH + 1)),
+    ('agent_rationale', 'x' * (MAX_RATIONALE_LENGTH + 1)),
+    ('counterparty_id', 'c' * (MAX_ID_LENGTH + 1)),
+    ('source_document_ids', ['bill'] * (MAX_SOURCE_DOCUMENTS + 1)),
+    ('source_document_ids', ['b' * (MAX_ID_LENGTH + 1)]),
+])
+def test_oversized_text_is_rejected_before_authorization(field, value):
+    _rejected_before_authorization(*_request_with(**{field: value}), match='at most')
+
+
+def test_text_at_the_caps_is_accepted():
+    _, request = _request_with(memo='x' * MAX_MEMO_LENGTH, agent_rationale='x' * MAX_RATIONALE_LENGTH)
+    assert len(Proposal.model_validate_json(request.body).agent_rationale) == MAX_RATIONALE_LENGTH
