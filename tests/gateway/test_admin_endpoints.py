@@ -148,3 +148,39 @@ def test_a_rolling_limit_on_the_real_checker_counts_the_ledger(setup):
     second = _propose(client, key)                         # $3,700 > $3,000
     record = client.get(f"/v1/decisions/{second['decision_id']}", headers=ADMIN).json()
     assert second["decision"] == "block" and record["reasons"] == ["authorization:limits.rolling"]
+
+
+def test_late_approval_counts_execution_in_the_current_rolling_window():
+    from datetime import timedelta
+    from tests.gateway.fakes import FakeWorld
+    from zeta_one.gateway.reuse import RiskReuse
+
+    connection = sqlite3.connect(":memory:", check_same_thread=False)
+    connection.row_factory = sqlite3.Row
+    stages = real_stages(connection)
+    world = FakeWorld()
+    stages.tiers = {"strong": world._Strong(world)}
+    clock = [SEED_NOW]
+    gateway = Gateway(stages=stages, ledger=Ledger(connection), reuse=RiskReuse(connection), clock=lambda: clock[0])
+    client = TestClient(create_app(gateway, TOKEN))
+    key = Ed25519PrivateKey.generate()
+    client.post("/v1/agents", json=_registration(key), headers=ADMIN)
+    amount = load_fixture("vendor_payment_method_changed").proposal.amount.amount
+    limits = {"rolling": {"window_days": 1, "amount": {"amount": amount, "currency": "USD"}}}
+    grant = {**_grant(), "limits": limits, "expires_at": (SEED_NOW + timedelta(days=10)).isoformat()}
+    assert client.post("/v1/authorizations", json=grant, headers=ADMIN).status_code == 201
+    body = load_fixture("vendor_payment_method_changed").proposal.model_dump_json().encode()
+    path = "/v1/actions/propose_payment"
+    held = client.post(path, content=body, headers=sign(key, AGENT, "POST", path, body, clock[0])).json()
+    assert held["decision"] == "challenge"
+    clock[0] += timedelta(days=2)
+    # An outstanding hold continues to reserve its amount even after the original window ages out.
+    assert gateway.ledger.spend(AGENT, clock[0] - timedelta(days=1), "USD") == amount
+    resolved = client.post(f"/v1/challenges/{held['challenge_id']}/resolve",
+                           json={"outcome": "approve", "by": "owner"}, headers=ADMIN).json()
+    assert resolved["status"] == "executed"
+    assert gateway.ledger.spend(AGENT, clock[0] - timedelta(days=1), "USD") == amount
+    second = client.post(path, content=body, headers=sign(key, AGENT, "POST", path, body, clock[0])).json()
+    record = client.get(f"/v1/decisions/{second['decision_id']}", headers=ADMIN).json()
+    assert second["decision"] == "block"
+    assert record["reasons"] == ["authorization:limits.rolling"]

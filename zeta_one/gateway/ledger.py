@@ -246,11 +246,15 @@ class Ledger:
         return bool(changed)
 
     def spend(self, agent_id: str, since: datetime, currency: str, exclude: str | None = None) -> int:
-        """Executed and held payments by an agent since a time, in one currency, in minor units."""
+        """Executed spend since a time plus all outstanding held reservations, in minor units.
+
+        A hold reserves its amount until resolved; execution starts its rolling spend window.
+        """
         row = self._db.execute(
             """SELECT COALESCE(SUM(amount), 0) FROM payments
-               WHERE agent_id = ? AND currency = ? AND status IN ('executed', 'held')
-               AND created_at >= ? AND payment_id IS NOT ?""",
+               WHERE agent_id = ? AND currency = ?
+               AND (status = 'held' OR (status = 'executed' AND executed_at >= ?))
+               AND payment_id IS NOT ?""",
             (agent_id, currency, _iso(since), exclude),
         ).fetchone()
         return int(row[0])

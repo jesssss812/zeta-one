@@ -41,7 +41,7 @@ def test_spend_counts_executed_and_held_only(ledger, held_scenario, routine_scen
     assert ledger.spend(agent, since, "USD") == 1200
     assert ledger.spend(agent, since, "EUR") == 0
     assert ledger.spend("someone_else", since, "USD") == 0
-    assert ledger.spend(agent, since + timedelta(days=2), "USD") == 0
+    assert ledger.spend(agent, since + timedelta(days=2), "USD") == 200  # unresolved holds stay reserved
 
 
 def test_spend_source_can_leave_out_one_payment(ledger, held_scenario):
