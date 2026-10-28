@@ -1,11 +1,11 @@
 {
-  "engine_version": "e5d2aca",
+  "engine_version": "e853f63",
   "eval_report": "eval_report.json",
   "live_models": false,
   "note": "Recorded results of real engine runs on synthetic data. Payments are simulated. Model tiers replay the fixtures' recorded answers, so those scenarios are marked illustrative.",
-  "policy_version": "2026-10-28.3",
+  "policy_version": "2026-10-28.4",
   "recorded": true,
-  "recorded_at": "2026-10-28T12:50:40+00:00",
+  "recorded_at": "2026-10-28T14:42:48+00:00",
   "scenarios": [
     {
       "decision": "challenge",

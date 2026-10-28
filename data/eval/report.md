@@ -10,12 +10,13 @@ Rates are shown as `rate (k/n, 95% Wilson interval)`. There is no overall accura
 
 - Models that ran: none
 - Prices used: `{}`
-- Engine version: `a41533b`
-- Policy version: `2026-10-28.3`
+- Engine version: `e853f63`
+- Policy version: `2026-10-28.4`
 - Seed version: `3574ce8f0cef1de72c159f3b2c98128410721da8c4016114bf90928e6958909c`
-- Generator seeds: none
+- Generator seeds: dev: [7]; test: [11]
+- test combinations also in dev: 15 (the routine class has too few to keep apart; only wording and vendor differ)
 - Set hashes the results ran against:
-  - deterministic: `c6b67bcf16858b0b` (not frozen)
+  - deterministic: `095c6492168c4f11` (not frozen)
   - dev: `d015f457ed5d92f7` (not frozen)
 - Cases by category: deterministic: {'B': 13, 'C': 7, 'D': 1, 'E': 2}; dev: {'A': 1, 'D': 1, 'E': 1}
 
@@ -45,6 +46,14 @@ Every case must pass; counts, not statistics. A case that repeats its request pa
 | rules | dev | 100% (3/3, 44%–100%) | 100% (3/3, 44%–100%) | 100% (2/2, 34%–100%) | 0% (0/1, 0%–79%) | 0% (0/1, 0%–79%) |
 
 A drop from dev to test or hard is overfitting to the generator or the tuning, and is reported as found.
+
+## Cost
+
+How many decisions reached any model, and what they cost. Tier 0 is free; dollars appear only for measured, priced model calls (a model's own price list, recorded in each decision).
+
+| Configuration | Set | Reached a model | $ per 1,000 decisions | $ per fraud caught | Notes |
+| --- | --- | --- | --- | --- | --- |
+| rules | dev | 0% (0/3, 0%–56%) | 0.00 | 0.0000 |  |
 
 ## Per category
 
@@ -86,10 +95,10 @@ Confusion matrix over the risk categories (rows expected, columns decided):
 
 | Category | n | Accuracy | With acceptable | Detection | Legit challenged | Lowerings (legit / other) | $ per action | p50 / p95 ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| A | 1 | 100% (1/1, 21%–100%) | 100% (1/1, 21%–100%) | – | 0% (0/1, 0%–79%) | 0 / 0 | 0.0000 | 12 / 12 |
-| D | 1 | 100% (1/1, 21%–100%) | 100% (1/1, 21%–100%) | 100% (1/1, 21%–100%) | – | 0 / 0 | 0.0000 | 15 / 15 |
-| E | 1 | 100% (1/1, 21%–100%) | 100% (1/1, 21%–100%) | 100% (1/1, 21%–100%) | – | 0 / 0 | 0.0000 | 16 / 16 |
-| risk (A, D, E, F) | 3 | 100% (3/3, 44%–100%) | 100% (3/3, 44%–100%) | 100% (2/2, 34%–100%) | 0% (0/1, 0%–79%) | 0 / 0 | 0.0000 | 15 / 16 |
+| A | 1 | 100% (1/1, 21%–100%) | 100% (1/1, 21%–100%) | – | 0% (0/1, 0%–79%) | 0 / 0 | 0.0000 | 14 / 14 |
+| D | 1 | 100% (1/1, 21%–100%) | 100% (1/1, 21%–100%) | 100% (1/1, 21%–100%) | – | 0 / 0 | 0.0000 | 14 / 14 |
+| E | 1 | 100% (1/1, 21%–100%) | 100% (1/1, 21%–100%) | 100% (1/1, 21%–100%) | – | 0 / 0 | 0.0000 | 18 / 18 |
+| risk (A, D, E, F) | 3 | 100% (3/3, 44%–100%) | 100% (3/3, 44%–100%) | 100% (2/2, 34%–100%) | 0% (0/1, 0%–79%) | 0 / 0 | 0.0000 | 14 / 18 |
 
 Confusion matrix over the risk categories (rows expected, columns decided):
 
