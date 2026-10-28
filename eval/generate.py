@@ -214,9 +214,10 @@ def setup_for(row: dict) -> tuple[list[dict], dict]:
     created, payments = {"established": (400, 12), "recent": (RECENT_TENURE_DAYS, 2), "new": (2, 0)}[c["tenure"]]
     ops = [{"op": "add_counterparty", "args": {"counterparty_id": vendor, "name": row["vendor"], "created_days_ago": created,
                                                 "payment_method_id": method}}]
-    if payments:
-        ops.append({"op": "add_payments", "args": {"counterparty_id": vendor, "count": payments,
-                                                    "median_amount": MEDIAN_CENTS, "currency": "USD"}})
+    # One payment a month, the latest ten days ago, as the wording says ("paid monthly", "paid twice").
+    for month in range(payments):
+        ops.append({"op": "add_payments", "args": {"counterparty_id": vendor, "count": 1, "median_amount": MEDIAN_CENTS,
+                                                    "currency": "USD", "days_ago": 10 + 30 * month}})
     paying = method
     if c["change_days"] is not None:
         paying = new_method

@@ -126,3 +126,18 @@ def test_assemble_refuses_invoice_text_with_no_bill(tmp_path):
     sets.write_jsonl(tmp_path / "dev" / "wording" / "batch_00.output.jsonl", out)
     with pytest.raises(ValueError, match="no bill"):
         generate.assemble("dev", data=tmp_path)
+
+
+def test_payment_history_is_monthly_and_matches_the_seeded_context(tmp_path):
+    from zeta_one.contracts import Proposal, SetupOp
+    from eval import label
+
+    rows = generate.combos("test", data=tmp_path)
+    row = next(r for r in rows if r["dimensions"]["tenure"] == "established")
+    ops, proposal = generate.setup_for(row)
+    days = [op["args"]["days_ago"] for op in ops if op["op"] == "add_payments"]
+    assert days == [10 + 30 * month for month in range(12)]
+    context = label.seed_context([SetupOp(**op) for op in ops],
+                                 Proposal.model_validate({**proposal, "memo": "", "agent_rationale": ""}))
+    assert context["payment_history"]["count"] == 12
+    assert context["payment_history"]["median_amount"]["amount"] == generate.MEDIAN_CENTS
