@@ -68,7 +68,7 @@ Solid lines are the decision; dotted lines are the feedback loop.
 | Model review: Claude Opus 5.5; Jev (OpenRouter, TypeSafe as backup); open-weight arm | Each answers live calls; not yet run on the evaluation |
 | Feedback loop: verified outcomes and risk adjustments | Working; recorded end to end in `site/data/loop.json` |
 | Case review page with source links and a local chat model | Research and assembly ran live; the chat needs a local model |
-| Evaluation: labelled `dev` and `test` sets, seven configurations, cost table | Sets generated; labelling and the scored run are in progress |
+| Evaluation: labelled `dev`, `test` and hand-written `hard` sets, seven configurations, cost table ([how it works](docs/reference/evaluation-system.md)) | Sets generated; labelling and the scored run are in progress |
 | Rho | Read-only: the API cannot make payments, so execution is simulated |
 
 ## Quick start
@@ -150,5 +150,6 @@ What is not done is in [docs/roadmap.md](docs/roadmap.md).
 ## Documentation
 
 - [docs/strategy/product.md](docs/strategy/product.md): the problem, the decision model and scope.
+- [docs/reference/evaluation-system.md](docs/reference/evaluation-system.md): how it is evaluated, and who does each step.
 - [docs/reference/demo-api.md](docs/reference/demo-api.md): the HTTP API and the evidence record.
 - [docs/README.md](docs/README.md): every document.
