@@ -3,19 +3,20 @@
 Written by hand from docs/reference/rho-openapi.json. Fields the engine doesn't read are left out.
 """
 
-from pydantic import BaseModel, ConfigDict
+from datetime import datetime
+
+from pydantic import BaseModel, ConfigDict, Field, StrictInt
 
 
 class Money(BaseModel):
-    """Integer minor units and an ISO 4217 code: Money(amount=125000, currency="USD") is $1,250.00."""
+    """Integer minor units and an ISO 4217 code: Money(amount=125000, currency="USD") is $1,250.00.
+
+    The amount is a strict integer: JSON `true`, `"100"` or `100.0` are refused, not coerced."""
 
     model_config = ConfigDict(frozen=True)
 
-    amount: int
+    amount: StrictInt
     currency: str
-
-from datetime import datetime
-from pydantic import Field
 
 
 class Business(BaseModel):

@@ -353,7 +353,8 @@ class CounterpartyScope(_Open):
 
 
 class RollingLimit(_Open):
-    window_days: int
+    # At least a day: a zero or negative window would count no earlier spend and switch the limit off.
+    window_days: int = Field(ge=1)
     amount: Money
 
 

@@ -72,3 +72,17 @@ def test_oversized_text_is_rejected_before_authorization(field, value):
 def test_text_at_the_caps_is_accepted():
     _, request = _request_with(memo='x' * MAX_MEMO_LENGTH, agent_rationale='x' * MAX_RATIONALE_LENGTH)
     assert len(Proposal.model_validate_json(request.body).agent_rationale) == MAX_RATIONALE_LENGTH
+
+
+@pytest.mark.parametrize('amount', [True, '185000', 185000.0])
+def test_an_amount_that_is_not_a_json_integer_is_refused(amount):
+    _rejected_before_authorization(*_request_with(amount=amount), match='integer|valid')
+
+
+@pytest.mark.parametrize('window_days', [0, -5])
+def test_a_rolling_limit_needs_a_window_of_at_least_a_day(window_days):
+    from pydantic import ValidationError
+
+    from zeta_one.contracts import RollingLimit
+    with pytest.raises(ValidationError):
+        RollingLimit(window_days=window_days, amount={'amount': 600000, 'currency': 'USD'})
