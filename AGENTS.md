@@ -5,9 +5,9 @@ live in `docs/`.
 
 **Zeta One: trust and risk checks for AI agents that move money.** A solo hackathon project, aimed
 at the Rho fintech track. Submissions close **Thu Oct 29, 2026, 5:00 PM CT**; the live demo is at the Hack
-Fair on Fri Oct 30. The engine's kernel exists (shared contracts, merge rule, policy, evidence
-record, pipeline); the stages are being built in parallel, per
-[docs/strategy/parallel-build.md](docs/strategy/parallel-build.md).
+Fair on Fri Oct 30. The engine runs end to end on the real stages (identity, authorization, seed
+context, tier 0, strong tier) behind the local gateway; the evaluation runs on the real backend.
+How it was split up is in [docs/strategy/parallel-build.md](docs/strategy/parallel-build.md).
 
 ## Safety rules
 
@@ -94,7 +94,10 @@ Settled; the reasoning is in [docs/strategy/product.md](docs/strategy/product.md
 uv venv .venv && uv pip install --python .venv/bin/python -r requirements-dev.txt  # once per clone
 git config core.hooksPath .githooks  # once per clone: turns on the pre-push check
 .venv/bin/python -m pytest           # the test suite
+.venv/bin/python scripts/keygen.py   # once: the demo agent's key and the admin token (never printed)
 .venv/bin/uvicorn zeta_one.gateway.app:app --port 8000  # the demo API, on 127.0.0.1
+.venv/bin/python -m eval.run --set deterministic --config rules --backend real   # no model calls
+.venv/bin/python -m eval.report      # rebuild data/eval/report.{json,md} from the results
 python3 scripts/check.py             # checks that must pass before every push to main
 python3 scripts/staging_check.py     # read-only Rho staging check; needs the VPN and RHO_API_TOKEN in .env
 ```

@@ -14,9 +14,6 @@ The build order, schedule and cut list are in
 
 ## First version (Wednesday)
 
-- Wire the [implemented deterministic stages](reference/deterministic-stages.md) into the default
-  gateway and real evaluation backend, including signed demo requests and persistent admin state.
-  The five decisions already pass in direct engine integration tests; HTTP wiring remains.
 - The demo API in `docs/reference/demo-api.md` serving the site; no UI of its own.
 
 ## Security guardrails (Wednesday, with the module each protects)
@@ -24,8 +21,6 @@ The build order, schedule and cut list are in
 Detail, tests and estimates are in [strategy/security.md](strategy/security.md); the decisions in
 [decisions/0010-gateway-guardrails.md](decisions/0010-gateway-guardrails.md).
 
-- Exercise the implemented admin, resolve and risk-reuse guardrails with the default gateway
-  after the real identity, authorization and seed stages are wired in.
 - Live Rho client GET only; site renders untrusted text as text.
 - A Claude Code hook refusing shell commands that touch `.env` or `*.ovpn`.
 
@@ -38,13 +33,13 @@ The plan is in [strategy/evaluation.md](strategy/evaluation.md); the times are i
 Wednesday:
 
 - **Owner:** write the `hard` set, 15–20 risk cases outside the generator's templates (~1.5 h).
-- Use the implemented case generator and wording prompt to assemble `dev` ~50 with
-  independently generated wording and harmless look-alikes.
+- Run `scripts/keygen.py` once, so the default gateway registers the demo agent.
+- Use the case generator and wording prompt to assemble `dev` ~50 with independently generated
+  wording and harmless look-alikes.
 - **Owner:** read ~20 `dev` cases and write the one-page labelling guide (~30 min).
 - Use the implemented blind export/merge workflow to label `dev`.
-- Connect the evaluation runner to a real backend; runner, statistics and reporting are
-  implemented against the replay backend.
-- Runs on `dev`; failures-by-stage table; tune on `dev` only.
+- Runs on `dev` with the real backend (`--backend real --live --max-usd` for the model
+  configurations); failures-by-stage table; tune on `dev` only.
 - Generate `test` ~100 with a new seed and wording against the frozen tier-0 lexicon;
   hash it; AI-label it.
 
