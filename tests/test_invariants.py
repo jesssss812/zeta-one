@@ -119,6 +119,14 @@ def test_an_unrounded_ratio_missing_falls_back_to_the_rounded_one():
     assert escalation.soft_signals(feats) == ["amount_ratio_to_vendor_median"]
 
 
+def test_a_method_change_through_day_30_sets_the_floor_and_day_31_does_not():
+    at_30 = {"payment_method_changed_days_ago": Feature(value=escalation.RECENT_CHANGE_DAYS)}
+    at_31 = {"payment_method_changed_days_ago": Feature(value=escalation.RECENT_CHANGE_DAYS + 1)}
+    assert escalation.floor(at_30).level == "elevated"
+    assert escalation.floor(at_31) is None
+    assert escalation.soft_signals(at_31) == ["payment_method_changed_days_ago"]
+
+
 def test_clean_tier0_does_not_escalate_and_soft_signal_does():
     clean = {"counterparty_is_new": Feature(value=False), "amount_ratio_to_vendor_median": Feature(value=1.0)}
     soft = {**clean, "amount_ratio_to_vendor_median": Feature(value=5.0)}

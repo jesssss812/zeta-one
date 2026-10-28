@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import re
 
 from zeta_one.contracts import Context, Feature, Proposal
+from zeta_one.risk.escalation import RECENT_CHANGE_DAYS
 
 NEW_COUNTERPARTY_DAYS = 30
 # Frozen 2026-10-27 before evaluation test-set generation. Case-insensitive regexes.
@@ -70,7 +71,7 @@ def bill_not_referenced(proposal: Proposal, context: Context, now: datetime) -> 
         return Feature(value=False)
     new = counterparty_is_new(proposal, context, now)
     changed = payment_method_changed_days_ago(proposal, context, now)
-    recent = changed.value is not None and changed.value <= 30
+    recent = changed.value is not None and changed.value <= RECENT_CHANGE_DAYS
     evidence = [bill.id for bill in context.open_bills]
     if new.value:
         evidence += new.evidence

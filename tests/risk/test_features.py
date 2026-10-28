@@ -143,3 +143,14 @@ def test_paying_a_long_standing_vendor_in_a_new_currency_counts_as_new():
     features = compute_features(p, c, now)
     assert features['counterparty_is_new'].value is True
     assert features['amount_ratio_to_vendor_median'].value is None
+
+
+@pytest.mark.parametrize('days, flagged', [(30, True), (31, False)])
+def test_no_bill_reference_with_a_change_through_day_30_is_flagged(days, flagged):
+    from zeta_one.contracts import PaymentMethodChange
+    p, c, now = sample()
+    p.bill_id = None
+    c.open_bills = []
+    c.payment_method_history = [PaymentMethodChange(id='pmc_1', method_id=p.payment_method_id, change='updated',
+                                                    changed_at=now - timedelta(days=days))]
+    assert compute_features(p, c, now)['bill_not_referenced'].value is flagged

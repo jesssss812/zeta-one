@@ -98,3 +98,9 @@ def test_persisted_naive_expiry_fails_closed(tmp_path):
     result = checker(lambda *args: 0)(proposal(), loaded, IDENTITY, NOW)
     assert [(v.field, v.kind) for v in result.violations] == [('expires_at', 'limit')]
     assert result.violations[0].limit == expires_at.isoformat()
+
+
+def test_one_minor_unit_over_the_rolling_cap_is_a_violation():
+    check = checker(lambda agent_id, since, currency: 100101)
+    assert not checker(lambda *_: 100100)(proposal(), auth(), IDENTITY, NOW).violations  # exactly the cap
+    assert [v.field for v in check(proposal(), auth(), IDENTITY, NOW).violations] == ['limits.rolling']
