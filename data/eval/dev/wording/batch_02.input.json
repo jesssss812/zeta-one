@@ -1,0 +1,98 @@
+[
+  {
+    "id": "dev_040",
+    "vendor": "Alder Print Works",
+    "invoice_from": "Alder Print Works",
+    "amount_usd": 600.0,
+    "invoice": "clean",
+    "rationale": "plain",
+    "channel": "lookalike_sender",
+    "bank_details_changed_days_ago": null,
+    "bank_change_confirmed_with_vendor": null,
+    "vendor_relationship": "paid monthly for over a year"
+  },
+  {
+    "id": "dev_041",
+    "vendor": "Birchwood Catering",
+    "invoice_from": "Birchwood Catering",
+    "amount_usd": 600.0,
+    "invoice": "urgency",
+    "rationale": "plain",
+    "channel": "compromised_vendor_channel",
+    "bank_details_changed_days_ago": null,
+    "bank_change_confirmed_with_vendor": null,
+    "vendor_relationship": "paid monthly for over a year"
+  },
+  {
+    "id": "dev_042",
+    "vendor": "Copperline Freight",
+    "invoice_from": "Copperline Freight",
+    "amount_usd": 600.0,
+    "invoice": "clean",
+    "rationale": "plain",
+    "channel": "compromised_vendor_channel",
+    "bank_details_changed_days_ago": null,
+    "bank_change_confirmed_with_vendor": null,
+    "vendor_relationship": "paid twice before"
+  },
+  {
+    "id": "dev_043",
+    "vendor": "Dunmore Legal Services",
+    "invoice_from": "Dunmore Legal Services",
+    "amount_usd": 600.0,
+    "invoice": "clean",
+    "rationale": "plain",
+    "channel": "real_vendor",
+    "bank_details_changed_days_ago": 90,
+    "bank_change_confirmed_with_vendor": false,
+    "vendor_relationship": "paid monthly for over a year"
+  },
+  {
+    "id": "dev_044",
+    "vendor": "Elmstead Cloud Hosting",
+    "invoice_from": "Elmstead Cloud Hosting",
+    "amount_usd": 600.0,
+    "invoice": "legit_change_notice",
+    "rationale": "cites_updated_instructions",
+    "channel": "real_vendor",
+    "bank_details_changed_days_ago": 3,
+    "bank_change_confirmed_with_vendor": true,
+    "vendor_relationship": "paid twice before"
+  },
+  {
+    "id": "dev_045",
+    "vendor": "Fairhaven Janitorial",
+    "invoice_from": "Fairhaven Janitorial",
+    "amount_usd": 600.0,
+    "invoice": "urgency",
+    "rationale": "plain",
+    "channel": "lookalike_sender",
+    "bank_details_changed_days_ago": null,
+    "bank_change_confirmed_with_vendor": null,
+    "vendor_relationship": "paid monthly for over a year"
+  },
+  {
+    "id": "dev_046",
+    "vendor": "Grayson Marketing Partners",
+    "invoice_from": "Grayson Marketing Partners",
+    "amount_usd": 600.0,
+    "invoice": "legit_change_notice",
+    "rationale": "cites_updated_instructions",
+    "channel": "real_vendor",
+    "bank_details_changed_days_ago": 20,
+    "bank_change_confirmed_with_vendor": true,
+    "vendor_relationship": "paid twice before"
+  },
+  {
+    "id": "dev_047",
+    "vendor": "Hollis Staffing",
+    "invoice_from": "Hollis Staffing",
+    "amount_usd": 600.0,
+    "invoice": "clean",
+    "rationale": "plain",
+    "channel": "real_vendor",
+    "bank_details_changed_days_ago": null,
+    "bank_change_confirmed_with_vendor": null,
+    "vendor_relationship": "paid twice before"
+  }
+]
