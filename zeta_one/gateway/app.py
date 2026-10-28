@@ -180,11 +180,8 @@ def create_app(gateway: Gateway, token: str | None, eval_report: Path = EVAL_REP
     def revoke_authorization(authorization_id: str, request: Request):
         _, authorizations = _admin_stores(request)
         with gateway.lock:
-            found = authorizations.connection.execute(
-                "SELECT 1 FROM authorization_documents WHERE authorization_id = ?", (authorization_id,)).fetchone()
-            if found is None:
-                return _error(404, "unknown_authorization", f"no authorization {authorization_id}")
-            authorizations.revoke(authorization_id, datetime.now(UTC))
+            if not authorizations.revoke(authorization_id, datetime.now(UTC)):
+                return _error(404, "unknown_authorization", f"no current authorization {authorization_id}")
         return {"authorization_id": authorization_id, "status": "revoked"}
 
     # Records name the signals and the model's rationale, which the agent's own response leaves out

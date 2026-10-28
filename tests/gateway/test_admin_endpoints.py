@@ -98,3 +98,13 @@ def test_admin_on_stand_in_stages_is_unavailable():
     connection.row_factory = sqlite3.Row
     client = TestClient(create_app(Gateway(stages=FakeWorld().stages(), ledger=Ledger(connection)), TOKEN))
     assert client.post("/v1/agents", json={}, headers=ADMIN).status_code == 503
+
+
+def test_revoking_a_superseded_version_is_404_not_a_false_success(setup):
+    client, stages = setup
+    key = Ed25519PrivateKey.generate()
+    client.post("/v1/agents", json=_registration(key), headers=ADMIN)
+    client.post("/v1/authorizations", json=_grant(authorization_id="auth_old"), headers=ADMIN)
+    client.post("/v1/authorizations", json=_grant(version=2, authorization_id="auth_current"), headers=ADMIN)
+    assert client.post("/v1/authorizations/auth_old/revoke", headers=ADMIN).status_code == 404
+    assert stages.authorizations.load(BUSINESS, AGENT).status == "active"

@@ -26,7 +26,8 @@ class Store:
                  authorization.version, authorization.model_dump_json()))
         return authorization
 
-    def revoke(self, authorization_id: str, now: datetime) -> None:
+    def revoke(self, authorization_id: str, now: datetime) -> int:
+        """Revoke the current version of each grant with this id; returns how many were current."""
         with self.connection:
             rows = self.connection.execute('''SELECT business_id, agent_id, version, document
                 FROM authorization_documents WHERE authorization_id=? AND version=(
@@ -38,6 +39,7 @@ class Store:
                 authorization.status, authorization.revoked_at = 'revoked', now
                 self.connection.execute('UPDATE authorization_documents SET document=? WHERE business_id=? AND agent_id=? AND version=?',
                                         (authorization.model_dump_json(), business, agent, version))
+        return len(rows)
 
     def load(self, business_id: str, agent_id: str) -> Authorization | None:
         row = self.connection.execute('''SELECT document FROM authorization_documents
