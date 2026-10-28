@@ -17,8 +17,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 VENV_PYTHON = ROOT / ".venv" / "bin" / "python"
-FORBIDDEN = (re.compile(r"(^|/)\.env(\.local)?$"), re.compile(r"\.ovpn$"),
-             re.compile(r"^data/(snapshots|keys)/"))
+FORBIDDEN = (re.compile(r"(^|/)\.env(\.(?!example$)[^/]+)?$"), re.compile(r"\.(ovpn|pem|key|p12)$"),
+             re.compile(r"^data/(snapshots|keys)/"), re.compile(r"(^|/)zeta\.db(-wal|-shm|-journal)?$"))
 LINK = re.compile(r"\]\(([^)#\s]+)(?:#[^)]*)?\)")
 
 
