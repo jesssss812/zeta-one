@@ -30,6 +30,21 @@ The challenge ladder ([../decisions/0008-friction-ladder.md](../decisions/0008-f
 is the damping made concrete. The evaluation measures ζ as detection next to unnecessary
 challenges, and as a friction score once there is more than one challenge type.
 
+## What sets it apart
+
+Four claims, each with where it is shown. Say only what the evidence column supports; the dollar
+figures wait for the live evaluation runs.
+
+| Claim | Why it matters | Where it is shown |
+| --- | --- | --- |
+| **No model can talk a payment past a hard check.** Identity, authorization and tier-0 hard flags are deterministic floors; a model may only lower soft signals, and every lowering is recorded | An agent's model, an invoice's injected text or our own model being fooled can't move money by itself | Property tests over every model answer ([../decisions/0007-risk-tiers.md](../decisions/0007-risk-tiers.md)); a model that clears everything lets no blocked or challenged case through in the evaluation |
+| **Most payments need no model at all.** Engineered escalation sends only the uncertain fraction to a model; Jev, a typed decision model, can take a cut of that before a frontier model reads anything | Cost scales with judgement, not with volume | The report's Cost table: the share of decisions that reached a model, dollars per 1,000 decisions and per fraud caught, rules against engineered, `jev`, open-weight and strong-on-everything ([evaluation.md](evaluation.md)) |
+| **The loop closes, and it is audited.** A person records what turned out to be true and how they know; a verified fraud blocks the account, a verified bank change stops costing friction, a customer's report alone changes nothing | The system gets better at exactly the cases it got wrong, without a model writing its own labels | `scripts/demo_loop.py` runs it end to end; every change is an append-only adjustment cited by the decisions it affects ([../decisions/0012-verified-outcomes.md](../decisions/0012-verified-outcomes.md), [../decisions/0013-outcomes-change-risk.md](../decisions/0013-outcomes-change-risk.md)) |
+| **Agents help people, not instead of them.** When a customer disputes a payment, an assistant assembles the evidence and researches the vendor; a person decides | Case work gets faster without handing a fraud ruling to a model | The case file has no verdict field; web research never sees the business's data ([../decisions/0015-case-review-assistant.md](../decisions/0015-case-review-assistant.md)) |
+
+And one honest line to keep: the evaluation reports the friction the engine costs legitimate
+payments next to the fraud it catches, so a reader can see the trade, not only the catch rate.
+
 ## One-line answers
 
 - *How is this different from approvals?* Approvals are per bill and in the app, and know nothing
@@ -43,7 +58,9 @@ challenges, and as a friction score once there is more than one challenge type.
 - *Why not a cheaper model?* Savings should come from engineering, not from routing money decisions
   to a less capable model. The only cheap model in the loop is a typed decision model built for
   calibrated answers, and its calibration is never assumed: until our cases can measure it, its
-  probabilities are reported as uncalibrated.
+  probabilities are reported as uncalibrated. An open-weight model in the frontier model's place is
+  measured as a comparison arm, so the trade is shown rather than argued
+  ([../decisions/0014-open-weight-arm.md](../decisions/0014-open-weight-arm.md)).
 - *Can agents pay on Rho today?* No: Rho's API and MCP server are read-only by design. The spec
   names the payments-write scope as the next step, and that is the step Zeta One is built for.
 
