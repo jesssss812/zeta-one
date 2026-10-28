@@ -16,7 +16,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Any, Literal
 
 from zeta_one.contracts import Context, ContextSource, IdentityEvidence, Proposal, SignedRequest
-from zeta_one.gateway import admin
+from zeta_one.gateway.recheck import recheck
 from zeta_one.gateway.ledger import Ledger
 from zeta_one.gateway.pipeline import Engine
 from zeta_one.gateway.reuse import RiskReuse
@@ -117,7 +117,7 @@ class Gateway:
             status, result = "blocked", "rejected"
         else:
             identity = IdentityEvidence.model_validate(self.ledger.decision(held.decision_id)["identity"])
-            changes = admin.recheck(held, identity, self.stages, self.ledger, now)
+            changes = recheck(held, identity, self.stages, self.ledger, now)
             if changes:
                 status, result, reasons = "blocked", "blocked", ["resolve:state_changed"]
             else:
