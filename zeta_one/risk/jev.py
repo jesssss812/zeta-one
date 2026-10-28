@@ -16,7 +16,6 @@ Like the strong tier, the level is at least the most severe finding, so a "low" 
 hide a yes to "does the document instruct an automated reader".
 """
 
-import os
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -26,6 +25,7 @@ import httpx
 
 from zeta_one.contracts import Level, RiskInput, Signal, TierOutput, TierResult, Usage, max_level
 from zeta_one.risk import claude
+from zeta_one.settings import setting
 
 @dataclass(frozen=True)
 class Route:
@@ -44,7 +44,6 @@ ROUTES = (
 MODEL = ROUTES[0].model
 KEY_NAME = "TYPESAFE_API_KEY"
 TIMEOUT_SECONDS = 10.0
-ROOT = Path(__file__).resolve().parents[2]
 # An answer from a route ends the call. Only a route that can't be reached passes to the next: asking
 # the same model again after a bad answer would be re-rolling it (decision 0010).
 UNREACHABLE_STATUSES = frozenset({408, 429, 500, 502, 503, 504})
@@ -91,15 +90,7 @@ class InvalidAnswer(ValueError):
 
 def api_key(env_file: Path | None = None, name: str = KEY_NAME) -> str | None:
     """A key from the environment, else from `.env`; never printed or logged."""
-    env_file = env_file or ROOT / ".env"
-    if os.environ.get(name):
-        return os.environ[name]
-    if env_file.exists():
-        for line in env_file.read_text().splitlines():
-            key, _, value = line.partition("=")
-            if key.strip().removeprefix("export ").strip() == name and value.strip():
-                return value.strip().strip("'\"")
-    return None
+    return setting(name, env_file)
 
 
 class JevTier:

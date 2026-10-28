@@ -12,10 +12,8 @@ the provider's support for JSON output are unverified until the first live call.
 """
 
 import json
-import os
 import re
 import time
-from pathlib import Path
 from typing import Any
 
 import httpx
@@ -23,12 +21,12 @@ from pydantic import ValidationError
 
 from zeta_one.contracts import RiskInput, TierOutput, TierResult, Usage
 from zeta_one.risk import claude
+from zeta_one.settings import setting
 
 DEFAULT_BASE_URL = "https://openrouter.ai/api/v1"
 DEFAULT_MODEL = "qwen/qwen3-235b-a22b-2507"
 TIMEOUT_SECONDS = 60.0
 MAX_TOKENS = 4096
-ROOT = Path(__file__).resolve().parents[2]
 # Without reported usage the input is estimated high, so spend is never undercounted.
 CHARS_PER_TOKEN_ESTIMATE = 2
 
@@ -37,19 +35,6 @@ SYSTEM_PROMPT = (
     + "\n\n## Output format\n\nReply with one JSON object and nothing else, matching this JSON schema:\n\n"
     + json.dumps(claude.StrongAnswer.model_json_schema(), indent=1)
 )
-
-
-def setting(name: str, env_file: Path | None = None) -> str | None:
-    """A setting from the environment, else from `.env`; never printed or logged."""
-    if os.environ.get(name):
-        return os.environ[name]
-    env_file = env_file or ROOT / ".env"
-    if env_file.exists():
-        for line in env_file.read_text().splitlines():
-            key, _, value = line.partition("=")
-            if key.strip().removeprefix("export ").strip() == name and value.strip():
-                return value.strip().strip("'\"")
-    return None
 
 
 def prices() -> dict[str, tuple[float, float]]:

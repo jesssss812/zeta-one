@@ -5,6 +5,7 @@ import json
 import pytest
 
 from tests.risk.test_claude import risk_input, scenario, tier0_output
+from zeta_one import settings
 from zeta_one.contracts import Configuration
 from zeta_one.decide import policy
 from zeta_one.risk import escalation, jev
@@ -100,7 +101,7 @@ def test_each_failure_is_an_error_and_no_level(reply, status, error):
 def test_no_key_is_an_error_without_a_call(monkeypatch, tmp_path):
     for route in jev.ROUTES:
         monkeypatch.delenv(route.key_name, raising=False)
-    monkeypatch.setattr(jev, "ROOT", tmp_path)
+    monkeypatch.setattr(settings, "ROOT", tmp_path)
 
     def never(*args):
         raise AssertionError("a test without a key made a real Jev call")
@@ -290,6 +291,6 @@ def test_missing_usage_is_estimated_high_not_free():
 
 def test_the_missing_key_test_never_reads_the_checkouts_env(monkeypatch, tmp_path):
     monkeypatch.delenv(jev.KEY_NAME, raising=False)
-    monkeypatch.setattr(jev, "ROOT", tmp_path)
+    monkeypatch.setattr(settings, "ROOT", tmp_path)
     (tmp_path / ".env").write_text("")
     assert jev.api_key() is None

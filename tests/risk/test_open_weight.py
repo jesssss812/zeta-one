@@ -5,6 +5,7 @@ import json
 import pytest
 
 from tests.risk.test_claude import answer, risk_input
+from zeta_one import settings
 from zeta_one.risk import claude, open_weight
 from zeta_one.risk.open_weight import OpenWeightTier
 
@@ -78,7 +79,7 @@ def test_each_failure_is_an_error_and_no_level(payload, status, error):
 def test_no_key_is_an_error_without_a_call(monkeypatch, tmp_path):
     for name in ("OPEN_WEIGHT_API_KEY", "OPENROUTER_API_KEY"):
         monkeypatch.delenv(name, raising=False)
-    monkeypatch.setattr(open_weight, "ROOT", tmp_path)
+    monkeypatch.setattr(settings, "ROOT", tmp_path)
 
     def never(*args):
         raise AssertionError("a test without a key made a real call")
@@ -93,7 +94,7 @@ def test_missing_usage_is_estimated_high_not_free():
 
 
 def test_prices_are_unset_until_configured(monkeypatch, tmp_path):
-    monkeypatch.setattr(open_weight, "ROOT", tmp_path)
+    monkeypatch.setattr(settings, "ROOT", tmp_path)
     monkeypatch.delenv("OPEN_WEIGHT_PRICES", raising=False)
     assert open_weight.prices() == {}
     monkeypatch.setenv("OPEN_WEIGHT_PRICES", "0.2,0.6")
