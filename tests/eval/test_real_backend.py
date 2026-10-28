@@ -31,11 +31,19 @@ class EchoCheap:
 
 @pytest.fixture(scope="module")
 def backend():
-    return backends.RealBackend(strong_tier=EchoStrong(), cheap_tier=EchoCheap())
+    return backends.RealBackend(strong_tier=EchoStrong(), cheap_tier=EchoCheap(), open_weight_tier=EchoOpenWeight())
+
+
+class EchoOpenWeight(EchoStrong):
+    name = "open_weight"
+
+    def assess(self, risk_input):
+        self.calls += 1
+        return TierOutput(result=TierResult(tier="open_weight", model="stand-in", level=risk_input.tier0.level))
 
 
 @pytest.mark.parametrize("case", cases.all_cases(), ids=lambda c: c.id)
-@pytest.mark.parametrize("config", ["rules", "engineered", "jev"])
+@pytest.mark.parametrize("config", ["rules", "engineered", "jev", "open_weight"])
 def test_every_hand_written_case_passes_on_the_real_stages(backend, case, config):
     needs_model = any(op.op == "fail_model" for op in case.setup) or (
         any(op.op == "repeat" for op in case.setup) and not case.agent.endswith("+replay"))
@@ -73,6 +81,7 @@ def test_a_live_tier_makes_a_configuration_that_uses_it_paid():
     assert stand_in_strong.paid_for(run.CONFIGS["jev"])  # Jev is still live
     both = backends.RealBackend(strong_tier=EchoStrong(), cheap_tier=EchoCheap())
     assert not both.paid_for(run.CONFIGS["jev"]) and not live.paid_for(run.CONFIGS["rules"])
+    assert live.paid_for(run.CONFIGS["open_weight"]) and both.paid_for(run.CONFIGS["open_weight"])
 
 
 def test_the_runner_refuses_the_live_backend_without_a_budget(tmp_path):

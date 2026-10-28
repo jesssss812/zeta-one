@@ -28,7 +28,7 @@ RecordId = Annotated[str, Field(min_length=1, max_length=MAX_ID_LENGTH)]
 
 Level = Literal["low", "elevated", "high"]
 Decision = Literal["allow", "challenge", "block"]
-TierName = Literal["tier0", "cheap", "strong"]
+TierName = Literal["tier0", "cheap", "strong", "open_weight"]
 IdentityStatus = Literal[
     "verified", "unsigned", "unknown_agent", "revoked", "stale_timestamp", "replay", "invalid_signature"
 ]

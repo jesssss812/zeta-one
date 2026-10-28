@@ -5,8 +5,9 @@
 
 Configurations: always_allow and always_challenge are trivial baselines that never touch the engine;
 rules runs tier 0 only; engineered adds the strong model on engineered escalation (decision 0009);
-jev puts Jev between them, so the strong model runs only on Jev's rule (decision 0007); strong runs
-the model on every request. The models see only the proposal and its context.
+jev puts Jev between them, so the strong model runs only on Jev's rule (decision 0007); open_weight
+runs an open-weight model in the strong model's place, on the same rule (decision 0009); strong
+runs the model on every request. The models see only the proposal and its context.
 
 Each row records the backend, the set's hash at run time and whether its latency is measured, so the
 report reads them from the results rather than from its own arguments. A case that raises is
@@ -34,6 +35,7 @@ CONFIGS: dict[str, Configuration | None] = {
     "rules": Configuration(tiers=["tier0"], escalation="none"),
     "engineered": Configuration(tiers=["tier0", "strong"], escalation="engineered"),
     "jev": Configuration(tiers=["tier0", "cheap", "strong"], escalation="jev"),
+    "open_weight": Configuration(tiers=["tier0", "open_weight"], escalation="engineered"),
     "strong": Configuration(tiers=["tier0", "strong"], escalation="always"),
 }
 BASELINES = {"always_allow": "allow", "always_challenge": "challenge"}

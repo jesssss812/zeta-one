@@ -44,6 +44,8 @@ from zeta_one.risk import claude
 from zeta_one.risk import jev
 from zeta_one.risk.claude import StrongTier
 from zeta_one.risk.jev import JevTier
+from zeta_one.risk import open_weight
+from zeta_one.risk.open_weight import OpenWeightTier
 from zeta_one.risk.tier0 import Tier0 as RealTier0
 from zeta_one.testing.replay import replay_engine
 
@@ -55,6 +57,8 @@ DEMO_AGENTS = {"ap_assistant": "routine_bill_payment"}
 CONFIGURATIONS = {
     "engineered": Configuration(tiers=["tier0", "strong"], escalation="engineered"),
     "jev": Configuration(tiers=["tier0", "cheap", "strong"], escalation="jev"),
+    # The comparison arm: an open-weight model in the strong tier's place (decision 0009).
+    "open_weight": Configuration(tiers=["tier0", "open_weight"], escalation="engineered"),
 }
 CONFIGURATION_NAME = "ZETA_RISK_CONFIGURATION"
 
@@ -112,10 +116,10 @@ def real_stages(connection: sqlite3.Connection, store: SeedStore | None = None,
         make_checker=checker,
         load_context=context_for(store),
         tier0=RealTier0(),
-        tiers={"cheap": JevTier(), "strong": StrongTier()},
+        tiers={"cheap": JevTier(), "strong": StrongTier(), "open_weight": OpenWeightTier()},
         agent_status=agent_status,
         configuration=configuration or CONFIGURATIONS["engineered"],
-        prices={**claude.PRICES, **jev.PRICES},
+        prices={**claude.PRICES, **jev.PRICES, **open_weight.prices()},
         seed_version=store.seed_version,
         registry=registry,
         authorizations=authorizations,

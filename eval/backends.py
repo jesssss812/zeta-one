@@ -101,18 +101,19 @@ class RealBackend:
     name = "real"
     measures_latency = True
 
-    def __init__(self, strong_tier: Any = None, cheap_tier: Any = None):
-        """`strong_tier` and `cheap_tier` stand in for the live strong tier and Jev; None uses the live
-        one, which is paid."""
+    def __init__(self, strong_tier: Any = None, cheap_tier: Any = None, open_weight_tier: Any = None):
+        """`strong_tier`, `cheap_tier` and `open_weight_tier` stand in for the live strong tier, Jev and
+        the open-weight model; None uses the live one, which is paid."""
         from zeta_one.gateway.wiring import engine_version
 
-        self._strong, self._cheap = strong_tier, cheap_tier
-        self.paid = strong_tier is None or cheap_tier is None
+        self._strong, self._cheap, self._open_weight = strong_tier, cheap_tier, open_weight_tier
+        self.paid = strong_tier is None or cheap_tier is None or open_weight_tier is None
         self._version = engine_version()
 
     def paid_for(self, configuration: Configuration) -> bool:
         """Whether a run under this configuration can call a live, paid model tier."""
-        live = {"strong": self._strong is None, "cheap": self._cheap is None}
+        live = {"strong": self._strong is None, "cheap": self._cheap is None,
+                "open_weight": self._open_weight is None}
         return any(live.get(tier, False) for tier in configuration.tiers)
 
     def run(self, case: Case, configuration: Configuration) -> Outcome:
@@ -124,6 +125,7 @@ class RealBackend:
         from zeta_one.identity.signing import sign
         from zeta_one.risk.claude import StrongTier
         from zeta_one.risk.jev import JevTier
+        from zeta_one.risk.open_weight import OpenWeightTier
         from zeta_one.rho import mutations
         from zeta_one.rho.seed import SEED_NOW
         from zeta_one.rho.snapshot import Store as SeedStore
@@ -149,6 +151,7 @@ class RealBackend:
             stages.tiers = {
                 "strong": _FailingTier("strong") if failing else (self._strong or StrongTier()),
                 "cheap": _FailingTier("cheap") if failing else (self._cheap or JevTier()),
+                "open_weight": _FailingTier("open_weight") if failing else (self._open_weight or OpenWeightTier()),
             }
             key = Ed25519PrivateKey.generate()
             if fault != "unknown":
