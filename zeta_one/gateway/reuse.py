@@ -7,6 +7,11 @@ and tier 0 still run every time: the earlier result is reused only if tier 0 fin
 found then, so a hard flag raised since (a bill that opened, new instruction text) is never skipped.
 The reused result names the decision it came from in `risk.reused_from` and carries no token usage,
 since no model was called for it.
+
+Changing the amount by a cent is a new proposal, so an agent could re-roll that way. After
+MAX_FRESH_ASSESSMENTS fresh assessments for the same agent, payee and payment method within the
+window, a further different proposal skips the models: tier 0 still runs, and the policy challenges
+it (`risk.repeat_limit_reached`).
 """
 
 import hashlib
@@ -25,8 +30,10 @@ from zeta_one.contracts import (
 )
 from zeta_one.gateway.ledger import payment_method_state
 from zeta_one.gateway.pipeline import Engine
+from zeta_one.risk import assess
 
 WINDOW = timedelta(hours=24)
+MAX_FRESH_ASSESSMENTS = 3
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS risk_results (
@@ -35,7 +42,8 @@ CREATE TABLE IF NOT EXISTS risk_results (
     configuration TEXT NOT NULL,
     created_at TEXT NOT NULL,
     payment_method_state TEXT NOT NULL,
-    risk TEXT NOT NULL
+    risk TEXT NOT NULL,
+    payee_key TEXT
 );
 CREATE INDEX IF NOT EXISTS risk_results_lookup ON risk_results (fingerprint, configuration, created_at);
 """
@@ -50,6 +58,12 @@ def fingerprint(agent_id: str | None, proposal: Proposal) -> str:
         proposal.amount.currency,
         proposal.bill_id,
     ]
+    return hashlib.sha256(json.dumps(parts).encode()).hexdigest()
+
+
+def payee_key(agent_id: str | None, proposal: Proposal) -> str:
+    """Agent, payee and payment method: what stays the same while an agent varies the amount."""
+    parts = [agent_id, proposal.counterparty_id, proposal.payment_method_id]
     return hashlib.sha256(json.dumps(parts).encode()).hexdigest()
 
 
@@ -78,12 +92,19 @@ class RiskReuse:
         self._db = connection
         self._window = window
         self._db.executescript(SCHEMA)
+        columns = {row[1] for row in self._db.execute("PRAGMA table_info(risk_results)")}
+        if "payee_key" not in columns:  # a gateway file from before the repeat limit
+            with self._db:
+                self._db.execute("ALTER TABLE risk_results ADD COLUMN payee_key TEXT")
 
     def __call__(
         self, engine: Engine, proposal: Proposal, context: Context, now: datetime, identity: IdentityEvidence
     ) -> RiskEvidence:
         earlier = self._find(identity.claimed_agent_id, proposal, context, now, engine.configuration)
         if earlier is None:
+            if self._fresh_count(identity.claimed_agent_id, proposal, now, engine.configuration) >= MAX_FRESH_ASSESSMENTS:
+                tier0_only = assess.assess(proposal, context, now, engine.tier0, {}, Configuration(tiers=["tier0"]))
+                return tier0_only.model_copy(update={"repeat_limit_reached": True})
             return engine.run_tiers(proposal, context, now, identity)
         decision_id, risk = earlier
         if not _same_tier0(engine.tier0(proposal, context, now), risk):
@@ -93,20 +114,32 @@ class RiskReuse:
 
     def remember(self, record: EvidenceRecord, proposal: Proposal | None, context: Context | None) -> None:
         """Keep a decision's risk result for reuse, unless risk didn't run or was itself reused."""
-        if proposal is None or context is None or not record.risk.tiers_run or record.risk.reused_from:
+        risk = record.risk
+        if proposal is None or context is None or not risk.tiers_run or risk.reused_from or risk.repeat_limit_reached:
             return
         with self._db:
             self._db.execute(
-                "INSERT OR REPLACE INTO risk_results VALUES (?, ?, ?, ?, ?, ?)",
+                """INSERT OR REPLACE INTO risk_results
+                   (decision_id, fingerprint, configuration, created_at, payment_method_state, risk, payee_key)
+                   VALUES (?, ?, ?, ?, ?, ?, ?)""",
                 (
                     record.decision_id,
                     fingerprint(record.identity.claimed_agent_id, proposal),
                     _configuration_key(record.configuration),
                     _iso(record.created_at),
                     json.dumps(payment_method_state(context)),
-                    record.risk.model_dump_json(by_alias=True),
+                    risk.model_dump_json(by_alias=True),
+                    payee_key(record.identity.claimed_agent_id, proposal),
                 ),
             )
+
+    def _fresh_count(self, agent_id: str | None, proposal: Proposal, now: datetime, configuration: Configuration) -> int:
+        row = self._db.execute(
+            """SELECT COUNT(*) FROM risk_results
+               WHERE payee_key = ? AND configuration = ? AND created_at > ? AND created_at <= ?""",
+            (payee_key(agent_id, proposal), _configuration_key(configuration), _iso(now - self._window), _iso(now)),
+        ).fetchone()
+        return int(row[0])
 
     def _find(
         self, agent_id: str | None, proposal: Proposal, context: Context, now: datetime, configuration: Configuration

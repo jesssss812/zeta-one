@@ -73,3 +73,8 @@ def test_a_tier0_failure_is_a_challenge_not_an_allow():
     risk = RiskEvidence(tiers_run=["tier0"], tier_results=[TierResult(tier="tier0", error="boom")])
     outcome = _decide(risk)
     assert (outcome.decision, outcome.reasons) == ("challenge", ["risk:tier0_unavailable"])
+
+
+def test_the_repeat_limit_is_a_challenge():
+    outcome = _decide(RiskEvidence(level="low", repeat_limit_reached=True))
+    assert (outcome.decision, outcome.reasons) == ("challenge", ["risk:repeat_limit"])

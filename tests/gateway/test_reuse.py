@@ -8,7 +8,7 @@ import pytest
 from tests.gateway.fakes import NOW, FakeWorld, agent_headers, held_proposal, routine_proposal
 from zeta_one.contracts import Feature, Money, SignedRequest
 from zeta_one.gateway.ledger import Ledger
-from zeta_one.gateway.reuse import RiskReuse, fingerprint
+from zeta_one.gateway.reuse import MAX_FRESH_ASSESSMENTS, RiskReuse, fingerprint
 from zeta_one.gateway.service import Gateway
 
 
@@ -122,3 +122,30 @@ def test_concurrent_identical_proposals_get_one_model_call(gateway, world):
     assert world.strong_calls == 1
     assert len({r["decision_id"] for r in records}) == 5
     assert sum(r["risk"]["reused_from"] is None for r in records) == 1
+
+
+def test_varying_the_amount_stops_reaching_the_model_after_the_limit(gateway, world):
+    records = [send(gateway, held_proposal(amount=Money(amount=251500 + cents, currency="USD")))
+               for cents in range(MAX_FRESH_ASSESSMENTS + 2)]
+    assert world.strong_calls == MAX_FRESH_ASSESSMENTS
+    limited = records[MAX_FRESH_ASSESSMENTS:]
+    assert all(r["risk"]["repeat_limit_reached"] for r in limited)
+    assert all(r["decision"] == "challenge" and "risk:repeat_limit" in r["reasons"] for r in limited)
+    assert all(r["risk"]["tiers_run"] == ["tier0"] for r in limited)
+
+
+def test_the_repeat_limit_ends_with_the_window(gateway, world, clock):
+    for cents in range(MAX_FRESH_ASSESSMENTS):
+        send(gateway, held_proposal(amount=Money(amount=251500 + cents, currency="USD")))
+    clock.now += timedelta(hours=24, seconds=1)
+    record = send(gateway, held_proposal(amount=Money(amount=251599, currency="USD")))
+    assert record["risk"]["repeat_limit_reached"] is False
+    assert world.strong_calls == MAX_FRESH_ASSESSMENTS + 1
+
+
+def test_an_older_risk_table_gains_the_payee_column():
+    connection = sqlite3.connect(":memory:")
+    connection.execute("""CREATE TABLE risk_results (decision_id TEXT PRIMARY KEY, fingerprint TEXT NOT NULL,
+        configuration TEXT NOT NULL, created_at TEXT NOT NULL, payment_method_state TEXT NOT NULL, risk TEXT NOT NULL)""")
+    RiskReuse(connection)
+    assert "payee_key" in {row[1] for row in connection.execute("PRAGMA table_info(risk_results)")}

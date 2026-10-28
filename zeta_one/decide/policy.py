@@ -79,6 +79,8 @@ ROWS: list[Row] = [
         "The risk check could not complete; confirm this payment before it is sent."),
     Row(lambda p: p.risk.model_failed(), "challenge", ChallengeType.CONFIRM, "risk:model_unavailable",
         "The risk check could not complete; confirm this payment before it is sent."),
+    Row(lambda p: p.risk.repeat_limit_reached, "challenge", ChallengeType.CONFIRM, "risk:repeat_limit",
+        "The agent has proposed several variations of this payment; confirm it before it is sent."),
     Row(_level_at_least("high"), "challenge", ChallengeType.CONFIRM, "risk:high",
         "This payment carries high risk; confirm it before it is sent."),
     Row(_new_counterparty_needs_approval, "challenge", ChallengeType.CONFIRM,

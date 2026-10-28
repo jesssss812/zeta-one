@@ -258,6 +258,9 @@ class RiskEvidence(_Open):
     signals: list[Signal] = Field(default_factory=list)
     lowered: Lowered | None = None
     reused_from: str | None = None
+    # True when the models were skipped because this agent had already had MAX_FRESH_ASSESSMENTS
+    # different proposals to the same payee and method assessed within the reuse window (S3).
+    repeat_limit_reached: bool = False
     model_rationale: str | None = None
 
     @classmethod

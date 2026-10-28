@@ -111,6 +111,7 @@ describes how it is produced). Fields the site should rely on:
     "signals": [{"name", "severity": "low" | "elevated" | "high", "evidence": ["<record id>"], "source": "tier0" | "cheap" | "strong"}],
     "lowered": null | {"from": "elevated" | "high", "to": "low" | "elevated", "by": "cheap" | "strong", "signals": ["<soft signal name>"]},
     "reused_from": null | "dec_...",
+    "repeat_limit_reached": false,
     "model_rationale": null | "..."
   },
   "execution": {"status": "executed" | "held" | "blocked", "simulated": true},
@@ -140,7 +141,10 @@ Rules the site can count on:
 - `risk.lowered` is set when a model lowered soft signals below tier 0's level, and the reasons
   then include `risk:lowered_by_model`; show it, since an allow a model cleared is not the same as
   a clean one. `risk.reused_from` names an earlier decision whose risk result was reused for the
-  same proposal, after tier 0 ran again and found the same. A `tier_results` entry may carry
+  same proposal, after tier 0 ran again and found the same. `risk.repeat_limit_reached` is `true`
+  when the agent had already had three different proposals to the same payee and method assessed
+  by the models within 24 hours: only tier 0 ran, and the decision is `challenge` with
+  `risk:repeat_limit`. A `tier_results` entry may carry
   `error` when that tier failed; the decision is then `challenge`, with `risk:model_unavailable`
   for a model tier or `risk:tier0_unavailable` when tier 0 or the context it reads failed (the
   risk `level` is then null). All three are optional; fixtures omit them.
