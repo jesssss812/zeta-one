@@ -38,7 +38,7 @@ def _now() -> datetime:
     return datetime.now(UTC)
 
 
-def _new_id() -> str:
+def new_decision_id() -> str:
     return f"dec_{uuid.uuid4().hex[:16]}"
 
 
@@ -53,7 +53,7 @@ class Engine:
     configuration: Configuration = field(default_factory=Configuration)
     prices: dict[str, tuple[float, float]] = field(default_factory=dict)
     clock: Callable[[], datetime] = _now
-    new_id: Callable[[], str] = _new_id
+    new_id: Callable[[], str] = new_decision_id
     engine_version: str | None = None
     seed_version: str | None = None
     # Wraps the risk stage, e.g. to reuse an earlier result for a repeated proposal (decision 0010).

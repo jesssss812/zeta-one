@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 
 from zeta_one.gateway.app import create_app
 from zeta_one.gateway.ledger import Ledger
-from zeta_one.gateway.scenarios import ORDER
+from zeta_one.gateway.scenarios import ORDER, load_fixture
 from zeta_one.gateway.service import Gateway
 from zeta_one.gateway.wiring import real_stages
 
@@ -39,3 +39,13 @@ def test_unknown_scenario_is_404(client):
     response = client.post("/v1/scenarios/nope/run")
     assert response.status_code == 404
     assert response.json()["error"]["code"] == "unknown_scenario"
+
+
+def test_each_scenario_run_is_a_new_decision(client):
+    first = client.post("/v1/scenarios/routine_bill_payment/run").json()["decision_record"]
+    second = client.post("/v1/scenarios/routine_bill_payment/run").json()["decision_record"]
+    assert first["decision_id"] != second["decision_id"]
+    fixture = load_fixture("routine_bill_payment").decision_record
+    assert fixture.decision_id not in (first["decision_id"], second["decision_id"])
+    assert first["created_at"] != fixture.created_at.isoformat().replace("+00:00", "Z")
+    assert len(client.get("/v1/decisions", headers=ADMIN).json()) == 2

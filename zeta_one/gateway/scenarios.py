@@ -1,10 +1,13 @@
 """The five demo scenarios. Until the seed and the real stages land, each runs by replaying its
 fixture through the real merge and policy, so its result stays marked illustrative."""
 
+import dataclasses
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 
 from zeta_one.contracts import EvidenceRecord, ScenarioResult
+from zeta_one.gateway.pipeline import new_decision_id
 from zeta_one.testing.replay import replay_engine, request_for
 
 FIXTURES = Path(__file__).resolve().parents[2] / "data" / "fixtures"
@@ -29,7 +32,9 @@ def run(name: str) -> ScenarioResult:
     if name not in ORDER:
         raise KeyError(name)
     scenario = load_fixture(name)
-    record, _ = replay_engine(scenario).evaluate(request_for(scenario))
+    # Each run is a new decision: its own id and the time it ran, not the fixture's.
+    engine = dataclasses.replace(replay_engine(scenario), new_id=new_decision_id, clock=lambda: datetime.now(UTC))
+    record, _ = engine.evaluate(request_for(scenario))
     return scenario.model_copy(update={"decision_record": record, "illustrative": True})
 
 

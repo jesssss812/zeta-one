@@ -1,8 +1,9 @@
 """Which implementation runs each stage of the Engine.
 
-`real_stages()` names the real stages that exist. `build_engine` uses them and, for a demo scenario,
-falls back stage by stage to the replay stand-ins of its fixture. The live agent endpoint has no
-fixture to fall back to, so it runs only once every stage is real.
+`real_stages()` names the real stages that exist. `build_engine` uses them and, given a fixture as
+`replay`, falls back stage by stage to that fixture's replay stand-ins. The live agent endpoint has
+no fixture to fall back to, so it runs only once every stage is real. Demo scenarios
+(`scenarios.run`) still replay their fixture whole.
 """
 
 import subprocess
