@@ -41,6 +41,9 @@ internally with a built-in signed agent).
 | `GET /v1/eval/latest` | the evaluation report as JSON once one exists; `404` before |
 
 Error responses are `{"error": {"code", "message"}}` with a 4xx or 5xx status.
+A signed proposal that is malformed or names records that don't exist or don't belong together is
+`400 invalid_proposal` and is not recorded; this is checked before authorization, so the response
+is the same whatever the amount.
 
 ## Scenario result
 

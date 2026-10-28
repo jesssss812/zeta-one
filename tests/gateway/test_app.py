@@ -6,6 +6,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from tests.gateway.fakes import AGENT, NOW, FakeWorld, agent_headers, held_proposal, routine_proposal
+from zeta_one.contracts import Money
 from zeta_one.gateway.app import create_app
 from zeta_one.gateway.ledger import Ledger
 from zeta_one.gateway.service import Gateway
@@ -79,6 +80,15 @@ def test_malformed_body_from_a_verified_agent_is_400(client):
 def test_unknown_counterparty_is_400(client):
     response = propose(client, held_proposal(counterparty_id="cp_nope"))
     assert response.status_code == 400
+
+
+def test_an_unknown_counterparty_is_400_whatever_the_amount(client, gateway, world):
+    """The 400 comes before authorization, so it can't reveal how much rolling budget is left."""
+    world.set_rolling_limit(500000)
+    for amount in (100000, 900000):
+        bogus = held_proposal(counterparty_id="cp_nope", amount=Money(amount=amount, currency="USD"))
+        assert propose(client, bogus).status_code == 400
+    assert gateway.ledger.decisions(10) == []
 
 
 def test_engine_not_ready_without_every_stage(world):

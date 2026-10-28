@@ -64,7 +64,8 @@ class Engine:
         return assess.assess(proposal, context, now, self.tier0, self.tiers, self.configuration)
 
     def evaluate(self, request: SignedRequest) -> tuple[EvidenceRecord, Proposal | None]:
-        """Decide one request. Raises InvalidProposal for a malformed body from a verified agent."""
+        """Decide one request. Raises InvalidProposal for a malformed body from a verified agent, or one
+        naming records that don't exist or don't belong together; nothing is decided for it."""
         now = self.clock()
         latency: dict[str, int] = {}
         started = time.perf_counter()
@@ -78,6 +79,12 @@ class Engine:
 
         if identity.result == "verified":
             proposal = _parse(request.body)
+            # The context is loaded before authorization, so a proposal naming records that don't
+            # exist is refused the same way whatever its amount: a 400 can't tell an agent whether
+            # an amount was within its limits (security.md, S8).
+            step = time.perf_counter()
+            context = self.load_context(proposal, identity.business_id, now)
+            context_ms = _ms_since(step)
             step = time.perf_counter()
             authorization_doc = self.load_authorization(identity.business_id, identity.claimed_agent_id)
             authorization = self.check_authorization(proposal, authorization_doc, identity, now)
@@ -85,9 +92,8 @@ class Engine:
 
             if not authorization.violations:
                 step = time.perf_counter()
-                context = self.load_context(proposal, identity.business_id, now)
                 risk = (self.assess_risk or Engine.run_tiers)(self, proposal, context, now, identity)
-                latency["risk"] = _ms_since(step)
+                latency["risk"] = context_ms + _ms_since(step)
 
         outcome = policy.decide(policy.PolicyInput(identity, authorization, authorization_doc, risk, proposal))
         latency["total"] = _ms_since(started)
