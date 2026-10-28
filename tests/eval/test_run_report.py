@@ -267,9 +267,9 @@ def test_freezing_the_hard_set_keeps_it_loadable(tmp_path):
 
 
 def test_the_report_shows_versions_and_says_when_dev_is_only_the_demo_cases(tmp_path):
-    results = tmp_path / "results"
-    run.run_set("dev", "rules", backends.ReplayBackend(), results=results)
-    built = report.build(results=results)
+    results, data = tmp_path / "results", tmp_path / "data"  # no generated dev cases: only the demo cases
+    run.run_set("dev", "rules", backends.ReplayBackend(), data=data, results=results)
+    built = report.build(results=results, data=data)
     assert built["dev_is_demo_only"] is True and built["versions"]["policy_version"]
     text = report.render(built)
     assert "dev holds only the hand-built demo cases" in text and "Policy version" in text
