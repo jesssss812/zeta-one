@@ -68,7 +68,9 @@ def cell(rows: list[dict]) -> dict:
     for r in ran:
         if r.get("record") and r["record"]["risk"].get("lowered"):
             lowerings["legitimate" if r["truth"] == "legitimate" else "not_legitimate"] += 1
-    usd = [r["cost"]["usd"] for r in records if r.get("cost")]
+    # Every send's cost when the runner measured it, so a repeat's paid first send isn't lost.
+    usd = [r["cost_usd"] if r.get("cost_usd") is not None else r["record"]["cost"]["usd"]
+           for r in ran if r.get("cost_usd") is not None or (r.get("record") or {}).get("cost")]
     totals = [r["latency_ms"]["total"] for r in timed if r.get("latency_ms") and "total" in r["latency_ms"]]
     return {
         "n": len(ran),
@@ -97,8 +99,10 @@ def by_category(rows: list[dict]) -> dict[str, dict]:
 
 def discordance(rows_a: list[dict], rows_b: list[dict]) -> dict:
     """Discordant tables per category and one pooled McNemar over the risk categories."""
-    b_by_id = {r["case_id"]: r for r in rows_b if not r["not_run"]}
-    pairs = [(a, b_by_id[a["case_id"]]) for a in rows_a if not a["not_run"] and a["case_id"] in b_by_id]
+    # Undetectable cases are left out here as they are from accuracy.
+    b_by_id = {r["case_id"]: r for r in rows_b if not r["not_run"] and r["detectable"]}
+    pairs = [(a, b_by_id[a["case_id"]]) for a in rows_a
+             if not a["not_run"] and a["detectable"] and a["case_id"] in b_by_id]
     tables = {}
     for cat in sorted({a["category"] for a, _ in pairs}):
         chosen = [(a, b) for a, b in pairs if a["category"] == cat]

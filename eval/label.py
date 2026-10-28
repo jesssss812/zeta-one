@@ -224,11 +224,13 @@ def merge(set_name: str, data: Path = sets.DATA) -> dict:
                                           "label_provenance": provenance.model_dump()}).model_dump(mode="json"))
     sets.write_jsonl(data / set_name / "cases.jsonl", cases)
     agreement = stats.kappa_bootstrap([a for a, _ in pairs], [o for _, o in pairs]) if pairs else None
-    if agreement:
-        agreement["labeller_blindness"] = BLINDNESS
-        (out / "agreement.json").write_text(json.dumps(agreement, indent=2) + "\n")
-        if set_name == "test":
-            (data / "agreement.json").write_text(json.dumps(agreement, indent=2) + "\n")
+    paths = [out / "agreement.json"] + ([data / "agreement.json"] if set_name == "test" else [])
+    for path in paths:
+        if agreement:
+            agreement["labeller_blindness"] = BLINDNESS
+            path.write_text(json.dumps(agreement, indent=2) + "\n")
+        else:
+            path.unlink(missing_ok=True)  # a relabel with no owner overlap must not leave old agreement behind
     return {"cases": len(cases), "agreement": agreement}
 
 

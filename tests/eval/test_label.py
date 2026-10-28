@@ -162,3 +162,16 @@ def test_the_reading_sheet_shows_cases_blind(tmp_path):
     assert text.count("\n## c") == 5 and "Agent's rationale (untrusted)" in text
     for word in ("payee_fraud", "manipulated_agent", "legitimate", "category", "truth", "dev_0"):
         assert word not in text.split("No labels:")[1]
+
+
+def test_a_relabel_without_owner_overlap_removes_old_agreement(prepared):
+    ids = _write_ai(prepared, lambda case_id: "challenge")
+    out = prepared / "test" / "label"
+    reverse = {case_id: blind for blind, case_id in ids.items()}
+    sample = json.loads((out / "owner_sample.json").read_text())
+    sets.write_jsonl(out / "owner.jsonl", [{"id": reverse[c], "expected": "challenge"} for c in sample])
+    label.merge("test", data=prepared)
+    assert (prepared / "agreement.json").exists()
+    (out / "owner.jsonl").unlink()
+    label.merge("test", data=prepared)
+    assert not (prepared / "agreement.json").exists() and not (out / "agreement.json").exists()

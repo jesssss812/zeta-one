@@ -17,6 +17,7 @@ Cases already running finish, so the spend can pass the budget by up to `workers
 
 import argparse
 import json
+import math
 import sys
 import threading
 from concurrent.futures import ThreadPoolExecutor
@@ -109,6 +110,8 @@ def run_set(set_name: str, config: str, backend: Backend, workers: int = 4, data
     paid = models and (paid_for(CONFIGS[config]) if paid_for else getattr(backend, "paid", True))
     if paid and (not live or max_usd is None):
         raise BudgetRequired(f"the {backend.name} backend calls a paid model: pass live=True and max_usd")
+    if max_usd is not None and not (math.isfinite(max_usd) and max_usd > 0):
+        raise BudgetRequired(f"max_usd must be a positive number, not {max_usd!r}")
     cases = sets.load_set(set_name, data)
     sets.check_frozen(set_name, cases, data)
     digest = sets.set_hash(cases)

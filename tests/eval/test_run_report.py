@@ -274,3 +274,27 @@ def test_the_report_shows_versions_and_says_when_dev_is_only_the_demo_cases(tmp_
     text = report.render(built)
     assert "dev holds only the hand-built demo cases" in text and "Policy version" in text
     assert "## Not run\n\n- none" in text
+
+
+@pytest.mark.parametrize("max_usd", [float("nan"), float("inf"), 0.0, -1.0])
+def test_a_budget_must_be_a_positive_number(data, tmp_path, monkeypatch, max_usd):
+    monkeypatch.setattr(cases, "demo_cases", lambda: [])
+    with pytest.raises(run.BudgetRequired):
+        run.run_set("dev", "engineered", PaidBackend({}), data=data, results=tmp_path / "r", live=True, max_usd=max_usd)
+
+
+def test_mcnemar_leaves_out_undetectable_cases_as_accuracy_does(data, tmp_path, monkeypatch):
+    monkeypatch.setattr(cases, "demo_cases", lambda: [])
+    results = tmp_path / "results"
+    base = {"a1": "allow", "a2": "allow", "d1": "challenge", "e1": "block"}
+    run.run_set("dev", "rules", FakeBackend({**base, "e2": "allow"}), data=data, results=results)
+    run.run_set("dev", "engineered", FakeBackend({**base, "e2": "block"}), data=data, results=results)
+    pair = report.build(results=results, data=data)["discordant"]["rules vs engineered on dev"]
+    assert all(t["only_a"] == 0 and t["only_b"] == 0 for t in pair["per_category"].values())  # e2 differs but is excluded
+
+
+def test_cost_per_action_counts_every_send(tmp_path):
+    rows = [{"case_id": "r", "set": "dev", "category": "E", "truth": "manipulated_agent", "detectable": True,
+             "expected": "block", "decision": "block", "correct": True, "acceptable": True, "not_run": None,
+             "cost_usd": 0.05, "record": {"cost": {"usd": 0.0}, "risk": {}}}]
+    assert report.cell(rows)["cost_per_action_usd"] == pytest.approx(0.05)
