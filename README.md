@@ -102,7 +102,7 @@ Reproduce the recorded runs the site shows:
 | Variable | Needed for |
 | --- | --- |
 | `ZETA_ADMIN_TOKEN` | Admin endpoints and the review page; `scripts/keygen.py` writes it to `.env` |
-| `ANTHROPIC_API_KEY` | Claude model review and the case review assistant; export it in the shell, the Anthropic SDK reads it from the environment |
+| `ANTHROPIC_API_KEY` | Claude model review and the case review assistant |
 | `OPENROUTER_API_KEY`, `TYPESAFE_API_KEY` | Jev and the open-weight arm |
 | `CHAT_BASE_URL`, `CHAT_MODEL` | The case chat on a local model (`ollama pull qwen2.5:7b`) |
 | `RHO_API_TOKEN` | The read-only Rho staging check (needs the hackathon VPN) |

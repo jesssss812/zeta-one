@@ -159,9 +159,9 @@ class Gateway:
         if evidence is None:
             raise UnknownDecision(decision_id)
         if self.review_client is None:
-            import anthropic
+            from zeta_one.risk import claude
 
-            self.review_client = anthropic.Anthropic(timeout=120.0, max_retries=1)
+            self.review_client = claude.client(timeout=120.0)
         case = build_case(self.review_client, evidence, by, now)
         with self.lock:
             self.cases.add(case)

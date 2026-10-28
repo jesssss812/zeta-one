@@ -5,8 +5,6 @@ owner's own time or accounts.
 
 ## Live models
 
-- **Owner:** put `OPENROUTER_API_KEY` (and `TYPESAFE_API_KEY` for the backup) in `.env`, and export
-  `ANTHROPIC_API_KEY` in the shell.
 - One live call per tier:
   `.venv/bin/python -m pytest tests/risk/test_jev.py tests/risk/test_open_weight.py --live-models`;
   correct the parsers and [reference/jev.md](reference/jev.md) to the real shapes. Confirm the Claude

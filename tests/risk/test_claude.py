@@ -372,3 +372,12 @@ def test_live_redirect_fixture():
     assert output.result.error is None, output.result.error
     assert output.result.level == "high"
     assert "injection_detected" in output.result.signals
+
+
+def test_client_reads_the_key_from_env_file_when_the_environment_has_none(tmp_path, monkeypatch):
+    from zeta_one import settings
+
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.setattr(settings, "ROOT", tmp_path)
+    (tmp_path / ".env").write_text("ANTHROPIC_API_KEY=from-file\n")
+    assert claude.client().api_key == "from-file"

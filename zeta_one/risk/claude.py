@@ -24,12 +24,18 @@ import anthropic
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from zeta_one.contracts import Decision, Level, RiskInput, Signal, TierOutput, TierResult, Usage, max_level
+from zeta_one.settings import setting
 
 MODEL = "claude-opus-5-5"
 EFFORT = "medium"
 MAX_TOKENS = 8192
 TIMEOUT_SECONDS = 60.0
 MAX_RETRIES = 1
+
+
+def client(timeout: float = TIMEOUT_SECONDS, max_retries: int = MAX_RETRIES) -> anthropic.Anthropic:
+    """An Anthropic client keyed from the environment, else from `.env`."""
+    return anthropic.Anthropic(api_key=setting("ANTHROPIC_API_KEY"), timeout=timeout, max_retries=max_retries)
 # Each untrusted field is cut to this many characters before it reaches the model. The proposal's
 # own fields are capped in contracts.Proposal; this bounds the business's records too (invoice text).
 MAX_UNTRUSTED_CHARS = 8000
@@ -109,7 +115,7 @@ class StrongTier:
 
     def _messages(self) -> Any:
         if self._client is None:
-            self._client = anthropic.Anthropic(timeout=TIMEOUT_SECONDS, max_retries=MAX_RETRIES)
+            self._client = client()
         return self._client.messages
 
     def _failed(self, started: float, usage: Usage | None, error: str) -> TierOutput:
