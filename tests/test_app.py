@@ -134,3 +134,29 @@ def test_a_scenario_record_says_it_is_a_sandbox_run(client):
 def test_identity_checks_use_the_contracts_names(client, name):
     record = client.post(f"/v1/scenarios/{name}/run", json={}).json()["decision_record"]
     assert record["identity"]["checked"] == load_fixture(name).decision_record.identity.checked
+
+
+def test_a_scenario_run_writes_no_payment_and_spends_nothing():
+    """Scenarios share the demo agent's id; their runs must not count toward its live limits."""
+    from datetime import timedelta
+
+    from zeta_one.rho.seed import SEED_NOW
+
+    connection = sqlite3.connect(":memory:", check_same_thread=False)
+    connection.row_factory = sqlite3.Row
+    ledger = Ledger(connection)
+    client = TestClient(create_app(Gateway(stages=real_stages(connection), ledger=ledger), TOKEN))
+    for name in ORDER:
+        assert client.post(f"/v1/scenarios/{name}/run", json={}).status_code == 200
+    assert connection.execute("SELECT COUNT(*) FROM payments").fetchone()[0] == 0
+    assert ledger.spend("agent_ap_assistant_01", SEED_NOW - timedelta(days=365), "USD") == 0
+    assert ledger.payments_to("biz_seed_01", "cp_0012", SEED_NOW - timedelta(days=365)) == []
+
+
+@pytest.mark.parametrize("origin, allowed", [
+    ("http://localhost:3000", True), ("http://127.0.0.1:5173", True),
+    ("http://localhost.evil.com", False), ("https://localhost:3000", False), ("http://evil.example", False),
+])
+def test_cors_allows_only_local_origins(client, origin, allowed):
+    response = client.options("/v1/health", headers={"Origin": origin, "Access-Control-Request-Method": "GET"})
+    assert (response.headers.get("access-control-allow-origin") == origin) is allowed

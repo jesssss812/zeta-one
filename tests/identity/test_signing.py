@@ -81,3 +81,24 @@ def test_checked_lists_every_check_that_ran_including_the_failing_one():
     assert verify(request.model_copy(update={'headers': {}}), NOW).checked == ['present']
     stranger = sign(Ed25519PrivateKey.generate(), 'stranger', 'POST', '/pay', b'{}', NOW)
     assert verify(request.model_copy(update={'headers': stranger}), NOW).checked == ['present', 'known']
+
+
+def test_the_first_failing_check_decides_when_two_fail():
+    key = Ed25519PrivateKey.generate()
+    registry = Registry(sqlite3.connect(':memory:'))
+    registry.register('agent', 'business', 'owner', key.public_key(), NOW)
+    verify = verifier(registry)
+    stale = sign(key, 'agent', 'POST', '/pay', b'{}', NOW - timedelta(seconds=400))
+    registry.revoke('agent', NOW)
+    assert verify(SignedRequest(method='POST', path='/pay', body=b'{}', headers=stale), NOW).result == 'revoked'
+
+
+def test_a_signature_that_is_not_base64_is_invalid_and_uses_no_nonce():
+    key = Ed25519PrivateKey.generate()
+    registry = Registry(sqlite3.connect(':memory:'))
+    registry.register('agent', 'business', 'owner', key.public_key(), NOW)
+    verify = verifier(registry)
+    headers = sign(key, 'agent', 'POST', '/pay', b'{}', NOW)
+    broken = {**headers, 'Zeta-Signature': '!!'}
+    assert verify(SignedRequest(method='POST', path='/pay', body=b'{}', headers=broken), NOW).result == 'invalid_signature'
+    assert verify(SignedRequest(method='POST', path='/pay', body=b'{}', headers=headers), NOW).result == 'verified'

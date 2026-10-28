@@ -108,3 +108,43 @@ def test_revoking_a_superseded_version_is_404_not_a_false_success(setup):
     client.post("/v1/authorizations", json=_grant(version=2, authorization_id="auth_current"), headers=ADMIN)
     assert client.post("/v1/authorizations/auth_old/revoke", headers=ADMIN).status_code == 404
     assert stages.authorizations.load(BUSINESS, AGENT).status == "active"
+
+
+def test_a_hold_whose_grant_expired_before_approval_is_blocked_on_the_real_checker():
+    """S9 on the real stages: same authorization version, but it expired while the payment was held."""
+    from datetime import timedelta
+
+    connection = sqlite3.connect(":memory:", check_same_thread=False)
+    connection.row_factory = sqlite3.Row
+    stages = real_stages(connection)
+    clock = [SEED_NOW]
+    gateway = Gateway(stages=stages, ledger=Ledger(connection), clock=lambda: clock[0])
+    client = TestClient(create_app(gateway, TOKEN))
+    key = Ed25519PrivateKey.generate()
+    client.post("/v1/agents", json=_registration(key), headers=ADMIN)
+    grant = {**_grant(), "expires_at": (SEED_NOW + timedelta(hours=1)).isoformat()}
+    assert client.post("/v1/authorizations", json=grant, headers=ADMIN).status_code == 201
+    held = load_fixture("vendor_payment_method_changed").proposal.model_dump_json().encode()
+    path = "/v1/actions/propose_payment"
+    answer = client.post(path, content=held, headers=sign(key, AGENT, "POST", path, held, SEED_NOW)).json()
+    assert answer["decision"] == "challenge"
+    clock[0] = SEED_NOW + timedelta(hours=2)
+    resolved = client.post(f"/v1/challenges/{answer['challenge_id']}/resolve", json={"outcome": "approve", "by": "owner"},
+                           headers=ADMIN).json()
+    assert resolved["status"] == "blocked"
+    review = client.get(f"/v1/decisions/{answer['decision_id']}", headers=ADMIN).json()["review"]
+    assert "authorization:expires_at" in review["changes"]
+
+
+def test_a_rolling_limit_on_the_real_checker_counts_the_ledger(setup):
+    """S8 on the real stages: the second payment that would pass the rolling cap is blocked."""
+    client, _ = setup
+    key = Ed25519PrivateKey.generate()
+    client.post("/v1/agents", json=_registration(key), headers=ADMIN)
+    limits = {"per_payment": {"amount": 500000, "currency": "USD"},
+              "rolling": {"window_days": 7, "amount": {"amount": 300000, "currency": "USD"}}}
+    client.post("/v1/authorizations", json={**_grant(), "limits": limits}, headers=ADMIN)
+    assert _propose(client, key)["decision"] == "allow"   # $1,850
+    second = _propose(client, key)                         # $3,700 > $3,000
+    record = client.get(f"/v1/decisions/{second['decision_id']}", headers=ADMIN).json()
+    assert second["decision"] == "block" and record["reasons"] == ["authorization:limits.rolling"]
