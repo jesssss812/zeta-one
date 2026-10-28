@@ -4,6 +4,7 @@
 
 Everything evaluation.md asks for, reported per category and never as one headline number: counts
 with Wilson intervals, detection next to the challenge rate it cost, confusion matrices, lowerings,
+provenance read from the results themselves (backend, set hashes, seeds, frozen state),
 cost and latency, dev / test / hard side by side, discordant tables with a pooled McNemar p-value,
 failures by first stage that went wrong, label agreement, the undetectable cases by name, and the
 limitations.
@@ -17,7 +18,7 @@ from itertools import combinations
 from pathlib import Path
 
 from eval import sets, stats
-from eval.run import CONFIGS, RESULTS, result_path
+from eval.run import BASELINES, CONFIGS, RESULTS, result_path
 from zeta_one.contracts import Case
 
 RISK_CATEGORIES = ("A", "D", "E", "F")
@@ -29,12 +30,12 @@ LIMITATIONS = [
     "each case occurs.",
     "The generator's dimensions resemble tier 0's features, so the rules look better on dev and test than "
     "they would on cases the generator did not write; the hard set is the check on that.",
-    "Claude Haiku 5.5 wrote the case wording, Claude Sonnet 5.5 labelled, and Claude Opus 5.5 is the strong "
-    "tier: all three are from one family.",
+    "The plan has Claude Haiku 5.5 write the case wording, Claude Sonnet 5.5 label, and Claude Opus 5.5 serve "
+    "as the strong tier: all three from one family. The Run section lists the models that actually ran.",
     "With about 30 cases in a class a rate near 85% has a 95% interval of roughly ±12 points: enough to tell "
     "configurations apart in aggregate, not to rank them within a category.",
-    "Latency is a single run on one machine including network time; no responses are cached, though the "
-    "fixed system prompt is prompt-cached.",
+    "Latency is a single run on one machine including network time, and is shown only for backends that "
+    "measure the engine; no responses are cached, though the fixed system prompt is prompt-cached.",
     "Payments are simulated.",
 ]
 
@@ -51,25 +52,30 @@ def load_rows(results: Path = RESULTS) -> dict[str, dict[str, list[dict]]]:
 
 
 def cell(rows: list[dict]) -> dict:
-    """Metrics for one configuration on one group of cases."""
+    """Metrics for one configuration on one group of cases. Undetectable cases are left out of accuracy
+    and detection and counted on their own."""
     ran = [r for r in rows if not r["not_run"]]
+    scored = [r for r in ran if r["detectable"]]
     legit = [r for r in ran if r["truth"] == "legitimate"]
-    detectable = [r for r in ran if r["truth"] != "legitimate" and r["detectable"]]
+    detectable = [r for r in scored if r["truth"] != "legitimate"]
     records = [r["record"] for r in ran if r.get("record")]
+    timed = [r["record"] for r in ran if r.get("record") and r.get("measured_latency")]
     confusion = {e: dict.fromkeys(DECISIONS, 0) for e in DECISIONS}
-    for r in ran:
+    for r in scored:
         confusion[r["expected"]][r["decision"]] += 1
     lowerings = Counter()
     for r in ran:
         if r.get("record") and r["record"]["risk"].get("lowered"):
             lowerings["legitimate" if r["truth"] == "legitimate" else "not_legitimate"] += 1
     usd = [r["cost"]["usd"] for r in records if r.get("cost")]
-    totals = [r["latency_ms"]["total"] for r in records if r.get("latency_ms") and "total" in r["latency_ms"]]
+    totals = [r["latency_ms"]["total"] for r in timed if r.get("latency_ms") and "total" in r["latency_ms"]]
     return {
         "n": len(ran),
         "not_run": len(rows) - len(ran),
-        "accuracy": stats.rate(sum(bool(r["correct"]) for r in ran), len(ran)),
-        "accuracy_with_acceptable": stats.rate(sum(bool(r["acceptable"]) for r in ran), len(ran)),
+        "undetectable": len(ran) - len(scored),
+        "unstable": sum(r.get("stable") is False for r in ran),
+        "accuracy": stats.rate(sum(bool(r["correct"]) for r in scored), len(scored)),
+        "accuracy_with_acceptable": stats.rate(sum(bool(r["acceptable"]) for r in scored), len(scored)),
         "detection": stats.rate(sum(r["decision"] != "allow" for r in detectable), len(detectable)),
         "legit_challenge_rate": stats.rate(sum(r["decision"] == "challenge" for r in legit), len(legit)),
         "legit_block_rate": stats.rate(sum(r["decision"] == "block" for r in legit), len(legit)),
@@ -112,11 +118,11 @@ def failure_stage(row: dict) -> str:
         return "authorization"
     risk = record["risk"]
     too_lenient = row["decision"] == "allow" or (row["decision"] == "challenge" and row["expected"] == "block")
+    if too_lenient and risk["floor"] and record["decision"] == "allow":
+        return "merge_or_policy"
     if "risk:model_unavailable" in record["reasons"]:
         return "model"
     if too_lenient:
-        if risk["floor"] and record["decision"] == "allow":
-            return "merge_or_policy"
         if risk["tiers_run"] == ["tier0"]:
             return "feature_or_escalation"
         return "model"
@@ -145,20 +151,48 @@ def models_and_prices(rows: dict[str, dict[str, list[dict]]]) -> tuple[list[str]
     return sorted(models), prices
 
 
-def build(results: Path = RESULTS, data: Path = sets.DATA, backend: str = "unknown", seed: int | None = None) -> dict:
+def _provenance(rows: dict[str, dict[str, list[dict]]], cases: dict[str, list[Case]], data: Path) -> dict:
+    """What the results say about how they were made: backends, the set hashes they ran against, the
+    generator seeds, and whether each set still matches its frozen hash."""
+    backends, run_hashes = set(), defaultdict(set)
+    for by_set in rows.values():
+        for set_name, group in by_set.items():
+            for r in group:
+                backends.add(r.get("backend") or "unrecorded")
+                run_hashes[set_name].add(r.get("set_hash") or "unrecorded")
+    seeds = {}
+    for name in ("dev", "test"):
+        combos = data / name / "combos.jsonl"
+        if combos.exists():
+            seeds[name] = sorted({row["seed"] for row in sets.read_jsonl(combos)})
+    frozen = {}
+    for name, group in cases.items():
+        if not (data / name / "frozen.sha256").exists():
+            frozen[name] = "not frozen"
+            continue
+        try:
+            sets.check_frozen(name, group, data)
+            frozen[name] = "matches its frozen hash"
+        except sets.FrozenSetChanged:
+            frozen[name] = "changed since it was frozen"
+    current = {name: sets.set_hash(group) for name, group in cases.items() if group}
+    stale = sorted(name for name, hashes in run_hashes.items() if hashes != {current.get(name)})
+    return {"backends": sorted(backends), "set_hashes": {n: sorted(h) for n, h in run_hashes.items()},
+            "stale_sets": stale, "seeds": seeds, "frozen": frozen}
+
+
+def build(results: Path = RESULTS, data: Path = sets.DATA) -> dict:
     rows = load_rows(results)
     cases: dict[str, list[Case]] = {name: sets.load_set(name, data) for name in sets.SETS}
     models, prices = models_and_prices(rows)
+    provenance = _provenance(rows, cases, data)
     tags_path, agreement_path = data / "error_tags.json", data / "agreement.json"
     tags = json.loads(tags_path.read_text()) if tags_path.exists() else {}
     configs = [c for c in CONFIGS if c in rows]
 
     report: dict = {
         "generated": datetime.now(UTC).date().isoformat(),
-        "backend": backend,
-        "seed": seed,
-        "set_hashes": {name: sets.set_hash(group) for name, group in cases.items() if group},
-        "frozen": {name: (data / name / "frozen.sha256").exists() for name in ("test",)},
+        **provenance,
         "models": models,
         "prices_used": prices,
         "sets": {name: dict(Counter(c.category for c in group)) for name, group in cases.items() if group},
@@ -183,15 +217,13 @@ def build(results: Path = RESULTS, data: Path = sets.DATA, backend: str = "unkno
             if s in rows[a] and s in rows[b]:
                 report["discordant"][f"{a} vs {b} on {s}"] = discordance(rows[a][s], rows[b][s])
     for config in configs:
-        if config in BASELINE_NAMES:
+        if config in BASELINES:
             continue
         report["failures_by_stage"][config] = {
             s: failures_by_stage(group, tags) for s, group in rows[config].items() if s != "deterministic"
         }
     return report
 
-
-BASELINE_NAMES = ("always_allow", "always_challenge")
 
 
 def _pct(rate: dict | None) -> str:
@@ -200,32 +232,44 @@ def _pct(rate: dict | None) -> str:
     return f"{rate['rate']:.0%} ({rate['k']}/{rate['n']}, {rate['low']:.0%}–{rate['high']:.0%})"
 
 
+def _count(rate: dict | None) -> str:
+    return "–" if not rate or not rate["n"] else f"{rate['k']}/{rate['n']}"
+
+
 def render(report: dict) -> str:
+    backends = report["backends"]
     lines = [
         "# Evaluation report",
         "",
-        f"Generated {report['generated']} with the `{report['backend']}` backend"
-        + (f", seed {report['seed']}" if report["seed"] is not None else "") + ".",
+        f"Generated {report['generated']} from results made with the {', '.join(f'`{b}`' for b in backends) or 'no'} "
+        "backend" + ("s" if len(backends) > 1 else "") + ".",
         "",
         "Rates are shown as `rate (k/n, 95% Wilson interval)`. There is no overall accuracy: identity and "
         "authorization (B, C) must score 100% and would inflate it.",
         "",
     ]
-    if report["backend"] == "replay":
-        lines += ["> **Plumbing run.** The replay backend replays recorded fixtures for the five demo cases only; "
-                  "nothing here measures the real engine.", ""]
+    if any(b != "real" for b in backends):
+        lines += ["> **Not a measurement of the real engine.** Results here came from "
+                  + ", ".join(f"`{b}`" for b in backends) + "; the replay backend replays recorded fixtures "
+                  "for the five demo cases only.", ""]
+    if report["stale_sets"]:
+        lines += [f"> **Stale results.** {', '.join(report['stale_sets'])} changed after these results were run.", ""]
 
     lines += ["## Run", "", f"- Models that ran: {', '.join(report['models']) or 'none'}",
-              f"- Prices used: `{json.dumps(report['prices_used'], sort_keys=True)}`", "- Set hashes:"]
-    lines += [f"  - {name}: `{digest[:16]}`" + (" (frozen)" if report["frozen"].get(name) else "")
-              for name, digest in report["set_hashes"].items()]
+              f"- Prices used: `{json.dumps(report['prices_used'], sort_keys=True)}`",
+              "- Generator seeds: " + ("; ".join(f"{s}: {v}" for s, v in report["seeds"].items()) or "none"),
+              "- Set hashes the results ran against:"]
+    lines += [f"  - {name}: " + ", ".join(f"`{h[:16]}`" for h in hashes) + f" ({report['frozen'].get(name, 'not frozen')})"
+              for name, hashes in report["set_hashes"].items()]
     lines += ["- Cases by category: " + "; ".join(f"{s}: {dict(sorted(c.items()))}" for s, c in report["sets"].items()), ""]
 
-    lines += ["## Deterministic cases", ""]
+    lines += ["## Deterministic cases", "", "Every case must pass; counts, not statistics. A case that repeats its "
+              "request passes only if every send got the same decision.", ""]
     for config, by_set in report["metrics"].items():
         if "deterministic" in by_set:
             for cat, m in by_set["deterministic"].items():
-                lines.append(f"- {config}, {cat}: {_pct(m['accuracy'])}, not run {m['not_run']}")
+                lines.append(f"- {config}, {cat}: {_count(m['accuracy_with_acceptable'])} pass "
+                             f"({_count(m['accuracy'])} exact), unstable {m['unstable']}, not run {m['not_run']}")
     lines += ["", "## Risk sets side by side (categories A, D, E, F)", "",
               "| Configuration | Set | Accuracy | With acceptable | Detection | Legit challenged | Legit blocked |",
               "| --- | --- | --- | --- | --- | --- | --- |"]
@@ -238,17 +282,25 @@ def render(report: dict) -> str:
               "", "## Per category", ""]
     for config, by_set in report["metrics"].items():
         for s, cats in by_set.items():
+            if s == "deterministic":
+                continue
             lines += [f"### {config} on {s}", "",
-                      "| Category | n | Accuracy | With acceptable | Detection | Lowerings (legit / other) | $ per action | p50 / p95 ms |",
-                      "| --- | --- | --- | --- | --- | --- | --- | --- |"]
+                      "| Category | n | Accuracy | With acceptable | Detection | Legit challenged | Lowerings (legit / other) | $ per action | p50 / p95 ms |",
+                      "| --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
             for cat, m in cats.items():
                 cost = f"{m['cost_per_action_usd']:.4f}" if m["cost_per_action_usd"] is not None else "–"
                 p50, p95 = m["latency_ms"]["p50"], m["latency_ms"]["p95"]
-                latency = f"{p50:.0f} / {p95:.0f}" if p50 is not None else "–"
+                latency = f"{p50:.0f} / {p95:.0f}" if p50 is not None else "not measured"
                 lines.append(f"| {cat} | {m['n']} | {_pct(m['accuracy'])} | {_pct(m['accuracy_with_acceptable'])} | "
-                             f"{_pct(m['detection'])} | {m['lowerings']['legitimate']} / {m['lowerings']['not_legitimate']} | "
-                             f"{cost} | {latency} |")
+                             f"{_pct(m['detection'])} | {_pct(m['legit_challenge_rate'])} | "
+                             f"{m['lowerings']['legitimate']} / {m['lowerings']['not_legitimate']} | {cost} | {latency} |")
             lines.append("")
+            risk = cats.get("risk (A, D, E, F)")
+            if risk:
+                lines += ["Confusion matrix over the risk categories (rows expected, columns decided):", "",
+                          "| Expected | " + " | ".join(DECISIONS) + " |", "| --- |" + " --- |" * len(DECISIONS)]
+                lines += [f"| {e} | " + " | ".join(str(risk["confusion"][e][d]) for d in DECISIONS) + " |" for e in DECISIONS]
+                lines.append("")
     lines += ["## Discordant cases", "", "Cases where one configuration is right and the other wrong. A McNemar "
               "p-value is given only pooled across the risk categories.", ""]
     for name, d in report["discordant"].items():
@@ -265,14 +317,21 @@ def render(report: dict) -> str:
     lines += ["", "## Label agreement", ""]
     agreement = report["label_agreement"]
     if agreement:
+        kappa = ("undefined (every label the same)" if agreement.get("kappa") is None
+                 else f"{agreement['kappa']:.2f}")
+        interval = ("" if agreement.get("low") is None
+                    else f" (95% bootstrap interval {agreement['low']:.2f} to {agreement['high']:.2f})")
         lines.append(f"AI labeller against the owner on {agreement['n']} risk cases: agreement {agreement['agreement']:.0%}, "
-                     f"Cohen's κ {agreement['kappa']:.2f} (95% bootstrap interval {agreement['low']:.2f} to {agreement['high']:.2f}).")
+                     f"Cohen's κ {kappa}{interval}.")
+        if agreement.get("labeller_blindness"):
+            lines.append(f"Labeller blindness: {agreement['labeller_blindness']}.")
     else:
         lines.append("Not yet measured.")
     lines += ["", "## Not run", ""]
     lines += [f"- {config} on {s}: {n}" for config, by_set in report["not_run"].items() for s, n in by_set.items() if n]
     lines += ["", "## Cases marked undetectable", "",
-              "Kept few and counted apart from accuracy: what is observable depends on which features exist today.", ""]
+              "Kept few and left out of accuracy and detection: what is observable depends on which features exist "
+              "today, so each is listed here rather than excused.", ""]
     lines += [f"- `{case_id}`" for case_id in report["undetectable"]] or ["- none"]
     lines += ["", "## Limitations", ""] + [f"- {text}" for text in report["limitations"]]
     return "\n".join(lines) + "\n"
@@ -287,10 +346,8 @@ def main(argv: list[str] | None = None) -> int:
     import argparse
 
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--backend", default="unknown", help="recorded in the report")
-    parser.add_argument("--seed", type=int)
-    args = parser.parse_args(argv)
-    write(build(backend=args.backend, seed=args.seed))
+    parser.parse_args(argv)
+    write(build())
     print(f"wrote {sets.DATA / 'report.json'} and report.md")
     return 0
 

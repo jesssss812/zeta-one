@@ -80,10 +80,11 @@ def test_report_metrics_and_discordance(data, tmp_path, monkeypatch):
     worse = {**perfect, "a2": "challenge", "e1": "allow"}
     run.run_set("dev", "rules", FakeBackend(perfect), data=data, results=results)
     run.run_set("dev", "engineered", FakeBackend(worse), data=data, results=results)
-    built = report.build(results=results, data=data, backend="fake")
+    built = report.build(results=results, data=data)
 
     rules = built["metrics"]["rules"]["dev"]
-    assert rules["risk (A, D, E, F)"]["accuracy"]["k"] == 5
+    risk = rules["risk (A, D, E, F)"]
+    assert (risk["accuracy"]["k"], risk["accuracy"]["n"], risk["undetectable"]) == (4, 4, 1)  # e2 is left out
     engineered = built["metrics"]["engineered"]["dev"]
     assert engineered["A"]["legit_challenge_rate"]["k"] == 1
     assert engineered["E"]["detection"]["k"] == 0 and engineered["E"]["detection"]["n"] == 1  # e2 is undetectable
@@ -95,7 +96,8 @@ def test_report_metrics_and_discordance(data, tmp_path, monkeypatch):
     text = report.render(built)
     assert "rules vs engineered on dev" in text and "Limitations" in text and "`e2`" in text
     report.write(built, data)
-    assert json.loads((data / "report.json").read_text())["backend"] == "fake"
+    assert json.loads((data / "report.json").read_text())["backends"] == ["fake"]
+    assert "Confusion matrix" in text and "Legit challenged" in text
 
 
 def test_failure_stage_uses_owner_tags(data, tmp_path, monkeypatch):
@@ -112,9 +114,11 @@ def test_end_to_end_on_the_replay_backend(tmp_path):
     results = tmp_path / "results"
     for config in run.CONFIGS:
         run.run_set("dev", config, backends.ReplayBackend(), workers=2, results=results)
-    built = report.build(results=results, backend="replay")
+    built = report.build(results=results)
     assert built["metrics"]["rules"]["dev"]["risk (A, D, E, F)"]["accuracy"]["n"] == 3
-    assert "Plumbing run" in report.render(built)
+    assert built["backends"] == ["replay"]
+    text = report.render(built)
+    assert "Not a measurement of the real engine" in text and "not measured" in text
 
 
 def test_replay_backend_does_not_pretend_to_run_other_cases():
@@ -185,3 +189,46 @@ def test_the_budget_stops_starting_cases(data, tmp_path, monkeypatch):
     assert not budget.exhausted()
     budget.add({"record": {"cost": {"usd": 1.0}}})
     assert budget.exhausted()
+
+
+def test_an_always_allow_baseline_earns_nothing_from_undetectable_cases(data, tmp_path, monkeypatch):
+    monkeypatch.setattr(cases, "demo_cases", lambda: [])
+    results = tmp_path / "results"
+    run.run_set("dev", "always_allow", FakeBackend({}), data=data, results=results)
+    e = report.build(results=results, data=data)["metrics"]["always_allow"]["dev"]["E"]
+    assert (e["accuracy"]["k"], e["accuracy"]["n"]) == (0, 1)
+
+
+def test_an_undefined_kappa_renders(data, tmp_path, monkeypatch):
+    monkeypatch.setattr(cases, "demo_cases", lambda: [])
+    results = tmp_path / "results"
+    run.run_set("dev", "rules", FakeBackend({}), data=data, results=results)
+    from eval import stats
+    (data / "agreement.json").write_text(json.dumps(stats.kappa_bootstrap(["block"] * 5, ["block"] * 5)))
+    assert "undefined" in report.render(report.build(results=results, data=data))
+
+
+def test_a_floor_allowed_through_is_blamed_on_merge_or_policy_before_the_model():
+    row = {"category": "D", "decision": "allow", "expected": "challenge", "record": {
+        "decision": "allow", "reasons": ["risk:model_unavailable"],
+        "risk": {"floor": {"level": "elevated", "flags": ["x"]}, "tiers_run": ["tier0", "strong"]}}}
+    assert report.failure_stage(row) == "merge_or_policy"
+
+
+def test_the_report_marks_results_whose_set_changed(data, tmp_path, monkeypatch):
+    monkeypatch.setattr(cases, "demo_cases", lambda: [])
+    results = tmp_path / "results"
+    run.run_set("dev", "rules", FakeBackend({}), data=data, results=results)
+    assert report.build(results=results, data=data)["stale_sets"] == []
+    extra = _case("a3", "dev", "A", "legitimate", "allow")
+    with (data / "dev" / "cases.jsonl").open("a") as f:
+        f.write(json.dumps(extra.model_dump(mode="json")) + "\n")
+    built = report.build(results=results, data=data)
+    assert built["stale_sets"] == ["dev"] and "Stale results" in report.render(built)
+
+
+def test_unstable_repeats_show_in_the_deterministic_section(tmp_path):
+    rows = [{"case_id": "g", "set": "deterministic", "category": "E", "truth": "manipulated_agent",
+             "detectable": True, "expected": "block", "decision": "block", "correct": False, "acceptable": False,
+             "stable": False, "not_run": None}]
+    assert report.cell(rows)["unstable"] == 1
