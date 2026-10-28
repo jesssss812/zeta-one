@@ -140,6 +140,8 @@ Rules the site can count on:
   `["tier0", "strong"]` with engineered escalation: the strong tier runs only when tier 0 isn't
   clean, so a routine payment shows `tiers_run: ["tier0"]` and no model.
 - `execution.simulated` is always `true` in this build.
+- Proposal amounts must be positive integer minor units. Zero or negative payments are
+  malformed requests, rejected before authorization or risk runs.
 - Evidence ids in `features` and `signals` refer to records in `context` (payment-method history
   ids, transaction ids, bill ids) so the site can link a signal to the row it came from.
 - `amount_ratio_to_vendor_median` may also carry `raw_value`, the unrounded ratio used for

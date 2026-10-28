@@ -8,7 +8,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Any, Literal, Protocol
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from zeta_one.rho.models import Money
 
@@ -56,6 +56,13 @@ class Proposal(BaseModel):
     memo: str = ""
     agent_rationale: str = ""
     source_document_ids: list[str] = Field(default_factory=list)
+
+    @field_validator("amount")
+    @classmethod
+    def positive_payment(cls, value: Money) -> Money:
+        if value.amount <= 0:
+            raise ValueError("payment amount must be positive")
+        return value
 
 
 class SignedRequest(BaseModel):
