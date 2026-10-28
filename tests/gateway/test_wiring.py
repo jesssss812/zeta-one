@@ -12,12 +12,36 @@ def _no_spend(agent_id, since, currency):
     return 0
 
 
-def test_real_stages_are_complete_and_include_the_strong_tier_and_its_prices():
-    stages = real_stages(sqlite3.connect(":memory:", check_same_thread=False))
-    assert stages.missing() == []
-    assert isinstance(stages.tiers["strong"], StrongTier)
-    assert stages.prices == PRICES
+def test_real_stages_are_complete_and_include_both_model_tiers_and_their_prices():
+    from zeta_one.risk import jev
+    from zeta_one.risk.jev import JevTier
+    from zeta_one.gateway.wiring import CONFIGURATIONS
+
+    for configuration in CONFIGURATIONS.values():
+        stages = real_stages(sqlite3.connect(":memory:", check_same_thread=False), configuration=configuration)
+        assert stages.missing() == []
+    assert isinstance(stages.tiers["strong"], StrongTier) and isinstance(stages.tiers["cheap"], JevTier)
+    assert stages.prices == {**PRICES, **jev.PRICES}
     assert stages.seed_version
+
+
+@pytest.mark.parametrize("value, escalation", [(None, "engineered"), ("engineered", "engineered"), ("jev", "jev")])
+def test_the_live_configuration_comes_from_the_environment(monkeypatch, value, escalation):
+    from zeta_one.gateway.wiring import CONFIGURATION_NAME, configuration_from_env
+
+    if value is None:
+        monkeypatch.delenv(CONFIGURATION_NAME, raising=False)
+    else:
+        monkeypatch.setenv(CONFIGURATION_NAME, value)
+    assert configuration_from_env().escalation == escalation
+
+
+def test_an_unknown_configuration_name_is_refused(monkeypatch):
+    from zeta_one.gateway.wiring import CONFIGURATION_NAME, configuration_from_env
+
+    monkeypatch.setenv(CONFIGURATION_NAME, "cheapest")
+    with pytest.raises(ValueError):
+        configuration_from_env()
 
 
 def test_the_demo_agent_is_registered_once_from_its_local_key(tmp_path):

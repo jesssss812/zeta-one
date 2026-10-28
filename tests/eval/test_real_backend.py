@@ -19,13 +19,23 @@ class EchoStrong:
         return TierOutput(result=TierResult(tier="strong", model="stand-in", level=risk_input.tier0.level))
 
 
+class EchoCheap:
+    """A stand-in Jev that agrees with tier 0, confidently."""
+
+    name = "cheap"
+
+    def assess(self, risk_input):
+        return TierOutput(result=TierResult(tier="cheap", model="stand-in", level=risk_input.tier0.level,
+                                            confidence=0.99, probabilities={"risk_level": 0.99}))
+
+
 @pytest.fixture(scope="module")
 def backend():
-    return backends.RealBackend(strong_tier=EchoStrong())
+    return backends.RealBackend(strong_tier=EchoStrong(), cheap_tier=EchoCheap())
 
 
 @pytest.mark.parametrize("case", cases.all_cases(), ids=lambda c: c.id)
-@pytest.mark.parametrize("config", ["rules", "engineered"])
+@pytest.mark.parametrize("config", ["rules", "engineered", "jev"])
 def test_every_hand_written_case_passes_on_the_real_stages(backend, case, config):
     needs_model = any(op.op == "fail_model" for op in case.setup) or (
         any(op.op == "repeat" for op in case.setup) and not case.agent.endswith("+replay"))
@@ -55,9 +65,14 @@ def test_a_model_that_clears_everything_lets_no_blocked_or_challenged_case_throu
     assert outcome.decision != "allow", outcome.record.reasons
 
 
-def test_a_live_strong_tier_makes_the_backend_paid():
-    assert backends.get_backend("real").paid is True
-    assert backends.RealBackend(strong_tier=EchoStrong()).paid is False
+def test_a_live_tier_makes_a_configuration_that_uses_it_paid():
+    live = backends.get_backend("real")
+    assert live.paid_for(run.CONFIGS["engineered"]) and live.paid_for(run.CONFIGS["jev"])
+    stand_in_strong = backends.RealBackend(strong_tier=EchoStrong())
+    assert not stand_in_strong.paid_for(run.CONFIGS["engineered"])
+    assert stand_in_strong.paid_for(run.CONFIGS["jev"])  # Jev is still live
+    both = backends.RealBackend(strong_tier=EchoStrong(), cheap_tier=EchoCheap())
+    assert not both.paid_for(run.CONFIGS["jev"]) and not live.paid_for(run.CONFIGS["rules"])
 
 
 def test_the_runner_refuses_the_live_backend_without_a_budget(tmp_path):
@@ -161,3 +176,16 @@ def test_evaluation_records_carry_the_engine_version(backend):
     case = next(c for c in cases.all_cases() if c.id == "demo_routine_bill")
     record = backend.run(case, run.CONFIGS["rules"]).record
     assert record.engine_version == engine_version() and record.seed_version and record.policy_version
+
+
+@pytest.mark.parametrize("case", [c for c in cases.all_cases() if c.expected != "allow"], ids=lambda c: c.id)
+def test_a_jev_that_clears_everything_lets_no_blocked_or_challenged_case_through(case):
+    class LoweringCheap:
+        name = "cheap"
+
+        def assess(self, risk_input):
+            return TierOutput(result=TierResult(tier="cheap", model="stand-in", level="low", confidence=0.99,
+                                                probabilities={"risk_level": 0.99}))
+
+    backend = backends.RealBackend(strong_tier=LoweringStrong(), cheap_tier=LoweringCheap())
+    assert backend.run(case, run.CONFIGS["jev"]).decision != "allow"

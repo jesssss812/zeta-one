@@ -4,7 +4,9 @@ What is not done, as of 2026-10-27. Remove a line when it is done.
 
 ## Before implementation
 
-- Create a TypeSafe key, make one Jev call, and correct `docs/reference/jev.md`.
+- **Owner:** create a TypeSafe key, put it in `.env` as `TYPESAFE_API_KEY`, and run
+  `.venv/bin/python -m pytest tests/risk/test_jev.py --live-models`; correct the parser and
+  `docs/reference/jev.md` to the real request and answer shapes.
 - Confirm the Console key, the Claude model ids and the `messages.parse` call with one request.
 - Test Rho's MCP connector in claude.ai (Connectors → Rho): does it connect, and what tools does
   it list? Record the answer in `docs/reference/rho-api.md`.
@@ -61,7 +63,7 @@ If time allows (extensions 2 and 3 below, then 11):
 
 ## Extensions (Thursday morning, in the plan's order)
 
-Live Rho read; repeat runs with pass^3; attacking model; Jev as the cheap tier;
+Live Rho read; repeat runs with pass^3; attacking model; Jev's calibration on our cases;
 `renew_authorization` and `verify_payee` challenge types with the friction score;
 grant-authorization beat; extra tier-0 features; `notify`; observe mode; open-weight comparison
 arm; expected cost and an evaluation chart.

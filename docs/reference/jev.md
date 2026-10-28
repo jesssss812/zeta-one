@@ -48,9 +48,22 @@ sources differ on whether a choice takes `options` or `criteria` and whether a s
   bill", each with a confidence that gates escalation. See
   [../decisions/0007-risk-tiers.md](../decisions/0007-risk-tiers.md).
 - Jev is a risk signal, never identity or authorization (AGENTS.md rules 7 and 9).
-- If an API key or a working call isn't in hand by the end of Tue Oct 27, the Jev arm waits; the
-  engineered cascade (tier 0, then the strong model only on escalation) is the default and needs
-  no cheap model (decision 0009). There is no language-model stand-in for Jev.
+- There is no language-model stand-in for Jev (decision 0009).
+
+## How Zeta One calls it
+
+`zeta_one/risk/jev.py` is the cheap tier. It posts to the direct route above with
+`TYPESAFE_API_KEY` from the environment or `.env`, a `state` that is the strong tier's rendering
+(gateway facts, then untrusted text in bounded blocks), and four questions: `risk_level` (choice:
+low / elevated / high), `document_targets_agent`, `proposal_matches_documents` and
+`vendor_impersonation_signs` (nouls). The parser accepts the answer shapes the sources describe
+(`answers`, `results`, or `choices` and `nouls` keyed by question; a value with a probability, or a
+probability per option) and treats anything else as invalid output, which fails closed. Until the
+first real call, run with `.venv/bin/python -m pytest tests/risk/test_jev.py --live-models`, these
+shapes are unverified. The live gateway uses Jev when `ZETA_RISK_CONFIGURATION=jev`; the evaluation
+has a `jev` arm. The escalation rule after Jev is in
+[../decisions/0007-risk-tiers.md](../decisions/0007-risk-tiers.md), with thresholds 0.8 and 0.9
+recorded in each decision's configuration.
 
 ## Sources
 

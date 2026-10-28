@@ -5,7 +5,8 @@
 
 Configurations: always_allow and always_challenge are trivial baselines that never touch the engine;
 rules runs tier 0 only; engineered adds the strong model on engineered escalation (decision 0009);
-strong runs the model on every request. The models see only the proposal and its context.
+jev puts Jev between them, so the strong model runs only on Jev's rule (decision 0007); strong runs
+the model on every request. The models see only the proposal and its context.
 
 Each row records the backend, the set's hash at run time and whether its latency is measured, so the
 report reads them from the results rather than from its own arguments. A case that raises is
@@ -31,6 +32,7 @@ CONFIGS: dict[str, Configuration | None] = {
     "always_challenge": None,
     "rules": Configuration(tiers=["tier0"], escalation="none"),
     "engineered": Configuration(tiers=["tier0", "strong"], escalation="engineered"),
+    "jev": Configuration(tiers=["tier0", "cheap", "strong"], escalation="jev"),
     "strong": Configuration(tiers=["tier0", "strong"], escalation="always"),
 }
 BASELINES = {"always_allow": "allow", "always_challenge": "challenge"}
@@ -103,7 +105,8 @@ def run_set(set_name: str, config: str, backend: Backend, workers: int = 4, data
     if config not in CONFIGS:
         raise ValueError(f"unknown configuration {config!r}; choose from {list(CONFIGS)}")
     models = config not in BASELINES and any(tier != "tier0" for tier in CONFIGS[config].tiers)
-    paid = getattr(backend, "paid", True) and models
+    paid_for = getattr(backend, "paid_for", None)
+    paid = models and (paid_for(CONFIGS[config]) if paid_for else getattr(backend, "paid", True))
     if paid and (not live or max_usd is None):
         raise BudgetRequired(f"the {backend.name} backend calls a paid model: pass live=True and max_usd")
     cases = sets.load_set(set_name, data)

@@ -108,7 +108,7 @@ describes how it is produced). Fields the site should rely on:
   "schema_version": 1,
   "decision_id": "dec_...", "created_at": "...", "policy_version": "2026-10-28.3",
   "engine_version": "<git sha>" | null, "seed_version": "<hash>" | null,
-  "configuration": {"tiers": ["tier0", "strong"], "escalation": "engineered" | "jev" | "always" | "none"},
+  "configuration": {"tiers": ["tier0", "strong"] | ["tier0", "cheap", "strong"], "escalation": "engineered" | "jev" | "always" | "none", "jev_min_confidence": 0.8, "jev_min_finding_confidence": 0.9},
   "decision": "allow" | "challenge" | "block",
   "reasons": ["risk:elevated"],
   "challenge": null | {"type": "confirm" | "renew_authorization" | "verify_payee", "routed_to": "...", "user_sees": "..."},
@@ -123,7 +123,7 @@ describes how it is produced). Fields the site should rely on:
     "floor": null | {"level": "elevated" | "high", "flags": ["<feature name>"]},
     "tiers_run": ["tier0", "strong"],
     "features": {"<name>": {"value", "evidence": ["<record id>"]}},
-    "tier_results": [{"tier": "tier0" | "cheap" | "strong", "model": "<model id>" | null, "level", "confidence": 0.0-1.0 | null, "signals": ["<signal name>"], "latency_ms", "usage": null | {"input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens"}, "error": null | "...", "recommended_decision": "allow" | "challenge" | "block" (strong tier only), "answered_level": "<level>" (when the tier raised the model's own level)}],
+    "tier_results": [{"tier": "tier0" | "cheap" | "strong", "model": "<model id>" | null, "level", "confidence": 0.0-1.0 | null, "signals": ["<signal name>"], "latency_ms", "usage": null | {"input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens"}, "error": null | "...", "recommended_decision": "allow" | "challenge" | "block" (strong tier only), "answered_level": "<level>" (when the tier raised the model's own level), "probabilities": {"<question>": 0.0-1.0} and "answers": {"<question>": value} (Jev only)}],
     "signals": [{"name", "severity": "low" | "elevated" | "high", "evidence": ["<record id>"], "source": "tier0" | "cheap" | "strong"}],
     "lowered": null | {"from": "elevated" | "high", "to": "low" | "elevated", "by": "cheap" | "strong", "signals": ["<soft signal name>"]},
     "reused_from": null | "dec_...",
@@ -177,7 +177,10 @@ Rules the site can count on:
   `["tier0", "strong"]` with engineered escalation: the strong tier runs only when tier 0 isn't
   clean, so a routine payment shows `tiers_run: ["tier0"]` and no model.
   `escalation: "none"` runs tier 0 alone (the evaluation's rules-only arm); `"always"` runs the
-  model tiers on every case.
+  model tiers on every case. `"jev"` runs `["tier0", "cheap", "strong"]`: Jev when tier 0 isn't
+  clean, then the strong tier only on Jev's rule, so a record may show `tiers_run: ["tier0", "cheap"]`
+  with Jev's level, confidence and probabilities. The live gateway runs `engineered` unless
+  `ZETA_RISK_CONFIGURATION=jev`.
 - `execution.simulated` is always `true` in this build.
 - A scenario result's `illustrative` is `true` when any stage replayed the fixture instead of
   running, and `replayed_stages` names them (`["strong"]` for the two scenarios that escalate).

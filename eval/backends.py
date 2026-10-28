@@ -85,10 +85,11 @@ class ReplayBackend:
 class _FailingTier:
     """A model tier that errors on every call: the `fail_model` setup op."""
 
-    name = "strong"
+    def __init__(self, name: str = "strong"):
+        self.name = name
 
     def assess(self, risk_input: RiskInput) -> TierOutput:
-        return TierOutput(result=TierResult(tier="strong", error="evaluation: fail_model"))
+        return TierOutput(result=TierResult(tier=self.name, error="evaluation: fail_model"))
 
 
 PATH = "/v1/actions/propose_payment"
@@ -100,13 +101,19 @@ class RealBackend:
     name = "real"
     measures_latency = True
 
-    def __init__(self, strong_tier: Any = None):
-        """`strong_tier` stands in for the live strong tier; None uses the live one, which is paid."""
+    def __init__(self, strong_tier: Any = None, cheap_tier: Any = None):
+        """`strong_tier` and `cheap_tier` stand in for the live strong tier and Jev; None uses the live
+        one, which is paid."""
         from zeta_one.gateway.wiring import engine_version
 
-        self._strong = strong_tier
-        self.paid = strong_tier is None
+        self._strong, self._cheap = strong_tier, cheap_tier
+        self.paid = strong_tier is None or cheap_tier is None
         self._version = engine_version()
+
+    def paid_for(self, configuration: Configuration) -> bool:
+        """Whether a run under this configuration can call a live, paid model tier."""
+        live = {"strong": self._strong is None, "cheap": self._cheap is None}
+        return any(live.get(tier, False) for tier in configuration.tiers)
 
     def run(self, case: Case, configuration: Configuration) -> Outcome:
         from zeta_one.gateway.app import create_app
@@ -116,6 +123,7 @@ class RealBackend:
         from zeta_one.gateway.wiring import real_stages
         from zeta_one.identity.signing import sign
         from zeta_one.risk.claude import StrongTier
+        from zeta_one.risk.jev import JevTier
         from zeta_one.rho import mutations
         from zeta_one.rho.seed import SEED_NOW
         from zeta_one.rho.snapshot import Store as SeedStore
@@ -137,7 +145,11 @@ class RealBackend:
                     mutations.apply(store, op)
             stages = real_stages(connection, store)
             stages.configuration = configuration
-            stages.tiers = {"strong": _FailingTier() if "fail_model" in ops else (self._strong or StrongTier())}
+            failing = "fail_model" in ops
+            stages.tiers = {
+                "strong": _FailingTier("strong") if failing else (self._strong or StrongTier()),
+                "cheap": _FailingTier("cheap") if failing else (self._cheap or JevTier()),
+            }
             key = Ed25519PrivateKey.generate()
             if fault != "unknown":
                 stages.registry.register(agent_id, business_id, identity.identity.owner or "owner", key.public_key(), SEED_NOW)

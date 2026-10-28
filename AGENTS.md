@@ -95,7 +95,7 @@ uv venv .venv && uv pip install --python .venv/bin/python -r requirements-dev.tx
 git config core.hooksPath .githooks  # once per clone: turns on the pre-push check
 .venv/bin/python -m pytest           # the test suite
 .venv/bin/python scripts/keygen.py   # once: the demo agent's key and the admin token (never printed)
-.venv/bin/uvicorn zeta_one.gateway.app:app --port 8000  # the demo API, on 127.0.0.1
+.venv/bin/uvicorn zeta_one.gateway.app:app --port 8000  # the demo API, on 127.0.0.1 (ZETA_RISK_CONFIGURATION=jev for Jev)
 .venv/bin/python -m eval.run --set deterministic --config rules --backend real   # no model calls
 .venv/bin/python -m eval.report      # rebuild data/eval/report.{json,md} from the results
 python3 scripts/check.py             # checks that must pass before every push to main

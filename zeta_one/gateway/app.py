@@ -26,7 +26,7 @@ from zeta_one.gateway import admin, scenarios
 from zeta_one.gateway.ledger import Ledger
 from zeta_one.gateway.reuse import RiskReuse
 from zeta_one.gateway.service import EngineNotReady, Gateway, NotHeld, UnknownChallenge
-from zeta_one.gateway.wiring import ROOT, engine_version, real_stages, register_demo_agents
+from zeta_one.gateway.wiring import ROOT, configuration_from_env, engine_version, real_stages, register_demo_agents
 
 HOST = "127.0.0.1"
 EVAL_REPORT = ROOT / "data" / "eval" / "report.json"
@@ -230,7 +230,7 @@ def create_app(gateway: Gateway, token: str | None, eval_report: Path = EVAL_REP
 
 def default_gateway() -> Gateway:
     connection = db.connect()
-    stages = real_stages(connection)
+    stages = real_stages(connection, configuration=configuration_from_env())
     register_demo_agents(stages)
     return Gateway(stages=stages, ledger=Ledger(connection), reuse=RiskReuse(connection), version=engine_version())
 

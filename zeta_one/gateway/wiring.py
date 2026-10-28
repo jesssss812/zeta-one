@@ -41,7 +41,9 @@ from zeta_one.identity.signing import verifier
 from zeta_one.rho.snapshot import Store as SeedStore
 from zeta_one.rho.view import context_for
 from zeta_one.risk import claude
+from zeta_one.risk import jev
 from zeta_one.risk.claude import StrongTier
+from zeta_one.risk.jev import JevTier
 from zeta_one.risk.tier0 import Tier0 as RealTier0
 from zeta_one.testing.replay import replay_engine
 
@@ -49,6 +51,12 @@ ROOT = Path(__file__).resolve().parents[2]
 KEYS = ROOT / "data" / "keys"
 # Built-in demo agents: key file name -> the fixture whose identity and authorization they take.
 DEMO_AGENTS = {"ap_assistant": "routine_bill_payment"}
+# The live gateway's risk configurations, chosen by ZETA_RISK_CONFIGURATION (decisions 0007, 0009).
+CONFIGURATIONS = {
+    "engineered": Configuration(tiers=["tier0", "strong"], escalation="engineered"),
+    "jev": Configuration(tiers=["tier0", "cheap", "strong"], escalation="jev"),
+}
+CONFIGURATION_NAME = "ZETA_RISK_CONFIGURATION"
 
 # An agent's registry status ("active", "revoked") or None when unknown: what resolve rechecks.
 AgentStatus = Callable[[str], str | None]
@@ -78,7 +86,18 @@ class Stages:
         return missing
 
 
-def real_stages(connection: sqlite3.Connection, store: SeedStore | None = None) -> Stages:
+def configuration_from_env() -> Configuration:
+    """The configuration ZETA_RISK_CONFIGURATION names: `engineered` (the default) or `jev`."""
+    import os
+
+    name = os.environ.get(CONFIGURATION_NAME, "engineered")
+    if name not in CONFIGURATIONS:
+        raise ValueError(f"{CONFIGURATION_NAME} must be one of {sorted(CONFIGURATIONS)}, not {name!r}")
+    return CONFIGURATIONS[name]
+
+
+def real_stages(connection: sqlite3.Connection, store: SeedStore | None = None,
+                configuration: Configuration | None = None) -> Stages:
     """Every real stage, on the gateway's connection and a seed store (a fresh one by default)."""
     store = store or SeedStore()
     registry, authorizations = Registry(connection), AuthorizationStore(connection)
@@ -93,9 +112,10 @@ def real_stages(connection: sqlite3.Connection, store: SeedStore | None = None) 
         make_checker=checker,
         load_context=context_for(store),
         tier0=RealTier0(),
-        tiers={"strong": StrongTier()},
+        tiers={"cheap": JevTier(), "strong": StrongTier()},
         agent_status=agent_status,
-        prices=dict(claude.PRICES),
+        configuration=configuration or CONFIGURATIONS["engineered"],
+        prices={**claude.PRICES, **jev.PRICES},
         seed_version=store.seed_version,
         registry=registry,
         authorizations=authorizations,
