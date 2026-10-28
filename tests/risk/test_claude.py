@@ -109,6 +109,40 @@ def test_no_injection_signal_when_the_model_reports_none():
     assert output.signals == [] and output.result.signals == []
 
 
+def test_a_reported_injection_raises_a_low_answer_to_high():
+    output, _ = run(message(answer(risk_level="low", recommended_decision="allow", signals=[])))
+    assert output.result.level == "high"
+    assert output.result.answered_level == "low"
+
+
+def test_the_level_is_at_least_the_most_severe_signal():
+    signals = [{"name": "payee_redirect", "severity": "elevated", "evidence": ["bill_0194"]}]
+    output, _ = run(message(answer(risk_level="low", injection_detected=False, signals=signals)))
+    assert output.result.level == "elevated"
+
+
+def test_a_consistent_answer_keeps_its_level():
+    output, _ = run(message(answer()))
+    assert output.result.level == "high"
+    assert "answered_level" not in output.result.model_dump()
+
+
+def test_an_injection_reported_over_soft_signals_is_not_allowed():
+    """Tier 0 elevated on a soft signal alone: a model that reports an injection can't clear it."""
+    from zeta_one.contracts import AuthorizationEvidence, Feature, IdentityEvidence, TierResult
+    from zeta_one.decide import policy
+
+    features = {"amount_ratio_to_vendor_median": Feature(value=3.0, raw_value=3.0, evidence=["cp_0051"])}
+    tier0 = Tier0Output(result=TierResult(tier="tier0", level="elevated"), features=features)
+    output, _ = run(message(answer(risk_level="low", recommended_decision="allow",
+                                   signals=[{"name": "payee_redirect", "severity": "high", "evidence": []}])))
+    risk = escalation.merge(tier0, [output])
+    proposal = scenario("invoice_redirect_instructions").proposal
+    outcome = policy.decide(policy.PolicyInput(IdentityEvidence(result="verified"), AuthorizationEvidence(), None,
+                                               risk, proposal))
+    assert risk.level == "high" and outcome.decision != "allow"
+
+
 def test_evidence_the_request_never_mentioned_is_dropped():
     output, _ = run(message(answer()))
     redirect = next(s for s in output.signals if s.name == "payee_redirect")

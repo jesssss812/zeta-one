@@ -4,6 +4,9 @@ The system prompt is fixed and cached. Per-request content goes last, in two par
 the engine trusts, and untrusted text (invoice, memos, payee and bank names, the agent's rationale)
 in delimited blocks labelled as data an attacker may have written (security.md, S1).
 
+The tier's level is at least its most severe signal, and `high` when the model reports an injection
+attempt: a model that names a high-severity finding can't also answer `low` (security.md, S1).
+
 `StrongTier.assess` never raises. A timeout, API error, refusal, truncated or invalid output comes
 back as a `TierOutput` with `result.error` set, which the policy turns into a challenge (S2).
 """
@@ -17,7 +20,7 @@ from typing import Any
 import anthropic
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
-from zeta_one.contracts import Decision, Level, RiskInput, Signal, TierOutput, TierResult, Usage
+from zeta_one.contracts import Decision, Level, RiskInput, Signal, TierOutput, TierResult, Usage, max_level
 
 MODEL = "claude-opus-5-5"
 EFFORT = "medium"
@@ -125,15 +128,20 @@ class StrongTier:
             signals.insert(
                 0, Signal(name="injection_detected", severity="high", evidence=[bill.id] if bill else [], source="strong")
             )
+        level = answer.risk_level
+        for signal in signals:
+            level = max_level(level, signal.severity)
+        raised = {"answered_level": answer.risk_level} if level != answer.risk_level else {}
         result = TierResult(
             tier="strong",
             model=self.model,
-            level=answer.risk_level,
+            level=level,
             confidence=None,
             signals=[signal.name for signal in signals],
             latency_ms=_since(started),
             usage=usage,
             recommended_decision=answer.recommended_decision,
+            **raised,
         )
         return TierOutput(result=result, signals=signals, rationale=answer.rationale)
 
