@@ -76,6 +76,7 @@ arm; expected cost and an evaluation chart.
   comparison of payment methods, signed authorizations, hash-chained evidence, rate limits, key
   rotation.
 - Approval side panel: poll Rho items waiting for approval and score them (decision 0003).
+- **Owner:** to use the case chat, run `ollama serve` and `ollama pull qwen2.5:7b` (about 4.7 GB).
 - Case review assistant: dual control on findings, a per-day model budget, and an evaluation of the
   assistant on adversarial web pages (decision 0015).
 

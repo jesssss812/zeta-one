@@ -50,3 +50,16 @@ money.
 - The demo can show the agentic part where it is safe: gathering and research for a person, after
   the deterministic engine has decided.
 - Needs the Anthropic key; the tests run against a stubbed client.
+
+## Amendment, 2026-10-28: sources and questions
+
+- Every record id the page shows links to the record itself through `GET /v1/records/{id}`, with the
+  system it came from and where it lives in production, so the case worker can check each point
+  where they used to have to look it up.
+- A case worker can ask about the case. A **local model** answers (Ollama by default, `CHAT_MODEL`),
+  so the case never leaves the machine and there is no rate limit. It gets the same rendering as the
+  assembly, untrusted text in bounded blocks, answers only from the case, and decides nothing; the ids
+  it cites are checked against the case and any it invents are flagged. Questions and answers are kept
+  with the case.
+- Risk added: a small local model is weaker at resisting injected text and at staying grounded than
+  the assembly model. Its answers are labelled as such and every claim points to a record to check.
