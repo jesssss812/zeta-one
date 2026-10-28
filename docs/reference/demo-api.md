@@ -123,12 +123,12 @@ describes how it is produced). Fields the site should rely on:
   "authorization": {"authorization_id", "version", "violations": [{"field", "kind": "scope" | "limit", "limit", "observed"}], "snapshot": {"...as stored..."}},
   "risk": {
     "level": "low" | "elevated" | "high" | null,
-    "level_set_by": "tier0" | "cheap" | "strong" | null,
+    "level_set_by": "tier0" | "cheap" | "strong" | "open_weight" | null,
     "floor": null | {"level": "elevated" | "high", "flags": ["<feature name>"]},
     "tiers_run": ["tier0", "strong"],
     "features": {"<name>": {"value", "evidence": ["<record id>"]}},
-    "tier_results": [{"tier": "tier0" | "cheap" | "strong", "model": "<model id>" | null, "level", "confidence": 0.0-1.0 | null, "signals": ["<signal name>"], "latency_ms", "usage": null | {"input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens"}, "error": null | "...", "recommended_decision": "allow" | "challenge" | "block" (strong tier only), "answered_level": "<level>" (when the tier raised the model's own level), "probabilities": {"<question>": 0.0-1.0} and "answers": {"<question>": value} (Jev only)}],
-    "signals": [{"name", "severity": "low" | "elevated" | "high", "evidence": ["<record id>"], "source": "tier0" | "cheap" | "strong"}],
+    "tier_results": [{"tier": "tier0" | "cheap" | "strong" | "open_weight", "model": "<model id>" | null, "level", "confidence": 0.0-1.0 | null, "signals": ["<signal name>"], "latency_ms", "usage": null | {"input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens"}, "error": null | "...", "recommended_decision": "allow" | "challenge" | "block" (language-model tiers only), "answered_level": "<level>" (when the tier raised the model's own level), "probabilities": {"<question>": 0.0-1.0} and "answers": {"<question>": value} (Jev only)}],
+    "signals": [{"name", "severity": "low" | "elevated" | "high", "evidence": ["<record id>"], "source": "tier0" | "cheap" | "strong" | "open_weight"}],
     "lowered": null | {"from": "elevated" | "high", "to": "low" | "elevated", "by": "cheap" | "strong", "signals": ["<soft signal name>"]},
     "reused_from": null | "dec_...",
     "repeat_limit_reached": false,
@@ -186,8 +186,9 @@ Rules the site can count on:
   `escalation: "none"` runs tier 0 alone (the evaluation's rules-only arm); `"always"` runs the
   model tiers on every case. `"jev"` runs `["tier0", "cheap", "strong"]`: Jev when tier 0 isn't
   clean, then the strong tier only on Jev's rule, so a record may show `tiers_run: ["tier0", "cheap"]`
-  with Jev's level, confidence and probabilities. The live gateway runs `engineered` unless
-  `ZETA_RISK_CONFIGURATION=jev`.
+  with Jev's level, confidence and probabilities. `["tier0", "open_weight"]` puts an open-weight
+  model in the strong tier's place (decision 0014). The live gateway runs `engineered` unless
+  `ZETA_RISK_CONFIGURATION` is `jev` or `open_weight`.
 - `execution.simulated` is always `true` in this build.
 - A record keeps what was decided on: `proposal` whenever the body parsed (an unverified request's
   too, kept for the reviewer and never acted on) and `context` whenever it was loaded (never for an
