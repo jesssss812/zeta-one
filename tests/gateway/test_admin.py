@@ -32,6 +32,7 @@ def test_the_environment_wins_over_the_env_file(tmp_path, monkeypatch):
     ("ZETA_ADMIN_TOKEN = spaced ", "spaced"),
     ("ZETA_ADMIN_TOKEN=\"double\"", "double"),
     ("ZETA_ADMIN_TOKEN='single'", "single"),
+    ("export ZETA_ADMIN_TOKEN=exported", "exported"),
     ("ZETA_ADMIN_TOKEN=", None),
     ("OTHER=value", None),
 ])

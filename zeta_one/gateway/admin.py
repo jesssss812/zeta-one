@@ -29,7 +29,7 @@ def admin_token(env_file: Path = ROOT / ".env") -> str | None:
     if env_file.exists():
         for line in env_file.read_text().splitlines():
             name, _, value = line.partition("=")
-            if name.strip() == TOKEN_NAME and value.strip():
+            if name.strip().removeprefix("export ").strip() == TOKEN_NAME and value.strip():
                 return value.strip().strip("'\"")
     return None
 
