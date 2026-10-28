@@ -114,7 +114,7 @@ describes how it is produced). Fields the site should rely on:
     "model_rationale": null | "..."
   },
   "execution": {"status": "executed" | "held" | "blocked", "simulated": true},
-  "cost": null | {"input_tokens", "output_tokens", "usd", "prices_used": {"<model>": {"input_per_mtok", "output_per_mtok"}}},
+  "cost": null | {"input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens", "usd", "prices_used": {"<model>": {"input_per_mtok", "output_per_mtok", "cache_read_multiplier", "cache_write_multiplier"}}, "unpriced_models": ["<model>"]},
   "latency_ms": null | {"identity", "authorization", "risk", "total"},
   "review": null | {"by", "at", "outcome", "note", "provenance"}
 }
@@ -128,7 +128,11 @@ Rules the site can count on:
   leaves `risk.tiers_run: []`. "Not evaluated" is a state the site should show, distinct from
   "passed".
 - `cost` and `latency_ms` are `null` when not measured. The site shows "not measured", never a
-  placeholder number. Fixtures always have them `null`.
+  placeholder number. Fixtures always have them `null`. Records the engine writes always carry
+  `cost`: `usd` is `0` when no model ran, cache reads and writes are priced from the input price,
+  and a model with no known price is listed in `unpriced_models` and left out of `usd`.
+  `latency_ms` has a key for each stage that ran (`identity`, `authorization`, `risk`) and
+  `total`; a stage that didn't run has no key.
 - `model_rationale` is model output, and `proposal.agent_rationale` is the agent's own text; both
   can be written by an attacker. Label both as untrusted text, never as findings.
 - `friction_rung` is `0` for allow, `2`–`4` for the challenge types, `5` for block

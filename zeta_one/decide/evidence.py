@@ -62,16 +62,37 @@ def build(
     )
 
 
+# Anthropic bills cache reads at a tenth of the input price and five-minute cache writes at 1.25x.
+CACHE_READ_MULTIPLIER = 0.1
+CACHE_WRITE_MULTIPLIER = 1.25
+
+
 def _cost(risk: RiskEvidence, prices: dict[str, tuple[float, float]]) -> Cost:
-    """Cost from reported token usage at per-million-token (input, output) prices."""
+    """Cost from reported token usage at per-million-token (input, output) prices, cache included."""
     cost = Cost()
     for result in risk.tier_results:
         if not result.usage:
             continue
-        cost.input_tokens += result.usage.input_tokens
-        cost.output_tokens += result.usage.output_tokens
-        if result.model in prices:
-            input_price, output_price = prices[result.model]
-            cost.usd += (result.usage.input_tokens * input_price + result.usage.output_tokens * output_price) / 1e6
-            cost.prices_used[result.model] = {"input_per_mtok": input_price, "output_per_mtok": output_price}
+        usage = result.usage
+        cost.input_tokens += usage.input_tokens
+        cost.output_tokens += usage.output_tokens
+        cost.cache_read_input_tokens += usage.cache_read_input_tokens
+        cost.cache_creation_input_tokens += usage.cache_creation_input_tokens
+        if result.model not in prices:
+            if result.model and result.model not in cost.unpriced_models:
+                cost.unpriced_models.append(result.model)
+            continue
+        input_price, output_price = prices[result.model]
+        input_equivalent = (
+            usage.input_tokens
+            + usage.cache_read_input_tokens * CACHE_READ_MULTIPLIER
+            + usage.cache_creation_input_tokens * CACHE_WRITE_MULTIPLIER
+        )
+        cost.usd += (input_equivalent * input_price + usage.output_tokens * output_price) / 1e6
+        cost.prices_used[result.model] = {
+            "input_per_mtok": input_price,
+            "output_per_mtok": output_price,
+            "cache_read_multiplier": CACHE_READ_MULTIPLIER,
+            "cache_write_multiplier": CACHE_WRITE_MULTIPLIER,
+        }
     return cost

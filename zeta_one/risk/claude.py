@@ -34,8 +34,8 @@ MAX_RETRIES = 1
 # own fields are capped in contracts.Proposal; this bounds the business's records too (invoice text).
 MAX_UNTRUSTED_CHARS = 8000
 
-# USD per million tokens, (input, output), for evidence.build's cost. Anthropic list prices as of
-# 2026-10-06; cache reads and writes are billed differently and are reported in usage separately.
+# USD per million tokens, (input, output), for evidence.build's cost, which prices cache reads and
+# writes from the input price. Anthropic list prices as of 2026-10-06.
 PRICES: dict[str, tuple[float, float]] = {MODEL: (4.0, 20.0)}
 
 SYSTEM_PROMPT = (Path(__file__).parent / "prompts" / "strong.md").read_text()

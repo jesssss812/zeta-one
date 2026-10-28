@@ -212,8 +212,12 @@ class Signal(_Open):
 
 
 class Usage(_Open):
+    """Token usage as the API reports it; `input_tokens` excludes the cache reads and writes."""
+
     input_tokens: int = 0
     output_tokens: int = 0
+    cache_read_input_tokens: int = 0
+    cache_creation_input_tokens: int = 0
 
 
 class TierResult(_Open):
@@ -281,8 +285,12 @@ class Execution(_Open):
 class Cost(_Open):
     input_tokens: int = 0
     output_tokens: int = 0
+    cache_read_input_tokens: int = 0
+    cache_creation_input_tokens: int = 0
     usd: float = 0.0
     prices_used: dict[str, Any] = Field(default_factory=dict)
+    # Models whose tokens are counted but had no price, so `usd` leaves them out.
+    unpriced_models: list[str] = Field(default_factory=list)
 
 
 class Configuration(_Open):
