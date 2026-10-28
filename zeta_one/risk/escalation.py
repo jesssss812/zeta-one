@@ -80,14 +80,46 @@ def soft_signals(features: dict[str, Feature]) -> list[str]:
 
 
 def should_escalate(configuration: Configuration, tier0: Tier0Output) -> bool:
-    """Whether the first model tier runs after tier 0."""
+    """Whether the first model tier runs after tier 0. Under the Jev rule Jev is that tier, and it
+    runs when the engineered rule would run a model."""
     if configuration.escalation == "none":
         return False
     if configuration.escalation == "always":
         return True
-    if configuration.escalation == "engineered":
+    if configuration.escalation in ("engineered", "jev"):
         return tier0.result.level in ("elevated", "high") or bool(soft_signals(tier0.features))
-    raise NotImplementedError("the Jev escalation rule arrives with the Jev tier (extension 4)")
+    raise ValueError(f"unknown escalation rule {configuration.escalation!r}")
+
+
+def should_escalate_after_cheap(configuration: Configuration, tier0: Tier0Output, cheap: TierOutput) -> bool:
+    """Whether the strong tier runs after Jev (decision 0007): Jev isn't confident enough in its level,
+    or says elevated, or is more than one band from tier 0, or found something it isn't sure of. A Jev
+    that failed escalates nothing: the policy challenges a failed model tier whatever comes after."""
+    if configuration.escalation == "always":
+        return True
+    result = cheap.result
+    if result.error or result.level is None:
+        return False
+    tier0_level = tier0.result.level or "low"
+    unsure_findings = any(
+        probability < configuration.jev_min_finding_confidence
+        for name, probability in (getattr(result, "probabilities", None) or {}).items()
+        if name != "risk_level" and name in _finding_names(result)
+    )
+    return (
+        (result.confidence is None or result.confidence < configuration.jev_min_confidence)
+        or result.level == "elevated"
+        or abs(LEVEL_ORDER[result.level] - LEVEL_ORDER[tier0_level]) > 1
+        or unsure_findings
+    )
+
+
+def _finding_names(result) -> set[str]:
+    """The questions whose answer was a finding: the signals Jev raised, by the question they came from."""
+    named = set(result.signals)
+    if "proposal_mismatches_documents" in named:
+        named.add("proposal_matches_documents")
+    return named
 
 
 def merge(tier0: Tier0Output, later: list[TierOutput]) -> RiskEvidence:

@@ -304,6 +304,9 @@ class Configuration(_Open):
 
     tiers: list[TierName] = Field(default_factory=lambda: ["tier0", "strong"])
     escalation: Literal["engineered", "jev", "always", "none"] = "engineered"
+    # The Jev rule's thresholds, policy parameters recorded with every decision (decision 0007).
+    jev_min_confidence: float = 0.8
+    jev_min_finding_confidence: float = 0.9
 
 
 class EvidenceRecord(_Open):

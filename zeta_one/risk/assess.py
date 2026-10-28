@@ -42,9 +42,12 @@ def assess(
         return escalation.merge(first, [TierOutput(result=TierResult(tier=name, error=message)) for name in model_tiers])
     if escalate:
         risk_input = RiskInput(proposal=proposal, context=context, features=first.features, tier0=first.result)
-        # One model tier in the first version; the Jev rule decides between cheap and strong later.
+        # Model tiers run in order; after Jev (the cheap tier) the strong tier runs only on Jev's rule.
         for name in model_tiers:
-            later.append(_run(tiers.get(name), name, risk_input))
+            output = _run(tiers.get(name), name, risk_input)
+            later.append(output)
+            if name == "cheap" and not escalation.should_escalate_after_cheap(configuration, first, output):
+                break
     return escalation.merge(first, later)
 
 

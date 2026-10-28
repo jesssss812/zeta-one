@@ -1,6 +1,5 @@
 """A stage that raises is recorded and challenged, never a crash and never an allow (decision 0010)."""
 
-from zeta_one.contracts import Configuration
 from zeta_one.gateway.scenarios import load_fixture
 from zeta_one.testing.replay import replay_engine, request_for
 
@@ -34,9 +33,14 @@ def test_the_context_failing_is_a_recorded_challenge():
     assert record.risk.tier_results[0].error.startswith("context: OSError")
 
 
-def test_an_unimplemented_escalation_rule_is_a_recorded_challenge():
+def test_an_escalation_rule_that_fails_is_a_recorded_challenge(monkeypatch):
+    from zeta_one.risk import escalation
+
+    def broken(configuration, tier0):
+        raise RuntimeError("rule failed")
+
+    monkeypatch.setattr(escalation, "should_escalate", broken)
     engine, request = _engine("vendor_payment_method_changed")
-    engine.configuration = Configuration(escalation="jev")
     record, _ = engine.evaluate(request)
     assert record.decision == "challenge" and "risk:model_unavailable" in record.reasons
-    assert record.risk.tier_results[-1].error.startswith("escalation: NotImplementedError")
+    assert record.risk.tier_results[-1].error.startswith("escalation: RuntimeError")
