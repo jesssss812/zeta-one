@@ -5,10 +5,6 @@ owner's own time or accounts.
 
 ## Live models
 
-- One live call per tier:
-  `.venv/bin/python -m pytest tests/risk/test_jev.py tests/risk/test_open_weight.py --live-models`;
-  correct the parsers and [reference/jev.md](reference/jev.md) to the real shapes. Confirm the Claude
-  model id and the `messages.parse` call with one request.
 - **Owner:** to use the case chat, run `ollama serve` and `ollama pull qwen2.5:7b` (about 4.7 GB).
 - One live case file on the review page, to check the research and assembly calls.
 

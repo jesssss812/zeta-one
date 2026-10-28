@@ -15,22 +15,28 @@ from zeta_one.risk.jev import JevTier
 JEV = Configuration(tiers=["tier0", "cheap", "strong"], escalation="jev")
 
 
-def payload(level="low", p=0.95, targets=False, matches=True, impersonation=False, findings_p=0.97, shape="nested"):
-    answers = {
-        "risk_level": {"value": level, "probability": p},
-        "document_targets_agent": {"value": targets, "probability": findings_p},
-        "proposal_matches_documents": {"value": matches, "probability": findings_p},
-        "vendor_impersonation_signs": {"value": impersonation, "probability": findings_p},
+def payload(level="low", p=0.95, targets=False, matches=True, impersonation=False, findings_p=0.97):
+    """A reply in the shape both routes return."""
+    others = [other for other in jev.LEVELS if other != level]
+    def noul(yes):
+        return {"type": "noul", "noul": findings_p if yes else round(1 - findings_p, 6)}
+    return {
+        "model": "typesafe/jev-1.14-20261014",
+        "answers": {
+            "risk_level": {"type": "choice", "choice": level, "confidence": p,
+                           "probabilities": {level: p, others[0]: round(1 - p, 6), others[1]: 0.0}},
+            "document_targets_agent": noul(targets),
+            "proposal_matches_documents": noul(matches),
+            "vendor_impersonation_signs": noul(impersonation),
+        },
+        "usage": {"input_tokens": 812, "output_tokens": 100},
     }
-    if shape == "nested":
-        return {"answers": answers, "usage": {"input_tokens": 812}}
-    if shape == "typed":
-        return {"choices": {"risk_level": answers["risk_level"]},
-                "nouls": {k: v for k, v in answers.items() if k != "risk_level"}, "usage": {"prompt_tokens": 812}}
-    if shape == "distribution":
-        dist = {"low": 0.05, "elevated": 0.15, "high": 0.8}
-        return {"answers": {**answers, "risk_level": {"probabilities": dist}}}
-    raise AssertionError(shape)
+
+
+def with_answer(name, answer):
+    reply = payload()
+    reply["answers"][name] = answer
+    return reply
 
 
 class Post:
@@ -49,9 +55,8 @@ def run(reply, status=200, name="invoice_redirect_instructions"):
     return JevTier(post=post, keys={"OPENROUTER_API_KEY": "test-key"}).assess(risk_input(name)), post.calls
 
 
-@pytest.mark.parametrize("shape", ["nested", "typed"])
-def test_an_answer_becomes_a_cheap_tier_result_with_its_probabilities(shape):
-    output, calls = run(payload(shape=shape))
+def test_an_answer_becomes_a_cheap_tier_result_with_its_probabilities():
+    output, calls = run(payload())
     result = output.result
     assert (result.tier, result.model, result.level, result.confidence, result.error) == ("cheap", "typesafe/jev-1.14", "low", 0.95, None)
     assert result.route == "openrouter"
@@ -59,9 +64,17 @@ def test_an_answer_becomes_a_cheap_tier_result_with_its_probabilities(shape):
     assert result.usage.input_tokens == 812 and output.signals == []
 
 
-def test_a_probability_distribution_is_read_as_its_most_likely_level():
-    output, _ = run(payload(shape="distribution"))
+def test_the_confidence_is_the_probability_of_the_chosen_level():
+    reply = with_answer("risk_level", {"type": "choice", "choice": "high", "confidence": 0.8,
+                                       "probabilities": {"low": 0.05, "elevated": 0.15, "high": 0.8}})
+    output, _ = run(reply)
     assert (output.result.level, output.result.confidence) == ("high", 0.8)
+
+
+def test_a_yes_no_answer_is_yes_from_one_half_with_confidence_in_that_answer():
+    output, _ = run(with_answer("vendor_impersonation_signs", {"type": "noul", "noul": 0.3}))
+    assert output.result.answers["vendor_impersonation_signs"] is False
+    assert output.result.probabilities["vendor_impersonation_signs"] == 0.7
 
 
 def test_the_request_sends_the_rendered_state_and_the_four_questions():
@@ -69,6 +82,7 @@ def test_the_request_sends_the_rendered_state_and_the_four_questions():
     url, headers, body = calls[0]
     assert url == jev.ROUTES[0].endpoint and headers == {"Authorization": "Bearer test-key"}
     assert body["model"] == "typesafe/jev-1.14" and set(body["questions"]) == set(jev.QUESTIONS)
+    assert set(body["questions"]["risk_level"]["criteria"]) == set(jev.LEVELS)
     assert "<gateway_facts>" in body["state"] and "<untrusted_data boundary=" in body["state"]
     assert scenario("invoice_redirect_instructions").context.bill.document_excerpt in body["state"]
 
@@ -88,9 +102,10 @@ def test_a_mismatch_and_impersonation_are_elevated_findings():
 @pytest.mark.parametrize("reply, status, error", [
     (payload(), 401, "openrouter: http_401"),
     ({"answers": {}}, 200, "invalid_output"),
-    ({"answers": {**payload()["answers"], "risk_level": {"value": "catastrophic", "probability": 0.9}}}, 200, "invalid_output"),
-    ({"answers": {**payload()["answers"], "risk_level": {"value": "low", "probability": 1.7}}}, 200, "invalid_output"),
-    ({"answers": {**payload()["answers"], "document_targets_agent": {"value": "maybe", "probability": 0.9}}}, 200, "invalid_output"),
+    (with_answer("risk_level", {"type": "choice", "choice": "catastrophic", "probabilities": {"catastrophic": 0.9}}), 200, "invalid_output"),
+    (with_answer("risk_level", {"type": "choice", "choice": "low", "probabilities": {"low": 1.7}}), 200, "invalid_output"),
+    (with_answer("document_targets_agent", {"type": "noul", "noul": "maybe"}), 200, "invalid_output"),
+    (with_answer("document_targets_agent", {"type": "noul", "noul": True}), 200, "invalid_output"),
     (None, 200, "invalid_output"),
 ])
 def test_each_failure_is_an_error_and_no_level(reply, status, error):

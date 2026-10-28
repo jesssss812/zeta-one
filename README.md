@@ -65,7 +65,7 @@ Solid lines are the decision; dotted lines are the feedback loop.
 | Part | State |
 | --- | --- |
 | Gateway: identity, authorization, risk rules, policy, evidence, simulated payments | Working end to end over HTTP, on synthetic data in Rho's shapes |
-| Model review: Claude Opus 5.5; Jev (OpenRouter, TypeSafe as backup); open-weight arm | Wired and tested against stubs; not yet run live |
+| Model review: Claude Opus 5.5; Jev (OpenRouter, TypeSafe as backup); open-weight arm | Each answers live calls; not yet run on the evaluation |
 | Feedback loop: verified outcomes and risk adjustments | Working; recorded end to end in `site/data/loop.json` |
 | Case review page with source links and a local chat model | Working against stubs; the research and chat need keys and a local model |
 | Evaluation: labelled `dev` and `test` sets, seven configurations, cost table | Sets generated; labelling and the scored run are in progress |

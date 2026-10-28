@@ -19,7 +19,7 @@ What is not done yet is in [roadmap.md](roadmap.md). Every document under `docs/
 | [reference/rho-api.md](reference/rho-api.md) | What the Rho API allows: hosts, auth, read endpoints, the confirmed limits (read-only by design, no payments write yet, no webhooks or pre-execution hook), the MCP server and the `x-mcp-*` annotations, and what that means for Zeta One |
 | [reference/staging-data.md](reference/staging-data.md) | What the Rho staging business holds: record counts and field coverage per endpoint |
 | [reference/rho-openapi.json](reference/rho-openapi.json) | Rho's public OpenAPI description, copied 2026-10-27 |
-| [reference/jev.md](reference/jev.md) | What Jev (TypeSafe's typed decision model) is, how it is called and priced; unverified until the first call |
+| [reference/jev.md](reference/jev.md) | What Jev (TypeSafe's typed decision model) is, how it is called and priced, with the request and answer shapes |
 | [reference/deterministic-stages.md](reference/deterministic-stages.md) | Implemented seed, identity, authorization and tier-0 interfaces, provenance and gateway wiring |
 | [reference/demo-api.md](reference/demo-api.md) | The contract between the engine and the demo site: endpoints, scenario result, evidence record, ownership of directories |
 
