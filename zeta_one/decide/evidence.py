@@ -8,10 +8,12 @@ from zeta_one.contracts import (
     AuthorizationEvidence,
     Challenge,
     Configuration,
+    Context,
     Cost,
     EvidenceRecord,
     Execution,
     IdentityEvidence,
+    Proposal,
     RiskEvidence,
 )
 from zeta_one.decide.policy import Outcome
@@ -33,6 +35,8 @@ def build(
     prices: dict[str, tuple[float, float]] | None = None,
     engine_version: str | None = None,
     seed_version: str | None = None,
+    proposal: Proposal | None = None,
+    context: Context | None = None,
 ) -> EvidenceRecord:
     challenge = None
     if outcome.challenge_type:
@@ -59,6 +63,9 @@ def build(
         execution=Execution(status=EXECUTION_STATUS[outcome.decision]),
         cost=_cost(risk, prices or {}),
         latency_ms=latency_ms,
+        # Copies, so later changes to the objects the stages hold can't rewrite the record.
+        proposal=proposal.model_copy(deep=True) if proposal else None,
+        context=context.model_copy(deep=True) if context else None,
     )
 
 

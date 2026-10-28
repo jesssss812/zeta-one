@@ -73,6 +73,7 @@ class Engine:
         identity = self.verify_identity(request, now)
         latency["identity"] = _ms_since(started)
         proposal: Proposal | None = None
+        context: Context | None = None
         authorization = AuthorizationEvidence.not_evaluated()
         authorization_doc = None
         risk = RiskEvidence.not_evaluated()
@@ -83,7 +84,6 @@ class Engine:
             # exist is refused the same way whatever its amount: a 400 can't tell an agent whether
             # an amount was within its limits (security.md, S8).
             step = time.perf_counter()
-            context: Context | None = None
             context_error = None
             try:
                 context = self.load_context(proposal, identity.business_id, now)
@@ -104,8 +104,12 @@ class Engine:
                 else:
                     risk = (self.assess_risk or Engine.run_tiers)(self, proposal, context, now, identity)
                 latency["risk"] = context_ms + _ms_since(step)
+        else:
+            # Kept for the reviewer if it parses; an unverified request is never acted on or given context.
+            proposal = _parse_or_none(request.body)
 
-        outcome = policy.decide(policy.PolicyInput(identity, authorization, authorization_doc, risk, proposal))
+        outcome = policy.decide(policy.PolicyInput(identity, authorization, authorization_doc, risk,
+                                                   proposal if identity.result == "verified" else None))
         latency["total"] = _ms_since(started)
         record = evidence.build(
             decision_id=self.new_id(),
@@ -120,8 +124,10 @@ class Engine:
             prices=self.prices,
             engine_version=self.engine_version,
             seed_version=self.seed_version,
+            proposal=proposal,
+            context=context,
         )
-        return record, proposal
+        return record, proposal if identity.result == "verified" else None
 
 
 def _parse(body: bytes) -> Proposal:
@@ -129,6 +135,13 @@ def _parse(body: bytes) -> Proposal:
         return Proposal.model_validate_json(body)
     except ValidationError as error:
         raise InvalidProposal(str(error)) from error
+
+
+def _parse_or_none(body: bytes) -> Proposal | None:
+    try:
+        return Proposal.model_validate_json(body)
+    except ValidationError:
+        return None
 
 
 def _ms_since(start: float) -> int:

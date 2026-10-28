@@ -135,7 +135,9 @@ describes how it is produced). Fields the site should rely on:
   "execution": {"status": "executed" | "held" | "blocked", "simulated": true},
   "cost": null | {"input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens", "usd", "prices_used": {"<model>": {"input_per_mtok", "output_per_mtok", "cache_read_multiplier", "cache_write_multiplier"}}, "unpriced_models": ["<model>"]},
   "latency_ms": null | {"identity", "authorization", "risk", "total"},
-  "review": null | {"by", "at", "outcome", "note", "provenance"}
+  "review": null | {"by", "at", "outcome", "note", "provenance"},
+  "proposal": null | {the proposal as above, as it was submitted},
+  "context": null | {the context as above, as the risk stage read it}
 }
 ```
 
@@ -184,6 +186,9 @@ Rules the site can count on:
   with Jev's level, confidence and probabilities. The live gateway runs `engineered` unless
   `ZETA_RISK_CONFIGURATION=jev`.
 - `execution.simulated` is always `true` in this build.
+- A record keeps what was decided on: `proposal` whenever the body parsed (an unverified request's
+  too, kept for the reviewer and never acted on) and `context` whenever it was loaded (never for an
+  unverified request). Later changes to the business's records don't change them.
 - A record may carry `outcomes`: each `{"finding", "verification", "verified", "by", "at", "note", "source": "resolve" | "report"}`, oldest first. Show unverified ones as claims, never as findings.
 - A scenario result's `illustrative` is `true` when any stage replayed the fixture instead of
   running, and `replayed_stages` names them (`["strong"]` for the two scenarios that escalate).

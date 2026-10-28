@@ -332,6 +332,10 @@ class EvidenceRecord(_Open):
     cost: Cost | None = None
     latency_ms: dict[str, int] | None = None
     review: dict[str, Any] | None = None
+    # What was decided on, as it was then: the proposed payment (when the body parsed) and the context
+    # the risk stage read (when it loaded). A reviewer reads these, not today's records.
+    proposal: Proposal | None = None
+    context: Context | None = None
 
 
 class ScenarioInfo(_Open):
