@@ -33,3 +33,10 @@ site/build/
 .claude/settings.local.json
 .claude/worktrees/
 .check_pycache
+
+# Editor swap and backup files, which can hold a copy of .env
+*.swp
+*.swo
+*~
+.env.*
+!.env.example
