@@ -28,7 +28,7 @@
   form.open { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
   .card h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 10px; }
-  .hero { display: grid; grid-template-columns: minmax(240px, 1.3fr) repeat(3, minmax(150px, 1fr)); gap: 12px; margin-bottom: 14px; }
+  .hero { display: grid; grid-template-columns: minmax(240px, 1.3fr) repeat(2, minmax(150px, 1fr)); gap: 12px; margin-bottom: 14px; }
   .who { display: flex; gap: 12px; align-items: center; }
   .logo { width: 52px; height: 52px; border-radius: 12px; flex: none; display: grid; place-items: center; overflow: hidden;
     font-weight: 700; font-size: 18px; color: #fff; border: 1px solid var(--line); background: var(--chip); }
@@ -88,7 +88,18 @@
   .chat .a { background: var(--chip); border-radius: 10px 10px 10px 2px; padding: 6px 10px; max-width: 95%; white-space: pre-wrap; }
   .chat form { display: flex; gap: 6px; } .chat input { flex: 1; }
   .warn { color: var(--amber); }
-  @media (max-width: 900px) { .hero, .layout, .two, .domains { grid-template-columns: 1fr; } .side { position: static; } }
+  .why { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(160px, .8fr); gap: 0; padding: 0; margin-bottom: 14px; overflow: hidden; }
+  .why > div { padding: 12px 14px; border-left: 1px solid var(--line); } .why > div:first-child { border-left: 0; }
+  .why .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .why .answer { font-size: 15px; font-weight: 600; margin: 3px 0; }
+  .why .ok .answer::before { content: "✓ "; color: var(--green); } .why .bad .answer::before { content: "! "; color: var(--red); }
+  .why .bad { background: var(--amber-bg); }
+  .why .verdict { background: var(--chip); }
+  .inbox table { margin: 0; } .inbox tr.row { cursor: pointer; } .inbox tr.row:hover td { background: var(--chip); }
+  .inbox td { vertical-align: top; } .inbox .reason { color: var(--muted); }
+  .toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+  @media (max-width: 900px) { .hero, .layout, .two, .domains, .why { grid-template-columns: 1fr; } .why > div { border-left: 0; border-top: 1px solid var(--line); } .side { position: static; }
+    .inbox .when, .inbox .reason-col { display: none; } }
 </style>
 </head>
 <body>
@@ -99,13 +110,12 @@
   </div>
   <form class="open" id="open">
     <input id="token" type="password" placeholder="Admin token" autocomplete="off" required>
-    <input id="decision" placeholder="Decision id (dec_...)" required>
     <input id="by" placeholder="Your name" required>
-    <button class="primary">Assemble case</button>
+    <button class="primary">Open inbox</button>
     <span id="status" class="note"></span>
   </form>
 </header>
-<main id="case"><p class="empty">Enter a decision id to assemble its case.</p></main>
+<main id="case"><p class="empty">Enter the admin token from <code>.env</code> and your name once; the inbox opens.</p></main>
 <aside class="drawer" id="drawer" aria-live="polite"></aside>
 
 <script>
@@ -124,7 +134,7 @@ function el(tag, attrs, ...children) {
 const money = (a) => a ? `${(a.amount / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })} ${a.currency}` : "–";
 const domainOf = (url) => { try { return new URL(url).hostname; } catch (e) { return null; } };
 const favicon = (domain, size) => `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=${size}`;
-try { $("token").value = sessionStorage.getItem("zeta-admin") || ""; } catch (e) {}
+try { $("token").value = sessionStorage.getItem("zeta-admin") || ""; $("by").value = sessionStorage.getItem("zeta-by") || ""; } catch (e) {}
 const RECORD_ID = /\b(?:dec|pay|adj|chl|bill|paid|cp|pm|pmc|pmh|txn|acct)_[A-Za-z0-9_]+/g;
 
 // A record id as a link to its source: the record, the system it came from, and where it lives in production.
@@ -197,11 +207,8 @@ function hero(c) {
       el("div", {}, el("strong", { text: vendor }), el("span", { class: "note", text: official ? official : "Official domain not found" }))),
     el("section", { class: "card kpi" }, el("div", { class: "label", text: "Amount" }), el("div", { class: "value", text: money(p.amount) }),
       el("div", { class: "note" }, "to ", p.payment_method_id ? ref(p.payment_method_id) : "?", " · payee ", p.counterparty_id ? ref(p.counterparty_id) : "?")),
-    el("section", { class: "card kpi" }, el("div", { class: "label", text: "Engine decided" }),
-      el("div", { class: "value" }, el("span", { class: `badge ${d.decision}`, text: d.decision }), " ", ref(d.decision_id)),
-      el("div", { class: "chips" }, (d.reasons || []).map((r) => el("span", { class: "chip", text: r })))),
     el("section", { class: "card kpi" }, el("div", { class: "label", text: "Reported" }),
-      el("div", { class: "value" }, latest ? el("span", { class: `badge ${latest.verified ? "block" : "claim"}`,
+      el("div", { class: "value" }, latest ? el("span", { class: `badge ${!latest.verified ? "claim" : latest.finding === "legitimate" ? "allow" : "block"}`,
         text: `${latest.finding.replace("_", " ")}${latest.verified ? "" : " (claim)"}` }) : el("span", { class: "note", text: "No report yet" })),
       el("div", { class: "chips" }, floor ? floor.flags.map((f) => el("span", { class: "chip", text: f })) : el("span", { class: "note", text: "No floor at decision" }))));
 }
@@ -265,7 +272,7 @@ function side(c) {
   }));
   const form = el("form", { class: "finding" },
     el("select", { id: "f-finding" }, [["legitimate", "Legitimate"], ["payee_fraud", "Payee fraud"], ["manipulated_agent", "Manipulated agent"], ["unauthorized", "Unauthorized"]].map(([v, t]) => el("option", { value: v, text: t }))),
-    el("select", { id: "f-verification" }, [["callback_known_number", "Called back on a number already on file"], ["bank_confirmation", "Bank confirmation"], ["vendor_portal", "Vendor portal"], ["signed_customer_attestation", "Signed customer attestation"], ["customer_report", "Customer report only (a claim)"], ["none", "Not verified"]].map(([v, t]) => el("option", { value: v, text: t }))),
+    el("select", { id: "f-verification", required: "" }, el("option", { value: "", text: "How did you verify it?" }), [["callback_known_number", "Called back on a number already on file"], ["bank_confirmation", "Bank confirmation"], ["vendor_portal", "Vendor portal"], ["signed_customer_attestation", "Signed customer attestation"], ["customer_report", "Customer report only (a claim)"], ["none", "Not verified"]].map(([v, t]) => el("option", { value: v, text: t }))),
     el("input", { id: "f-note", placeholder: "What you found, and from whom" }),
     el("div", { class: "row" }, el("button", { text: "Record finding" }), el("span", { id: "f-status", class: "note" })));
   form.addEventListener("submit", async (event) => {
@@ -315,13 +322,77 @@ function show(c) {
       side(c)));
 }
 
-$("open").addEventListener("submit", async (event) => {
+// The decision's three questions in plain words, from the record itself (no model).
+function why(row) {
+  const parts = Object.fromEntries(row.parts.map((part) => [part.question, part]));
+  const column = (question, label) => {
+    const part = parts[question];
+    if (!part) return el("div", {}, el("div", { class: "label", text: label }), el("div", { class: "note", text: "Not reached" }));
+    return el("div", { class: part.ok ? "ok" : "bad" }, el("div", { class: "label", text: label }),
+      el("div", { class: "answer", text: part.text.charAt(0).toUpperCase() + part.text.slice(1) }),
+      el("div", { class: "sources" }, part.evidence.map(ref)));
+  };
+  const timings = Object.entries(row.stages).map(([stage, ms]) => `${stage} ${ms} ms`).join(" · ");
+  return el("section", { class: "card why" }, column("identity", "Who is acting"), column("authorization", "Authorized?"),
+    column("risk", "About the payment"),
+    el("div", { class: "verdict" }, el("div", { class: "label", text: "Engine decided" }),
+      el("div", { class: "answer" }, el("span", { class: `badge ${row.decision}`, text: row.action }), " ", ref(row.decision_id)),
+      el("div", { class: "note", text: `${timings}${row.models.length ? " · model: " + row.models.join(", ") : " · no model"}` })));
+}
+
+async function openRow(row) {
+  const status = $("status");
+  const back = el("button", { type: "button", text: "← Inbox" }); back.addEventListener("click", loadInbox);
+  const progress = el("p", { class: "note" });
+  $("case").replaceChildren(el("div", { class: "toolbar" }, back, el("strong", { text: `${row.vendor} · ${money(row.amount)}` })), why(row), progress);
+  try {
+    let found;
+    if (row.case_ids.length) found = await api("/v1/cases/" + encodeURIComponent(row.case_ids[row.case_ids.length - 1]));
+    else {
+      progress.textContent = "Gathering the records and researching the vendor on the web (about a minute)…";
+      found = await api("/v1/cases", { decision_id: row.decision_id, by: $("by").value });
+    }
+    show(found);
+    $("case").prepend(el("div", { class: "toolbar" }, back, el("strong", { text: `${row.vendor} · ${money(row.amount)}` })), why(row));
+    status.textContent = "";
+  } catch (e) { progress.className = "warn"; progress.textContent = "Couldn't assemble the case: " + e.message; }
+}
+
+async function loadInbox() {
+  const status = $("status");
+  status.textContent = "Loading…";
+  try {
+    const rows = await api("/v1/inbox?limit=100");
+    const attention = (row) => row.decision !== "allow" || (row.outcome && row.outcome.finding !== "legitimate");
+    const table = el("table", {}, el("tr", {}, ["When", "Vendor", "Amount", "Decision", "Why", "Finding", "Case"].map((h, i) =>
+      el("th", { class: i === 0 ? "when" : i === 4 ? "reason-col" : "", text: h }))),
+      rows.map((row) => {
+        const tr = el("tr", { class: "row", tabindex: "0" },
+          el("td", { class: "when note", text: String(row.created_at || "").slice(0, 16).replace("T", " ") }),
+          el("td", {}, el("strong", { text: row.vendor }), row.sandbox ? el("div", { class: "note", text: "scenario run" }) : null),
+          el("td", { text: money(row.amount) }),
+          el("td", {}, el("span", { class: `badge ${row.decision}`, text: row.action })),
+          el("td", { class: "reason reason-col", text: row.parts[row.parts.length - 1].text }),
+          el("td", {}, row.outcome ? el("span", { class: `badge ${!row.outcome.verified ? "claim" : row.outcome.finding === "legitimate" ? "allow" : "block"}`,
+            text: row.outcome.finding.replace("_", " ") + (row.outcome.verified ? "" : " (claim)") }) : el("span", { class: "note", text: "–" })),
+          el("td", { class: "note", text: row.case_ids.length ? "Ready" : (attention(row) ? "Assemble" : "–") }));
+        tr.addEventListener("click", () => openRow(row));
+        tr.addEventListener("keydown", (event) => { if (event.key === "Enter") openRow(row); });
+        return tr;
+      }));
+    $("case").replaceChildren(el("section", { class: "card inbox" }, el("h2", { text: `Decisions (${rows.length})` }),
+      rows.length ? table : el("p", { class: "empty", text: "No decisions yet. Run a scenario or the demo to make some." }),
+      el("p", { class: "note", text: "Open a row to see its records. Opening one without a case file asks the assistant to assemble it, which calls a model." })));
+    status.textContent = "";
+  } catch (e) { status.textContent = "Couldn't load the inbox: " + e.message; }
+}
+
+$("open").addEventListener("submit", (event) => {
   event.preventDefault();
-  try { sessionStorage.setItem("zeta-admin", $("token").value); } catch (e) {}
-  $("status").textContent = "Gathering evidence and researching the vendor…";
-  try { show(await api("/v1/cases", { decision_id: $("decision").value.trim(), by: $("by").value })); $("status").textContent = ""; }
-  catch (e) { $("status").textContent = "Couldn't assemble: " + e.message; }
+  try { sessionStorage.setItem("zeta-admin", $("token").value); sessionStorage.setItem("zeta-by", $("by").value); } catch (e) {}
+  loadInbox();
 });
+if ($("token").value && $("by").value) loadInbox();
 </script>
 </body>
 </html>

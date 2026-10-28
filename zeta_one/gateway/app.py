@@ -27,6 +27,7 @@ from zeta_one.gateway.ledger import Ledger
 from zeta_one.gateway.reuse import RiskReuse
 from zeta_one.gateway.service import EngineNotReady, Gateway, NotHeld, UnknownChallenge, UnknownDecision
 from zeta_one.review.chat import ChatUnavailable
+from zeta_one.review.explain import summary
 from zeta_one.review.records import resolve as resolve_record
 from zeta_one.gateway.wiring import ROOT, configuration_from_env, engine_version, real_stages, register_demo_agents
 
@@ -307,6 +308,16 @@ def create_app(gateway: Gateway, token: str | None, eval_report: Path = EVAL_REP
         with gateway.lock:
             found = resolve_record(record_id, gateway.ledger, gateway.adjustments, gateway.stages.seed)
         return found if found else _error(404, "unknown_record", f"no record {record_id}")
+
+    @app.get("/v1/inbox")
+    def inbox(request: Request, limit: int = 50) -> list[dict]:
+        """Recent decisions as a reviewer reads them: vendor, amount, decision, the one-line reason,
+        any finding recorded, and the case files already assembled."""
+        admin.require_admin(request.headers, token)
+        with gateway.lock:
+            records = gateway.ledger.decisions(min(max(limit, 1), 500))
+            return [summary(record) | {"case_ids": [case["case_id"] for case in gateway.cases.for_decision(record["decision_id"])]}
+                    for record in records]
 
     @app.get("/review", response_class=HTMLResponse)
     def review_page():
