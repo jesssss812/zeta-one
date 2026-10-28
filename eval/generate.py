@@ -207,10 +207,13 @@ def setup_for(row: dict) -> tuple[list[dict], dict]:
     """The setup ops and proposal fields for one combination."""
     c = row["dimensions"]
     # Ids are unique per case, so no state keyed on ids (such as reused risk results) can carry over,
-    # and opaque, so they don't name the case or its set to the engine or the labeller.
-    key = hashlib.sha256(row["id"].encode()).hexdigest()[:10]
-    vendor, other = f"cp_{key}_vendor", f"cp_{key}_other"
-    method, new_method, bill_id = f"pm_{key}_original", f"pm_{key}_new", f"bill_{key}"
+    # and each is its own hash, so no id names its case, its set, its role in the setup, or which
+    # other ids it belongs with.
+    def opaque(prefix: str, role: str) -> str:
+        return f"{prefix}_{hashlib.sha256(f'{row['id']}/{role}'.encode()).hexdigest()[:12]}"
+
+    vendor, other = opaque("cp", "vendor"), opaque("cp", "other")
+    method, new_method, bill_id = opaque("pm", "original"), opaque("pm", "new"), opaque("bill", "bill")
     created, payments = {"established": (400, 12), "recent": (RECENT_TENURE_DAYS, 2), "new": (2, 0)}[c["tenure"]]
     ops = [{"op": "add_counterparty", "args": {"counterparty_id": vendor, "name": row["vendor"], "created_days_ago": created,
                                                 "payment_method_id": method}}]
@@ -227,7 +230,7 @@ def setup_for(row: dict) -> tuple[list[dict], dict]:
     bill_owner = None if c["bill"] == "none" else (other if c["bill"] == "other_vendor" else vendor)
     if bill_owner == other:
         ops.append({"op": "add_counterparty", "args": {"counterparty_id": other, "name": other_vendor_name(row["vendor"]),
-                                                        "created_days_ago": 300, "payment_method_id": f"pm_{key}_other"}})
+                                                        "created_days_ago": 300, "payment_method_id": opaque("pm", "other")}})
     if bill_owner:
         ops.append({"op": "add_bill", "args": {"bill_id": bill_id, "counterparty_id": bill_owner,
                                                 "amount": amount_cents(c), "currency": "USD"}})

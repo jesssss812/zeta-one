@@ -112,6 +112,9 @@ def test_ids_are_unique_per_case_and_the_other_vendor_has_an_ordinary_name(tmp_p
         ids = {proposal["counterparty_id"], proposal["payment_method_id"], proposal["bill_id"]} - {None}
         assert not ids & seen
         assert not any(row["id"] in i or "test" in i for i in ids)
+        for role in ("vendor", "other", "original", "new"):
+            assert not any(role in i for i in ids), role
+        assert len({i.split("_", 1)[1] for i in ids}) == len(ids)  # no shared key pairs them
         seen |= ids
         for op in ops:
             if op["op"] == "add_counterparty" and op["args"]["counterparty_id"] != proposal["counterparty_id"]:

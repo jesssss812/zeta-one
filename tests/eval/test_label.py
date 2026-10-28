@@ -108,11 +108,12 @@ def test_the_default_context_is_the_seed_with_the_case_setup_applied(tmp_path):
 def test_the_seed_context_never_shows_labels(tmp_path):
     rows = generate.combos("test", data=tmp_path)
     from zeta_one.contracts import Proposal, SetupOp
-    for row in rows[:10]:
+    for row in rows:
         ops, proposal = generate.setup_for(row)
         text = json.dumps(label.seed_context([SetupOp(**op) for op in ops],
                                              Proposal.model_validate({**proposal, "memo": "", "agent_rationale": ""})))
-        for word in ("payee_fraud", "manipulated_agent", "truth", "detectable", row["id"], "Unrelated"):
+        for word in ("payee_fraud", "manipulated_agent", "truth", "detectable", row["id"], "Unrelated",
+                     "_other", "_original", "_new\"", "_new_"):
             assert word not in text
 
 
