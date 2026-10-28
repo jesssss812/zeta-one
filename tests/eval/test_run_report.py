@@ -298,3 +298,26 @@ def test_cost_per_action_counts_every_send(tmp_path):
              "expected": "block", "decision": "block", "correct": True, "acceptable": True, "not_run": None,
              "cost_usd": 0.05, "record": {"cost": {"usd": 0.0}, "risk": {}}}]
     assert report.cell(rows)["cost_per_action_usd"] == pytest.approx(0.05)
+
+
+def _row(decision, truth, tiers, usd, detectable=True):
+    return {"case_id": decision + truth, "set": "dev", "category": "D", "truth": truth, "detectable": detectable,
+            "expected": "challenge", "decision": decision, "correct": True, "acceptable": True, "not_run": None,
+            "cost_usd": usd, "record": {"cost": {"usd": usd}, "risk": {"tiers_run": tiers, "tier_results": []}}}
+
+
+def test_cost_says_how_many_decisions_reached_a_model_and_what_a_caught_fraud_cost():
+    rows = [_row("allow", "legitimate", ["tier0"], 0.0), _row("challenge", "payee_fraud", ["tier0", "strong"], 0.04),
+            _row("block", "payee_fraud", ["tier0", "strong"], 0.06), _row("allow", "legitimate", ["tier0"], 0.0)]
+    cost = report.cell(rows)["cost"]
+    assert (cost["reached_a_model"]["k"], cost["reached_a_model"]["n"]) == (2, 4)
+    assert cost["usd_per_1000_decisions"] == pytest.approx(25.0)
+    assert cost["usd_per_fraud_caught"] == pytest.approx(0.05)
+
+
+def test_cost_flags_unpriced_models_and_estimated_usage():
+    row = _row("challenge", "payee_fraud", ["tier0", "open_weight"], 0.0)
+    row["record"]["cost"]["unpriced_models"] = ["org/open-model"]
+    row["record"]["risk"]["tier_results"] = [{"tier": "open_weight", "usage": {"estimated": True}}]
+    cost = report.cell([row])["cost"]
+    assert cost["unpriced_models"] == ["org/open-model"] and cost["estimated_usage"] is True

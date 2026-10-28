@@ -86,6 +86,27 @@ def cell(rows: list[dict]) -> dict:
         "lowerings": {"legitimate": lowerings["legitimate"], "not_legitimate": lowerings["not_legitimate"]},
         "cost_per_action_usd": sum(usd) / len(usd) if usd else None,
         "latency_ms": {"p50": stats.percentile(totals, 50), "p95": stats.percentile(totals, 95)},
+        "cost": _cost_summary(ran, usd, detectable),
+    }
+
+
+def _cost_summary(ran: list[dict], usd: list[float], detectable: list[dict]) -> dict:
+    """Where the money goes: how many decisions reached any model, what 1,000 decisions cost, and what
+    each fraud caught cost. Dollar figures exist only for runs with priced, measured model calls."""
+    with_record = [r for r in ran if r.get("record")]
+    reached = [r for r in with_record if any(t != "tier0" for t in r["record"]["risk"].get("tiers_run") or [])]
+    unpriced = sorted({m for r in with_record for m in ((r["record"].get("cost") or {}).get("unpriced_models") or [])})
+    estimated = any((t.get("usage") or {}).get("estimated") for r in with_record
+                    for t in r["record"]["risk"].get("tier_results") or [])
+    caught = sum(r["decision"] != "allow" for r in detectable)
+    total = sum(usd) if usd else None
+    return {
+        "decisions": len(with_record),
+        "reached_a_model": stats.rate(len(reached), len(with_record)),
+        "usd_per_1000_decisions": total / len(usd) * 1000 if usd else None,
+        "usd_per_fraud_caught": total / caught if usd and caught else None,
+        "unpriced_models": unpriced,
+        "estimated_usage": estimated,
     }
 
 
@@ -309,7 +330,22 @@ def render(report: dict) -> str:
                 lines.append(f"| {config} | {s} | {_pct(m['accuracy'])} | {_pct(m['accuracy_with_acceptable'])} | "
                              f"{_pct(m['detection'])} | {_pct(m['legit_challenge_rate'])} | {_pct(m['legit_block_rate'])} |")
     lines += ["", "A drop from dev to test or hard is overfitting to the generator or the tuning, and is reported as found.",
-              "", "## Per category", ""]
+              "", "## Cost", "",
+              "How many decisions reached any model, and what they cost. Tier 0 is free; dollars appear only for "
+              "measured, priced model calls (a model's own price list, recorded in each decision).", "",
+              "| Configuration | Set | Reached a model | $ per 1,000 decisions | $ per fraud caught | Notes |",
+              "| --- | --- | --- | --- | --- | --- |"]
+    for config, by_set in report["side_by_side"].items():
+        for s, m in by_set.items():
+            c = m.get("cost") if m else None
+            if not c or not c["decisions"]:
+                continue
+            per_1000 = f"{c['usd_per_1000_decisions']:.2f}" if c["usd_per_1000_decisions"] is not None else "–"
+            per_fraud = f"{c['usd_per_fraud_caught']:.4f}" if c["usd_per_fraud_caught"] is not None else "–"
+            notes = "; ".join([*(["unpriced: " + ", ".join(c["unpriced_models"])] if c["unpriced_models"] else []),
+                               *(["some usage estimated"] if c["estimated_usage"] else [])]) or ""
+            lines.append(f"| {config} | {s} | {_pct(c['reached_a_model'])} | {per_1000} | {per_fraud} | {notes} |")
+    lines += ["", "## Per category", ""]
     for config, by_set in report["metrics"].items():
         for s, cats in by_set.items():
             if s == "deterministic":
