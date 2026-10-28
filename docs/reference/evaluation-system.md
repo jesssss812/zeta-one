@@ -95,7 +95,7 @@ by side for each configuration.
 | Model | Job | What it sees |
 | --- | --- | --- |
 | Claude Haiku 5.5 | Writes each case's invoice text and agent rationale | The case's combination only, never its truth, category, label or the rules' lexicon |
-| Claude Sonnet 5.5 | Labels every `dev` and `test` case | What the engine sees, plus the labelling guide; it reports zero tool calls, checked per batch |
+| Claude Sonnet 5.5 | Labels every `dev` and `test` case, through the Anthropic API | What the engine sees, plus the labelling guide; no tools are offered, so it cannot open a file |
 | Claude Opus 5.5 | Strong tier under test, through the Anthropic API | The proposal and its context, with invoice text in marked untrusted blocks |
 | Jev 1.14 (TypeSafe) | Cheap typed-decision tier under test, through OpenRouter, with TypeSafe direct as the backup | The same as Opus |
 | Qwen3 235B | Open-weight comparison arm in Opus's place, through OpenRouter | The same as Opus |

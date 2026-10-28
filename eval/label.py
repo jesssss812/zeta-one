@@ -3,6 +3,7 @@ and adjudications into labelled cases.
 
     python -m eval.label sheet dev           # 20 cases to read before writing the labelling guide
     python -m eval.label export dev          # after `eval.generate assemble dev`
+    python -m eval.label ai dev              # the AI labels, through the Anthropic API with no tools (paid)
     python -m eval.label merge dev
 
 Under data/eval/<set>/label/:
@@ -10,9 +11,11 @@ Under data/eval/<set>/label/:
     batch_NN.prompt.md            the prompt for one labelling subagent, cases inside, no file access needed
     owner_sample.json             test only: the stratified cases the owner labels without seeing the AI label
     owner_view.json               the blind view of those cases
-    ai/batch_NN.jsonl             the subagent's answer, saved by the owner
-    ai/batch_NN.meta.json         {"tool_calls": N}: copied by the owner from the subagent's run; merge
-                                  refuses N != 0. It is self-reported, and the agreement says so.
+    ai/batch_NN.jsonl             the AI labeller's answer
+    ai/batch_NN.meta.json         {"tool_calls": N, ...}: merge refuses N != 0. `ai` writes it with
+                                  "route": "anthropic_api" and no tools offered, so the labeller could
+                                  not open a file; a batch from a subagent run carries the count the
+                                  owner copied from it, which is self-reported. The agreement says which.
     owner.jsonl                   {id (blind), expected, also_acceptable}: the owner's labels, final
 
 Export reads the assembled, unlabelled cases. The labeller sees the proposal and the context its
@@ -29,6 +32,7 @@ from collections import defaultdict
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from eval import sets, stats
 from zeta_one.contracts import Case, LabelProvenance, Proposal, SetupOp
@@ -41,6 +45,9 @@ JUDGED_CATEGORIES = ("D", "E", "F")
 DECISIONS = ("allow", "challenge", "block")
 AI_SOURCE = "claude-sonnet-5-5"
 BLINDNESS = "tool_calls 0 for every batch, as copied by the owner from each subagent run (self-reported)"
+API_BLINDNESS = ("every batch sent through the Anthropic API with no tools offered, so the labeller could "
+                 "not open a file; it saw only its prompt")
+AI_MAX_TOKENS = 16_000
 
 # The context a case's setup produces for its proposal: what the labeller may see.
 ContextFor = Callable[[list[SetupOp], Proposal], dict]
@@ -184,6 +191,62 @@ def reading_sheet(set_name: str, n: int = 20, context_for: ContextFor = seed_con
     return path
 
 
+def ai_label(set_name: str, client: Any = None, data: Path = sets.DATA) -> list[str]:
+    """Label each exported batch with the AI labeller through the Anthropic API, offering no tools, and
+    write ai/batch_NN.jsonl with its meta. A batch already labelled is kept, so a failure resumes.
+    Returns the batches labelled now."""
+    out = label_dir(set_name, data)
+    ids: list[str] = list(json.loads((out / "ids.json").read_text()))
+    (out / "ai").mkdir(exist_ok=True)
+    if client is None:
+        from zeta_one.risk import claude
+        client = claude.client(timeout=600.0)
+    done = []
+    for prompt_path in sorted(out.glob("batch_*.prompt.md")):
+        name = prompt_path.name.removesuffix(".prompt.md")
+        answer_path = out / "ai" / f"{name}.jsonl"
+        if answer_path.exists():
+            continue
+        number = int(name.removeprefix("batch_"))
+        expected = ids[number * BATCH:(number + 1) * BATCH]
+        with client.messages.stream(model=AI_SOURCE, max_tokens=AI_MAX_TOKENS, thinking={"type": "adaptive"},
+                                    messages=[{"role": "user", "content": prompt_path.read_text()}]) as stream:
+            response = stream.get_final_message()
+        if response.stop_reason != "end_turn":
+            raise LabelError(f"{name}: the labeller stopped with {response.stop_reason}")
+        text = "".join(block.text for block in response.content if getattr(block, "type", None) == "text")
+        rows = _answer_rows(text, name)
+        if [row.get("id") for row in rows] != expected:
+            raise LabelError(f"{name}: the answer's ids are not this batch's {len(expected)} cases in order")
+        for row in rows:
+            _check_label(row)
+        sets.write_jsonl(answer_path, rows)
+        usage = response.usage
+        answer_path.with_suffix(".meta.json").write_text(json.dumps({
+            "tool_calls": 0, "tools_offered": [], "route": "anthropic_api", "model": response.model,
+            "usage": {"input_tokens": usage.input_tokens, "output_tokens": usage.output_tokens},
+        }, indent=2) + "\n")
+        done.append(name)
+    return done
+
+
+def _answer_rows(text: str, source: str) -> list[dict]:
+    rows = []
+    for line in text.splitlines():
+        line = line.strip()
+        if line.startswith("{"):
+            try:
+                rows.append(json.loads(line))
+            except json.JSONDecodeError as error:
+                raise LabelError(f"{source}: a line is not JSON: {error}") from None
+    return rows
+
+
+def _blindness(set_name: str, data: Path) -> str:
+    metas = [json.loads(path.read_text()) for path in sorted((label_dir(set_name, data) / "ai").glob("batch_*.meta.json"))]
+    return API_BLINDNESS if metas and all(meta.get("route") == "anthropic_api" for meta in metas) else BLINDNESS
+
+
 def _read_ai(set_name: str, ids: dict[str, str], data: Path) -> dict[str, dict]:
     labels: dict[str, dict] = {}
     for path in sorted((label_dir(set_name, data) / "ai").glob("batch_*.jsonl")):
@@ -238,7 +301,7 @@ def merge(set_name: str, data: Path = sets.DATA) -> dict:
     paths = [out / "agreement.json"] + ([data / "agreement.json"] if set_name == "test" else [])
     for path in paths:
         if agreement:
-            agreement["labeller_blindness"] = BLINDNESS
+            agreement["labeller_blindness"] = _blindness(set_name, data)
             path.write_text(json.dumps(agreement, indent=2) + "\n")
         else:
             path.unlink(missing_ok=True)  # a relabel with no owner overlap must not leave old agreement behind
@@ -247,13 +310,16 @@ def merge(set_name: str, data: Path = sets.DATA) -> dict:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("command", choices=["export", "merge", "sheet"])
+    parser.add_argument("command", choices=["export", "ai", "merge", "sheet"])
     parser.add_argument("set", choices=["dev", "test"])
     args = parser.parse_args(argv)
     if args.command == "sheet":
         print(f"wrote {reading_sheet(args.set)}")
     elif args.command == "export":
         print(f"{export(args.set)} cases exported")
+    elif args.command == "ai":
+        done = ai_label(args.set)
+        print(f"labelled {', '.join(done) or 'nothing new'}")
     else:
         print(json.dumps(merge(args.set), indent=2))
     return 0

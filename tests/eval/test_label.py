@@ -187,3 +187,57 @@ def test_the_labeller_sees_a_reviewer_confirmation_in_the_context(tmp_path):
     [adjustment] = context["adjustments"]
     assert adjustment["kind"] == "confirmed_method_change"
     assert adjustment["subject"] == max(context["payment_method_history"], key=lambda c: c["changed_at"])["id"]
+
+
+class _Block:
+    type = "text"
+
+    def __init__(self, text):
+        self.text = text
+
+
+class _Labeller:
+    """A stand-in for the Anthropic client: answers each batch from the blind ids in its prompt."""
+
+    def __init__(self, answer=None, stop_reason="end_turn"):
+        self.calls, self._answer, self._stop = [], answer, stop_reason
+        self.messages = self
+
+    def stream(self, **request):
+        self.calls.append(request)
+        cases = json.loads(request["messages"][0]["content"].split("## Cases", 1)[1].split("## Answer", 1)[0])
+        text = self._answer(cases) if self._answer else "\n".join(
+            json.dumps({"id": case["id"], "expected": "challenge", "also_acceptable": [], "reason": "r"}) for case in cases)
+        response = type("Response", (), {"stop_reason": self._stop, "content": [_Block(text)], "model": "claude-sonnet-5-5",
+                                         "usage": type("Usage", (), {"input_tokens": 10, "output_tokens": 5})()})()
+        return type("Stream", (), {"__enter__": lambda s: s, "__exit__": lambda s, *a: None,
+                                   "get_final_message": lambda s: response})()
+
+
+def test_ai_labels_every_batch_with_no_tools_and_says_so(prepared):
+    client = _Labeller()
+    done = label.ai_label("test", client=client, data=prepared)
+    out = prepared / "test" / "label"
+    assert done == [p.name.removesuffix(".prompt.md") for p in sorted(out.glob("batch_*.prompt.md"))]
+    assert all("tools" not in call and call["model"] == label.AI_SOURCE for call in client.calls)
+    meta = json.loads((out / "ai" / "batch_00.meta.json").read_text())
+    assert (meta["tool_calls"], meta["tools_offered"], meta["route"]) == (0, [], "anthropic_api")
+    assert label.ai_label("test", client=client, data=prepared) == []  # resumes: nothing left to label
+    ids = json.loads((out / "ids.json").read_text())
+    reverse = {case_id: blind for blind, case_id in ids.items()}
+    sample = json.loads((out / "owner_sample.json").read_text())
+    sets.write_jsonl(out / "owner.jsonl", [{"id": reverse[c], "expected": "challenge"} for c in sample])
+    blindness = label.merge("test", data=prepared)["agreement"]["labeller_blindness"]
+    assert "no tools offered" in blindness and "self-reported" not in blindness
+
+
+@pytest.mark.parametrize("answer, stop, message", [
+    (lambda cases: "", "end_turn", "ids"),
+    (lambda cases: "\n".join(json.dumps({"id": c["id"], "expected": "allow"}) for c in reversed(cases)), "end_turn", "ids"),
+    (lambda cases: "\n".join(json.dumps({"id": c["id"], "expected": "pay"}) for c in cases), "end_turn", "bad label"),
+    (None, "max_tokens", "max_tokens"),
+])
+def test_a_bad_answer_writes_nothing(prepared, answer, stop, message):
+    with pytest.raises(label.LabelError, match=message):
+        label.ai_label("test", client=_Labeller(answer, stop), data=prepared)
+    assert not list((prepared / "test" / "label" / "ai").glob("*.jsonl"))

@@ -322,7 +322,7 @@ section { display: grid; gap: 14px; }
     <thead><tr><th>Model</th><th>Job</th><th>Reached through</th><th>Sees</th></tr></thead>
     <tbody>
       <tr><td><span class="pill model t-model">Claude Haiku 5.5</span></td><td>Writes each case's invoice text and agent rationale</td><td>Claude Code subagents</td><td>The case's combination only: never its truth, category, label or the rules' lexicon</td></tr>
-      <tr><td><span class="pill model t-model">Claude Sonnet 5.5</span></td><td>Labels every dev and test case, blind</td><td>Claude Code subagents</td><td>What the engine sees, plus the labelling guide; it reports zero tool calls, checked per batch</td></tr>
+      <tr><td><span class="pill model t-model">Claude Sonnet 5.5</span></td><td>Labels every dev and test case, blind</td><td>Anthropic API, no tools offered</td><td>What the engine sees, plus the labelling guide; it cannot open a file</td></tr>
       <tr><td><span class="pill model t-model">Claude Opus 5.5</span></td><td>Strong tier under test</td><td>Anthropic API</td><td>The proposal and its context, with invoice text in marked untrusted blocks</td></tr>
       <tr><td><span class="pill model t-model">Jev 1.14</span></td><td>Cheap typed-decision tier under test (TypeSafe)</td><td>OpenRouter; TypeSafe direct as the backup</td><td>The same as Opus</td></tr>
       <tr><td><span class="pill model t-model">Qwen3 235B</span></td><td>Open-weight comparison arm, in Opus's place</td><td>OpenRouter</td><td>The same as Opus</td></tr>

@@ -112,12 +112,12 @@ report says that all three are from one family.
 
 1. **The guide comes after reading.** The owner reads and notes ~20 generated `dev` cases, then
    writes a one-page labelling guide.
-2. **One AI labeller, blind.** Claude Sonnet 5.5, run as a Claude Code subagent on the owner's
-   subscription from the committed prompt `eval/prompts/label.md`. It receives, inside its prompt,
-   only what the system sees plus the guide; never `truth`, the category or the dimension values.
-   It is told not to open repository files, and each batch's tool-call count is checked to be zero
-   so the blindness is shown, not assumed. Its labels are committed; a rerun may label differently,
-   which is why the committed file is the record.
+2. **One AI labeller, blind.** Claude Sonnet 5.5, sent each batch through the Anthropic API from
+   the committed prompt `eval/prompts/label.md` (`python -m eval.label ai <set>`). It receives, inside
+   its prompt, only what the system sees plus the guide; never `truth`, the category or the
+   dimension values. No tools are offered, so it cannot open a file: the blindness holds by
+   construction, and each batch's meta records the route. Its labels are committed; a rerun may
+   label differently, which is why the committed file is the record.
 3. **The owner labels** the whole `hard` set and 40 suspicious, adversarial and ambiguous cases
    from `test`, stratified, without seeing the AI label.
 4. **Agreement is reported on those 40**: raw agreement, and Cohen's κ with a bootstrap 95%

@@ -97,6 +97,7 @@ git config core.hooksPath .githooks  # once per clone: turns on the pre-push che
 .venv/bin/python scripts/keygen.py   # once: the demo agent's key and the admin token (never printed)
 .venv/bin/uvicorn zeta_one.gateway.app:app --port 8000  # the demo API, on 127.0.0.1 (ZETA_RISK_CONFIGURATION=jev for Jev)
 .venv/bin/python -m eval.run --set deterministic --config rules --backend real   # no model calls
+.venv/bin/python -m eval.label ai dev   # blind AI labels through the Anthropic API, no tools (paid)
 .venv/bin/python -m eval.report      # rebuild data/eval/report.{json,md} from the results
 .venv/bin/python -m eval.feedback    # verified outcomes in data/zeta.db -> the feedback set
 .venv/bin/python scripts/record_runs.py   # record scenario results and the report into site/data/
