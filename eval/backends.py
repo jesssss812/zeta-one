@@ -102,8 +102,11 @@ class RealBackend:
 
     def __init__(self, strong_tier: Any = None):
         """`strong_tier` stands in for the live strong tier; None uses the live one, which is paid."""
+        from zeta_one.gateway.wiring import engine_version
+
         self._strong = strong_tier
         self.paid = strong_tier is None
+        self._version = engine_version()
 
     def run(self, case: Case, configuration: Configuration) -> Outcome:
         from zeta_one.gateway.app import create_app
@@ -145,7 +148,8 @@ class RealBackend:
             ledger = Ledger(connection)
             if "add_spend" in ops:
                 _add_spend(connection, agent_id, business_id, ops["add_spend"], SEED_NOW)
-            gateway = Gateway(stages=stages, ledger=ledger, reuse=RiskReuse(connection), clock=lambda: SEED_NOW)
+            gateway = Gateway(stages=stages, ledger=ledger, reuse=RiskReuse(connection), clock=lambda: SEED_NOW,
+                              version=self._version)
 
             body = case.proposal.model_dump_json().encode()
             times = int(ops["repeat"].args.get("times", 1)) if "repeat" in ops else 1

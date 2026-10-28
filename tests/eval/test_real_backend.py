@@ -154,3 +154,10 @@ def test_generated_cases_reproduce_their_dimensions_in_tier_0(tmp_path, backend)
         assert features["bill_mismatch"].value is (dims["bill"] == "other_vendor"), dims
         ratio = features["amount_ratio_to_vendor_median"].value
         assert ratio is None if dims["tenure"] == "new" else ratio == dims["amount_ratio"], dims
+
+
+def test_evaluation_records_carry_the_engine_version(backend):
+    from zeta_one.gateway.wiring import engine_version
+    case = next(c for c in cases.all_cases() if c.id == "demo_routine_bill")
+    record = backend.run(case, run.CONFIGS["rules"]).record
+    assert record.engine_version == engine_version() and record.seed_version and record.policy_version
