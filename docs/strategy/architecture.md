@@ -6,6 +6,11 @@ Status: **accepted** the same day; the choices are recorded in
 who builds each module is in [parallel-build.md](parallel-build.md); the guardrails are in
 [security.md](security.md).
 
+Since then (2026-10-28): Jev runs as a model tier through OpenRouter, with TypeSafe as the backup
+([../reference/jev.md](../reference/jev.md)); an open-weight model is a comparison arm
+([../decisions/0014-open-weight-arm.md](../decisions/0014-open-weight-arm.md)); the gateway also
+serves the case review page ([../decisions/0015-case-review-assistant.md](../decisions/0015-case-review-assistant.md)).
+
 The hackathon credits ($25 Supabase, $25 Apify) are resources, not requirements. Each choice below
 is made on what the demo, the judges and the reproduction need; where a credit fits, it says so.
 

@@ -1,94 +1,62 @@
 # Roadmap
 
-What is not done, as of 2026-10-27. Remove a line when it is done.
+What is not done, as of 2026-10-28. Remove a line when it is done. Items marked **owner** need the
+owner's own time or accounts.
 
-## Before implementation
+## Live models
 
-- **Owner:** put an OpenRouter key in `.env` as `OPENROUTER_API_KEY` (and a TypeSafe key as
-  `TYPESAFE_API_KEY` for the backup), then run
+- **Owner:** put `OPENROUTER_API_KEY` (and `TYPESAFE_API_KEY` for the backup) in `.env`, and export
+  `ANTHROPIC_API_KEY` in the shell.
+- One live call per tier:
   `.venv/bin/python -m pytest tests/risk/test_jev.py tests/risk/test_open_weight.py --live-models`;
-  correct the parsers and `docs/reference/jev.md` to the real shapes.
-- Confirm the Console key, the Claude model ids and the `messages.parse` call with one request.
-- Test Rho's MCP connector in claude.ai (Connectors → Rho): does it connect, and what tools does
-  it list? Record the answer in `docs/reference/rho-api.md`.
-
-The build order, schedule and cut list are in
-[strategy/implementation-plan.md](strategy/implementation-plan.md).
-
-## First version (Wednesday)
-
-- The demo API in `docs/reference/demo-api.md` serving the site; no UI of its own.
-
-## Security guardrails (Wednesday, with the module each protects)
-
-Detail, tests and estimates are in [strategy/security.md](strategy/security.md); the decisions in
-[decisions/0010-gateway-guardrails.md](decisions/0010-gateway-guardrails.md).
-
-- Live Rho client GET only; site renders untrusted text as text.
-- A Claude Code hook refusing shell commands that touch `.env` or `*.ovpn`.
+  correct the parsers and [reference/jev.md](reference/jev.md) to the real shapes. Confirm the Claude
+  model id and the `messages.parse` call with one request.
+- **Owner:** to use the case chat, run `ollama serve` and `ollama pull qwen2.5:7b` (about 4.7 GB).
+- One live case file on the review page, to check the research and assembly calls.
 
 ## Evaluation
 
-The plan is in [strategy/evaluation.md](strategy/evaluation.md); the times are in the schedule in
-[strategy/implementation-plan.md](strategy/implementation-plan.md#schedule). Items marked
-**owner** need the owner's own time.
+The plan is in [strategy/evaluation.md](strategy/evaluation.md). `dev` (48 cases) and `test` (100)
+are generated; the report so far covers only the deterministic cases.
 
-Wednesday:
-
+- **Owner:** edit `eval/prompts/label_guide.draft.md` and rename it to `label_guide.md` (~20 min).
+- AI-label `dev` and `test` with the guide, blind.
 - **Owner:** write the `hard` set, 15–20 risk cases outside the generator's templates (~1.5 h).
-- Run `scripts/keygen.py` once, so the default gateway registers the demo agent.
-- Use the case generator and wording prompt to assemble `dev` ~50 with independently generated
-  wording and harmless look-alikes.
-- **Owner:** read ~20 `dev` cases and write the one-page labelling guide (~30 min).
-- Use the implemented blind export/merge workflow to label `dev`.
-- Runs on `dev` with the real backend (`--backend real --live --max-usd` for the model
-  configurations); failures-by-stage table; tune on `dev` only.
-- Generate `test` ~100 with a new seed and wording against the frozen tier-0 lexicon;
-  hash it; AI-label it.
+- **Owner:** label 40 stratified `test` cases blind, then adjudicate disagreements (~1 h).
+- Runs on `dev` with the real backend (`--backend real --live --max-usd`); tune on `dev` only;
+  freeze; then the scored run of every configuration on `test`, `hard` and the deterministic cases.
+- Final report: per-category rates with intervals, confusion matrices, agreement, the Cost table,
+  limitations. Then `scripts/record_runs.py --live` and `scripts/demo_loop.py --live`, so
+  `site/data/` holds the final runs.
 
-Thursday 08:00–09:30:
-
-- **Owner:** label 40 stratified suspicious, adversarial and ambiguous `test` cases blind, then
-  adjudicate disagreements (~1 h).
-- Scored run of every configuration on `test`, `hard` and the identity and authorization cases.
-- Final `report.md`: per-category rates with intervals, confusion matrices, `dev` / `test` /
-  `hard` side by side, agreement, cost and latency, limitations.
-- Replace the fixtures' numbers with this run.
-
-If time allows (extensions 2 and 3 below, then 11):
-
-- Repeat runs (3×, through the Batches API) with pass^3.
-- Attacking model, ~20 attempts per configuration, aimed first at model lowering of soft
-  signals.
-- Expected cost with the halved and doubled missed-fraud weight.
-
-## Extensions (Thursday morning, in the plan's order)
-
-Live Rho read; repeat runs with pass^3; attacking model; Jev's calibration on our cases;
-`renew_authorization` and `verify_payee` challenge types with the friction score;
-grant-authorization beat; extra tier-0 features; `notify`; observe mode; open-weight comparison
-arm; expected cost and an evaluation chart.
-
-## Stretch (after the hackathon)
-
-- Evaluation follow-ups listed in [strategy/evaluation.md](strategy/evaluation.md#after-the-hackathon).
-- Security follow-ups listed in [strategy/security.md](strategy/security.md#later): snapshot
-  comparison of payment methods, signed authorizations, hash-chained evidence, rate limits, key
-  rotation.
-- Approval side panel: poll Rho items waiting for approval and score them (decision 0003).
-- **Owner:** to use the case chat, run `ollama serve` and `ollama pull qwen2.5:7b` (about 4.7 GB).
-- Case review assistant: dual control on findings, a per-day model budget, and an evaluation of the
-  assistant on adversarial web pages (decision 0015).
+If time allows: repeat runs with pass^3; an attacking model aimed at model lowering of soft
+signals; expected cost with the missed-fraud weight halved and doubled.
 
 ## Submission (by Thu Oct 29, 5:00 PM CT)
 
-- **Owner:** connect the repo to Vercel, serving `site/` as a static site (decision 0011).
-- Run `.venv/bin/python scripts/record_runs.py --live` after the final evaluation, so `site/data/`
-  holds the final report and live scenario results; the site session renders them.
+Checklist in [reference/hackathon.md](reference/hackathon.md).
 
-- Confirm the track (aimed at Rho fintech).
-- README sections the checklist requires; see `docs/reference/hackathon.md`.
-- Loom video, 2–5 minutes.
-- 150–300 word write-up.
-- Make the repo public, after checking it holds no personal details, raw staging data or
-  credentials.
+- The site renders the recorded runs in `site/data/`.
+- **Owner:** run `scripts/keygen.py` once on the demo machine, so the default gateway registers
+  the demo agent and has an admin token.
+- **Owner:** connect the repo to Vercel, serving `site/` as a static site (decision 0011).
+- **Owner:** Loom video, 2–5 minutes; 150–300 word write-up; team roster; confirm the Rho
+  fintech track.
+- **Owner:** make the repo public, after checking it holds no personal details, raw staging data
+  or credentials.
+
+## Extensions
+
+Live Rho read through a GET-only client; Jev's calibration on our cases; `renew_authorization` and
+`verify_payee` challenge types with the friction score; extra tier-0 features; `notify`; observe
+mode; a Claude Code hook refusing shell commands that touch `.env` or `*.ovpn`; testing Rho's MCP
+connector in claude.ai and recording the answer in [reference/rho-api.md](reference/rho-api.md).
+
+## After the hackathon
+
+- Evaluation follow-ups in [strategy/evaluation.md](strategy/evaluation.md#after-the-hackathon).
+- Security follow-ups in [strategy/security.md](strategy/security.md#later): snapshot comparison
+  of payment methods, signed authorizations, hash-chained evidence, rate limits, key rotation.
+- Approval side panel: poll Rho items waiting for approval and score them (decision 0003).
+- Case review assistant: dual control on findings, a per-day model budget, and an evaluation of the
+  assistant on adversarial web pages (decision 0015).

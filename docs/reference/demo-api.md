@@ -1,10 +1,11 @@
 # Demo API: the contract between the engine and the site
 
 Agreed 2026-10-27 between the engine (this repo's `zeta_one/`) and the site (`site/`, built in
-parallel). The engine serves JSON; the site renders it and holds no decision logic. Until the
-engine runs, the site uses the fixture in `data/fixtures/`, which carries `"illustrative": true`
-and no latency or cost figures. Payment execution is simulated before and after integration, and
-every response says so.
+parallel). The engine serves JSON; the site renders it and holds no decision logic. The static
+site reads recorded runs from `site/data/`, written by `scripts/record_runs.py` and
+`scripts/demo_loop.py` and marked `"recorded": true`; the fixtures in `data/fixtures/` carry
+`"illustrative": true` and no latency or cost figures. Payment execution is simulated, and every
+response says so.
 
 ## Ownership
 

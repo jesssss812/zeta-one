@@ -112,8 +112,10 @@ count as recent. An absent, zero or wrong-currency median yields no amount-ratio
 
 ## Gateway wiring and verification
 
-`gateway.wiring.real_stages(connection)` builds every stage on the gateway's SQLite connection: the
-registry and authorization store, the seed as the context source, tier 0 and the strong tier. The
+`gateway.wiring.real_stages(connection, store, configuration)` builds every stage on the gateway's
+SQLite connection: the registry and authorization store, the seed as the context source, tier 0
+and the model tiers the configuration names (`ZETA_RISK_CONFIGURATION`: `engineered`, `jev` or
+`open_weight`). The
 default app (`zeta_one.gateway.app:app`) uses it with `data/zeta.db` and registers the built-in demo
 agent from `data/keys/ap_assistant.pem` with the demo authorization, if the key exists (run
 `scripts/keygen.py` once). Admin endpoints register and revoke agents and grant and revoke
