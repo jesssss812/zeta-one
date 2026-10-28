@@ -59,7 +59,7 @@ def test_propose_returns_exactly_decision_and_ids(client, make):
 def test_routine_payment_is_allowed_and_executed_simulated(client):
     body = propose(client, routine_proposal()).json()
     assert body["decision"] == "allow" and body["challenge_id"] is None
-    record = client.get(f"/v1/decisions/{body['decision_id']}").json()
+    record = client.get(f"/v1/decisions/{body['decision_id']}", headers=ADMIN).json()
     assert record["execution"] == {"status": "executed", "simulated": True}
     assert record["risk"]["tiers_run"] == ["tier0"]
 
@@ -67,14 +67,14 @@ def test_routine_payment_is_allowed_and_executed_simulated(client):
 def test_unsigned_request_is_blocked_and_recorded(client):
     body = client.post(PROPOSE, content=b"not even json").json()
     assert body["decision"] == "block"
-    assert client.get(f"/v1/decisions/{body['decision_id']}").json()["reasons"] == ["identity:unsigned"]
+    assert client.get(f"/v1/decisions/{body['decision_id']}", headers=ADMIN).json()["reasons"] == ["identity:unsigned"]
 
 
 def test_malformed_body_from_a_verified_agent_is_400(client):
     response = client.post(PROPOSE, content=b'{"amount": "lots"}', headers=agent_headers())
     assert response.status_code == 400
     assert response.json()["error"]["code"] == "invalid_proposal"
-    assert client.get("/v1/decisions").json() == []
+    assert client.get("/v1/decisions", headers=ADMIN).json() == []
 
 
 def test_unknown_counterparty_is_400(client):
@@ -114,7 +114,7 @@ def test_agent_signed_resolve_of_its_own_challenge_is_refused_and_stays_held(cli
     response = resolve(client, held["challenge_id"], headers={**ADMIN, **agent_headers()})
     assert response.status_code == 403
     assert response.json()["error"]["code"] == "agent_signed"
-    assert client.get(f"/v1/decisions/{held['decision_id']}").json()["execution"]["status"] == "held"
+    assert client.get(f"/v1/decisions/{held['decision_id']}", headers=ADMIN).json()["execution"]["status"] == "held"
 
 
 @pytest.mark.parametrize("headers", [{}, {"Authorization": "Bearer wrong"}, {"Authorization": TOKEN}])
@@ -136,7 +136,7 @@ def test_approve_with_nothing_changed_executes(client):
     held = hold(client)
     body = resolve(client, held["challenge_id"]).json()
     assert body["status"] == "executed" and body["reasons"] == []
-    record = client.get(f"/v1/decisions/{held['decision_id']}").json()
+    record = client.get(f"/v1/decisions/{held['decision_id']}", headers=ADMIN).json()
     assert record["execution"] == {"status": "executed", "simulated": True}
     assert record["review"]["outcome"] == "approved" and record["review"]["provenance"] == "admin_token"
 
@@ -151,7 +151,7 @@ def test_revoking_the_authorization_while_held_blocks_on_approve(client, world):
     world.authorization = world.authorization.model_copy(update={"status": "revoked", "version": 2})
     body = resolve(client, held["challenge_id"]).json()
     assert body == {**body, "status": "blocked", "reasons": ["resolve:state_changed"]}
-    review = client.get(f"/v1/decisions/{held['decision_id']}").json()["review"]
+    review = client.get(f"/v1/decisions/{held['decision_id']}", headers=ADMIN).json()["review"]
     assert "authorization:version" in review["changes"] and "authorization:status" in review["changes"]
 
 
@@ -204,3 +204,14 @@ def test_concurrent_proposals_cannot_both_fit_under_the_rolling_limit(gateway, w
     with ThreadPoolExecutor(max_workers=2) as pool:
         decisions = sorted(pool.map(send, range(2)))
     assert decisions == ["allow", "block"]
+
+
+@pytest.mark.parametrize("path", ["/v1/decisions", "/v1/decisions/{id}"])
+def test_reading_records_needs_the_admin_token_and_refuses_agents(client, path):
+    """An agent gets only the decision and its ids (S4); it can't read back the record's signals."""
+    body = propose(client, held_proposal()).json()
+    url = path.format(id=body["decision_id"])
+    assert client.get(url).status_code == 401
+    assert client.get(url, headers=agent_headers()).status_code == 403
+    assert client.get(url, headers={**ADMIN, **agent_headers()}).status_code == 403
+    assert client.get(url, headers=ADMIN).status_code == 200

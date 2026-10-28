@@ -26,9 +26,13 @@ uvicorn zeta_one.gateway.app:app --port 8000
 ```
 
 CORS allows `http://localhost:*` so a dev server for the site can call it. Base URL
-`http://localhost:8000`. All endpoints below are unauthenticated: they are the demo surface, not the
-signed agent endpoint (`POST /v1/actions/propose_payment`, which the scenario runner calls
-internally with a built-in signed agent).
+`http://localhost:8000`. The endpoints below are unauthenticated, except reading decision records:
+they are the demo surface, not the signed agent endpoint (`POST /v1/actions/propose_payment`,
+which the scenario runner calls internally with a built-in signed agent). A record names the
+signals and the model's rationale that an agent's own response leaves out, so
+`GET /v1/decisions` and `GET /v1/decisions/{decision_id}` need
+`Authorization: Bearer $ZETA_ADMIN_TOKEN` and refuse agent-signed requests, like the other admin
+endpoints. A scenario run returns its record in full.
 
 ## Endpoints
 
@@ -37,7 +41,7 @@ internally with a built-in signed agent).
 | `GET /v1/health` | `{"engine_version", "policy_version", "data_backend": "seed" \| "live", "simulated": true}` |
 | `GET /v1/scenarios` | `[{"name", "title", "summary", "expected"}]` |
 | `POST /v1/scenarios/{name}/run` | a **scenario result** (below); runs the scenario fresh each time |
-| `GET /v1/decisions/{decision_id}` | the **evidence record** of an earlier run |
+| `GET /v1/decisions/{decision_id}` | the **evidence record** of an earlier run (admin token) |
 | `GET /v1/eval/latest` | the evaluation report as JSON once one exists; `404` before |
 
 Error responses are `{"error": {"code", "message"}}` with a 4xx or 5xx status.

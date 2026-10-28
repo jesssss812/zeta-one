@@ -85,13 +85,17 @@ def create_app(gateway: Gateway, token: str | None) -> FastAPI:
         except NotHeld as error:
             return _error(409, "not_held", str(error))
 
+    # Records name the signals and the model's rationale, which the agent's own response leaves out
+    # (S4), so reading them is an admin action.
     @app.get("/v1/decisions")
-    def list_decisions(limit: int = 50) -> list[dict]:
+    def list_decisions(request: Request, limit: int = 50) -> list[dict]:
+        admin.require_admin(request.headers, token)
         with gateway.lock:
             return gateway.ledger.decisions(min(max(limit, 1), 500))
 
     @app.get("/v1/decisions/{decision_id}")
-    def get_decision(decision_id: str):
+    def get_decision(decision_id: str, request: Request):
+        admin.require_admin(request.headers, token)
         with gateway.lock:
             record = gateway.ledger.decision(decision_id)
         if record is None:
