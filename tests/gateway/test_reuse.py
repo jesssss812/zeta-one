@@ -157,3 +157,45 @@ def test_clean_payments_that_never_reach_a_model_do_not_count_toward_the_limit(g
     assert world.strong_calls == 0
     assert all(not r["risk"]["repeat_limit_reached"] for r in records)
     assert {r["decision"] for r in records} == {"allow"}
+
+
+def test_material_tier0_changes_cannot_bypass_the_fresh_model_cap(gateway, world):
+    records = []
+    for index in range(MAX_FRESH_ASSESSMENTS + 2):
+        world.extra_features = {"new_risk": Feature(value=index, evidence=[f"source_{index}"])}
+        records.append(send(gateway, held_proposal()))
+    assert world.strong_calls == MAX_FRESH_ASSESSMENTS
+    assert all(record["risk"]["repeat_limit_reached"] for record in records[MAX_FRESH_ASSESSMENTS:])
+
+
+def test_real_tier0_repeated_holds_reuse_after_duplicate_risk_first_appears():
+    from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
+    from zeta_one.contracts import Authorization
+    from zeta_one.gateway.wiring import real_stages
+    from zeta_one.identity.signing import sign
+    from tests.gateway.fakes import AGENT, BUSINESS, HELD
+
+    connection = sqlite3.connect(":memory:", check_same_thread=False)
+    connection.row_factory = sqlite3.Row
+    stages = real_stages(connection)
+    key = Ed25519PrivateKey.generate()
+    stages.registry.register(AGENT, BUSINESS, "Synthetic owner", key.public_key(), NOW)
+    stages.authorizations.grant(Authorization.model_validate(HELD.decision_record.authorization.snapshot))
+    world = FakeWorld()
+    stages.tiers = {"strong": world._Strong(world)}
+    clock = Clock()
+    gateway = Gateway(stages=stages, ledger=Ledger(connection), reuse=RiskReuse(connection), clock=clock)
+    path = "/v1/actions/propose_payment"
+    body = held_proposal().model_dump_json().encode()
+    records = []
+    for _ in range(6):
+        headers = sign(key, AGENT, "POST", path, body, clock.now)
+        response = gateway.propose(SignedRequest(method="POST", path=path, headers=headers, body=body))
+        records.append(gateway.ledger.decision(response["decision_id"]))
+        clock.now += timedelta(minutes=1)
+    assert world.strong_calls == 2
+    assert not records[0]["risk"]["features"]["duplicate_candidate"]["value"]
+    assert records[1]["risk"]["features"]["duplicate_candidate"]["value"]
+    assert records[1]["risk"]["reused_from"] is None
+    assert all(record["risk"]["reused_from"] == records[1]["decision_id"] for record in records[2:])
+    assert {record["execution"]["status"] for record in records} == {"held"}

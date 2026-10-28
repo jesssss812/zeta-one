@@ -3,14 +3,14 @@
 A proposal with the same fingerprint (agent, counterparty, payment method, amount, currency, bill)
 under the same configuration within 24 hours reuses the earlier risk result instead of asking the
 models again, provided the payee's payment methods haven't changed since. Identity, authorization
-and tier 0 still run every time: the earlier result is reused only if tier 0 finds exactly what it
+and tier 0 still run every time: the earlier result is reused only if tier 0 finds the same material risk as it
 found then, so a hard flag raised since (a bill that opened, new instruction text) is never skipped.
 The reused result names the decision it came from in `risk.reused_from` and carries no token usage,
 since no model was called for it.
 
 Changing the amount by a cent is a new proposal, so an agent could re-roll that way. After
 MAX_FRESH_ASSESSMENTS fresh assessments that reached a model for the same agent, payee and payment
-method within the window, a further different proposal skips the models: tier 0 still runs, and the policy challenges
+method within the window, any further fresh assessment skips the models: tier 0 still runs, and the policy challenges
 it (`risk.repeat_limit_reached`).
 """
 
@@ -73,11 +73,18 @@ def _configuration_key(configuration: Configuration) -> str:
 
 def _same_tier0(fresh: Tier0Output, risk: RiskEvidence) -> bool:
     earlier = next((result for result in risk.tier_results if result.tier == "tier0"), None)
-    features = {name: feature.model_dump(mode="json") for name, feature in fresh.features.items()}
+    def comparable(features):
+        values = {name: feature.model_dump(mode="json") for name, feature in features.items()}
+        # Additional matching holds do not change an already-present duplicate signal.
+        if "duplicate_candidate" in values:
+            values["duplicate_candidate"].pop("evidence", None)
+        return values
+
+    features = comparable(fresh.features)
     return (
         earlier is not None
         and fresh.result.level == earlier.level
-        and features == {name: feature.model_dump(mode="json") for name, feature in risk.features.items()}
+        and features == comparable(risk.features)
     )
 
 
@@ -101,14 +108,17 @@ class RiskReuse:
         self, engine: Engine, proposal: Proposal, context: Context, now: datetime, identity: IdentityEvidence
     ) -> RiskEvidence:
         earlier = self._find(identity.claimed_agent_id, proposal, context, now, engine.configuration)
-        if earlier is None:
-            if self._fresh_count(identity.claimed_agent_id, proposal, now, engine.configuration) >= MAX_FRESH_ASSESSMENTS:
-                tier0_only = assess.assess(proposal, context, now, engine.tier0, {}, Configuration(tiers=["tier0"]))
-                return tier0_only.model_copy(update={"repeat_limit_reached": True})
-            return engine.run_tiers(proposal, context, now, identity)
-        decision_id, risk = earlier
-        if not _same_tier0(engine.tier0(proposal, context, now), risk):
-            return engine.run_tiers(proposal, context, now, identity)
+        if earlier is not None:
+            decision_id, risk = earlier
+            if _same_tier0(engine.tier0(proposal, context, now), risk):
+                return self._reused(decision_id, risk)
+        if self._fresh_count(identity.claimed_agent_id, proposal, now, engine.configuration) >= MAX_FRESH_ASSESSMENTS:
+            tier0_only = assess.assess(proposal, context, now, engine.tier0, {}, Configuration(tiers=["tier0"]))
+            return tier0_only.model_copy(update={"repeat_limit_reached": True})
+        return engine.run_tiers(proposal, context, now, identity)
+
+    @staticmethod
+    def _reused(decision_id: str, risk: RiskEvidence) -> RiskEvidence:
         results = [result.model_copy(update={"usage": None, "latency_ms": None}) for result in risk.tier_results]
         return risk.model_copy(update={"reused_from": decision_id, "tier_results": results})
 
