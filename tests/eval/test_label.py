@@ -175,3 +175,15 @@ def test_a_relabel_without_owner_overlap_removes_old_agreement(prepared):
     (out / "owner.jsonl").unlink()
     label.merge("test", data=prepared)
     assert not (prepared / "agreement.json").exists() and not (out / "agreement.json").exists()
+
+
+def test_the_labeller_sees_a_reviewer_confirmation_in_the_context(tmp_path):
+    from zeta_one.contracts import Proposal, SetupOp
+    rows = generate.combos("test", data=tmp_path)
+    row = next(r for r in rows if r["dimensions"]["change_verified"] == "yes")
+    ops, proposal = generate.setup_for(row)
+    context = label.seed_context([SetupOp(**op) for op in ops],
+                                 Proposal.model_validate({**proposal, "memo": "", "agent_rationale": ""}))
+    [adjustment] = context["adjustments"]
+    assert adjustment["kind"] == "confirmed_method_change"
+    assert adjustment["subject"] == max(context["payment_method_history"], key=lambda c: c["changed_at"])["id"]

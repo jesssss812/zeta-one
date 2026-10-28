@@ -166,6 +166,7 @@ def test_generated_cases_reproduce_their_dimensions_in_tier_0(tmp_path, backend)
         features = backend.run(Case.model_validate({**raw, "expected": "allow"}), run.CONFIGS["rules"]).record.risk.features
         assert features["counterparty_is_new"].value is (dims["tenure"] == "new"), dims
         assert features["payment_method_changed_days_ago"].value == dims["change_days"], dims
+        assert features["payment_method_change_confirmed"].value is (dims["change_verified"] == "yes"), dims
         assert features["bill_mismatch"].value is (dims["bill"] == "other_vendor"), dims
         ratio = features["amount_ratio_to_vendor_median"].value
         assert ratio is None if dims["tenure"] == "new" else ratio == dims["amount_ratio"], dims
@@ -189,3 +190,16 @@ def test_a_jev_that_clears_everything_lets_no_blocked_or_challenged_case_through
 
     backend = backends.RealBackend(strong_tier=LoweringStrong(), cheap_tier=LoweringCheap())
     assert backend.run(case, run.CONFIGS["jev"]).decision != "allow"
+
+
+def test_a_reviewer_confirmed_change_is_not_a_floor_and_an_unconfirmed_one_is(backend):
+    from zeta_one.contracts import Case, SetupOp
+    base = next(c for c in cases.all_cases() if c.id == "demo_routine_bill")
+    change = SetupOp(op="change_payment_method", args={"counterparty_id": "cp_0012", "days_ago": 5})
+    unconfirmed = base.model_copy(update={"id": "u", "setup": [change]})
+    confirmed = base.model_copy(update={"id": "c", "setup": [change, SetupOp(op="confirm_method_change")]})
+    floor_u = backend.run(unconfirmed, run.CONFIGS["rules"]).record.risk.floor
+    risk_c = backend.run(confirmed, run.CONFIGS["rules"]).record.risk
+    assert "payment_method_changed_days_ago" in floor_u.flags
+    assert risk_c.floor is None or "payment_method_changed_days_ago" not in risk_c.floor.flags
+    assert risk_c.adjustments and risk_c.adjustments[0].startswith("adj_setup_")

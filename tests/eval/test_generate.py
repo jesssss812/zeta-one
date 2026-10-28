@@ -90,6 +90,7 @@ def test_truth_follows_where_the_money_goes(changes, truth):
 def test_every_generated_fraud_leaves_a_trace_tier_0_sees():
     """detectable is True for every generated case, so check it: each fraud combination's setup gives
     tier 0 a signal on the real seed."""
+    from eval.cases import EVAL_OPS
     from zeta_one.contracts import Proposal, SetupOp
     from zeta_one.rho import mutations
     from zeta_one.rho.seed import SEED_NOW
@@ -104,7 +105,8 @@ def test_every_generated_fraud_leaves_a_trace_tier_0_sees():
         proposal = Proposal.model_validate({**proposal, "memo": "", "agent_rationale": ""})
         with Store() as store:
             for op in ops:
-                mutations.apply(store, SetupOp(**op))
+                if op["op"] not in EVAL_OPS:
+                    mutations.apply(store, SetupOp(**op))
             output = Tier0()(proposal, context_for(store)(proposal, mutations.BUSINESS, SEED_NOW), SEED_NOW)
         assert output.result.level != "low", row["dimensions"]
     assert all(generate.detectable(c) for c in generate.all_combos())
@@ -183,3 +185,12 @@ def test_a_bill_for_another_payee_is_worded_as_that_payees_invoice(tmp_path):
         bill = next((op for op in ops if op["op"] == "add_bill"), None)
         if bill:
             assert request["invoice_from"] == names[bill["args"]["counterparty_id"]]
+
+
+def test_a_confirmed_change_is_a_reviewer_confirmation_not_a_seed_note(tmp_path):
+    rows = generate.combos("test", data=tmp_path)
+    for row in rows:
+        ops, _ = generate.setup_for(row)
+        confirmed = any(op["op"] == "confirm_method_change" for op in ops)
+        assert confirmed is (row["dimensions"]["change_verified"] == "yes"), row["dimensions"]
+        assert not any("verified_with_vendor" in op["args"] for op in ops)

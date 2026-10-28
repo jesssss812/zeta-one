@@ -69,10 +69,19 @@ def seed_context(setup: list[SetupOp], proposal: Proposal) -> dict:
     from zeta_one.rho.snapshot import Store
     from zeta_one.rho.view import context_for
 
+    from datetime import timedelta
+
+    from eval.cases import EVAL_OPS, confirmed_change
+
     with Store() as store:
         for op in setup:
-            mutations.apply(store, op)
+            if op.op not in EVAL_OPS:
+                mutations.apply(store, op)
         context = context_for(store)(proposal, mutations.BUSINESS, SEED_NOW)
+        if any(op.op == "confirm_method_change" for op in setup):
+            confirmation = confirmed_change(store, proposal, mutations.BUSINESS, SEED_NOW - timedelta(minutes=1))
+            # As the gateway would show it: the business's active adjustments that bear on the payee.
+            context = context.model_copy(update={"adjustments": [confirmation] if confirmation else []})
     return context.model_dump(mode="json")
 
 
@@ -148,6 +157,7 @@ def reading_sheet(set_name: str, n: int = 20, context_for: ContextFor = seed_con
         payee, history = context["counterparty"], context["payment_history"]
         bill = context.get("bill")
         changes = context.get("payment_method_history") or []
+        confirmed = {a["subject"] for a in context.get("adjustments") or [] if a["kind"] == "confirmed_method_change"}
         lines += [
             f"## c{index:03d}",
             "",
@@ -156,7 +166,8 @@ def reading_sheet(set_name: str, n: int = 20, context_for: ContextFor = seed_con
             f"- History: {history['count']} payments"
             + (f", median {history['median_amount']['amount'] / 100:,.2f}" if history.get("median_amount") else ""),
             "- Method changes: " + ("; ".join(f"{c['change']} {c['changed_at'][:10]}"
-                                              + (" (confirmed with vendor)" if c.get("verified_with_vendor") else "")
+                                              + (" (verified by the business's reviewer, call-back)"
+                                                 if c["id"] in confirmed else "")
                                               for c in changes) or "none"),
             f"- Bill: " + (f"{bill['counterparty_name']}, {bill['amount']['amount'] / 100:,.2f}" if bill else "none named"),
             "",

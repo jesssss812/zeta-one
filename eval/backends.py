@@ -162,6 +162,12 @@ class RealBackend:
                 _add_spend(connection, agent_id, business_id, ops["add_spend"], SEED_NOW)
             gateway = Gateway(stages=stages, ledger=ledger, reuse=RiskReuse(connection), clock=lambda: SEED_NOW,
                               version=self._version)
+            if "confirm_method_change" in ops:
+                confirmation = hand_cases.confirmed_change(store, case.proposal, business_id,
+                                                           SEED_NOW - timedelta(minutes=1))
+                if confirmation is None:
+                    raise Unsupported("confirm_method_change needs a change to the proposal's payment method")
+                gateway.adjustments.append(confirmation)
 
             body = case.proposal.model_dump_json().encode()
             times = int(ops["repeat"].args.get("times", 1)) if "repeat" in ops else 1

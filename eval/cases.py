@@ -20,6 +20,7 @@ and ledger of the gateway it builds for each case:
 | `add_spend` | `amount`, `currency`, `days_ago`: an executed payment by the agent, for the rolling limit |
 | `fail_model` | none: the strong tier errors on every call |
 | `repeat` | `times`: send the same proposal this many times, each signed afresh |
+| `confirm_method_change` | none: a person at the business verified the latest change to the proposal's payment method earlier, recorded as a `confirmed_method_change` risk adjustment (decision 0013) |
 | `after:agent_resolves_own_challenge` | none: after the decision, the agent signs a resolve of its own challenge |
 | `after:revoke_then_approve` | none: after the decision, revoke the grant, then an admin approves the held payment |
 
@@ -40,8 +41,28 @@ PER_PAYMENT = 500_000
 APPROVAL_ABOVE = 1_000_000
 
 EVAL_OPS = frozenset(
-    {"grant_authorization", "no_authorization", "revoke_agent", "add_spend", "fail_model", "repeat"}
+    {"grant_authorization", "no_authorization", "revoke_agent", "add_spend", "fail_model", "repeat",
+     "confirm_method_change"}
 )
+
+
+def confirmed_change(store, proposal: Proposal, business_id: str, at):
+    """The `confirm_method_change` op's adjustment: the latest change to the proposal's payment method,
+    confirmed by the business's reviewer at `at`. None if the method has no change."""
+    from datetime import timedelta
+
+    from zeta_one.contracts import RiskAdjustment
+    from zeta_one.gateway.adjustments import CONFIRMATION_DAYS
+
+    changes = [row for row in store.all("method_history") if row.get("method_id") == proposal.payment_method_id]
+    if not changes:
+        return None
+    latest = max(changes, key=lambda row: row["changed_at"])
+    return RiskAdjustment(adjustment_id=f"adj_setup_{latest['id']}", business_id=business_id,
+                          kind="confirmed_method_change", subject=latest["id"], finding="legitimate",
+                          verification="callback_known_number", by="the business's reviewer (evaluation setup)",
+                          at=at, expires_at=at + timedelta(days=CONFIRMATION_DAYS),
+                          reason="the bank change was verified by call-back before this payment")
 FOLLOW_UP_PREFIX = "after:"
 
 # Fixture name -> (case id, set, category, truth, expected, also_acceptable)
@@ -149,8 +170,7 @@ def guardrail_cases() -> list[Case]:
                      SetupOp(op="add_spend", args={"amount": 499_900, "currency": "USD", "days_ago": 1})],
               note="S8: $4,999 after $4,999 under a $6,000 rolling limit", reason="authorization:limits.rolling"),
         _case("guardrail_model_failure", "D", "legitimate", "challenge",
-              setup=[SetupOp(op="change_payment_method", args={"counterparty_id": "cp_0012", "days_ago": 45,
-                                                                "verified_with_vendor": True}),
+              setup=[SetupOp(op="change_payment_method", args={"counterparty_id": "cp_0012", "days_ago": 45}),
                      SetupOp(op="fail_model")],
               note="S2: the routine bill after a 45-day-old change of bank details, a soft signal with no "
                    "floor, escalates; the model errors, so confirm", reason="risk:model_unavailable"),

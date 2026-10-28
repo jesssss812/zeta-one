@@ -238,8 +238,10 @@ def setup_for(row: dict) -> tuple[list[dict], dict]:
     if c["change_days"] is not None:
         paying = new_method
         ops.append({"op": "change_payment_method", "args": {
-            "counterparty_id": vendor, "days_ago": c["change_days"], "new_method_id": new_method,
-            "verified_with_vendor": c["change_verified"] == "yes"}})
+            "counterparty_id": vendor, "days_ago": c["change_days"], "new_method_id": new_method}})
+        if c["change_verified"] == "yes":
+            # Confirmed the only way the product can know: a person's verified outcome (decision 0013).
+            ops.append({"op": "confirm_method_change", "args": {}})
     bill_owner = None if c["bill"] == "none" else (other if c["bill"] == "other_vendor" else vendor)
     if bill_owner == other:
         ops.append({"op": "add_counterparty", "args": {"counterparty_id": other, "name": other_vendor_name(row["vendor"]),
