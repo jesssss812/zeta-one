@@ -48,3 +48,43 @@ def test_five_scenarios_with_real_data_identity_authorization_and_tier0(scenario
             assert proposal == scenario.proposal
         assert record.reasons == scenario.decision_record.reasons
     connection.close()
+
+
+def test_a_repeated_routine_payment_is_challenged_as_a_duplicate():
+    """Through the gateway on real stages: the second identical payment sees the first in the ledger."""
+    from datetime import timedelta
+
+    from zeta_one.gateway.ledger import Ledger
+    from zeta_one.gateway.service import Gateway
+    from zeta_one.gateway.wiring import Stages
+
+    from zeta_one.gateway.scenarios import load_fixture
+
+    scenario = load_fixture('routine_bill_payment')
+    identity = scenario.decision_record.identity
+    key = Ed25519PrivateKey.generate()
+    connection = sqlite3.connect(':memory:', check_same_thread=False)
+    connection.row_factory = sqlite3.Row
+    registry = Registry(connection)
+    registry.register(identity.claimed_agent_id, scenario.context.business.id, identity.owner or 'owner',
+                      key.public_key(), SEED_NOW)
+    authorizations = AuthorizationStore(connection)
+    authorizations.grant(Authorization.model_validate(scenario.decision_record.authorization.snapshot))
+    clock = [SEED_NOW]
+    with Store() as store:
+        stages = Stages(verify_identity=verifier(registry), load_authorization=authorizations.loader(),
+                        make_checker=checker, load_context=context_for(store), tier0=Tier0(),
+                        agent_status=lambda agent_id: 'active',
+                        configuration=Configuration(tiers=['tier0'], escalation='none'))
+        gateway = Gateway(stages=stages, ledger=Ledger(connection), clock=lambda: clock[0])
+        body = scenario.proposal.model_dump_json().encode()
+        decisions = []
+        for _ in range(2):
+            headers = sign(key, identity.claimed_agent_id, 'POST', '/v1/actions/propose_payment', body, clock[0])
+            request = SignedRequest(method='POST', path='/v1/actions/propose_payment', body=body, headers=headers)
+            decisions.append(gateway.propose(request))
+            clock[0] += timedelta(minutes=5)
+    assert [d['decision'] for d in decisions] == ['allow', 'challenge']
+    record = gateway.ledger.decision(decisions[1]['decision_id'])
+    assert record['risk']['features']['duplicate_candidate']['value'] is True
+    assert 'duplicate_candidate' in record['risk']['floor']['flags']

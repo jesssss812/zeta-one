@@ -101,3 +101,45 @@ def test_new_counterparty_age_and_settled_history():
         c.counterparty.created_at = now-timedelta(days=days)
         c.payment_history.count = count
         assert compute_features(p, c, now)['counterparty_is_new'].value is expected
+
+
+def _payment(id, amount, posted_at, bill_id=None):
+    from zeta_one.contracts import PaymentRecord
+    return PaymentRecord(id=id, posted_at=posted_at, amount=amount, bill_id=bill_id)
+
+
+def test_the_same_bill_paid_by_the_gateway_is_a_duplicate():
+    p, c, now = sample()
+    c.gateway_payments = [_payment('pay_1', p.amount, now - timedelta(days=20), bill_id=p.bill_id)]
+    feature = compute_features(p, c, now)['duplicate_candidate']
+    assert (feature.value, feature.evidence) == (True, ['pay_1'])
+
+
+def test_the_same_amount_to_the_payee_within_a_week_is_a_duplicate():
+    p, c, now = sample()
+    p.bill_id = None
+    c.gateway_payments = [_payment('pay_2', p.amount, now - timedelta(days=6))]
+    assert compute_features(p, c, now)['duplicate_candidate'].value is True
+    c.gateway_payments = [_payment('pay_3', p.amount, now - timedelta(days=8))]
+    assert compute_features(p, c, now)['duplicate_candidate'].value is False
+
+
+def test_a_different_amount_is_not_a_duplicate():
+    p, c, now = sample()
+    p.bill_id = None
+    other = Money(amount=p.amount.amount + 1, currency=p.amount.currency)
+    c.gateway_payments = [_payment('pay_4', other, now - timedelta(days=1))]
+    assert compute_features(p, c, now)['duplicate_candidate'].value is False
+
+
+def test_the_routine_fixture_is_not_a_duplicate():
+    assert compute_features(*sample())['duplicate_candidate'].value is False
+
+
+def test_paying_a_long_standing_vendor_in_a_new_currency_counts_as_new():
+    """History is per currency, so a switch has none: the payee reads as new, a soft signal."""
+    p, c, now = sample()
+    c.payment_history.count, c.payment_history.median_amount, c.payment_history.recent = 0, None, []
+    features = compute_features(p, c, now)
+    assert features['counterparty_is_new'].value is True
+    assert features['amount_ratio_to_vendor_median'].value is None

@@ -1,5 +1,5 @@
 """Pure deterministic risk features over the gateway's supplied evidence."""
-from datetime import datetime
+from datetime import datetime, timedelta
 import re
 
 from zeta_one.contracts import Context, Feature, Proposal
@@ -79,9 +79,25 @@ def bill_not_referenced(proposal: Proposal, context: Context, now: datetime) -> 
     return Feature(value=bool(evidence), evidence=evidence)
 
 
+DUPLICATE_DAYS = 7
+
+
+def duplicate_candidate(proposal: Proposal, context: Context, now: datetime) -> Feature:
+    """The same bill paid already, or the same amount to the same payee within DUPLICATE_DAYS, in Rho's
+    history or in the gateway's own simulated payments."""
+    window = now - timedelta(days=DUPLICATE_DAYS)
+    matched = []
+    for payment in [*context.payment_history.recent, *context.gateway_payments]:
+        same_bill = proposal.bill_id is not None and getattr(payment, 'bill_id', None) == proposal.bill_id
+        same_amount = payment.amount == proposal.amount and payment.posted_at >= window
+        if same_bill or same_amount:
+            matched.append(payment.id)
+    return Feature(value=bool(matched), evidence=matched)
+
+
 FEATURE_FUNCTIONS = (counterparty_is_new, payment_method_changed_days_ago,
                      amount_ratio_to_vendor_median, bill_mismatch,
-                     document_instruction_patterns, bill_not_referenced)
+                     document_instruction_patterns, bill_not_referenced, duplicate_candidate)
 
 
 def compute_features(proposal: Proposal, context: Context, now: datetime) -> dict[str, Feature]:

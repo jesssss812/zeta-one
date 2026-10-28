@@ -154,7 +154,9 @@ class Context(_Open):
     """Everything risk is assessed from. `counterparty` is always the proposed payee.
 
     `open_bills` holds the proposed counterparty's unpaid bills as the gateway found them itself,
-    whatever the agent cited (security.md, S7).
+    whatever the agent cited (security.md, S7). `gateway_payments` holds the simulated payments the
+    gateway executed or holds for this payee in the last 30 days, which Rho's records don't show;
+    each carries the `bill_id` it paid, if any.
     """
 
     business: BusinessView
@@ -165,6 +167,7 @@ class Context(_Open):
     bill_counterparty: CounterpartyView | None = None
     bill_counterparty_payment_history: PaymentHistory | None = None
     open_bills: list[BillView] = Field(default_factory=list)
+    gateway_payments: list[PaymentRecord] = Field(default_factory=list)
 
 
 # --- The evidence record ---------------------------------------------------------------------------

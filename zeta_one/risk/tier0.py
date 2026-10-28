@@ -12,7 +12,8 @@ class Tier0:
         new_or_changed = features['counterparty_is_new'].value or (changed is not None and changed <= 30)
         signals = []
         for name in ('bill_mismatch', 'bill_not_referenced', 'document_instruction_patterns',
-                     'counterparty_is_new', 'payment_method_changed_days_ago', 'amount_ratio_to_vendor_median'):
+                     'duplicate_candidate', 'counterparty_is_new', 'payment_method_changed_days_ago',
+                     'amount_ratio_to_vendor_median'):
             feature = features[name]
             severity = 'elevated'
             active = feature.value is True
@@ -21,7 +22,8 @@ class Tier0:
             if name == 'payment_method_changed_days_ago':
                 active = changed is not None
             if name == 'amount_ratio_to_vendor_median':
-                ratio = getattr(feature, 'raw_value', feature.value)
+                raw = getattr(feature, 'raw_value', None)
+                ratio = raw if raw is not None else feature.value
                 active = ratio is not None and not (0.5 <= ratio <= 2.0)
             if active:
                 signals.append(Signal(name='payment_method_changed' if name == 'payment_method_changed_days_ago' else name,

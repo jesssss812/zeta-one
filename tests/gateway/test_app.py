@@ -237,3 +237,14 @@ def test_an_unexpected_crash_is_a_500_in_the_api_error_shape(gateway):
     response = propose(client, routine_proposal())
     assert response.status_code == 500
     assert response.json() == {"error": {"code": "internal_error", "message": "RuntimeError"}}
+
+
+def test_the_gateways_own_payments_reach_the_context(client, gateway, world):
+    """Rho's records don't show simulated payments, so the gateway adds its own to the context."""
+    from tests.gateway.fakes import BUSINESS
+    from zeta_one.gateway.service import with_gateway_payments
+
+    assert propose(client, routine_proposal()).json()["decision"] == "allow"
+    context = with_gateway_payments(world.load_context, gateway.ledger)(routine_proposal(), BUSINESS, NOW)
+    assert [(p.amount, p.bill_id) for p in context.gateway_payments] == [
+        (routine_proposal().amount, routine_proposal().bill_id)]

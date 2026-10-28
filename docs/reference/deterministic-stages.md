@@ -97,7 +97,10 @@ these arguments and carry evidence IDs. The lexicon in `risk/features.py` is fro
 | `bill_mismatch` | Named bill differs in ID, amount/currency, payee, or an explicitly supplied optional method ID |
 | `document_instruction_patterns` | Fixed case-insensitive patterns in the named bill and independently discovered open bills |
 | `bill_not_referenced` | No bill named and an open bill exists, or the payee is new or recently changed |
+| `duplicate_candidate` | The named bill was already paid, or the same amount went to the payee within 7 days, in Rho's history or the gateway's own simulated payments (`context.gateway_payments`) |
 
+A duplicate candidate sets an elevated floor, so the payment is challenged. Paying a vendor in a
+currency it has never been paid in leaves no same-currency history, so the payee counts as new.
 Mismatch or a missing reference with a new/recently changed payee produces high risk. Other active
 features produce elevated risk; no active feature produces low risk. The kernel's escalation module
 alone computes the enforced floor and merges model results. Integer method ages through day 30

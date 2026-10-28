@@ -14,7 +14,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any
 
-from zeta_one.contracts import Context, EvidenceRecord, ExecutionStatus, Proposal, SpendSource
+from zeta_one.contracts import Context, EvidenceRecord, ExecutionStatus, PaymentRecord, Proposal, SpendSource
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS decisions (
@@ -189,6 +189,22 @@ class Ledger:
             (agent_id, currency, _iso(since), exclude),
         ).fetchone()
         return int(row[0])
+
+    def payments_to(self, business_id: str, counterparty_id: str, since: datetime) -> list[PaymentRecord]:
+        """The business's executed and held simulated payments to one payee since a time, newest first."""
+        rows = self._db.execute(
+            """SELECT payment_id, proposal, created_at FROM payments
+               WHERE business_id = ? AND status IN ('executed', 'held') AND created_at >= ?
+               ORDER BY created_at DESC""",
+            (business_id, _iso(since)),
+        ).fetchall()
+        records = []
+        for row in rows:
+            proposal = Proposal.model_validate_json(row["proposal"])
+            if proposal.counterparty_id == counterparty_id:
+                records.append(PaymentRecord(id=row["payment_id"], posted_at=row["created_at"],
+                                             amount=proposal.amount, bill_id=proposal.bill_id))
+        return records
 
     def spend_source(self, exclude: str | None = None) -> SpendSource:
         """A SpendSource; `exclude` leaves out one payment, so a held payment isn't counted against itself."""

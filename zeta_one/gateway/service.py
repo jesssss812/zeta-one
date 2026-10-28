@@ -12,15 +12,30 @@ model call runs, a fair price.
 import threading
 from collections.abc import Callable
 from dataclasses import dataclass, field, replace
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import Any, Literal
 
-from zeta_one.contracts import IdentityEvidence, SignedRequest
+from zeta_one.contracts import Context, ContextSource, IdentityEvidence, Proposal, SignedRequest
 from zeta_one.gateway import admin
 from zeta_one.gateway.ledger import Ledger
 from zeta_one.gateway.pipeline import Engine
 from zeta_one.gateway.reuse import RiskReuse
 from zeta_one.gateway.wiring import ContextCapture, Stages, build_engine
+
+
+# How far back the context's `gateway_payments` reach: what the duplicate check can see.
+GATEWAY_PAYMENT_WINDOW = timedelta(days=30)
+
+
+def with_gateway_payments(load_context: ContextSource, ledger: Ledger) -> ContextSource:
+    """A ContextSource that adds the gateway's own recent simulated payments to the payee."""
+
+    def load(proposal: Proposal, business_id: str, now: datetime) -> Context:
+        context = load_context(proposal, business_id, now)
+        payments = ledger.payments_to(business_id, proposal.counterparty_id, now - GATEWAY_PAYMENT_WINDOW)
+        return context.model_copy(update={"gateway_payments": payments})
+
+    return load
 
 
 class EngineNotReady(RuntimeError):
@@ -53,7 +68,7 @@ class Gateway:
         self._engine: Engine | None = None
         self._missing = self.stages.missing()
         if not self._missing:
-            self._capture = ContextCapture(self.stages.load_context)
+            self._capture = ContextCapture(with_gateway_payments(self.stages.load_context, self.ledger))
             captured = replace(self.stages, load_context=self._capture)
             self._engine = build_engine(
                 captured, self.ledger.spend_source(), assess_risk=self.reuse, clock=self.clock, version=self.version
