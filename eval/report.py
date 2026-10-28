@@ -160,11 +160,14 @@ def _provenance(rows: dict[str, dict[str, list[dict]]], cases: dict[str, list[Ca
             for r in group:
                 backends.add(r.get("backend") or "unrecorded")
                 run_hashes[set_name].add(r.get("set_hash") or "unrecorded")
-    seeds = {}
+    seeds, shared = {}, None
     for name in ("dev", "test"):
         combos = data / name / "combos.jsonl"
         if combos.exists():
-            seeds[name] = sorted({row["seed"] for row in sets.read_jsonl(combos)})
+            rows_of = sets.read_jsonl(combos)
+            seeds[name] = sorted({row["seed"] for row in rows_of})
+            if name == "test":
+                shared = sum(bool(row.get("shared_with_dev")) for row in rows_of)
     frozen = {}
     for name, group in cases.items():
         if not (data / name / "frozen.sha256").exists():
@@ -178,7 +181,7 @@ def _provenance(rows: dict[str, dict[str, list[dict]]], cases: dict[str, list[Ca
     current = {name: sets.set_hash(group) for name, group in cases.items() if group}
     stale = sorted(name for name, hashes in run_hashes.items() if hashes != {current.get(name)})
     return {"backends": sorted(backends), "set_hashes": {n: sorted(h) for n, h in run_hashes.items()},
-            "stale_sets": stale, "seeds": seeds, "frozen": frozen}
+            "stale_sets": stale, "seeds": seeds, "test_combinations_shared_with_dev": shared, "frozen": frozen}
 
 
 def build(results: Path = RESULTS, data: Path = sets.DATA) -> dict:
@@ -258,6 +261,9 @@ def render(report: dict) -> str:
     lines += ["## Run", "", f"- Models that ran: {', '.join(report['models']) or 'none'}",
               f"- Prices used: `{json.dumps(report['prices_used'], sort_keys=True)}`",
               "- Generator seeds: " + ("; ".join(f"{s}: {v}" for s, v in report["seeds"].items()) or "none"),
+              *([f"- test combinations also in dev: {report['test_combinations_shared_with_dev']} "
+                 "(the routine class has too few to keep apart; only wording and vendor differ)"]
+                if report.get("test_combinations_shared_with_dev") else []),
               "- Set hashes the results ran against:"]
     lines += [f"  - {name}: " + ", ".join(f"`{h[:16]}`" for h in hashes) + f" ({report['frozen'].get(name, 'not frozen')})"
               for name, hashes in report["set_hashes"].items()]

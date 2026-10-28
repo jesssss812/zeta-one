@@ -129,10 +129,20 @@ def all_combos() -> list[dict]:
     return [c for c in found if allowed(c)]
 
 
-def sample(set_name: str, seed: int) -> list[dict]:
+def sample(set_name: str, seed: int, exclude: list[dict] | None = None) -> list[dict]:
+    """Sample a set's combinations. `test` prefers combinations `dev` did not draw, so a rule tuned on
+    dev is scored on setups it has not seen; `exclude` defaults to dev's default sample. A class with
+    too few combinations to fill its quota otherwise (the routine class, A) takes dev's too; see
+    `shared_with`."""
     rng = random.Random(seed)
-    pool = all_combos()
-    rng.shuffle(pool)
+    if exclude is None and set_name == "test":
+        exclude = sample("dev", DEFAULT_SEEDS["dev"])
+    taken = [dict(c) for c in exclude or []]
+    fresh = [c for c in all_combos() if c not in taken]
+    reused = [c for c in all_combos() if c in taken]
+    rng.shuffle(fresh)
+    rng.shuffle(reused)
+    pool = fresh + reused  # fresh first: a dev combination is used only once a class runs out
     chosen: list[dict] = []
     left = dict(QUOTAS[set_name])
     legit_left = {cat: int(MAX_LEGIT_SHARE * n) for cat, n in QUOTAS[set_name].items() if cat in ("D", "E")}
@@ -155,13 +165,23 @@ def sample(set_name: str, seed: int) -> list[dict]:
     return chosen
 
 
+def shared_with(chosen: list[dict], other: list[dict]) -> int:
+    """How many of the chosen combinations the other set also drew."""
+    return sum(c in other for c in chosen)
+
+
 def combos(set_name: str, seed: int | None = None, data: Path = sets.DATA) -> list[dict]:
-    """Sample the combinations, write them and the wording requests. dev and test use different seeds
-    and are worded in separate calls; the cross product is small enough that they can share combinations."""
+    """Sample the combinations, write them and the wording requests. dev and test use different seeds,
+    are worded in separate calls, and share no combination: test leaves out the ones dev drew."""
     seed = DEFAULT_SEEDS[set_name] if seed is None else seed
+    dev_combos = data / "dev" / "combos.jsonl"
+    exclude = [row["dimensions"] for row in sets.read_jsonl(dev_combos)] if set_name == "test" and dev_combos.exists() else None
+    if set_name == "test" and exclude is None:
+        exclude = sample("dev", DEFAULT_SEEDS["dev"])
     rows = []
-    for index, c in enumerate(sample(set_name, seed)):
-        rows.append({"id": f"{set_name}_{index:03d}", "seed": seed, "dimensions": c, "truth": truth_of(c),
+    for index, c in enumerate(sample(set_name, seed, exclude)):
+        rows.append({"id": f"{set_name}_{index:03d}", "seed": seed, "dimensions": c,
+                     "shared_with_dev": bool(exclude) and c in exclude, "truth": truth_of(c),
                      "detectable": detectable(c), "category": category_of(c), "vendor": VENDOR_NAMES[index % len(VENDOR_NAMES)]})
     sets.write_jsonl(data / set_name / "combos.jsonl", rows)
     for number, start in enumerate(range(0, len(rows), BATCH)):

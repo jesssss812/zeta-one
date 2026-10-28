@@ -160,3 +160,15 @@ def test_payment_history_is_monthly_and_matches_the_seeded_context(tmp_path):
                                  Proposal.model_validate({**proposal, "memo": "", "agent_rationale": ""}))
     assert context["payment_history"]["count"] == 12
     assert context["payment_history"]["median_amount"]["amount"] == generate.MEDIAN_CENTS
+
+
+def test_test_reuses_dev_combinations_only_where_a_class_runs_out(tmp_path):
+    dev = generate.sample("dev", generate.DEFAULT_SEEDS["dev"])
+    test = generate.sample("test", generate.DEFAULT_SEEDS["test"])
+    shared = [c for c in test if c in dev]
+    assert {generate.category_of(c) for c in shared} <= {"A"}  # only the routine class is too small
+    available_a = sum(generate.category_of(c) == "A" for c in generate.all_combos())
+    dev_a = sum(generate.category_of(c) == "A" for c in dev)
+    assert len(shared) == max(0, generate.QUOTAS["test"]["A"] - (available_a - dev_a))
+    rows = generate.combos("test", data=tmp_path)
+    assert sum(r["shared_with_dev"] for r in rows) == len(shared)
