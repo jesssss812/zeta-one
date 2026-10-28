@@ -4,6 +4,7 @@ The evidence-record models follow docs/reference/demo-api.md, which is the contr
 required keys are checked, extra keys are allowed. A change here is a change to that contract.
 """
 
+import re
 from datetime import datetime
 from enum import StrEnum
 from typing import Any, Literal, Protocol
@@ -14,6 +15,9 @@ from zeta_one.rho.models import Money
 
 POLICY_VERSION = "2026-10-28.1"
 SCHEMA_VERSION = 1
+# The largest payment a proposal may name, in minor units: $10 billion, far inside SQLite's integer range.
+MAX_PAYMENT_MINOR_UNITS = 10**12
+CURRENCY_CODE = re.compile(r"^[A-Z]{3}$")
 
 Level = Literal["low", "elevated", "high"]
 Decision = Literal["allow", "challenge", "block"]
@@ -62,6 +66,10 @@ class Proposal(BaseModel):
     def positive_payment(cls, value: Money) -> Money:
         if value.amount <= 0:
             raise ValueError("payment amount must be positive")
+        if value.amount > MAX_PAYMENT_MINOR_UNITS:
+            raise ValueError("payment amount is too large")
+        if not CURRENCY_CODE.match(value.currency):
+            raise ValueError("currency must be an uppercase ISO 4217 code")
         return value
 
 
