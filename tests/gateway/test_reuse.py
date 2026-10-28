@@ -149,3 +149,11 @@ def test_an_older_risk_table_gains_the_payee_column():
         configuration TEXT NOT NULL, created_at TEXT NOT NULL, payment_method_state TEXT NOT NULL, risk TEXT NOT NULL)""")
     RiskReuse(connection)
     assert "payee_key" in {row[1] for row in connection.execute("PRAGMA table_info(risk_results)")}
+
+
+def test_clean_payments_that_never_reach_a_model_do_not_count_toward_the_limit(gateway, world):
+    records = [send(gateway, routine_proposal(amount=Money(amount=185000 + cents, currency="USD")))
+               for cents in range(MAX_FRESH_ASSESSMENTS + 2)]
+    assert world.strong_calls == 0
+    assert all(not r["risk"]["repeat_limit_reached"] for r in records)
+    assert {r["decision"] for r in records} == {"allow"}

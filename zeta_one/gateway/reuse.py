@@ -9,8 +9,8 @@ The reused result names the decision it came from in `risk.reused_from` and carr
 since no model was called for it.
 
 Changing the amount by a cent is a new proposal, so an agent could re-roll that way. After
-MAX_FRESH_ASSESSMENTS fresh assessments for the same agent, payee and payment method within the
-window, a further different proposal skips the models: tier 0 still runs, and the policy challenges
+MAX_FRESH_ASSESSMENTS fresh assessments that reached a model for the same agent, payee and payment
+method within the window, a further different proposal skips the models: tier 0 still runs, and the policy challenges
 it (`risk.repeat_limit_reached`).
 """
 
@@ -134,12 +134,14 @@ class RiskReuse:
             )
 
     def _fresh_count(self, agent_id: str | None, proposal: Proposal, now: datetime, configuration: Configuration) -> int:
-        row = self._db.execute(
-            """SELECT COUNT(*) FROM risk_results
+        """Fresh assessments in the window that reached a model; tier-0-only ones re-roll nothing."""
+        rows = self._db.execute(
+            """SELECT risk FROM risk_results
                WHERE payee_key = ? AND configuration = ? AND created_at > ? AND created_at <= ?""",
             (payee_key(agent_id, proposal), _configuration_key(configuration), _iso(now - self._window), _iso(now)),
-        ).fetchone()
-        return int(row[0])
+        ).fetchall()
+        return sum(any(tier != "tier0" for tier in RiskEvidence.model_validate_json(row["risk"]).tiers_run)
+                   for row in rows)
 
     def _find(
         self, agent_id: str | None, proposal: Proposal, context: Context, now: datetime, configuration: Configuration
