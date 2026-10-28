@@ -74,11 +74,26 @@ def freeze(name: str, data: Path = DATA, force: bool = False, note: str | None =
         raise AlreadyFrozen("a forced re-freeze needs a note saying why")
     digest = set_hash(load_set(name, data))
     path.write_text(digest + "\n")
-    meta = {"sha256": digest, "frozen_at": datetime.now(UTC).isoformat(), "commit": _git_sha(), "note": note}
-    history = data / name / "frozen.log.jsonl"
-    with history.open("a") as log:
+    meta = {"sha256": digest, "frozen_at": datetime.now(UTC).isoformat(), "commit": _git_sha(), "note": note,
+            **engine_inputs()}
+    # Not *.jsonl: the hard set's loader reads every .jsonl in its folder.
+    with (data / name / FREEZE_LOG).open("a") as log:
         log.write(json.dumps(meta, sort_keys=True) + "\n")
     return digest
+
+
+FREEZE_LOG = "frozen.log"
+
+
+def engine_inputs() -> dict[str, str]:
+    """What else a frozen set is scored against: the seed's version and tier 0's frozen lexicon."""
+    from zeta_one.rho.snapshot import Store
+    from zeta_one.risk.features import INSTRUCTION_PATTERN_LEXICON
+
+    with Store() as store:
+        seed_version = store.seed_version
+    lexicon = hashlib.sha256(json.dumps(INSTRUCTION_PATTERN_LEXICON).encode()).hexdigest()
+    return {"seed_version": seed_version, "lexicon_sha256": lexicon}
 
 
 def _git_sha() -> str:
@@ -98,4 +113,11 @@ def check_frozen(name: str, cases: list[Case], data: Path = DATA) -> str | None:
         return None
     if path.read_text().strip() != set_hash(cases):
         raise FrozenSetChanged(f"{name} changed since it was frozen")
+    log = data / name / FREEZE_LOG
+    if log.exists():
+        last = json.loads(log.read_text().splitlines()[-1])
+        current = engine_inputs()
+        changed = [key for key, value in current.items() if key in last and last[key] != value]
+        if changed:
+            raise FrozenSetChanged(f"{name} was frozen against a different {', '.join(changed)}")
     return path.read_text().strip()

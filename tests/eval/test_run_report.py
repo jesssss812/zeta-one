@@ -244,6 +244,23 @@ def test_a_frozen_set_is_not_refrozen_without_force_and_a_note(tmp_path):
     with pytest.raises(sets.AlreadyFrozen):
         sets.freeze("test", tmp_path, force=True)
     sets.freeze("test", tmp_path, force=True, note="relabelled a typo in t1")
-    log = [json.loads(line) for line in (tmp_path / "test" / "frozen.log.jsonl").read_text().splitlines()]
+    log = [json.loads(line) for line in (tmp_path / "test" / sets.FREEZE_LOG).read_text().splitlines()]
     assert [entry["note"] for entry in log] == [None, "relabelled a typo in t1"]
-    assert all(entry["frozen_at"] and entry["commit"] for entry in log)
+    assert all(entry["frozen_at"] and entry["commit"] and entry["seed_version"] and entry["lexicon_sha256"]
+               for entry in log)
+
+
+def test_a_frozen_set_refuses_a_changed_lexicon(tmp_path, monkeypatch):
+    from zeta_one.risk import features
+    sets.write_jsonl(tmp_path / "test" / "cases.jsonl", [_case("t1", "test", "A", "legitimate", "allow").model_dump(mode="json")])
+    sets.freeze("test", tmp_path)
+    sets.check_frozen("test", sets.load_set("test", tmp_path), tmp_path)
+    monkeypatch.setattr(features, "INSTRUCTION_PATTERN_LEXICON", (*features.INSTRUCTION_PATTERN_LEXICON, r"\\bwire\\b"))
+    with pytest.raises(sets.FrozenSetChanged, match="lexicon"):
+        sets.check_frozen("test", sets.load_set("test", tmp_path), tmp_path)
+
+
+def test_freezing_the_hard_set_keeps_it_loadable(tmp_path):
+    sets.write_jsonl(tmp_path / "hard" / "owner.jsonl", [_case("h1", "hard", "E", "payee_fraud", "block").model_dump(mode="json")])
+    sets.freeze("hard", tmp_path)
+    assert [c.id for c in sets.load_set("hard", tmp_path)] == ["h1"]
