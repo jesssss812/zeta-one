@@ -29,7 +29,7 @@ def check_counterparties(p, a, i, now, spend):
         return _violation('counterparties', 'scope', scope.model_dump(), p.counterparty_id)
 
 def check_expires_at(p, a, i, now, spend):
-    if a.expires_at is not None and now >= a.expires_at:
+    if a.expires_at is not None and (a.expires_at.utcoffset() is None or now >= a.expires_at):
         return _violation('expires_at', 'limit', a.expires_at.isoformat(), now.isoformat())
 
 def check_per_payment(p, a, i, now, spend):

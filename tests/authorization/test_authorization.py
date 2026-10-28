@@ -88,3 +88,13 @@ def test_older_grants_cannot_replace_latest(tmp_path):
     with pytest.raises(ValueError, match='increase'):
         store.grant(auth(version=1))
     assert store.load('biz', 'agent').version == 2
+
+
+def test_persisted_naive_expiry_fails_closed(tmp_path):
+    store = Store(sqlite3.connect(tmp_path / 'naive-expiry.db'))
+    expires_at = (NOW + timedelta(days=1)).replace(tzinfo=None)
+    store.grant(auth(expires_at=expires_at))
+    loaded = store.load('biz', 'agent')
+    result = checker(lambda *args: 0)(proposal(), loaded, IDENTITY, NOW)
+    assert [(v.field, v.kind) for v in result.violations] == [('expires_at', 'limit')]
+    assert result.violations[0].limit == expires_at.isoformat()
