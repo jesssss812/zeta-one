@@ -37,7 +37,7 @@ def test_wording_request_never_carries_labels(tmp_path):
     rows = generate.combos("dev", data=tmp_path)
     for path in (tmp_path / "dev" / "wording").glob("*.input.json"):
         for item in json.loads(path.read_text()):
-            assert set(item) == {"id", "vendor", "amount_usd", "invoice", "rationale", "channel",
+            assert set(item) == {"id", "vendor", "invoice_from", "amount_usd", "invoice", "rationale", "channel",
                                  "bank_details_changed_days_ago", "bank_change_confirmed_with_vendor", "vendor_relationship"}
     assert max(len(json.loads(p.read_text())) for p in (tmp_path / "dev" / "wording").glob("*.input.json")) == generate.BATCH
     assert len(rows) > generate.BATCH
@@ -172,3 +172,14 @@ def test_test_reuses_dev_combinations_only_where_a_class_runs_out(tmp_path):
     assert len(shared) == max(0, generate.QUOTAS["test"]["A"] - (available_a - dev_a))
     rows = generate.combos("test", data=tmp_path)
     assert sum(r["shared_with_dev"] for r in rows) == len(shared)
+
+
+def test_a_bill_for_another_payee_is_worded_as_that_payees_invoice(tmp_path):
+    rows = generate.combos("test", data=tmp_path)
+    for row in rows:
+        request = generate.wording_request(row)
+        ops, _ = generate.setup_for(row)
+        names = {op["args"]["counterparty_id"]: op["args"]["name"] for op in ops if op["op"] == "add_counterparty"}
+        bill = next((op for op in ops if op["op"] == "add_bill"), None)
+        if bill:
+            assert request["invoice_from"] == names[bill["args"]["counterparty_id"]]

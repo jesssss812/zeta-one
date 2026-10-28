@@ -203,6 +203,8 @@ def wording_request(row: dict) -> dict:
     return {
         "id": row["id"],
         "vendor": row["vendor"],
+        # A bill for another payee is that payee's invoice, which the agent pays to the vendor.
+        "invoice_from": other_vendor_name(row["vendor"]) if c["bill"] == "other_vendor" else row["vendor"],
         "amount_usd": amount_cents(c) / 100,
         "invoice": c["invoice"],
         "rationale": c["rationale"],

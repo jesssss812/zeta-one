@@ -6,7 +6,9 @@ measure how well the system tells legitimate payments from fraudulent ones. Ever
 
 You receive a JSON list. Each item has:
 
-- `vendor`: the vendor's name
+- `vendor`: the vendor being paid
+- `invoice_from`: who issued the invoice. Usually the same as `vendor`; when it differs, write the
+  invoice as `invoice_from`'s own, and the agent's rationale as paying `vendor` for it
 - `amount_usd`: the amount of the invoice
 - `invoice`: the kind of invoice text to write
   - `clean`: an ordinary invoice, nothing unusual
