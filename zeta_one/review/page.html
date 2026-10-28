@@ -3,62 +3,125 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
 <title>Zeta One case review</title>
 <style>
-  :root { --bg: #fbfaf7; --ink: #1d1d1b; --muted: #6b6a66; --line: #e3e0d8; --warn: #8a4b00; --accent: #24456b; }
-  @media (prefers-color-scheme: dark) { :root { --bg: #161615; --ink: #ecebe6; --muted: #a3a29c; --line: #34332f; --warn: #f0b36a; --accent: #9cc3ec; } }
-  body { background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, sans-serif; margin: 0 auto; max-width: 960px; padding: 24px 16px; }
-  h1 { font-size: 20px; margin: 0 0 4px; } h2 { font-size: 15px; margin: 24px 0 8px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
-  .note { color: var(--muted); font-size: 13px; } .warn { color: var(--warn); }
-  input, select, textarea, button { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: inherit; }
-  button { background: var(--accent); color: var(--bg); border: 0; cursor: pointer; }
-  form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0; }
-  ul { padding-left: 18px; } li { margin: 4px 0; } code, .src { font: 12px ui-monospace, monospace; color: var(--muted); }
-  .card { border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin: 8px 0; }
-  pre.untrusted { white-space: pre-wrap; border-left: 3px solid var(--warn); padding: 6px 10px; margin: 6px 0; }
+  :root {
+    --bg: #f6f5f1; --card: #ffffff; --ink: #1c1c1a; --muted: #6b6a65; --line: #e4e1d8;
+    --chip: #efede6; --accent: #24456b; --amber: #9a5b00; --amber-bg: #fdf3e2; --red: #9b2c2c; --red-bg: #fbeaea;
+    --green: #2d6a3e; --green-bg: #e8f4ec; --blue-bg: #e8eff7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #141413; --card: #1d1d1b; --ink: #ecebe6; --muted: #a09f99; --line: #33322e; --chip: #2a2926;
+      --accent: #9cc3ec; --amber: #f0b36a; --amber-bg: #2e2416; --red: #f19a9a; --red-bg: #2f1c1c;
+      --green: #8fd3a3; --green-bg: #18291e; --blue-bg: #1b2533; }
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font: 14px/1.5 system-ui, -apple-system, sans-serif; margin: 0; }
+  header.bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+    padding: 12px 20px; border-bottom: 1px solid var(--line); background: var(--card); position: sticky; top: 0; z-index: 2; }
+  header.bar h1 { font-size: 16px; margin: 0; } header.bar .note { margin: 0; }
+  main { max-width: 1240px; margin: 0 auto; padding: 16px 20px 40px; }
+  .note { color: var(--muted); font-size: 12.5px; }
+  input, select, button { font: inherit; padding: 6px 9px; border: 1px solid var(--line); border-radius: 6px; background: var(--card); color: inherit; }
+  button { cursor: pointer; } button.primary { background: var(--accent); color: var(--card); border-color: var(--accent); }
+  form.open { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .card h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin: 0 0 10px; }
+  .hero { display: grid; grid-template-columns: minmax(240px, 1.3fr) repeat(3, minmax(150px, 1fr)); gap: 12px; margin-bottom: 14px; }
+  .who { display: flex; gap: 12px; align-items: center; }
+  .logo { width: 52px; height: 52px; border-radius: 12px; flex: none; display: grid; place-items: center; overflow: hidden;
+    font-weight: 700; font-size: 18px; color: #fff; border: 1px solid var(--line); background: var(--chip); }
+  .logo img { width: 36px; height: 36px; }
+  .who strong { font-size: 17px; display: block; line-height: 1.2; }
+  .kpi .label { font-size: 11.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+  .kpi .value { font-size: 20px; font-weight: 650; margin-top: 2px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .chip { background: var(--chip); border-radius: 999px; padding: 2px 9px; font-size: 12px; white-space: nowrap; }
+  .badge { display: inline-block; border-radius: 6px; padding: 2px 8px; font-weight: 600; font-size: 13px; }
+  .allow { background: var(--green-bg); color: var(--green); } .challenge { background: var(--amber-bg); color: var(--amber); }
+  .block { background: var(--red-bg); color: var(--red); } .claim { background: var(--blue-bg); color: var(--accent); }
+  .layout { display: grid; grid-template-columns: minmax(0, 2.1fr) minmax(280px, 1fr); gap: 14px; align-items: start; }
+  .stack { display: grid; gap: 14px; }
+  .side { position: sticky; top: 72px; display: grid; gap: 14px; }
+  .lead { font-size: 15.5px; margin: 0 0 12px; }
+  .timeline { list-style: none; margin: 0; padding: 0 0 0 16px; border-left: 2px solid var(--line); }
+  .timeline li { position: relative; margin: 0 0 10px; padding-left: 10px; }
+  .timeline li::before { content: ""; position: absolute; left: -22px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+  .timeline time { display: block; font-size: 12px; color: var(--muted); }
+  .attention { border-color: var(--amber); background: var(--amber-bg); }
+  .attention h2 { color: var(--amber); }
+  .domains { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+  .domains div { background: var(--card); border-radius: 8px; padding: 8px 10px; }
+  .mismatch { color: var(--red); font-weight: 600; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  ul.clean { list-style: none; margin: 0; padding: 0; } ul.clean li { padding: 7px 0; border-top: 1px solid var(--line); }
+  ul.clean li:first-child { border-top: 0; padding-top: 0; }
+  .src { font: 11.5px ui-monospace, monospace; color: var(--muted); }
+  .sources { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 3px; }
+  .sources .chip { font: 11px ui-monospace, monospace; }
+  details { border-top: 1px solid var(--line); padding: 8px 0; } details:first-of-type { border-top: 0; }
+  summary { cursor: pointer; font-weight: 600; } summary .count { color: var(--muted); font-weight: 400; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+  th, td { text-align: left; padding: 6px 8px; border-top: 1px solid var(--line); } th { color: var(--muted); font-weight: 500; }
+  pre.untrusted { white-space: pre-wrap; border-left: 3px solid var(--amber); padding: 6px 10px; margin: 6px 0; font-size: 13px; }
+  .finding-card { display: flex; gap: 10px; align-items: flex-start; }
+  .finding-card img { width: 16px; height: 16px; margin-top: 3px; flex: none; }
+  .checks label { display: flex; gap: 8px; align-items: flex-start; padding: 6px 0; border-top: 1px solid var(--line); }
+  .checks label:first-child { border-top: 0; }
+  .checks input:checked + span { color: var(--muted); text-decoration: line-through; }
+  form.finding { display: grid; gap: 8px; } form.finding .row { display: flex; gap: 8px; }
+  .empty { color: var(--muted); }
+  .warn { color: var(--amber); }
+  @media (max-width: 900px) { .hero, .layout, .two, .domains { grid-template-columns: 1fr; } .side { position: static; } }
 </style>
 </head>
 <body>
-<h1>Case review</h1>
-<p class="note">An AI assistant gathers and orders the evidence. It decides nothing. You record what is true, and how you know.
-Payments are simulated.</p>
-
-<form id="open">
-  <input id="token" type="password" placeholder="Admin token" autocomplete="off" required>
-  <input id="decision" placeholder="Decision id (dec_...)" required>
-  <input id="by" placeholder="Your name" required>
-  <button>Assemble case</button>
-  <span id="status" class="note"></span>
-</form>
-
-<div id="case"></div>
-
-<template id="finding-form">
-  <h2>Record a finding</h2>
-  <form id="finding">
-    <select id="f-finding">
-      <option value="legitimate">Legitimate</option><option value="payee_fraud">Payee fraud</option>
-      <option value="manipulated_agent">Manipulated agent</option><option value="unauthorized">Unauthorized</option>
-    </select>
-    <select id="f-verification">
-      <option value="callback_known_number">Called back on a number already on file</option>
-      <option value="bank_confirmation">Bank confirmation</option><option value="vendor_portal">Vendor portal</option>
-      <option value="signed_customer_attestation">Signed customer attestation</option>
-      <option value="customer_report">Customer report only (a claim, changes nothing)</option>
-      <option value="none">Not verified</option>
-    </select>
-    <input id="f-note" placeholder="Note" size="40">
-    <button>Record</button>
-    <span id="f-status" class="note"></span>
+<header class="bar">
+  <div>
+    <h1>Case review</h1>
+    <p class="note">An AI assistant gathered and ordered this evidence. It decides nothing: you do. Payments are simulated.</p>
+  </div>
+  <form class="open" id="open">
+    <input id="token" type="password" placeholder="Admin token" autocomplete="off" required>
+    <input id="decision" placeholder="Decision id (dec_...)" required>
+    <input id="by" placeholder="Your name" required>
+    <button class="primary">Assemble case</button>
+    <span id="status" class="note"></span>
   </form>
-</template>
+</header>
+<main id="case"><p class="empty">Enter a decision id to assemble its case.</p></main>
 
 <script>
 // Every value from the case is set as text, never as HTML: invoice text, rationale and web findings
-// may be written by an attacker (security.md, S14).
+// may be written by an attacker (security.md, S14). Images load only from a domain the research
+// validated, through a favicon service, with no referrer.
 const $ = (id) => document.getElementById(id);
-const el = (tag, text, cls) => { const e = document.createElement(tag); if (text != null) e.textContent = text; if (cls) e.className = cls; return e; };
+function el(tag, attrs, ...children) {
+  const node = document.createElement(tag);
+  for (const [key, value] of Object.entries(attrs || {})) {
+    if (key === "class") node.className = value; else if (key === "text") node.textContent = value; else node.setAttribute(key, value);
+  }
+  for (const child of children.flat()) if (child != null) node.append(child instanceof Node ? child : document.createTextNode(String(child)));
+  return node;
+}
+const money = (a) => a ? `${(a.amount / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })} ${a.currency}` : "–";
+const domainOf = (url) => { try { return new URL(url).hostname; } catch (e) { return null; } };
+const favicon = (domain, size) => `https://www.google.com/s2/favicons?domain=${encodeURIComponent(domain)}&sz=${size}`;
 try { $("token").value = sessionStorage.getItem("zeta-admin") || ""; } catch (e) {}
+
+function logo(name, domain) {
+  const initials = (name || "?").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0].toUpperCase()).join("");
+  let hue = 0; for (const c of name || "") hue = (hue * 31 + c.charCodeAt(0)) % 360;
+  const box = el("div", { class: "logo", title: domain || "no domain found" });
+  const monogram = () => { box.replaceChildren(initials); box.style.background = `hsl(${hue} 40% 42%)`; };
+  if (domain) {
+    const img = el("img", { alt: "", src: favicon(domain, 128), referrerpolicy: "no-referrer" });
+    img.addEventListener("error", monogram);
+    box.append(img);
+  } else monogram();
+  return box;
+}
 
 async function api(path, body) {
   const headers = { "Authorization": "Bearer " + $("token").value, "Content-Type": "application/json" };
@@ -68,53 +131,120 @@ async function api(path, body) {
   return data;
 }
 
-function section(root, title, items, render) {
-  root.append(el("h2", title));
-  if (!items || !items.length) { root.append(el("p", "None.", "note")); return; }
-  const list = el("ul");
-  for (const item of items) list.append(render(item));
-  root.append(list);
+function card(title, ...children) { return el("section", { class: "card" }, el("h2", { text: title }), ...children); }
+function list(items, render, empty = "None.") {
+  return items && items.length ? el("ul", { class: "clean" }, items.map((item) => el("li", {}, render(item)))) : el("p", { class: "empty", text: empty });
 }
 
-function show(c) {
-  const root = $("case"); root.replaceChildren();
-  const d = c.evidence.decision, p = c.evidence.proposal || {};
-  const head = el("div", null, "card");
-  head.append(el("strong", `${d.decision} · ${d.decision_id}`), el("div", `Reasons: ${(d.reasons || []).join(", ")}`, "note"),
-              el("div", `Pays ${p.counterparty_id || "?"} ${p.amount ? (p.amount.amount / 100).toFixed(2) + " " + p.amount.currency : ""} to ${p.payment_method_id || "?"}`, "note"));
-  root.append(head);
-  for (const error of c.errors || []) root.append(el("p", "Assistant: " + error, "warn"));
-  const f = c.case_file;
-  if (f) {
-    root.append(el("h2", "Summary"), el("p", f.summary));
-    section(root, "Timeline", f.timeline, (e) => el("li", `${e.at} · ${e.event}`));
-    section(root, "Verified facts", f.verified_facts, (x) => { const li = el("li", x.statement); li.append(" ", el("span", x.sources.join(", "), "src")); return li; });
-    section(root, "Inferences", f.inferences, (x) => { const li = el("li", x.statement); li.append(" ", el("span", "(" + x.basis + ")", "note")); return li; });
-    section(root, "Contradictions", f.contradictions, (x) => el("li", x));
-    section(root, "Open questions", f.open_questions, (x) => el("li", x));
-    section(root, "Missing evidence", f.missing_evidence, (x) => el("li", x));
-    section(root, "Suggested checks for you", f.next_steps, (x) => el("li", x));
+function hero(c) {
+  const ev = c.evidence, d = ev.decision, p = ev.proposal || {}, ctx = ev.context || {};
+  const vendor = (ctx.counterparty || {}).name || p.counterparty_id || "Unknown payee";
+  const official = c.research && c.research.official_domain;
+  const outcomes = d.outcomes || [];
+  const latest = outcomes[outcomes.length - 1];
+  const floor = (d.risk || {}).floor;
+  return el("div", { class: "hero" },
+    el("section", { class: "card who" }, logo(vendor, official),
+      el("div", {}, el("strong", { text: vendor }), el("span", { class: "note", text: official ? official : "Official domain not found" }))),
+    el("section", { class: "card kpi" }, el("div", { class: "label", text: "Amount" }), el("div", { class: "value", text: money(p.amount) }),
+      el("div", { class: "note", text: `to ${p.payment_method_id || "?"}` })),
+    el("section", { class: "card kpi" }, el("div", { class: "label", text: "Engine decided" }),
+      el("div", { class: "value" }, el("span", { class: `badge ${d.decision}`, text: d.decision })),
+      el("div", { class: "chips" }, (d.reasons || []).map((r) => el("span", { class: "chip", text: r })))),
+    el("section", { class: "card kpi" }, el("div", { class: "label", text: "Reported" }),
+      el("div", { class: "value" }, latest ? el("span", { class: `badge ${latest.verified ? "block" : "claim"}`,
+        text: `${latest.finding.replace("_", " ")}${latest.verified ? "" : " (claim)"}` }) : el("span", { class: "note", text: "No report yet" })),
+      el("div", { class: "chips" }, floor ? floor.flags.map((f) => el("span", { class: "chip", text: f })) : el("span", { class: "note", text: "No floor at decision" }))));
+}
+
+function attention(c) {
+  const f = c.case_file || {}, ctx = c.evidence.context || {};
+  const official = c.research && c.research.official_domain;
+  const onInvoice = (c.public_facts_searched || {}).domains_on_invoice || [];
+  const mismatch = official && onInvoice.some((d) => !d.endsWith(official));
+  const box = el("section", { class: "card attention" }, el("h2", { text: "Look here first" }));
+  if (official || onInvoice.length) {
+    box.append(el("div", { class: "domains" },
+      el("div", {}, el("div", { class: "note", text: "Vendor's own domain (web research)" }), el("div", { text: official || "not found" })),
+      el("div", {}, el("div", { class: "note", text: "Domains on the invoice" }),
+        el("div", { class: mismatch ? "mismatch" : "", text: onInvoice.length ? onInvoice.join(", ") + (mismatch ? "  ≠ vendor" : "") : "none" }))));
   }
-  section(root, "Web findings (untrusted, check the source)", c.research && c.research.findings, (x) => {
-    const li = el("li", x.claim); li.append(" ", el("span", x.url, "src")); return li; });
-  root.append(el("h2", "Untrusted text in the case"));
-  const ctx = c.evidence.context || {};
-  for (const [label, text] of [["Invoice", ctx.bill && ctx.bill.document_excerpt], ["Agent's rationale", p.agent_rationale]]) {
-    if (text) { root.append(el("div", label, "note"), el("pre", text, "untrusted")); }
-  }
-  section(root, "Payments to this bank account", c.evidence.payments_to_method,
-          (x) => el("li", `${x.created_at} · ${x.status} · ${x.counterparty_id} · ${(x.amount.amount / 100).toFixed(2)} ${x.amount.currency}`));
-  section(root, "Risk adjustments for this business", c.evidence.adjustments, (x) => el("li", `${x.at} · ${x.kind} · ${x.subject} · by ${x.by}`));
-  root.append(el("p", c.note, "note"));
-  root.append($("finding-form").content.cloneNode(true));
-  $("finding").addEventListener("submit", async (event) => {
+  box.append(list(f.contradictions, (x) => x, "No contradictions found."));
+  if ((f.open_questions || []).length) box.append(el("div", { class: "note", text: "Open questions" }), list(f.open_questions, (x) => x));
+  return box;
+}
+
+function evidence(c) {
+  const ev = c.evidence, p = ev.proposal || {}, ctx = ev.context || {};
+  const section = (title, count, ...body) => el("details", {}, el("summary", {}, title, " ", el("span", { class: "count", text: `(${count})` })), ...body);
+  const rows = (items, cols) => el("table", {}, el("tr", {}, cols.map(([h]) => el("th", { text: h }))),
+    items.map((item) => el("tr", {}, cols.map(([, f]) => el("td", { text: f(item) })))));
+  const untrusted = [["Invoice", ctx.bill && ctx.bill.document_excerpt], ["Agent's rationale", p.agent_rationale], ["Memo", p.memo]].filter(([, t]) => t);
+  return card("Evidence, on demand",
+    section("Payments to this bank account", ev.payments_to_method.length,
+      rows(ev.payments_to_method, [["When", (x) => x.created_at.slice(0, 16).replace("T", " ")], ["Status", (x) => x.status], ["Payee", (x) => x.counterparty_id], ["Amount", (x) => money(x.amount)]])),
+    section("Payments to this payee", ev.payments_to_payee.length,
+      rows(ev.payments_to_payee, [["When", (x) => String(x.posted_at).slice(0, 10)], ["Status", (x) => x.status || ""], ["Bill", (x) => x.bill_id || ""], ["Amount", (x) => money(x.amount)]])),
+    section("Bank-detail changes", ev.method_changes.length,
+      rows(ev.method_changes, [["When", (x) => String(x.changed_at).slice(0, 10)], ["Change", (x) => x.change], ["Method", (x) => x.method_id]])),
+    section("Risk adjustments for this business", ev.adjustments.length,
+      rows(ev.adjustments, [["When", (x) => String(x.at).slice(0, 10)], ["Kind", (x) => x.kind], ["Subject", (x) => x.subject], ["By", (x) => x.by]])),
+    section("Untrusted text (may be written by an attacker)", untrusted.length,
+      untrusted.map(([label, text]) => [el("div", { class: "note", text: label }), el("pre", { class: "untrusted", text })])));
+}
+
+function web(c) {
+  const findings = (c.research && c.research.findings) || [];
+  return card("Web findings · untrusted, open the source",
+    list(findings, (x) => {
+      const domain = domainOf(x.url);
+      return el("div", { class: "finding-card" }, domain ? el("img", { alt: "", src: favicon(domain, 32), referrerpolicy: "no-referrer" }) : null,
+        el("div", {}, x.claim, el("div", { class: "src", text: x.url })));
+    }, c.research ? "Nothing found." : "Web research was not available for this case."));
+}
+
+function side(c) {
+  const f = c.case_file || {}, d = c.evidence.decision;
+  const checks = [...(f.next_steps || []), ...(f.missing_evidence || []).map((m) => "Get: " + m)];
+  const key = `zeta-checks-${c.case_id}`;
+  let done = []; try { done = JSON.parse(localStorage.getItem(key) || "[]"); } catch (e) {}
+  const checklist = el("div", { class: "checks" }, checks.map((text, i) => {
+    const box = el("input", { type: "checkbox" }); box.checked = done.includes(i);
+    box.addEventListener("change", () => { done = box.checked ? [...done, i] : done.filter((n) => n !== i);
+      try { localStorage.setItem(key, JSON.stringify(done)); } catch (e) {} });
+    return el("label", {}, box, el("span", { text }));
+  }));
+  const form = el("form", { class: "finding" },
+    el("select", { id: "f-finding" }, [["legitimate", "Legitimate"], ["payee_fraud", "Payee fraud"], ["manipulated_agent", "Manipulated agent"], ["unauthorized", "Unauthorized"]].map(([v, t]) => el("option", { value: v, text: t }))),
+    el("select", { id: "f-verification" }, [["callback_known_number", "Called back on a number already on file"], ["bank_confirmation", "Bank confirmation"], ["vendor_portal", "Vendor portal"], ["signed_customer_attestation", "Signed customer attestation"], ["customer_report", "Customer report only (a claim)"], ["none", "Not verified"]].map(([v, t]) => el("option", { value: v, text: t }))),
+    el("input", { id: "f-note", placeholder: "What you found, and from whom" }),
+    el("div", { class: "row" }, el("button", { text: "Record finding" }), el("span", { id: "f-status", class: "note" })));
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
     try {
       const o = await api(`/v1/decisions/${encodeURIComponent(d.decision_id)}/outcomes`, {
         finding: $("f-finding").value, verification: $("f-verification").value, by: $("by").value, note: $("f-note").value || null });
-      $("f-status").textContent = o.verified ? "Recorded as a verified finding." : "Recorded as a claim: it changes nothing.";
+      $("f-status").textContent = o.verified ? "Recorded. A verified finding changes risk for this business." : "Recorded as a claim: it changes nothing.";
     } catch (e) { $("f-status").textContent = "Not recorded: " + e.message; }
   });
+  return el("aside", { class: "side" },
+    card("Your checks", checks.length ? checklist : el("p", { class: "empty", text: "No checks suggested." })),
+    card("Record what you found", form, el("p", { class: "note", text: "Only a verified method changes risk. The assistant never records a finding." })));
+}
+
+function show(c) {
+  const f = c.case_file || {};
+  const facts = card("Shown by the records", list(f.verified_facts, (x) => [x.statement,
+    el("div", { class: "sources" }, x.sources.map((s) => el("span", { class: "chip", text: s })))], "No cited facts."));
+  const inferences = card("Suggested, not shown", list(f.inferences, (x) => [x.statement, el("div", { class: "note", text: x.basis })], "No inferences."));
+  const story = card("What happened", el("p", { class: "lead", text: f.summary || "The assistant couldn't write a summary; the evidence is below." }),
+    (f.timeline || []).length ? el("ol", { class: "timeline" }, f.timeline.map((e) => el("li", {}, el("time", { text: e.at }), e.event))) : null);
+  const errors = (c.errors || []).map((e) => el("p", { class: "warn", text: "Assistant: " + e }));
+  $("case").replaceChildren(hero(c), ...errors,
+    el("div", { class: "layout" },
+      el("div", { class: "stack" }, attention(c), story, el("div", { class: "two" }, facts, inferences), web(c), evidence(c),
+        el("p", { class: "note", text: c.note })),
+      side(c)));
 }
 
 $("open").addEventListener("submit", async (event) => {

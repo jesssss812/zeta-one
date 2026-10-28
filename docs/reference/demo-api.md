@@ -59,7 +59,7 @@ signature headers:
 | `POST /v1/adjustments/{adjustment_id}/revoke` | `{"by", "reason"}`; appends a revocation, never edits |
 | `POST /v1/cases` | `{"decision_id", "by"}`: an AI assistant assembles a case file for a person (decision 0015): the gathered evidence, public web research on the vendor, and a structured file with no verdict; `errors` lists any step that failed |
 | `GET /v1/cases/{case_id}`, `GET /v1/decisions/{decision_id}/cases` | a case file; the cases for a decision |
-| `GET /review` | the case worker's page; it holds no data, asks for the admin token and calls the endpoints above |
+| `GET /review` | the case worker's page; it holds no data, asks for the admin token and calls the endpoints above. It shows the vendor's logo from Google's favicon service for the domain the research found (with no referrer), so that service learns which vendor domain was viewed; a monogram stands in when there is none |
 | `GET /v1/stats` | decisions by kind, challenge approval rate, verified findings, unverified claims, `missed_fraud` and `unneeded_challenges` decision ids; sandbox scenario runs left out |
 | `POST /v1/agents` | registers an agent: `{"agent_id", "business_id", "owner", "public_key"}`, the Ed25519 key as 32 raw bytes in base64; `409` if it exists |
 | `POST /v1/agents/{agent_id}/revoke` | revokes the agent's future requests |
