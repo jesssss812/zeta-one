@@ -75,7 +75,8 @@ arm; expected cost and an evaluation chart.
   comparison of payment methods, signed authorizations, hash-chained evidence, rate limits, key
   rotation.
 - Approval side panel: poll Rho items waiting for approval and score them (decision 0003).
-- AI-assisted case review (P2).
+- Case review assistant: dual control on findings, a per-day model budget, and an evaluation of the
+  assistant on adversarial web pages (decision 0015).
 
 ## Submission (by Thu Oct 29, 5:00 PM CT)
 

@@ -27,6 +27,7 @@ from zeta_one.contracts import (
 )
 from zeta_one.gateway.recheck import recheck
 from zeta_one.gateway.adjustments import Adjustments
+from zeta_one.review.case import Cases, build_case, gather
 from zeta_one.gateway.ledger import Ledger
 from zeta_one.gateway.pipeline import Engine
 from zeta_one.gateway.reuse import RiskReuse
@@ -84,10 +85,13 @@ class Gateway:
     version: str | None = None
     lock: threading.RLock = field(default_factory=threading.RLock)
     adjustments: Adjustments | None = None
+    # The case-review assistant's Anthropic client (decision 0015); created on first use.
+    review_client: Any = None
 
     def __post_init__(self) -> None:
         if self.adjustments is None:
             self.adjustments = Adjustments(self.ledger.connection)
+        self.cases = Cases(self.ledger.connection)
         self._capture: ContextCapture | None = None
         self._engine: Engine | None = None
         self._missing = self.stages.missing()
@@ -143,6 +147,23 @@ class Gateway:
             if not self._record_outcome(decision_id, outcome):
                 raise UnknownDecision(decision_id)
         return outcome
+
+    def review(self, decision_id: str, by: str) -> dict[str, Any]:
+        """Assemble a case file for a person (decision 0015). The lock covers the reads and the write,
+        not the model calls. Raises UnknownDecision if there is no such decision."""
+        now = self.clock()
+        with self.lock:
+            evidence = gather(self.ledger, self.adjustments, decision_id, now)
+        if evidence is None:
+            raise UnknownDecision(decision_id)
+        if self.review_client is None:
+            import anthropic
+
+            self.review_client = anthropic.Anthropic(timeout=120.0, max_retries=1)
+        case = build_case(self.review_client, evidence, by, now)
+        with self.lock:
+            self.cases.add(case)
+        return case
 
     def _record_outcome(self, decision_id: str, outcome: VerifiedOutcome) -> bool:
         """Append the outcome and, if it is verified and implies one, the risk adjustment (decision 0013)."""

@@ -57,6 +57,9 @@ signature headers:
 | `POST /v1/decisions/{decision_id}/outcomes` | records a person's finding on any decision: `{"finding": "legitimate" \| "payee_fraud" \| "manipulated_agent" \| "unauthorized", "verification": "callback_known_number" \| "vendor_portal" \| "bank_confirmation" \| "signed_customer_attestation" \| "customer_report" \| "none", "by", "note"}`; returns it with `verified` (decision 0012) |
 | `GET /v1/adjustments` | the risk adjustments verified outcomes created (`?business_id=`), oldest first, revocations included (decision 0013) |
 | `POST /v1/adjustments/{adjustment_id}/revoke` | `{"by", "reason"}`; appends a revocation, never edits |
+| `POST /v1/cases` | `{"decision_id", "by"}`: an AI assistant assembles a case file for a person (decision 0015): the gathered evidence, public web research on the vendor, and a structured file with no verdict; `errors` lists any step that failed |
+| `GET /v1/cases/{case_id}`, `GET /v1/decisions/{decision_id}/cases` | a case file; the cases for a decision |
+| `GET /review` | the case worker's page; it holds no data, asks for the admin token and calls the endpoints above |
 | `GET /v1/stats` | decisions by kind, challenge approval rate, verified findings, unverified claims, `missed_fraud` and `unneeded_challenges` decision ids; sandbox scenario runs left out |
 | `POST /v1/agents` | registers an agent: `{"agent_id", "business_id", "owner", "public_key"}`, the Ed25519 key as 32 raw bytes in base64; `409` if it exists |
 | `POST /v1/agents/{agent_id}/revoke` | revokes the agent's future requests |

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zeta One case review</title>
+<style>
+  :root { --bg: #fbfaf7; --ink: #1d1d1b; --muted: #6b6a66; --line: #e3e0d8; --warn: #8a4b00; --accent: #24456b; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #161615; --ink: #ecebe6; --muted: #a3a29c; --line: #34332f; --warn: #f0b36a; --accent: #9cc3ec; } }
+  body { background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, sans-serif; margin: 0 auto; max-width: 960px; padding: 24px 16px; }
+  h1 { font-size: 20px; margin: 0 0 4px; } h2 { font-size: 15px; margin: 24px 0 8px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+  .note { color: var(--muted); font-size: 13px; } .warn { color: var(--warn); }
+  input, select, textarea, button { font: inherit; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: transparent; color: inherit; }
+  button { background: var(--accent); color: var(--bg); border: 0; cursor: pointer; }
+  form { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0; }
+  ul { padding-left: 18px; } li { margin: 4px 0; } code, .src { font: 12px ui-monospace, monospace; color: var(--muted); }
+  .card { border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin: 8px 0; }
+  pre.untrusted { white-space: pre-wrap; border-left: 3px solid var(--warn); padding: 6px 10px; margin: 6px 0; }
+</style>
+</head>
+<body>
+<h1>Case review</h1>
+<p class="note">An AI assistant gathers and orders the evidence. It decides nothing. You record what is true, and how you know.
+Payments are simulated.</p>
+
+<form id="open">
+  <input id="token" type="password" placeholder="Admin token" autocomplete="off" required>
+  <input id="decision" placeholder="Decision id (dec_...)" required>
+  <input id="by" placeholder="Your name" required>
+  <button>Assemble case</button>
+  <span id="status" class="note"></span>
+</form>
+
+<div id="case"></div>
+
+<template id="finding-form">
+  <h2>Record a finding</h2>
+  <form id="finding">
+    <select id="f-finding">
+      <option value="legitimate">Legitimate</option><option value="payee_fraud">Payee fraud</option>
+      <option value="manipulated_agent">Manipulated agent</option><option value="unauthorized">Unauthorized</option>
+    </select>
+    <select id="f-verification">
+      <option value="callback_known_number">Called back on a number already on file</option>
+      <option value="bank_confirmation">Bank confirmation</option><option value="vendor_portal">Vendor portal</option>
+      <option value="signed_customer_attestation">Signed customer attestation</option>
+      <option value="customer_report">Customer report only (a claim, changes nothing)</option>
+      <option value="none">Not verified</option>
+    </select>
+    <input id="f-note" placeholder="Note" size="40">
+    <button>Record</button>
+    <span id="f-status" class="note"></span>
+  </form>
+</template>
+
+<script>
+// Every value from the case is set as text, never as HTML: invoice text, rationale and web findings
+// may be written by an attacker (security.md, S14).
+const $ = (id) => document.getElementById(id);
+const el = (tag, text, cls) => { const e = document.createElement(tag); if (text != null) e.textContent = text; if (cls) e.className = cls; return e; };
+try { $("token").value = sessionStorage.getItem("zeta-admin") || ""; } catch (e) {}
+
+async function api(path, body) {
+  const headers = { "Authorization": "Bearer " + $("token").value, "Content-Type": "application/json" };
+  const response = await fetch(path, body ? { method: "POST", headers, body: JSON.stringify(body) } : { headers });
+  const data = await response.json();
+  if (!response.ok) throw new Error((data.error && data.error.message) || response.status);
+  return data;
+}
+
+function section(root, title, items, render) {
+  root.append(el("h2", title));
+  if (!items || !items.length) { root.append(el("p", "None.", "note")); return; }
+  const list = el("ul");
+  for (const item of items) list.append(render(item));
+  root.append(list);
+}
+
+function show(c) {
+  const root = $("case"); root.replaceChildren();
+  const d = c.evidence.decision, p = c.evidence.proposal || {};
+  const head = el("div", null, "card");
+  head.append(el("strong", `${d.decision} · ${d.decision_id}`), el("div", `Reasons: ${(d.reasons || []).join(", ")}`, "note"),
+              el("div", `Pays ${p.counterparty_id || "?"} ${p.amount ? (p.amount.amount / 100).toFixed(2) + " " + p.amount.currency : ""} to ${p.payment_method_id || "?"}`, "note"));
+  root.append(head);
+  for (const error of c.errors || []) root.append(el("p", "Assistant: " + error, "warn"));
+  const f = c.case_file;
+  if (f) {
+    root.append(el("h2", "Summary"), el("p", f.summary));
+    section(root, "Timeline", f.timeline, (e) => el("li", `${e.at} · ${e.event}`));
+    section(root, "Verified facts", f.verified_facts, (x) => { const li = el("li", x.statement); li.append(" ", el("span", x.sources.join(", "), "src")); return li; });
+    section(root, "Inferences", f.inferences, (x) => { const li = el("li", x.statement); li.append(" ", el("span", "(" + x.basis + ")", "note")); return li; });
+    section(root, "Contradictions", f.contradictions, (x) => el("li", x));
+    section(root, "Open questions", f.open_questions, (x) => el("li", x));
+    section(root, "Missing evidence", f.missing_evidence, (x) => el("li", x));
+    section(root, "Suggested checks for you", f.next_steps, (x) => el("li", x));
+  }
+  section(root, "Web findings (untrusted, check the source)", c.research && c.research.findings, (x) => {
+    const li = el("li", x.claim); li.append(" ", el("span", x.url, "src")); return li; });
+  root.append(el("h2", "Untrusted text in the case"));
+  const ctx = c.evidence.context || {};
+  for (const [label, text] of [["Invoice", ctx.bill && ctx.bill.document_excerpt], ["Agent's rationale", p.agent_rationale]]) {
+    if (text) { root.append(el("div", label, "note"), el("pre", text, "untrusted")); }
+  }
+  section(root, "Payments to this bank account", c.evidence.payments_to_method,
+          (x) => el("li", `${x.created_at} · ${x.status} · ${x.counterparty_id} · ${(x.amount.amount / 100).toFixed(2)} ${x.amount.currency}`));
+  section(root, "Risk adjustments for this business", c.evidence.adjustments, (x) => el("li", `${x.at} · ${x.kind} · ${x.subject} · by ${x.by}`));
+  root.append(el("p", c.note, "note"));
+  root.append($("finding-form").content.cloneNode(true));
+  $("finding").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    try {
+      const o = await api(`/v1/decisions/${encodeURIComponent(d.decision_id)}/outcomes`, {
+        finding: $("f-finding").value, verification: $("f-verification").value, by: $("by").value, note: $("f-note").value || null });
+      $("f-status").textContent = o.verified ? "Recorded as a verified finding." : "Recorded as a claim: it changes nothing.";
+    } catch (e) { $("f-status").textContent = "Not recorded: " + e.message; }
+  });
+}
+
+$("open").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  try { sessionStorage.setItem("zeta-admin", $("token").value); } catch (e) {}
+  $("status").textContent = "Gathering evidence and researching the vendor…";
+  try { show(await api("/v1/cases", { decision_id: $("decision").value.trim(), by: $("by").value })); $("status").textContent = ""; }
+  catch (e) { $("status").textContent = "Couldn't assemble: " + e.message; }
+});
+</script>
+</body>
+</html>

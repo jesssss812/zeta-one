@@ -16,7 +16,7 @@ from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from starlette.exceptions import HTTPException
 
@@ -30,6 +30,7 @@ from zeta_one.gateway.wiring import ROOT, configuration_from_env, engine_version
 
 HOST = "127.0.0.1"
 EVAL_REPORT = ROOT / "data" / "eval" / "report.json"
+REVIEW_PAGE = Path(__file__).resolve().parents[1] / "review" / "page.html"
 
 
 class AgentRegistration(BaseModel):
@@ -57,6 +58,13 @@ class AdjustmentRevocation(BaseModel):
 
     by: str = Field(min_length=1, max_length=200)
     reason: str = Field(min_length=1, max_length=1000)
+
+
+class CaseRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    decision_id: str = Field(min_length=1, max_length=128)
+    by: str = Field(min_length=1, max_length=200)
 
 
 class OutcomeReport(BaseModel):
@@ -233,6 +241,37 @@ def create_app(gateway: Gateway, token: str | None, eval_report: Path = EVAL_REP
         if revocation is None:
             return _error(404, "unknown_adjustment", f"no adjustment {adjustment_id}")
         return revocation.model_dump(mode="json")
+
+    # --- Case review (decision 0015): an AI assembles evidence; a person decides. ---
+
+    @app.post("/v1/cases", status_code=201)
+    async def open_case(request: Request):
+        admin.require_admin(request.headers, token)
+        body, problem = _body(CaseRequest, await request.body())
+        if problem:
+            return problem
+        try:
+            return await run_in_threadpool(gateway.review, body.decision_id, body.by)
+        except UnknownDecision:
+            return _error(404, "unknown_decision", f"no decision {body.decision_id}")
+
+    @app.get("/v1/cases/{case_id}")
+    def get_case(case_id: str, request: Request):
+        admin.require_admin(request.headers, token)
+        with gateway.lock:
+            case = gateway.cases.get(case_id)
+        return case if case else _error(404, "unknown_case", f"no case {case_id}")
+
+    @app.get("/v1/decisions/{decision_id}/cases")
+    def decision_cases(decision_id: str, request: Request):
+        admin.require_admin(request.headers, token)
+        with gateway.lock:
+            return gateway.cases.for_decision(decision_id)
+
+    @app.get("/review", response_class=HTMLResponse)
+    def review_page():
+        """The case worker's page. It holds no data: it asks for the admin token and calls the API."""
+        return REVIEW_PAGE.read_text()
 
     @app.get("/v1/stats")
     def stats(request: Request):
