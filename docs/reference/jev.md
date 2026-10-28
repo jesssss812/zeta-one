@@ -72,10 +72,13 @@ carries `cost` in dollars: about $0.0001 for a 2,700-token state.
 429 or a 5xx. A bad answer is not retried on the other route, which would re-roll the model
 (decision 0010). OpenRouter comes first so one key serves Jev and the open-weight arm; the cost is
 an alpha endpoint and one more processor that sees the invoice text. Each result names its
-`route` and any `routes_tried`. The request carries a `state` that is the strong tier's rendering
-(gateway facts, then untrusted text in bounded blocks), and four questions: `risk_level` (choice:
-low / elevated / high), `document_targets_agent`, `proposal_matches_documents` and
-`vendor_impersonation_signs` (nouls). The parser reads the shape above: a choice's confidence is
+`route` and any `routes_tried`. The request carries a compact `state`, about 1,100 tokens on `dev`
+against 2,600 for the strong tier's JSON: the gateway facts and the tier-0 checks that came out
+true as short sentences, then the untrusted text (agent rationale, memo, payee and bank names,
+invoice text) in blocks with a per-request boundary, neutralized as the strong tier's are. Four
+questions: `risk_level` (choice: low / elevated / high), `document_targets_agent`,
+`proposal_matches_documents` and `vendor_impersonation_signs` (nouls). How the state and wording
+were chosen, and what they changed, is in [dev-tuning.md](dev-tuning.md). The parser reads the shape above: a choice's confidence is
 the probability of the chosen option; a noul is yes from 0.5, with confidence `max(p, 1 - p)`.
 Anything else is invalid output, which fails closed. One live call:
 `.venv/bin/python -m pytest tests/risk/test_jev.py --live-models -k live`. The live gateway uses Jev when `ZETA_RISK_CONFIGURATION=jev`; the evaluation
