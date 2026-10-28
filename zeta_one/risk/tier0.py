@@ -11,11 +11,11 @@ class Tier0:
         changed = features['payment_method_changed_days_ago'].value
         new_or_changed = features['counterparty_is_new'].value or (changed is not None and changed <= 30)
         signals = []
-        for name in ('bill_mismatch', 'bill_not_referenced', 'document_instruction_patterns',
+        for name in ('payment_method_blocked', 'bill_mismatch', 'bill_not_referenced', 'document_instruction_patterns',
                      'duplicate_candidate', 'counterparty_is_new', 'payment_method_changed_days_ago',
                      'amount_ratio_to_vendor_median'):
             feature = features[name]
-            severity = 'elevated'
+            severity = 'high' if name == 'payment_method_blocked' else 'elevated'
             active = feature.value is True
             if name in ('bill_mismatch', 'bill_not_referenced') and new_or_changed:
                 severity = 'high'

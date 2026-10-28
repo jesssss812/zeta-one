@@ -100,6 +100,8 @@ these arguments and carry evidence IDs. The lexicon in `risk/features.py` is fro
 | `document_instruction_patterns` | Fixed case-insensitive patterns in the named bill and independently discovered open bills |
 | `bill_not_referenced` | No bill named and an open bill exists, or the payee is new or recently changed |
 | `duplicate_candidate` | The named bill is already paid (its status is `paid`, or a payment in Rho's history or the gateway's own simulated payments in `context.gateway_payments` names it), or the same amount went to the payee within 7 days |
+| `payment_method_blocked` | An active adjustment blocks the proposed payment method after a verified fraud finding (decision 0013); hard flag, floor `high` |
+| `payment_method_change_confirmed` | The method's latest change is one a person verified, within 90 days; that change is then a soft signal, not a floor |
 
 A duplicate candidate sets an elevated floor, so the payment is challenged. Paying a vendor in a
 currency it has never been paid in leaves no same-currency history, so the payee counts as new.

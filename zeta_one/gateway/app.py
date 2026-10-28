@@ -52,6 +52,13 @@ class Resolution(BaseModel):
     verification: Verification = "none"
 
 
+class AdjustmentRevocation(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    by: str = Field(min_length=1, max_length=200)
+    reason: str = Field(min_length=1, max_length=1000)
+
+
 class OutcomeReport(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -208,6 +215,24 @@ def create_app(gateway: Gateway, token: str | None, eval_report: Path = EVAL_REP
         except UnknownDecision:
             return _error(404, "unknown_decision", f"no decision {decision_id}")
         return outcome.model_dump(mode="json")
+
+    @app.get("/v1/adjustments")
+    def list_adjustments(request: Request, business_id: str | None = None):
+        admin.require_admin(request.headers, token)
+        with gateway.lock:
+            return [row.model_dump(mode="json") for row in gateway.adjustments.all(business_id)]
+
+    @app.post("/v1/adjustments/{adjustment_id}/revoke", status_code=201)
+    async def revoke_adjustment(adjustment_id: str, request: Request):
+        admin.require_admin(request.headers, token)
+        body, problem = _body(AdjustmentRevocation, await request.body())
+        if problem:
+            return problem
+        with gateway.lock:
+            revocation = gateway.adjustments.revoke(adjustment_id, body.by, gateway.clock(), body.reason)
+        if revocation is None:
+            return _error(404, "unknown_adjustment", f"no adjustment {adjustment_id}")
+        return revocation.model_dump(mode="json")
 
     @app.get("/v1/stats")
     def stats(request: Request):

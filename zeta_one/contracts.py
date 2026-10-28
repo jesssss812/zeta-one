@@ -13,7 +13,7 @@ from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validat
 
 from zeta_one.rho.models import Money
 
-POLICY_VERSION = "2026-10-28.3"
+POLICY_VERSION = "2026-10-28.4"
 SCHEMA_VERSION = 1
 # The largest payment a proposal may name, in minor units: $10 billion, far inside SQLite's integer range.
 MAX_PAYMENT_MINOR_UNITS = 10**12
@@ -154,6 +154,25 @@ class BusinessView(_Open):
     name: str
 
 
+class RiskAdjustment(_Open):
+    """A change to how one business's risk is decided, derived from a verified outcome (decision 0013).
+
+    Rows are appended, never edited: revoking one is a later row with `revokes` set."""
+
+    adjustment_id: str
+    business_id: str
+    kind: Literal["blocked_payment_method", "confirmed_method_change", "revoke"]
+    # The payment-method id blocked, the method-change id confirmed, or the adjustment id revoked.
+    subject: str
+    decision_id: str | None = None
+    finding: str | None = None
+    verification: str | None = None
+    by: str
+    at: datetime
+    expires_at: datetime | None = None
+    reason: str | None = None
+
+
 class Context(_Open):
     """Everything risk is assessed from. `counterparty` is always the proposed payee.
 
@@ -172,6 +191,8 @@ class Context(_Open):
     bill_counterparty_payment_history: PaymentHistory | None = None
     open_bills: list[BillView] = Field(default_factory=list)
     gateway_payments: list[PaymentRecord] = Field(default_factory=list)
+    # The business's active risk adjustments that bear on this payee (decision 0013).
+    adjustments: list[RiskAdjustment] = Field(default_factory=list)
 
 
 # --- The evidence record ---------------------------------------------------------------------------
@@ -265,6 +286,8 @@ class RiskEvidence(_Open):
     # True when the models were skipped because this agent had already had MAX_FRESH_ASSESSMENTS
     # different proposals to the same payee and method assessed within the reuse window (S3).
     repeat_limit_reached: bool = False
+    # Ids of the risk adjustments that changed this assessment (decision 0013).
+    adjustments: list[str] = Field(default_factory=list)
     model_rationale: str | None = None
 
     @classmethod

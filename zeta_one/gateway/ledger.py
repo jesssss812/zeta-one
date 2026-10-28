@@ -93,6 +93,7 @@ class HeldPayment:
 class Ledger:
     def __init__(self, connection: sqlite3.Connection, new_id: Callable[[str], str] = _new_id):
         self._db = connection
+        self.connection = connection
         self._new_id = new_id
         self._db.executescript(SCHEMA)
 

@@ -26,6 +26,7 @@ from zeta_one.contracts import (
     VerifiedOutcome,
 )
 from zeta_one.gateway.recheck import recheck
+from zeta_one.gateway.adjustments import Adjustments
 from zeta_one.gateway.ledger import Ledger
 from zeta_one.gateway.pipeline import Engine
 from zeta_one.gateway.reuse import RiskReuse
@@ -37,16 +38,19 @@ from zeta_one.gateway.wiring import ContextCapture, Stages, build_engine
 GATEWAY_PAYMENT_WINDOW = timedelta(days=365)
 
 
-def with_gateway_payments(load_context: ContextSource, ledger: Ledger) -> ContextSource:
-    """A ContextSource that adds the gateway's own recent simulated payments to the payee, and drops
-    the bills it has already paid from `open_bills`."""
+def with_gateway_payments(load_context: ContextSource, ledger: Ledger,
+                          adjustments: Adjustments | None = None) -> ContextSource:
+    """A ContextSource that adds the gateway's own recent simulated payments to the payee, drops the
+    bills it has already paid from `open_bills`, and adds the business's active risk adjustments."""
 
     def load(proposal: Proposal, business_id: str, now: datetime) -> Context:
         context = load_context(proposal, business_id, now)
         payments = ledger.payments_to(business_id, proposal.counterparty_id, now - GATEWAY_PAYMENT_WINDOW)
         paid = {payment.bill_id for payment in payments if payment.bill_id and payment.status == "executed"}
         open_bills = [bill for bill in context.open_bills if bill.id not in paid]
-        return context.model_copy(update={"gateway_payments": payments, "open_bills": open_bills})
+        active = adjustments.active(business_id, now) if adjustments else []
+        return context.model_copy(update={"gateway_payments": payments, "open_bills": open_bills,
+                                          "adjustments": active})
 
     return load
 
@@ -79,13 +83,16 @@ class Gateway:
     reuse: RiskReuse | None = None
     version: str | None = None
     lock: threading.RLock = field(default_factory=threading.RLock)
+    adjustments: Adjustments | None = None
 
     def __post_init__(self) -> None:
+        if self.adjustments is None:
+            self.adjustments = Adjustments(self.ledger.connection)
         self._capture: ContextCapture | None = None
         self._engine: Engine | None = None
         self._missing = self.stages.missing()
         if not self._missing:
-            self._capture = ContextCapture(with_gateway_payments(self.stages.load_context, self.ledger))
+            self._capture = ContextCapture(with_gateway_payments(self.stages.load_context, self.ledger, self.adjustments))
             captured = replace(self.stages, load_context=self._capture)
             self._engine = build_engine(
                 captured, self.ledger.spend_source(), assess_risk=self.reuse, clock=self.clock, version=self.version
@@ -121,7 +128,7 @@ class Gateway:
         with self.lock:
             resolved = self._resolve(challenge_id, outcome, by, note)
             if finding is not None:
-                self.ledger.add_outcome(resolved["decision_id"], VerifiedOutcome(
+                self._record_outcome(resolved["decision_id"], VerifiedOutcome(
                     finding=finding, verification=verification, by=by, at=self.clock(), note=note, source="resolve"))
             return resolved
 
@@ -133,9 +140,16 @@ class Gateway:
         outcome = VerifiedOutcome(finding=finding, verification=verification, by=by, at=self.clock(), note=note,
                                   source="report")
         with self.lock:
-            if not self.ledger.add_outcome(decision_id, outcome):
+            if not self._record_outcome(decision_id, outcome):
                 raise UnknownDecision(decision_id)
         return outcome
+
+    def _record_outcome(self, decision_id: str, outcome: VerifiedOutcome) -> bool:
+        """Append the outcome and, if it is verified and implies one, the risk adjustment (decision 0013)."""
+        if not self.ledger.add_outcome(decision_id, outcome):
+            return False
+        self.adjustments.derive(self.ledger.decision(decision_id), outcome)
+        return True
 
     def _resolve(
         self, challenge_id: str, outcome: Literal["approve", "reject"], by: str, note: str | None

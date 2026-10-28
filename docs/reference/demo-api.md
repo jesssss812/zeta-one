@@ -55,6 +55,8 @@ signature headers:
 | `GET /v1/decisions` | lists evidence records, newest first (`?limit=`, at most 500) |
 | `POST /v1/challenges/{challenge_id}/resolve` | `{"outcome": "approve" \| "reject", "by", "note", "finding"?, "verification"?}`; approval executes (simulated) only if a recheck finds nothing changed; a `finding` is recorded as an outcome |
 | `POST /v1/decisions/{decision_id}/outcomes` | records a person's finding on any decision: `{"finding": "legitimate" \| "payee_fraud" \| "manipulated_agent" \| "unauthorized", "verification": "callback_known_number" \| "vendor_portal" \| "bank_confirmation" \| "signed_customer_attestation" \| "customer_report" \| "none", "by", "note"}`; returns it with `verified` (decision 0012) |
+| `GET /v1/adjustments` | the risk adjustments verified outcomes created (`?business_id=`), oldest first, revocations included (decision 0013) |
+| `POST /v1/adjustments/{adjustment_id}/revoke` | `{"by", "reason"}`; appends a revocation, never edits |
 | `GET /v1/stats` | decisions by kind, challenge approval rate, verified findings, unverified claims, `missed_fraud` and `unneeded_challenges` decision ids; sandbox scenario runs left out |
 | `POST /v1/agents` | registers an agent: `{"agent_id", "business_id", "owner", "public_key"}`, the Ed25519 key as 32 raw bytes in base64; `409` if it exists |
 | `POST /v1/agents/{agent_id}/revoke` | revokes the agent's future requests |
@@ -108,7 +110,7 @@ describes how it is produced). Fields the site should rely on:
 ```json
 {
   "schema_version": 1,
-  "decision_id": "dec_...", "created_at": "...", "policy_version": "2026-10-28.3",
+  "decision_id": "dec_...", "created_at": "...", "policy_version": "2026-10-28.4",
   "engine_version": "<git sha>" | null, "seed_version": "<hash>" | null,
   "configuration": {"tiers": ["tier0", "strong"] | ["tier0", "cheap", "strong"], "escalation": "engineered" | "jev" | "always" | "none", "jev_min_confidence": 0.8, "jev_min_finding_confidence": 0.9},
   "decision": "allow" | "challenge" | "block",
@@ -130,6 +132,7 @@ describes how it is produced). Fields the site should rely on:
     "lowered": null | {"from": "elevated" | "high", "to": "low" | "elevated", "by": "cheap" | "strong", "signals": ["<soft signal name>"]},
     "reused_from": null | "dec_...",
     "repeat_limit_reached": false,
+    "adjustments": ["adj_..."],
     "model_rationale": null | "..."
   },
   "execution": {"status": "executed" | "held" | "blocked", "simulated": true},
@@ -189,6 +192,10 @@ Rules the site can count on:
 - A record keeps what was decided on: `proposal` whenever the body parsed (an unverified request's
   too, kept for the reviewer and never acted on) and `context` whenever it was loaded (never for an
   unverified request). Later changes to the business's records don't change them.
+- `risk.adjustments` lists the risk adjustments (decision 0013) that changed the assessment: a
+  blocked payment method (hard flag `payment_method_blocked`, floor `high`, blocked as a redirect
+  pattern) or a confirmed bank change (`payment_method_change_confirmed`: that change is a soft
+  signal, not a floor). Show them with the finding and person behind them.
 - A record may carry `outcomes`: each `{"finding", "verification", "verified", "by", "at", "note", "source": "resolve" | "report"}`, oldest first. Show unverified ones as claims, never as findings.
 - A scenario result's `illustrative` is `true` when any stage replayed the fixture instead of
   running, and `replayed_stages` names them (`["strong"]` for the two scenarios that escalate).

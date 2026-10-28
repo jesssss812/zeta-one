@@ -21,7 +21,7 @@ from zeta_one.contracts import (
 )
 
 FRICTION_RUNG = {"allow": 0, ChallengeType.CONFIRM: 2, "block": 5}
-REDIRECT_PATTERNS = ("bill_mismatch", "document_instruction_patterns", "injection_detected")
+REDIRECT_PATTERNS = ("bill_mismatch", "document_instruction_patterns", "injection_detected", "payment_method_blocked")
 
 
 @dataclass(frozen=True)

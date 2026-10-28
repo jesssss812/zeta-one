@@ -101,9 +101,28 @@ def duplicate_candidate(proposal: Proposal, context: Context, now: datetime) -> 
     return Feature(value=bool(matched), evidence=matched)
 
 
+def payment_method_blocked(proposal: Proposal, context: Context, now: datetime) -> Feature:
+    """The method was blocked after a verified fraud finding (decision 0013); evidence is the adjustment."""
+    blocks = [a.adjustment_id for a in context.adjustments
+              if a.kind == 'blocked_payment_method' and a.subject == proposal.payment_method_id]
+    return Feature(value=bool(blocks), evidence=blocks)
+
+
+def payment_method_change_confirmed(proposal: Proposal, context: Context, now: datetime) -> Feature:
+    """The latest change to the method is the one a person verified (decision 0013). A newer change isn't."""
+    changes = [change for change in context.payment_method_history if change.method_id == proposal.payment_method_id]
+    if not changes:
+        return Feature(value=False)
+    latest = max(changes, key=lambda change: change.changed_at)
+    confirmations = [a.adjustment_id for a in context.adjustments
+                     if a.kind == 'confirmed_method_change' and a.subject == latest.id]
+    return Feature(value=bool(confirmations), evidence=[latest.id, *confirmations] if confirmations else [])
+
+
 FEATURE_FUNCTIONS = (counterparty_is_new, payment_method_changed_days_ago,
                      amount_ratio_to_vendor_median, bill_mismatch,
-                     document_instruction_patterns, bill_not_referenced, duplicate_candidate)
+                     document_instruction_patterns, bill_not_referenced, duplicate_candidate,
+                     payment_method_blocked, payment_method_change_confirmed)
 
 
 def compute_features(proposal: Proposal, context: Context, now: datetime) -> dict[str, Feature]:

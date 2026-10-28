@@ -53,12 +53,24 @@ def floor(features: dict[str, Feature]) -> Floor | None:
     if _true(features, "document_instruction_patterns"):
         raise_to("elevated", "document_instruction_patterns")
     days = _changed_days_ago(features)
-    if days is not None and days <= RECENT_CHANGE_DAYS:
+    # A recent change is a floor unless a person verified that very change (decision 0013).
+    if days is not None and days <= RECENT_CHANGE_DAYS and not _true(features, "payment_method_change_confirmed"):
         raise_to("elevated", "payment_method_changed_days_ago")
     for flag in ("lookalike_counterparty", "duplicate_candidate"):
         if _true(features, flag):
             raise_to("elevated", flag)
+    if _true(features, "payment_method_blocked"):
+        raise_to("high", "payment_method_blocked")
     return Floor(level=level, flags=flags) if level else None
+
+
+ADJUSTMENT_FEATURES = ("payment_method_blocked", "payment_method_change_confirmed")
+
+
+def adjustments_used(features: dict[str, Feature]) -> list[str]:
+    """Ids of the risk adjustments that changed this assessment, from the features that read them."""
+    return [ref for name in ADJUSTMENT_FEATURES if _true(features, name)
+            for ref in features[name].evidence if ref.startswith("adj_")]
 
 
 def soft_signals(features: dict[str, Feature]) -> list[str]:
@@ -74,7 +86,8 @@ def soft_signals(features: dict[str, Feature]) -> list[str]:
     if ratio_value is not None and not (TYPICAL_AMOUNT_RATIO[0] <= ratio_value <= TYPICAL_AMOUNT_RATIO[1]):
         found.append("amount_ratio_to_vendor_median")
     days = _changed_days_ago(features)
-    if days is not None and days > RECENT_CHANGE_DAYS:
+    confirmed = _true(features, "payment_method_change_confirmed")
+    if days is not None and (days > RECENT_CHANGE_DAYS or confirmed):
         found.append("payment_method_changed_days_ago")
     return found
 
@@ -148,5 +161,6 @@ def merge(tier0: Tier0Output, later: list[TierOutput]) -> RiskEvidence:
         tier_results=[tier0.result, *(output.result for output in later)],
         signals=[*tier0.signals, *(signal for output in succeeded for signal in output.signals)],
         lowered=lowered,
+        adjustments=adjustments_used(tier0.features),
         model_rationale=succeeded[-1].rationale if succeeded else None,
     )
