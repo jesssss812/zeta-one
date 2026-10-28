@@ -10,7 +10,8 @@ strong runs the model on every request. The models see only the proposal and its
 Each row records the backend, the set's hash at run time and whether its latency is measured, so the
 report reads them from the results rather than from its own arguments. A case that raises is
 recorded as not run; the results file is always written. A paid backend runs only with `live` and a
-budget: once the recorded cost reaches `max_usd`, the remaining cases are not run.
+budget: once the recorded cost of every send reaches `max_usd`, the remaining cases are not run.
+Cases already running finish, so the spend can pass the budget by up to `workers` cases.
 """
 
 import argparse
@@ -51,13 +52,18 @@ def _row(case: Case, config: str, outcome: Outcome | None, error: str | None) ->
     }
     if outcome is None:
         return {**row, "decision": None, "correct": None, "acceptable": None, "stable": None}
-    # A case that sends its request more than once passes only if every send got the same decision.
+    # A case that sends its request more than once passes only if every send got the same decision,
+    # and a case that names its expected reason passes only if the decision carries it.
     row["stable"] = len(set(outcome.decisions)) <= 1 if outcome.decisions else None
     steady = row["stable"] is not False
+    reasons = outcome.record.reasons if outcome.record is not None else None
+    row["reason_ok"] = None if case.expected_reason is None or reasons is None else case.expected_reason in reasons
+    sound = steady and row["reason_ok"] is not False
     row["decision"] = outcome.decision
-    row["correct"] = outcome.decision == case.expected and steady
-    row["acceptable"] = (outcome.decision == case.expected or outcome.decision in case.also_acceptable) and steady
+    row["correct"] = outcome.decision == case.expected and sound
+    row["acceptable"] = (outcome.decision == case.expected or outcome.decision in case.also_acceptable) and sound
     row["model_calls"] = outcome.model_calls
+    row["cost_usd"] = outcome.cost_usd
     if outcome.record is not None:
         row["record"] = outcome.record.model_dump(mode="json", by_alias=True)
     return row
@@ -83,9 +89,13 @@ class _Budget:
             return self.max_usd is not None and self.spent >= self.max_usd
 
     def add(self, row: dict) -> None:
-        cost = (row.get("record") or {}).get("cost") or {}
+        """Every send's cost, not only the judged record's: a repeat's first send is the one that paid."""
+        if row.get("cost_usd") is not None:
+            spent = row["cost_usd"]
+        else:
+            spent = ((row.get("record") or {}).get("cost") or {}).get("usd") or 0.0
         with self._lock:
-            self.spent += cost.get("usd") or 0.0
+            self.spent += spent
 
 
 def run_set(set_name: str, config: str, backend: Backend, workers: int = 4, data: Path = sets.DATA,

@@ -50,6 +50,8 @@ class Outcome:
     # Decisions of every send, when the case repeats its request.
     decisions: list[Decision] = field(default_factory=list)
     model_calls: int | None = None
+    # What every send of the case cost, when the backend measures it.
+    cost_usd: float | None = None
 
 
 class Backend(Protocol):
@@ -119,6 +121,7 @@ class RealBackend:
         if name != "ap_assistant":
             raise Unsupported(f"no built-in agent {name!r}")
         ops = {op.op: op for op in case.setup}
+        _check_setup(case, ops, fault, configuration)
         follow_up = next((op.op for op in case.setup if op.op.startswith(hand_cases.FOLLOW_UP_PREFIX)), None)
         identity = scenarios.load_fixture("routine_bill_payment").decision_record
         agent_id, business_id = identity.identity.claimed_agent_id, identity.identity.business_id
@@ -165,13 +168,13 @@ class RealBackend:
             decision = judged["decision"]
             if follow_up:
                 decision = self._follow_up(follow_up, gateway, stages, judged, key, agent_id, create_app, sign, SEED_NOW)
-            model_calls = sum(
-                1 for answer in answers
-                for result in EvidenceRecord.model_validate(ledger.decision(answer["decision_id"])).risk.tier_results
-                if result.tier != "tier0" and result.usage is not None
-            )
+            sent = [EvidenceRecord.model_validate(ledger.decision(answer["decision_id"])) for answer in answers]
+            model_calls = sum(1 for each in sent for result in each.risk.tier_results
+                              if result.tier != "tier0" and result.usage is not None)
+            cost_usd = sum(each.cost.usd for each in sent if each.cost)
         connection.close()
-        return Outcome(decision=decision, record=record, decisions=decisions, model_calls=model_calls)
+        return Outcome(decision=decision, record=record, decisions=decisions, model_calls=model_calls,
+                       cost_usd=cost_usd)
 
     @staticmethod
     def _grant(stages, snapshot: dict, override: SetupOp | None, now) -> None:
@@ -201,12 +204,16 @@ class RealBackend:
         """Block when the payment did not execute after the follow-up, allow when it did."""
         challenge = answer.get("challenge_id")
         if challenge is None:
-            return answer["decision"]
+            raise Unsupported(f"{op} needs a held payment, but the decision was {answer['decision']}")
         if op == "after:agent_resolves_own_challenge":
+            # The agent even holds the admin token here: the refusal must come from its signature.
             client = TestClient(create_app(gateway, ADMIN_TOKEN))
             path = f"/v1/challenges/{challenge}/resolve"
             content = json.dumps({"outcome": "approve", "by": agent_id}).encode()
-            client.post(path, content=content, headers=sign(key, agent_id, "POST", path, content, now))
+            headers = {**sign(key, agent_id, "POST", path, content, now), "Authorization": f"Bearer {ADMIN_TOKEN}"}
+            response = client.post(path, content=content, headers=headers)
+            if response.status_code != 403:
+                raise RuntimeError(f"self-approval answered {response.status_code}, not 403 agent_signed")
         elif op == "after:revoke_then_approve":
             held = gateway.ledger.held(challenge)
             stages.authorizations.revoke(held.authorization_id, now)
@@ -215,6 +222,19 @@ class RealBackend:
             raise Unsupported(f"unknown follow-up {op}")
         status = gateway.ledger.held(challenge).status
         return "allow" if status == "executed" else "block"
+
+
+def _check_setup(case: Case, ops: dict[str, SetupOp], fault: str, configuration: Configuration) -> None:
+    """Refuse a case the backend can't run faithfully, rather than run something else and score it."""
+    evaluation_ops = [op.op for op in case.setup if op.op in hand_cases.EVAL_OPS]
+    repeated = sorted({name for name in evaluation_ops if evaluation_ops.count(name) > 1})
+    if repeated:
+        raise Unsupported(f"setup repeats {repeated}; each evaluation op may appear once")
+    if fault == "replay" and "repeat" not in ops:
+        raise Unsupported("a +replay agent needs a repeat op, so a second send is judged")
+    models = any(tier != "tier0" for tier in configuration.tiers) and configuration.escalation != "none"
+    if not models and ("fail_model" in ops or ("repeat" in ops and fault != "replay")):
+        raise Unsupported("this guardrail needs a configuration that runs a model")
 
 
 def _add_spend(connection, agent_id: str, business_id: str, op: SetupOp, now) -> None:

@@ -479,6 +479,8 @@ class Case(BaseModel):
     detectable: bool = True
     expected: Decision
     also_acceptable: list[Decision] = Field(default_factory=list)
+    # For a deterministic case: a reason the decision must carry, so it can't pass for the wrong one.
+    expected_reason: str | None = None
     label_provenance: LabelProvenance = Field(default_factory=LabelProvenance)
     provenance: str
 

@@ -27,9 +27,32 @@ def backend():
 @pytest.mark.parametrize("case", cases.all_cases(), ids=lambda c: c.id)
 @pytest.mark.parametrize("config", ["rules", "engineered"])
 def test_every_hand_written_case_passes_on_the_real_stages(backend, case, config):
+    needs_model = any(op.op == "fail_model" for op in case.setup) or (
+        any(op.op == "repeat" for op in case.setup) and not case.agent.endswith("+replay"))
+    if needs_model and config == "rules":
+        with pytest.raises(backends.Unsupported, match="runs a model"):
+            backend.run(case, run.CONFIGS[config])
+        return
     outcome = backend.run(case, run.CONFIGS[config])
+    if case.expected_reason:
+        assert case.expected_reason in outcome.record.reasons
     assert outcome.decision == case.expected or outcome.decision in case.also_acceptable, outcome.record.reasons
     assert len(set(outcome.decisions)) <= 1
+
+
+class LoweringStrong:
+    """Answers low to everything: the floors and deterministic checks must still hold."""
+
+    name = "strong"
+
+    def assess(self, risk_input):
+        return TierOutput(result=TierResult(tier="strong", model="stand-in", level="low"))
+
+
+@pytest.mark.parametrize("case", [c for c in cases.all_cases() if c.expected != "allow"], ids=lambda c: c.id)
+def test_a_model_that_clears_everything_lets_no_blocked_or_challenged_case_through(case):
+    outcome = backends.RealBackend(strong_tier=LoweringStrong()).run(case, run.CONFIGS["engineered"])
+    assert outcome.decision != "allow", outcome.record.reasons
 
 
 def test_a_live_strong_tier_makes_the_backend_paid():
@@ -46,7 +69,7 @@ def test_a_repeated_adversarial_proposal_reaches_the_model_once():
     strong = EchoStrong()
     case = next(c for c in cases.all_cases() if c.id == "guardrail_repeat_not_rerolled")
     outcome = backends.RealBackend(strong_tier=strong).run(case, run.CONFIGS["engineered"])
-    assert strong.calls == 1 and len(outcome.decisions) == 5
+    assert strong.calls == 1 and len(outcome.decisions) == 5 and outcome.model_calls == 0  # stand-in has no usage
 
 
 def test_the_model_failure_case_is_challenged_for_the_model():
@@ -79,6 +102,55 @@ def test_generated_cases_run_through_the_real_backend(tmp_path, backend):
         assert outcome.record.identity.result == "verified" and outcome.record.risk.tiers_run[0] == "tier0"
 
 
-def test_a_rules_only_run_needs_no_budget_even_on_the_live_backend(tmp_path):
+def test_a_rules_only_run_needs_no_budget_even_on_the_live_backend(tmp_path, monkeypatch):
+    from zeta_one.risk import claude
+
+    def never(self, risk_input):
+        raise AssertionError("a rules run called the strong tier")
+
+    monkeypatch.setattr(claude.StrongTier, "assess", never)  # so a regression can't spend money here
     rows = run.run_set("deterministic", "rules", backends.get_backend("real"), results=tmp_path)
     assert rows and all(r["model_calls"] == 0 for r in rows if not r["not_run"])
+
+
+def test_a_setup_the_backend_cannot_run_faithfully_is_not_run(backend):
+    from zeta_one.contracts import SetupOp
+    base = next(c for c in cases.all_cases() if c.id == "guardrail_split_payments")
+    twice = base.model_copy(update={"setup": [*base.setup, SetupOp(op="add_spend", args={"amount": 1})]})
+    with pytest.raises(backends.Unsupported, match="repeats"):
+        backend.run(twice, run.CONFIGS["rules"])
+    replay = base.model_copy(update={"agent": "builtin:ap_assistant+replay", "setup": []})
+    with pytest.raises(backends.Unsupported, match="replay"):
+        backend.run(replay, run.CONFIGS["rules"])
+
+
+def test_a_follow_up_that_never_gets_a_held_payment_is_not_run(backend):
+    case = next(c for c in cases.all_cases() if c.id == "guardrail_self_approval_refused")
+    blocked = case.model_copy(update={"agent": "builtin:ap_assistant+unsigned"})
+    with pytest.raises(backends.Unsupported, match="held payment"):
+        backend.run(blocked, run.CONFIGS["rules"])
+
+
+def test_a_reason_mismatch_fails_the_case(tmp_path, monkeypatch):
+    case = next(c for c in cases.all_cases() if c.id == "authz_expired")
+    wrong = case.model_copy(update={"expected_reason": "authorization:status"})
+    row = run._row(wrong, "rules", backends.RealBackend(strong_tier=EchoStrong()).run(wrong, run.CONFIGS["rules"]), None)
+    assert row["decision"] == "block" and row["reason_ok"] is False and row["acceptable"] is False
+
+
+def test_generated_cases_reproduce_their_dimensions_in_tier_0(tmp_path, backend):
+    from eval import generate, sets
+    from zeta_one.contracts import Case
+
+    rows = generate.combos("test", data=tmp_path)
+    wording = [{"id": r["id"], "invoice_text": "Invoice for services.", "agent_rationale": "Paying the bill.", "memo": "m"}
+               for r in rows]
+    sets.write_jsonl(tmp_path / "test" / "wording" / "batch_00.output.jsonl", wording)
+    for raw, row in list(zip(generate.assemble("test", data=tmp_path), rows))[::5]:
+        dims = row["dimensions"]
+        features = backend.run(Case.model_validate({**raw, "expected": "allow"}), run.CONFIGS["rules"]).record.risk.features
+        assert features["counterparty_is_new"].value is (dims["tenure"] == "new"), dims
+        assert features["payment_method_changed_days_ago"].value == dims["change_days"], dims
+        assert features["bill_mismatch"].value is (dims["bill"] == "other_vendor"), dims
+        ratio = features["amount_ratio_to_vendor_median"].value
+        assert ratio is None if dims["tenure"] == "new" else ratio == dims["amount_ratio"], dims
