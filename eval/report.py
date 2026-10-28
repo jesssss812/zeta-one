@@ -34,8 +34,9 @@ LIMITATIONS = [
     "as the strong tier: all three from one family. The Run section lists the models that actually ran.",
     "With about 30 cases in a class a rate near 85% has a 95% interval of roughly ±12 points: enough to tell "
     "configurations apart in aggregate, not to rank them within a category.",
-    "Latency is a single run on one machine including network time, and is shown only for backends that "
-    "measure the engine; no responses are cached, though the fixed system prompt is prompt-cached.",
+    "Latency, where shown, is a single run on one machine, including network time when a model ran. A "
+    "repeated proposal reuses its earlier risk result (decision 0010), and the strong tier's fixed system "
+    "prompt is prompt-cached; nothing else is cached.",
     "Payments are simulated.",
 ]
 
@@ -138,6 +139,18 @@ def failures_by_stage(rows: list[dict], tags: dict[str, str]) -> dict:
     return dict(stages)
 
 
+def versions(rows: dict[str, dict[str, list[dict]]]) -> dict[str, list[str]]:
+    """The engine, policy and seed versions the records were made with."""
+    found: dict[str, set] = {"engine_version": set(), "policy_version": set(), "seed_version": set()}
+    for by_set in rows.values():
+        for group in by_set.values():
+            for r in group:
+                for key in found:
+                    if r.get("record"):
+                        found[key].add(r["record"].get(key) or "unrecorded")
+    return {key: sorted(values) for key, values in found.items()}
+
+
 def models_and_prices(rows: dict[str, dict[str, list[dict]]]) -> tuple[list[str], dict]:
     models: set[str] = set()
     prices: dict = {}
@@ -196,6 +209,8 @@ def build(results: Path = RESULTS, data: Path = sets.DATA) -> dict:
     report: dict = {
         "generated": datetime.now(UTC).date().isoformat(),
         **provenance,
+        "versions": versions(rows),
+        "dev_is_demo_only": bool(cases["dev"]) and all(c.provenance.startswith("demo scenario") for c in cases["dev"]),
         "models": models,
         "prices_used": prices,
         "sets": {name: dict(Counter(c.category for c in group)) for name, group in cases.items() if group},
@@ -244,7 +259,7 @@ def render(report: dict) -> str:
     lines = [
         "# Evaluation report",
         "",
-        f"Generated {report['generated']} from results made with the {', '.join(f'`{b}`' for b in backends) or 'no'} "
+        f"Generated {report['generated']} (UTC) from results made with the {', '.join(f'`{b}`' for b in backends) or 'no'} "
         "backend" + ("s" if len(backends) > 1 else "") + ".",
         "",
         "Rates are shown as `rate (k/n, 95% Wilson interval)`. There is no overall accuracy: identity and "
@@ -255,11 +270,16 @@ def render(report: dict) -> str:
         lines += ["> **Not a measurement of the real engine.** Results here came from "
                   + ", ".join(f"`{b}`" for b in backends) + "; the replay backend replays recorded fixtures "
                   "for the five demo cases only.", ""]
+    if report.get("dev_is_demo_only"):
+        lines += ["> **dev holds only the hand-built demo cases** the rules were written around; no generated "
+                  "dev cases are labelled yet, so its rates say nothing about cases the rules weren't built for.", ""]
     if report["stale_sets"]:
         lines += [f"> **Stale results.** {', '.join(report['stale_sets'])} changed after these results were run.", ""]
 
     lines += ["## Run", "", f"- Models that ran: {', '.join(report['models']) or 'none'}",
               f"- Prices used: `{json.dumps(report['prices_used'], sort_keys=True)}`",
+              *[f"- {key.replace('_', ' ').capitalize()}: " + ", ".join(f"`{v}`" for v in values)
+                for key, values in report.get("versions", {}).items() if values],
               "- Generator seeds: " + ("; ".join(f"{s}: {v}" for s, v in report["seeds"].items()) or "none"),
               *([f"- test combinations also in dev: {report['test_combinations_shared_with_dev']} "
                  "(the routine class has too few to keep apart; only wording and vendor differ)"]
@@ -334,7 +354,7 @@ def render(report: dict) -> str:
     else:
         lines.append("Not yet measured.")
     lines += ["", "## Not run", ""]
-    lines += [f"- {config} on {s}: {n}" for config, by_set in report["not_run"].items() for s, n in by_set.items() if n]
+    lines += [f"- {config} on {s}: {n}" for config, by_set in report["not_run"].items() for s, n in by_set.items() if n] or ["- none"]
     lines += ["", "## Cases marked undetectable", "",
               "Kept few and left out of accuracy and detection: what is observable depends on which features exist "
               "today, so each is listed here rather than excused.", ""]

@@ -264,3 +264,13 @@ def test_freezing_the_hard_set_keeps_it_loadable(tmp_path):
     sets.write_jsonl(tmp_path / "hard" / "owner.jsonl", [_case("h1", "hard", "E", "payee_fraud", "block").model_dump(mode="json")])
     sets.freeze("hard", tmp_path)
     assert [c.id for c in sets.load_set("hard", tmp_path)] == ["h1"]
+
+
+def test_the_report_shows_versions_and_says_when_dev_is_only_the_demo_cases(tmp_path):
+    results = tmp_path / "results"
+    run.run_set("dev", "rules", backends.ReplayBackend(), results=results)
+    built = report.build(results=results)
+    assert built["dev_is_demo_only"] is True and built["versions"]["policy_version"]
+    text = report.render(built)
+    assert "dev holds only the hand-built demo cases" in text and "Policy version" in text
+    assert "## Not run\n\n- none" in text
