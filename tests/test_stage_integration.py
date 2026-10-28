@@ -1,11 +1,12 @@
 """W1–W3 on the real kernel with synthetic data, fresh keys and no model calls."""
 import sqlite3
 
+import pytest
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 
 from zeta_one.authorization.check import checker
 from zeta_one.authorization.store import Store as AuthorizationStore
-from zeta_one.contracts import Authorization, Configuration, SignedRequest
+from zeta_one.contracts import MAX_PAYMENT_MINOR_UNITS, Authorization, Configuration, SignedRequest
 from zeta_one.gateway.pipeline import Engine
 from zeta_one.identity.registry import Registry
 from zeta_one.identity.signing import sign, verifier
@@ -88,3 +89,50 @@ def test_a_repeated_routine_payment_is_challenged_as_a_duplicate():
     record = gateway.ledger.decision(decisions[1]['decision_id'])
     assert record['risk']['features']['duplicate_candidate']['value'] is True
     assert 'duplicate_candidate' in record['risk']['floor']['flags']
+
+
+@pytest.mark.parametrize('amount', [MAX_PAYMENT_MINOR_UNITS, MAX_PAYMENT_MINOR_UNITS + 1, 2**63, 10**400],
+                         ids=['maximum', 'maximum-plus-one', 'past-sqlite', 'float-overflow'])
+def test_signed_uncapped_payment_respects_the_supported_amount_range(amount):
+    """End to end on real stages with no authorization caps: the largest amount is decided and written
+    to the ledger; anything larger is a malformed request before authorization."""
+    import json
+    import math
+
+    from zeta_one.contracts import InvalidProposal, Limits
+    from zeta_one.gateway.ledger import Ledger
+    from zeta_one.gateway.scenarios import load_fixture
+
+    scenario = load_fixture('routine_bill_payment')
+    identity = scenario.decision_record.identity
+    key = Ed25519PrivateKey.generate()
+    connection = sqlite3.connect(':memory:')
+    registry = Registry(connection)
+    registry.register(identity.claimed_agent_id, scenario.context.business.id, 'synthetic-owner',
+                      key.public_key(), SEED_NOW)
+    authorizations = AuthorizationStore(connection)
+    authorization = Authorization.model_validate(scenario.decision_record.authorization.snapshot)
+    authorization.limits = Limits()
+    authorizations.grant(authorization)
+    payload = scenario.proposal.model_dump(mode='json')
+    payload['amount']['amount'] = amount
+    body = json.dumps(payload).encode()
+    method, path = 'POST', '/v1/actions/propose_payment'
+    request = SignedRequest(method=method, path=path, body=body,
+                            headers=sign(key, identity.claimed_agent_id, method, path, body, SEED_NOW))
+    ledger = Ledger(connection)
+    with Store() as store:
+        engine = Engine(verifier(registry), authorizations.loader(), checker(ledger.spend_source()),
+                        context_for(store), Tier0(), clock=lambda: SEED_NOW,
+                        configuration=Configuration(tiers=['tier0'], escalation='none'))
+        if amount > MAX_PAYMENT_MINOR_UNITS:
+            with pytest.raises(InvalidProposal, match='too large'):
+                engine.evaluate(request)
+        else:
+            record, proposal = engine.evaluate(request)
+            assert record.identity.result == 'verified' and not record.authorization.violations
+            assert record.decision == 'challenge'
+            assert math.isfinite(record.risk.features['amount_ratio_to_vendor_median'].raw_value)
+            ledger.record(record, proposal)
+            assert connection.execute('SELECT amount FROM payments').fetchone()[0] == amount
+    connection.close()
