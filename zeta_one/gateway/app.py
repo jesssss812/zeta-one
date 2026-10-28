@@ -5,6 +5,8 @@ Translates HTTP to and from the service; holds no decision logic. Run it on 127.
 first access, so importing `create_app` opens no database and reads no `.env`.
 """
 
+import json
+from pathlib import Path
 from typing import Literal
 
 from fastapi import FastAPI, Request
@@ -21,9 +23,10 @@ from zeta_one.gateway import admin, scenarios
 from zeta_one.gateway.ledger import Ledger
 from zeta_one.gateway.reuse import RiskReuse
 from zeta_one.gateway.service import EngineNotReady, Gateway, NotHeld, UnknownChallenge
-from zeta_one.gateway.wiring import engine_version, real_stages
+from zeta_one.gateway.wiring import ROOT, engine_version, real_stages
 
 HOST = "127.0.0.1"
+EVAL_REPORT = ROOT / "data" / "eval" / "report.json"
 
 
 class Resolution(BaseModel):
@@ -38,7 +41,7 @@ def _error(status: int, code: str, message: str) -> JSONResponse:
     return JSONResponse(status_code=status, content={"error": {"code": code, "message": message}})
 
 
-def create_app(gateway: Gateway, token: str | None) -> FastAPI:
+def create_app(gateway: Gateway, token: str | None, eval_report: Path = EVAL_REPORT) -> FastAPI:
     app = FastAPI(title="Zeta One gateway")
     app.add_middleware(
         CORSMiddleware,
@@ -134,7 +137,9 @@ def create_app(gateway: Gateway, token: str | None) -> FastAPI:
 
     @app.get("/v1/eval/latest")
     def eval_latest():
-        return _error(404, "no_report", "no evaluation report yet")
+        if not eval_report.exists():
+            return _error(404, "no_report", "no evaluation report yet")
+        return json.loads(eval_report.read_text())
 
     return app
 
