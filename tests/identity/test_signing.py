@@ -69,3 +69,15 @@ def test_signature_binds_method_path_and_exact_body(update):
     request = SignedRequest(method='POST',path='/pay',body=b'{}',headers=headers)
     assert verifier(registry)(request.model_copy(update=update),NOW).result == 'invalid_signature'
     assert verifier(registry)(request,NOW).result == 'verified'
+
+
+def test_checked_lists_every_check_that_ran_including_the_failing_one():
+    key = Ed25519PrivateKey.generate()
+    registry = Registry(sqlite3.connect(':memory:'))
+    registry.register('agent', 'business', 'owner', key.public_key(), NOW)
+    verify = verifier(registry)
+    request = SignedRequest(method='POST', path='/pay', body=b'{}', headers=sign(key, 'agent', 'POST', '/pay', b'{}', NOW))
+    assert verify(request, NOW).checked == ['present', 'known', 'active', 'timestamp', 'nonce', 'signature']
+    assert verify(request.model_copy(update={'headers': {}}), NOW).checked == ['present']
+    stranger = sign(Ed25519PrivateKey.generate(), 'stranger', 'POST', '/pay', b'{}', NOW)
+    assert verify(request.model_copy(update={'headers': stranger}), NOW).checked == ['present', 'known']

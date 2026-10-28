@@ -29,27 +29,29 @@ def verifier(registry: Registry) -> IdentityVerifier:
         def result(status):
             evidence.result = status
             return evidence
+        # `checked` lists each check that ran, the failing one included, in the demo API's names.
+        evidence.checked.append('present')
         if not all((agent_id, timestamp, nonce, signature)):
             return evidence
-        evidence.checked.append('headers')
+        evidence.checked.append('known')
         agent = registry.get(agent_id)
         if agent is None:
             return result('unknown_agent')
         evidence.business_id, evidence.owner, evidence.key_id = agent.business_id, agent.owner, agent.agent_id
-        evidence.checked.append('known_agent')
+        evidence.checked.append('active')
         if agent.status != 'active':
             return result('revoked')
-        evidence.checked.append('active')
+        evidence.checked.append('timestamp')
         try:
             signed_at = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
             if signed_at.tzinfo is None or abs((now - signed_at).total_seconds()) > 300:
                 return result('stale_timestamp')
         except (ValueError, OverflowError, TypeError):
             return result('stale_timestamp')
-        evidence.checked.append('timestamp')
+        evidence.checked.append('nonce')
         if registry.seen(agent_id, nonce, now):
             return result('replay')
-        evidence.checked.append('nonce')
+        evidence.checked.append('signature')
         try:
             Ed25519PublicKey.from_public_bytes(agent.public_key).verify(
                 base64.b64decode(signature, validate=True),
@@ -58,6 +60,5 @@ def verifier(registry: Registry) -> IdentityVerifier:
             return result('invalid_signature')
         if not registry.record_nonce(agent_id, nonce, signed_at + timedelta(seconds=300), now):
             return result('replay')
-        evidence.checked.append('signature')
         return result('verified')
     return verify

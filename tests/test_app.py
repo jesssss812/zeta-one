@@ -128,3 +128,9 @@ def test_a_scenario_record_says_it_is_a_sandbox_run(client):
     record = client.post("/v1/scenarios/routine_bill_payment/run", json={}).json()["decision_record"]
     assert record["sandbox"] == {"scenario": "routine_bill_payment"}
     assert client.get("/v1/decisions", headers=ADMIN).json()[0]["sandbox"] == {"scenario": "routine_bill_payment"}
+
+
+@pytest.mark.parametrize("name", ORDER)
+def test_identity_checks_use_the_contracts_names(client, name):
+    record = client.post(f"/v1/scenarios/{name}/run", json={}).json()["decision_record"]
+    assert record["identity"]["checked"] == load_fixture(name).decision_record.identity.checked
