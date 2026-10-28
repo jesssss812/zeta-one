@@ -1,0 +1,7 @@
+{
+  "history_note": "Paid-bill records support all 150 transactions; demo histories preserve fixture dates beyond twelve months.",
+  "provenance": "synthetic: zeta_one.rho.seed.make_seed; hand-specified demo entities and Random(7) filler; small-business assumptions, no staging data",
+  "random_seed": 7,
+  "seed_now": "2026-10-27T22:00:00Z",
+  "simulated": true
+}

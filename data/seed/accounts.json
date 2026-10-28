@@ -1,0 +1,29 @@
+[
+  {
+    "account_name": "Synthetic checking 1",
+    "account_type": "checking",
+    "balance": {
+      "amount": 10000000,
+      "currency": "USD"
+    },
+    "id": "acct_seed_checking_01"
+  },
+  {
+    "account_name": "Synthetic savings 2",
+    "account_type": "savings",
+    "balance": {
+      "amount": 10000000,
+      "currency": "USD"
+    },
+    "id": "acct_seed_savings_02"
+  },
+  {
+    "account_name": "Synthetic checking 3",
+    "account_type": "checking",
+    "balance": {
+      "amount": 10000000,
+      "currency": "USD"
+    },
+    "id": "acct_seed_checking_03"
+  }
+]

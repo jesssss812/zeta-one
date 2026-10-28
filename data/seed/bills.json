@@ -1,0 +1,3589 @@
+[
+  {
+    "amount": {
+      "amount": 249000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": "2026-11-09",
+    "id": "bill_0194",
+    "invoice_date": "2026-10-26",
+    "invoice_number": "HOS-10502",
+    "lines": [],
+    "memo": "November office supplies",
+    "status": "awaiting_approval",
+    "transaction": null,
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 720000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0019"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": "2026-11-05",
+    "id": "bill_0207",
+    "invoice_date": "2026-10-22",
+    "invoice_number": "PIT-4471",
+    "lines": [],
+    "memo": "Network hardware refresh",
+    "status": "awaiting_approval",
+    "transaction": null,
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 240000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0019"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0019_000",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0019_000"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 240000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0019"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0019_001",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0019_001"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 240000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0019"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0019_002",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0019_002"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 240000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0019"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0019_003",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0019_003"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 260000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0019"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_0770",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_0770"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": "2026-11-08",
+    "id": "bill_0201",
+    "invoice_date": "2026-10-25",
+    "invoice_number": "CRC-2026-10",
+    "lines": [],
+    "memo": "October cleaning services",
+    "status": "awaiting_approval",
+    "transaction": null,
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0012_000",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0012_000"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0012_001",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0012_001"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0012_002",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0012_002"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0012_003",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0012_003"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0012_004",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0012_004"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0012_005",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0012_005"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0012_006",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0012_006"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0012_007",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0012_007"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0012_008",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0012_008"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0012_009",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0012_009"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0012_010",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0012_010"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0012_011",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0012_011"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0012_012",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0012_012"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0012_013",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0012_013"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0012_014",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0012_014"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0012_015",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0012_015"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_0815",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_0815"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_0783",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_0783"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_0752",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_0752"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 251500,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": "2026-11-03",
+    "id": "bill_0193",
+    "invoice_date": "2026-10-20",
+    "invoice_number": "HOS-10488",
+    "lines": [],
+    "memo": "October office supplies",
+    "status": "awaiting_approval",
+    "transaction": null,
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0007_000",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0007_000"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0007_001",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0007_001"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0007_002",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0007_002"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0007_003",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0007_003"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0007_004",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0007_004"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0007_005",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0007_005"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0007_006",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0007_006"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0007_007",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0007_007"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0007_008",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0007_008"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0007_009",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0007_009"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0007_010",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0007_010"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0007_011",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0007_011"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_history_cp_0007_012",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_history_cp_0007_012"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 246000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_0812",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_0812"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 251000,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_0781",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_0781"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 243500,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_0007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_0749",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_0749"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 179781,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_000"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "bill_filler_000",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "awaiting_approval",
+    "transaction": null,
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 89088,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_001"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "bill_filler_001",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "awaiting_approval",
+    "transaction": null,
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 217001,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_002"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "bill_filler_002",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "awaiting_approval",
+    "transaction": null,
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 35315,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_003"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "bill_filler_003",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "awaiting_approval",
+    "transaction": null,
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 47977,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_004"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "bill_filler_004",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "awaiting_approval",
+    "transaction": null,
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 290956,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_005"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "bill_filler_005",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "awaiting_approval",
+    "transaction": null,
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 59351,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_006"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "bill_filler_006",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "awaiting_approval",
+    "transaction": null,
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 201726,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "bill_filler_007",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "awaiting_approval",
+    "transaction": null,
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 40408,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_008"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "bill_filler_008",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "awaiting_approval",
+    "transaction": null,
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 276042,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_009"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "bill_filler_009",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "awaiting_approval",
+    "transaction": null,
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 122563,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_010"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "bill_filler_010",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "awaiting_approval",
+    "transaction": null,
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 29658,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_011"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "bill_filler_011",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "awaiting_approval",
+    "transaction": null,
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 55061,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "bill_filler_012",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "awaiting_approval",
+    "transaction": null,
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 237355,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_013"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "bill_filler_013",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "awaiting_approval",
+    "transaction": null,
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 229242,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_014"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "bill_filler_014",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "awaiting_approval",
+    "transaction": null,
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 46624,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_015"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "bill_filler_015",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "awaiting_approval",
+    "transaction": null,
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 136176,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_016"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "bill_filler_016",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "awaiting_approval",
+    "transaction": null,
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 57559,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_017"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "bill_filler_017",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "awaiting_approval",
+    "transaction": null,
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 298907,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_018"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "bill_filler_018",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "awaiting_approval",
+    "transaction": null,
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 65968,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_002"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0040",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0040"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 77028,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_003"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0041",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0041"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 94551,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_004"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0042",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0042"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 104455,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_005"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0043",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0043"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 111499,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_006"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0044",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0044"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 118622,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0045",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0045"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 134120,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_008"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0046",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0046"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 139744,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_009"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0047",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0047"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 147363,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_010"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0048",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0048"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 156929,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_011"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0049",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0049"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 170054,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0050",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0050"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 177961,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_013"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0051",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0051"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 194528,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_014"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0052",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0052"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 198078,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_015"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0053",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0053"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 206596,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_016"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0054",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0054"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 216028,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_017"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0055",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0055"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 225976,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_018"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0056",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0056"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 48374,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_000"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0057",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0057"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 63711,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_001"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0058",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0058"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 70146,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_002"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0059",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0059"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 84593,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_003"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0060",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0060"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 90924,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_004"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0061",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0061"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 99070,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_005"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0062",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0062"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 108999,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_006"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0063",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0063"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 124411,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0064",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0064"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 133604,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_008"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0065",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0065"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 140627,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_009"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0066",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0066"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 149717,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_010"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0067",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0067"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 156199,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_011"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0068",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0068"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 173387,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0069",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0069"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 177702,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_013"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0070",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0070"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 187490,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_014"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0071",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0071"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 201909,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_015"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0072",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0072"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 206271,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_016"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0073",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0073"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 224388,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_017"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0074",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0074"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 230572,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_018"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0075",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0075"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 50737,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_000"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0076",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0076"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 63137,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_001"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0077",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0077"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 72474,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_002"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0078",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0078"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 76533,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_003"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0079",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0079"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 92767,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_004"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0080",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0080"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 96064,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_005"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0081",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0081"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 110072,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_006"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0082",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0082"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 124469,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0083",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0083"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 132301,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_008"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0084",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0084"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 141320,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_009"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0085",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0085"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 150685,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_010"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0086",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0086"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 162564,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_011"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0087",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0087"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 167753,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0088",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0088"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 176918,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_013"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0089",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0089"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 185965,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_014"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0090",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0090"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 199709,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_015"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0091",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0091"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 209056,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_016"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0092",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0092"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 221405,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_017"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0093",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0093"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 226320,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_018"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0094",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0094"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 52359,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_000"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0095",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0095"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 64002,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_001"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0096",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0096"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 67243,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_002"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0097",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0097"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 84014,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_003"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0098",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0098"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 91804,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_004"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0099",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0099"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 101233,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_005"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0100",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0100"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 107472,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_006"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0101",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0101"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 117887,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0102",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0102"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 128800,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_008"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0103",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0103"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 138822,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_009"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0104",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0104"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 152945,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_010"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0105",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0105"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 157987,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_011"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0106",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0106"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 169619,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0107",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0107"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 177386,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_013"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0108",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0108"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 193758,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_014"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0109",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0109"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 204991,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_015"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0110",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0110"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 210220,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_016"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0111",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0111"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 223445,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_017"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0112",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0112"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 225884,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_018"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0113",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0113"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 54163,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_000"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0114",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0114"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 61521,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_001"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0115",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0115"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 71457,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_002"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0116",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0116"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 82889,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_003"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0117",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0117"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 91560,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_004"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0118",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0118"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 98122,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_005"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0119",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0119"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 108420,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_006"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0120",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0120"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 117659,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0121",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0121"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 130571,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_008"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0122",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0122"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 135861,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_009"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0123",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0123"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 145003,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_010"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0124",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0124"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 157478,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_011"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0125",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0125"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 166662,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0126",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0126"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 175417,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_013"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0127",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0127"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 188407,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_014"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0128",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0128"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 201164,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_015"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0129",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0129"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 209132,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_016"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0130",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0130"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 224867,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_017"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0131",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0131"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 232768,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_018"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0132",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0132"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 46889,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_000"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0133",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0133"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 62634,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_001"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0134",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0134"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 72927,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_002"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0135",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0135"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 76407,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_003"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0136",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0136"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 86674,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_004"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0137",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0137"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 99337,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_005"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0138",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0138"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 107645,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_006"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0139",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0139"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 115378,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_007"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0140",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0140"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 133654,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_008"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0141",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0141"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 137401,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_009"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0142",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0142"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 153899,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_010"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0143",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0143"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 163652,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_011"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0144",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0144"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 166491,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_012"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0145",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0145"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 179278,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_013"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0146",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0146"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 191008,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_014"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0147",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0147"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 200827,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_015"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0148",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0148"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "amount": {
+      "amount": 213725,
+      "currency": "USD"
+    },
+    "counterparty": {
+      "id": "cp_filler_016"
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "due_date": null,
+    "id": "paid_txn_filler_0149",
+    "invoice_date": null,
+    "invoice_number": null,
+    "lines": [],
+    "memo": null,
+    "status": "paid",
+    "transaction": {
+      "id": "txn_filler_0149"
+    },
+    "updated_at": "2026-10-27T22:00:00Z"
+  }
+]

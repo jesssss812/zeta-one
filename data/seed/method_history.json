@@ -1,0 +1,11 @@
+[
+  {
+    "change": "added_as_default",
+    "changed_at": "2026-10-24T18:42:00Z",
+    "changed_by": "counterparty_profile_update",
+    "counterparty_id": "cp_0007",
+    "id": "pmh_0042",
+    "method_id": "pm_0007_03",
+    "summary": "Default ACH changed from First Harbor Savings (pm_0007_01) to Meridian Trust Bank (pm_0007_03)"
+  }
+]

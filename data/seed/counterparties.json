@@ -1,0 +1,436 @@
+[
+  {
+    "created_at": "2026-10-26T20:15:00Z",
+    "id": "cp_0051",
+    "is_business": true,
+    "legal_name": "Harbor Office Supplies LLC",
+    "payment_methods": [
+      {
+        "bank_name": "Crestline Bank",
+        "id": "pm_0051_01",
+        "is_default": true,
+        "type": "ach"
+      }
+    ],
+    "status": "active",
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "created_at": "2025-09-15T16:00:00Z",
+    "id": "cp_0019",
+    "is_business": true,
+    "legal_name": "Pinecrest IT Services",
+    "payment_methods": [
+      {
+        "bank_name": "Summit National Bank",
+        "id": "pm_0019_01",
+        "is_default": true,
+        "type": "ach"
+      }
+    ],
+    "status": "active",
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "created_at": "2025-03-04T17:20:00Z",
+    "id": "cp_0012",
+    "is_business": true,
+    "legal_name": "Cedar Ridge Cleaning Services",
+    "payment_methods": [
+      {
+        "bank_name": "Bluewater Community Bank",
+        "id": "pm_0012_01",
+        "is_default": true,
+        "type": "ach"
+      }
+    ],
+    "status": "active",
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "created_at": "2025-06-12T15:04:00Z",
+    "id": "cp_0007",
+    "is_business": true,
+    "legal_name": "Harbor Office Supply Co.",
+    "payment_methods": [
+      {
+        "bank_name": "Meridian Trust Bank",
+        "id": "pm_0007_03",
+        "is_default": true,
+        "type": "ach"
+      },
+      {
+        "bank_name": "First Harbor Savings",
+        "id": "pm_0007_01",
+        "is_default": false,
+        "type": "ach"
+      },
+      {
+        "bank_name": null,
+        "id": "pm_0007_02",
+        "is_default": false,
+        "type": "check"
+      }
+    ],
+    "status": "active",
+    "updated_at": "2026-10-27T22:00:00Z"
+  },
+  {
+    "created_at": "2025-10-27T22:00:00Z",
+    "id": "cp_filler_000",
+    "is_business": true,
+    "legal_name": "Synthetic supplier 01",
+    "payment_methods": [
+      {
+        "bank_name": "Synthetic Community Bank",
+        "id": "pm_filler_000_01",
+        "is_default": true,
+        "type": "ach"
+      }
+    ],
+    "status": "active",
+    "updated_at": "2026-07-19T22:00:00Z"
+  },
+  {
+    "created_at": "2025-10-27T22:00:00Z",
+    "id": "cp_filler_001",
+    "is_business": true,
+    "legal_name": "Synthetic supplier 02",
+    "payment_methods": [
+      {
+        "bank_name": "Synthetic Community Bank",
+        "id": "pm_filler_001_01",
+        "is_default": true,
+        "type": "ach"
+      },
+      {
+        "bank_name": null,
+        "id": "pm_filler_001_02",
+        "is_default": false,
+        "type": "check"
+      }
+    ],
+    "status": "active",
+    "updated_at": "2026-07-19T22:00:00Z"
+  },
+  {
+    "created_at": "2025-10-27T22:00:00Z",
+    "id": "cp_filler_002",
+    "is_business": true,
+    "legal_name": "Synthetic supplier 03",
+    "payment_methods": [
+      {
+        "bank_name": "Synthetic Community Bank",
+        "id": "pm_filler_002_01",
+        "is_default": true,
+        "type": "ach"
+      }
+    ],
+    "status": "active",
+    "updated_at": "2026-07-19T22:00:00Z"
+  },
+  {
+    "created_at": "2025-10-27T22:00:00Z",
+    "id": "cp_filler_003",
+    "is_business": true,
+    "legal_name": "Synthetic supplier 04",
+    "payment_methods": [
+      {
+        "bank_name": "Synthetic Community Bank",
+        "id": "pm_filler_003_01",
+        "is_default": true,
+        "type": "ach"
+      },
+      {
+        "bank_name": null,
+        "id": "pm_filler_003_02",
+        "is_default": false,
+        "type": "check"
+      }
+    ],
+    "status": "active",
+    "updated_at": "2026-07-19T22:00:00Z"
+  },
+  {
+    "created_at": "2025-10-27T22:00:00Z",
+    "id": "cp_filler_004",
+    "is_business": true,
+    "legal_name": "Synthetic supplier 05",
+    "payment_methods": [
+      {
+        "bank_name": "Synthetic Community Bank",
+        "id": "pm_filler_004_01",
+        "is_default": true,
+        "type": "ach"
+      }
+    ],
+    "status": "active",
+    "updated_at": "2026-07-19T22:00:00Z"
+  },
+  {
+    "created_at": "2025-10-27T22:00:00Z",
+    "id": "cp_filler_005",
+    "is_business": true,
+    "legal_name": "Synthetic supplier 06",
+    "payment_methods": [
+      {
+        "bank_name": "Synthetic Community Bank",
+        "id": "pm_filler_005_01",
+        "is_default": true,
+        "type": "ach"
+      },
+      {
+        "bank_name": null,
+        "id": "pm_filler_005_02",
+        "is_default": false,
+        "type": "check"
+      }
+    ],
+    "status": "active",
+    "updated_at": "2026-07-19T22:00:00Z"
+  },
+  {
+    "created_at": "2025-10-27T22:00:00Z",
+    "id": "cp_filler_006",
+    "is_business": true,
+    "legal_name": "Synthetic supplier 07",
+    "payment_methods": [
+      {
+        "bank_name": "Synthetic Community Bank",
+        "id": "pm_filler_006_01",
+        "is_default": true,
+        "type": "ach"
+      }
+    ],
+    "status": "active",
+    "updated_at": "2026-07-19T22:00:00Z"
+  },
+  {
+    "created_at": "2025-10-27T22:00:00Z",
+    "id": "cp_filler_007",
+    "is_business": true,
+    "legal_name": "Synthetic supplier 08",
+    "payment_methods": [
+      {
+        "bank_name": "Synthetic Community Bank",
+        "id": "pm_filler_007_01",
+        "is_default": true,
+        "type": "ach"
+      },
+      {
+        "bank_name": null,
+        "id": "pm_filler_007_02",
+        "is_default": false,
+        "type": "check"
+      }
+    ],
+    "status": "active",
+    "updated_at": "2026-07-19T22:00:00Z"
+  },
+  {
+    "created_at": "2025-10-27T22:00:00Z",
+    "id": "cp_filler_008",
+    "is_business": true,
+    "legal_name": "Synthetic supplier 09",
+    "payment_methods": [
+      {
+        "bank_name": "Synthetic Community Bank",
+        "id": "pm_filler_008_01",
+        "is_default": true,
+        "type": "ach"
+      }
+    ],
+    "status": "active",
+    "updated_at": "2026-07-19T22:00:00Z"
+  },
+  {
+    "created_at": "2025-10-27T22:00:00Z",
+    "id": "cp_filler_009",
+    "is_business": true,
+    "legal_name": "Synthetic supplier 10",
+    "payment_methods": [
+      {
+        "bank_name": "Synthetic Community Bank",
+        "id": "pm_filler_009_01",
+        "is_default": true,
+        "type": "ach"
+      },
+      {
+        "bank_name": null,
+        "id": "pm_filler_009_02",
+        "is_default": false,
+        "type": "check"
+      }
+    ],
+    "status": "active",
+    "updated_at": "2026-07-19T22:00:00Z"
+  },
+  {
+    "created_at": "2025-10-27T22:00:00Z",
+    "id": "cp_filler_010",
+    "is_business": true,
+    "legal_name": "Synthetic supplier 11",
+    "payment_methods": [
+      {
+        "bank_name": "Synthetic Community Bank",
+        "id": "pm_filler_010_01",
+        "is_default": true,
+        "type": "ach"
+      }
+    ],
+    "status": "active",
+    "updated_at": "2026-07-19T22:00:00Z"
+  },
+  {
+    "created_at": "2025-10-27T22:00:00Z",
+    "id": "cp_filler_011",
+    "is_business": true,
+    "legal_name": "Synthetic supplier 12",
+    "payment_methods": [
+      {
+        "bank_name": "Synthetic Community Bank",
+        "id": "pm_filler_011_01",
+        "is_default": true,
+        "type": "ach"
+      },
+      {
+        "bank_name": null,
+        "id": "pm_filler_011_02",
+        "is_default": false,
+        "type": "check"
+      }
+    ],
+    "status": "active",
+    "updated_at": "2026-07-19T22:00:00Z"
+  },
+  {
+    "created_at": "2025-10-27T22:00:00Z",
+    "id": "cp_filler_012",
+    "is_business": true,
+    "legal_name": "Synthetic supplier 13",
+    "payment_methods": [
+      {
+        "bank_name": "Synthetic Community Bank",
+        "id": "pm_filler_012_01",
+        "is_default": true,
+        "type": "ach"
+      }
+    ],
+    "status": "active",
+    "updated_at": "2026-07-19T22:00:00Z"
+  },
+  {
+    "created_at": "2025-10-27T22:00:00Z",
+    "id": "cp_filler_013",
+    "is_business": true,
+    "legal_name": "Synthetic supplier 14",
+    "payment_methods": [
+      {
+        "bank_name": "Synthetic Community Bank",
+        "id": "pm_filler_013_01",
+        "is_default": true,
+        "type": "ach"
+      },
+      {
+        "bank_name": null,
+        "id": "pm_filler_013_02",
+        "is_default": false,
+        "type": "check"
+      }
+    ],
+    "status": "active",
+    "updated_at": "2026-07-19T22:00:00Z"
+  },
+  {
+    "created_at": "2025-10-27T22:00:00Z",
+    "id": "cp_filler_014",
+    "is_business": true,
+    "legal_name": "Synthetic supplier 15",
+    "payment_methods": [
+      {
+        "bank_name": "Synthetic Community Bank",
+        "id": "pm_filler_014_01",
+        "is_default": true,
+        "type": "ach"
+      }
+    ],
+    "status": "active",
+    "updated_at": "2026-07-19T22:00:00Z"
+  },
+  {
+    "created_at": "2025-10-27T22:00:00Z",
+    "id": "cp_filler_015",
+    "is_business": true,
+    "legal_name": "Synthetic supplier 16",
+    "payment_methods": [
+      {
+        "bank_name": "Synthetic Community Bank",
+        "id": "pm_filler_015_01",
+        "is_default": true,
+        "type": "ach"
+      },
+      {
+        "bank_name": null,
+        "id": "pm_filler_015_02",
+        "is_default": false,
+        "type": "check"
+      }
+    ],
+    "status": "active",
+    "updated_at": "2026-07-19T22:00:00Z"
+  },
+  {
+    "created_at": "2025-10-27T22:00:00Z",
+    "id": "cp_filler_016",
+    "is_business": true,
+    "legal_name": "Synthetic supplier 17",
+    "payment_methods": [
+      {
+        "bank_name": "Synthetic Community Bank",
+        "id": "pm_filler_016_01",
+        "is_default": true,
+        "type": "ach"
+      }
+    ],
+    "status": "active",
+    "updated_at": "2026-07-19T22:00:00Z"
+  },
+  {
+    "created_at": "2025-10-27T22:00:00Z",
+    "id": "cp_filler_017",
+    "is_business": true,
+    "legal_name": "Synthetic supplier 18",
+    "payment_methods": [
+      {
+        "bank_name": "Synthetic Community Bank",
+        "id": "pm_filler_017_01",
+        "is_default": true,
+        "type": "ach"
+      },
+      {
+        "bank_name": null,
+        "id": "pm_filler_017_02",
+        "is_default": false,
+        "type": "check"
+      }
+    ],
+    "status": "active",
+    "updated_at": "2026-07-19T22:00:00Z"
+  },
+  {
+    "created_at": "2025-10-27T22:00:00Z",
+    "id": "cp_filler_018",
+    "is_business": true,
+    "legal_name": "Synthetic supplier 19",
+    "payment_methods": [
+      {
+        "bank_name": "Synthetic Community Bank",
+        "id": "pm_filler_018_01",
+        "is_default": true,
+        "type": "ach"
+      }
+    ],
+    "status": "active",
+    "updated_at": "2026-07-19T22:00:00Z"
+  }
+]

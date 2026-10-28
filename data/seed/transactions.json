@@ -1,0 +1,1952 @@
+[
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 240000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Pinecrest IT Services",
+    "id": "txn_history_cp_0019_000",
+    "initiated_at": "2025-10-03T15:00:00Z",
+    "posted_at": "2025-10-03T15:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 240000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Pinecrest IT Services",
+    "id": "txn_history_cp_0019_001",
+    "initiated_at": "2025-12-14T22:45:00Z",
+    "posted_at": "2025-12-14T22:45:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 240000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Pinecrest IT Services",
+    "id": "txn_history_cp_0019_002",
+    "initiated_at": "2026-02-25T06:30:00Z",
+    "posted_at": "2026-02-25T06:30:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 240000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Pinecrest IT Services",
+    "id": "txn_history_cp_0019_003",
+    "initiated_at": "2026-05-08T14:15:00Z",
+    "posted_at": "2026-05-08T14:15:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 260000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Pinecrest IT Services",
+    "id": "txn_0770",
+    "initiated_at": "2026-08-14T15:30:00Z",
+    "posted_at": "2026-08-14T15:30:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Cedar Ridge Cleaning Services",
+    "id": "txn_history_cp_0012_000",
+    "initiated_at": "2025-04-01T13:00:00Z",
+    "posted_at": "2025-04-01T13:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Cedar Ridge Cleaning Services",
+    "id": "txn_history_cp_0012_001",
+    "initiated_at": "2025-05-01T04:33:45Z",
+    "posted_at": "2025-05-01T04:33:45Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Cedar Ridge Cleaning Services",
+    "id": "txn_history_cp_0012_002",
+    "initiated_at": "2025-05-30T20:07:30Z",
+    "posted_at": "2025-05-30T20:07:30Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Cedar Ridge Cleaning Services",
+    "id": "txn_history_cp_0012_003",
+    "initiated_at": "2025-06-29T11:41:15Z",
+    "posted_at": "2025-06-29T11:41:15Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Cedar Ridge Cleaning Services",
+    "id": "txn_history_cp_0012_004",
+    "initiated_at": "2025-07-29T03:15:00Z",
+    "posted_at": "2025-07-29T03:15:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Cedar Ridge Cleaning Services",
+    "id": "txn_history_cp_0012_005",
+    "initiated_at": "2025-08-27T18:48:45Z",
+    "posted_at": "2025-08-27T18:48:45Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Cedar Ridge Cleaning Services",
+    "id": "txn_history_cp_0012_006",
+    "initiated_at": "2025-09-26T10:22:30Z",
+    "posted_at": "2025-09-26T10:22:30Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Cedar Ridge Cleaning Services",
+    "id": "txn_history_cp_0012_007",
+    "initiated_at": "2025-10-26T01:56:15Z",
+    "posted_at": "2025-10-26T01:56:15Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Cedar Ridge Cleaning Services",
+    "id": "txn_history_cp_0012_008",
+    "initiated_at": "2025-11-24T17:30:00Z",
+    "posted_at": "2025-11-24T17:30:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Cedar Ridge Cleaning Services",
+    "id": "txn_history_cp_0012_009",
+    "initiated_at": "2025-12-24T09:03:45Z",
+    "posted_at": "2025-12-24T09:03:45Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Cedar Ridge Cleaning Services",
+    "id": "txn_history_cp_0012_010",
+    "initiated_at": "2026-01-23T00:37:30Z",
+    "posted_at": "2026-01-23T00:37:30Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Cedar Ridge Cleaning Services",
+    "id": "txn_history_cp_0012_011",
+    "initiated_at": "2026-02-21T16:11:15Z",
+    "posted_at": "2026-02-21T16:11:15Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Cedar Ridge Cleaning Services",
+    "id": "txn_history_cp_0012_012",
+    "initiated_at": "2026-03-23T07:45:00Z",
+    "posted_at": "2026-03-23T07:45:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Cedar Ridge Cleaning Services",
+    "id": "txn_history_cp_0012_013",
+    "initiated_at": "2026-04-21T23:18:45Z",
+    "posted_at": "2026-04-21T23:18:45Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Cedar Ridge Cleaning Services",
+    "id": "txn_history_cp_0012_014",
+    "initiated_at": "2026-05-21T14:52:30Z",
+    "posted_at": "2026-05-21T14:52:30Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Cedar Ridge Cleaning Services",
+    "id": "txn_history_cp_0012_015",
+    "initiated_at": "2026-06-20T06:26:15Z",
+    "posted_at": "2026-06-20T06:26:15Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Cedar Ridge Cleaning Services",
+    "id": "txn_0815",
+    "initiated_at": "2026-10-01T13:02:00Z",
+    "posted_at": "2026-10-01T13:02:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Cedar Ridge Cleaning Services",
+    "id": "txn_0783",
+    "initiated_at": "2026-09-01T13:04:00Z",
+    "posted_at": "2026-09-01T13:04:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 185000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Cedar Ridge Cleaning Services",
+    "id": "txn_0752",
+    "initiated_at": "2026-08-01T13:01:00Z",
+    "posted_at": "2026-08-01T13:01:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Harbor Office Supply Co.",
+    "id": "txn_history_cp_0007_000",
+    "initiated_at": "2025-07-02T14:10:00Z",
+    "posted_at": "2025-07-02T14:10:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Harbor Office Supply Co.",
+    "id": "txn_history_cp_0007_001",
+    "initiated_at": "2025-08-01T00:00:00Z",
+    "posted_at": "2025-08-01T00:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Harbor Office Supply Co.",
+    "id": "txn_history_cp_0007_002",
+    "initiated_at": "2025-08-30T09:50:00Z",
+    "posted_at": "2025-08-30T09:50:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Harbor Office Supply Co.",
+    "id": "txn_history_cp_0007_003",
+    "initiated_at": "2025-09-28T19:40:00Z",
+    "posted_at": "2025-09-28T19:40:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Harbor Office Supply Co.",
+    "id": "txn_history_cp_0007_004",
+    "initiated_at": "2025-10-28T05:30:00Z",
+    "posted_at": "2025-10-28T05:30:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Harbor Office Supply Co.",
+    "id": "txn_history_cp_0007_005",
+    "initiated_at": "2025-11-26T15:20:00Z",
+    "posted_at": "2025-11-26T15:20:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Harbor Office Supply Co.",
+    "id": "txn_history_cp_0007_006",
+    "initiated_at": "2025-12-26T01:10:00Z",
+    "posted_at": "2025-12-26T01:10:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Harbor Office Supply Co.",
+    "id": "txn_history_cp_0007_007",
+    "initiated_at": "2026-01-24T11:00:00Z",
+    "posted_at": "2026-01-24T11:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Harbor Office Supply Co.",
+    "id": "txn_history_cp_0007_008",
+    "initiated_at": "2026-02-22T20:50:00Z",
+    "posted_at": "2026-02-22T20:50:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Harbor Office Supply Co.",
+    "id": "txn_history_cp_0007_009",
+    "initiated_at": "2026-03-24T06:40:00Z",
+    "posted_at": "2026-03-24T06:40:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Harbor Office Supply Co.",
+    "id": "txn_history_cp_0007_010",
+    "initiated_at": "2026-04-22T16:30:00Z",
+    "posted_at": "2026-04-22T16:30:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Harbor Office Supply Co.",
+    "id": "txn_history_cp_0007_011",
+    "initiated_at": "2026-05-22T02:20:00Z",
+    "posted_at": "2026-05-22T02:20:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 248000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Harbor Office Supply Co.",
+    "id": "txn_history_cp_0007_012",
+    "initiated_at": "2026-06-20T12:10:00Z",
+    "posted_at": "2026-06-20T12:10:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 246000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Harbor Office Supply Co.",
+    "id": "txn_0812",
+    "initiated_at": "2026-09-30T14:05:00Z",
+    "posted_at": "2026-09-30T14:05:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 251000,
+      "currency": "USD"
+    },
+    "counterparty_name": "Harbor Office Supply Co.",
+    "id": "txn_0781",
+    "initiated_at": "2026-08-29T14:11:00Z",
+    "posted_at": "2026-08-29T14:11:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 243500,
+      "currency": "USD"
+    },
+    "counterparty_name": "Harbor Office Supply Co.",
+    "id": "txn_0749",
+    "initiated_at": "2026-07-31T14:02:00Z",
+    "posted_at": "2026-07-31T14:02:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 65968,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 03",
+    "id": "txn_filler_0040",
+    "initiated_at": "2026-03-23T22:00:00Z",
+    "posted_at": "2026-03-23T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 77028,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 04",
+    "id": "txn_filler_0041",
+    "initiated_at": "2026-01-10T22:00:00Z",
+    "posted_at": "2026-01-10T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 94551,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 05",
+    "id": "txn_filler_0042",
+    "initiated_at": "2026-07-04T22:00:00Z",
+    "posted_at": "2026-07-04T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 104455,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 06",
+    "id": "txn_filler_0043",
+    "initiated_at": "2026-09-25T22:00:00Z",
+    "posted_at": "2026-09-25T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 111499,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 07",
+    "id": "txn_filler_0044",
+    "initiated_at": "2025-12-31T22:00:00Z",
+    "posted_at": "2025-12-31T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 118622,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 08",
+    "id": "txn_filler_0045",
+    "initiated_at": "2026-10-01T22:00:00Z",
+    "posted_at": "2026-10-01T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 134120,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 09",
+    "id": "txn_filler_0046",
+    "initiated_at": "2026-10-03T22:00:00Z",
+    "posted_at": "2026-10-03T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 139744,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 10",
+    "id": "txn_filler_0047",
+    "initiated_at": "2026-08-19T22:00:00Z",
+    "posted_at": "2026-08-19T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 147363,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 11",
+    "id": "txn_filler_0048",
+    "initiated_at": "2026-03-26T22:00:00Z",
+    "posted_at": "2026-03-26T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 156929,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 12",
+    "id": "txn_filler_0049",
+    "initiated_at": "2026-01-23T22:00:00Z",
+    "posted_at": "2026-01-23T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 170054,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 13",
+    "id": "txn_filler_0050",
+    "initiated_at": "2026-01-07T22:00:00Z",
+    "posted_at": "2026-01-07T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 177961,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 14",
+    "id": "txn_filler_0051",
+    "initiated_at": "2026-01-13T22:00:00Z",
+    "posted_at": "2026-01-13T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 194528,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 15",
+    "id": "txn_filler_0052",
+    "initiated_at": "2026-09-04T22:00:00Z",
+    "posted_at": "2026-09-04T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 198078,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 16",
+    "id": "txn_filler_0053",
+    "initiated_at": "2026-01-07T22:00:00Z",
+    "posted_at": "2026-01-07T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 206596,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 17",
+    "id": "txn_filler_0054",
+    "initiated_at": "2026-04-19T22:00:00Z",
+    "posted_at": "2026-04-19T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 216028,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 18",
+    "id": "txn_filler_0055",
+    "initiated_at": "2026-01-19T22:00:00Z",
+    "posted_at": "2026-01-19T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 225976,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 19",
+    "id": "txn_filler_0056",
+    "initiated_at": "2026-01-11T22:00:00Z",
+    "posted_at": "2026-01-11T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 48374,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 01",
+    "id": "txn_filler_0057",
+    "initiated_at": "2025-12-14T22:00:00Z",
+    "posted_at": "2025-12-14T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 63711,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 02",
+    "id": "txn_filler_0058",
+    "initiated_at": "2026-02-14T22:00:00Z",
+    "posted_at": "2026-02-14T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 70146,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 03",
+    "id": "txn_filler_0059",
+    "initiated_at": "2026-03-22T22:00:00Z",
+    "posted_at": "2026-03-22T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 84593,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 04",
+    "id": "txn_filler_0060",
+    "initiated_at": "2026-03-02T22:00:00Z",
+    "posted_at": "2026-03-02T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 90924,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 05",
+    "id": "txn_filler_0061",
+    "initiated_at": "2026-03-08T22:00:00Z",
+    "posted_at": "2026-03-08T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 99070,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 06",
+    "id": "txn_filler_0062",
+    "initiated_at": "2026-05-26T22:00:00Z",
+    "posted_at": "2026-05-26T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 108999,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 07",
+    "id": "txn_filler_0063",
+    "initiated_at": "2026-07-26T22:00:00Z",
+    "posted_at": "2026-07-26T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 124411,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 08",
+    "id": "txn_filler_0064",
+    "initiated_at": "2026-09-15T22:00:00Z",
+    "posted_at": "2026-09-15T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 133604,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 09",
+    "id": "txn_filler_0065",
+    "initiated_at": "2026-05-26T22:00:00Z",
+    "posted_at": "2026-05-26T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 140627,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 10",
+    "id": "txn_filler_0066",
+    "initiated_at": "2026-02-15T22:00:00Z",
+    "posted_at": "2026-02-15T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 149717,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 11",
+    "id": "txn_filler_0067",
+    "initiated_at": "2026-03-11T22:00:00Z",
+    "posted_at": "2026-03-11T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 156199,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 12",
+    "id": "txn_filler_0068",
+    "initiated_at": "2025-12-19T22:00:00Z",
+    "posted_at": "2025-12-19T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 173387,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 13",
+    "id": "txn_filler_0069",
+    "initiated_at": "2026-08-27T22:00:00Z",
+    "posted_at": "2026-08-27T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 177702,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 14",
+    "id": "txn_filler_0070",
+    "initiated_at": "2026-03-26T22:00:00Z",
+    "posted_at": "2026-03-26T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 187490,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 15",
+    "id": "txn_filler_0071",
+    "initiated_at": "2026-05-04T22:00:00Z",
+    "posted_at": "2026-05-04T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 201909,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 16",
+    "id": "txn_filler_0072",
+    "initiated_at": "2026-02-18T22:00:00Z",
+    "posted_at": "2026-02-18T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 206271,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 17",
+    "id": "txn_filler_0073",
+    "initiated_at": "2026-10-06T22:00:00Z",
+    "posted_at": "2026-10-06T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 224388,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 18",
+    "id": "txn_filler_0074",
+    "initiated_at": "2026-01-14T22:00:00Z",
+    "posted_at": "2026-01-14T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 230572,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 19",
+    "id": "txn_filler_0075",
+    "initiated_at": "2026-05-19T22:00:00Z",
+    "posted_at": "2026-05-19T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 50737,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 01",
+    "id": "txn_filler_0076",
+    "initiated_at": "2025-11-05T22:00:00Z",
+    "posted_at": "2025-11-05T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 63137,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 02",
+    "id": "txn_filler_0077",
+    "initiated_at": "2025-12-26T22:00:00Z",
+    "posted_at": "2025-12-26T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 72474,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 03",
+    "id": "txn_filler_0078",
+    "initiated_at": "2026-01-03T22:00:00Z",
+    "posted_at": "2026-01-03T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 76533,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 04",
+    "id": "txn_filler_0079",
+    "initiated_at": "2026-09-21T22:00:00Z",
+    "posted_at": "2026-09-21T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 92767,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 05",
+    "id": "txn_filler_0080",
+    "initiated_at": "2026-06-10T22:00:00Z",
+    "posted_at": "2026-06-10T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 96064,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 06",
+    "id": "txn_filler_0081",
+    "initiated_at": "2025-11-04T22:00:00Z",
+    "posted_at": "2025-11-04T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 110072,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 07",
+    "id": "txn_filler_0082",
+    "initiated_at": "2026-09-25T22:00:00Z",
+    "posted_at": "2026-09-25T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 124469,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 08",
+    "id": "txn_filler_0083",
+    "initiated_at": "2025-11-29T22:00:00Z",
+    "posted_at": "2025-11-29T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 132301,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 09",
+    "id": "txn_filler_0084",
+    "initiated_at": "2025-11-12T22:00:00Z",
+    "posted_at": "2025-11-12T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 141320,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 10",
+    "id": "txn_filler_0085",
+    "initiated_at": "2026-06-03T22:00:00Z",
+    "posted_at": "2026-06-03T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 150685,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 11",
+    "id": "txn_filler_0086",
+    "initiated_at": "2025-11-18T22:00:00Z",
+    "posted_at": "2025-11-18T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 162564,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 12",
+    "id": "txn_filler_0087",
+    "initiated_at": "2026-10-15T22:00:00Z",
+    "posted_at": "2026-10-15T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 167753,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 13",
+    "id": "txn_filler_0088",
+    "initiated_at": "2026-04-28T22:00:00Z",
+    "posted_at": "2026-04-28T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 176918,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 14",
+    "id": "txn_filler_0089",
+    "initiated_at": "2025-12-18T22:00:00Z",
+    "posted_at": "2025-12-18T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 185965,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 15",
+    "id": "txn_filler_0090",
+    "initiated_at": "2026-02-16T22:00:00Z",
+    "posted_at": "2026-02-16T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 199709,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 16",
+    "id": "txn_filler_0091",
+    "initiated_at": "2026-07-07T22:00:00Z",
+    "posted_at": "2026-07-07T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 209056,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 17",
+    "id": "txn_filler_0092",
+    "initiated_at": "2026-08-21T22:00:00Z",
+    "posted_at": "2026-08-21T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 221405,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 18",
+    "id": "txn_filler_0093",
+    "initiated_at": "2026-04-06T22:00:00Z",
+    "posted_at": "2026-04-06T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 226320,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 19",
+    "id": "txn_filler_0094",
+    "initiated_at": "2026-02-14T22:00:00Z",
+    "posted_at": "2026-02-14T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 52359,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 01",
+    "id": "txn_filler_0095",
+    "initiated_at": "2026-08-02T22:00:00Z",
+    "posted_at": "2026-08-02T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 64002,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 02",
+    "id": "txn_filler_0096",
+    "initiated_at": "2026-04-04T22:00:00Z",
+    "posted_at": "2026-04-04T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 67243,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 03",
+    "id": "txn_filler_0097",
+    "initiated_at": "2026-06-06T22:00:00Z",
+    "posted_at": "2026-06-06T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 84014,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 04",
+    "id": "txn_filler_0098",
+    "initiated_at": "2026-03-20T22:00:00Z",
+    "posted_at": "2026-03-20T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 91804,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 05",
+    "id": "txn_filler_0099",
+    "initiated_at": "2026-06-06T22:00:00Z",
+    "posted_at": "2026-06-06T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 101233,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 06",
+    "id": "txn_filler_0100",
+    "initiated_at": "2026-04-26T22:00:00Z",
+    "posted_at": "2026-04-26T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 107472,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 07",
+    "id": "txn_filler_0101",
+    "initiated_at": "2026-06-30T22:00:00Z",
+    "posted_at": "2026-06-30T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 117887,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 08",
+    "id": "txn_filler_0102",
+    "initiated_at": "2026-09-14T22:00:00Z",
+    "posted_at": "2026-09-14T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 128800,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 09",
+    "id": "txn_filler_0103",
+    "initiated_at": "2026-08-10T22:00:00Z",
+    "posted_at": "2026-08-10T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 138822,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 10",
+    "id": "txn_filler_0104",
+    "initiated_at": "2025-11-23T22:00:00Z",
+    "posted_at": "2025-11-23T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 152945,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 11",
+    "id": "txn_filler_0105",
+    "initiated_at": "2026-10-20T22:00:00Z",
+    "posted_at": "2026-10-20T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 157987,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 12",
+    "id": "txn_filler_0106",
+    "initiated_at": "2025-12-29T22:00:00Z",
+    "posted_at": "2025-12-29T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 169619,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 13",
+    "id": "txn_filler_0107",
+    "initiated_at": "2026-06-14T22:00:00Z",
+    "posted_at": "2026-06-14T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 177386,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 14",
+    "id": "txn_filler_0108",
+    "initiated_at": "2026-10-24T22:00:00Z",
+    "posted_at": "2026-10-24T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 193758,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 15",
+    "id": "txn_filler_0109",
+    "initiated_at": "2026-03-26T22:00:00Z",
+    "posted_at": "2026-03-26T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 204991,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 16",
+    "id": "txn_filler_0110",
+    "initiated_at": "2026-04-20T22:00:00Z",
+    "posted_at": "2026-04-20T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 210220,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 17",
+    "id": "txn_filler_0111",
+    "initiated_at": "2026-01-10T22:00:00Z",
+    "posted_at": "2026-01-10T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 223445,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 18",
+    "id": "txn_filler_0112",
+    "initiated_at": "2026-08-23T22:00:00Z",
+    "posted_at": "2026-08-23T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 225884,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 19",
+    "id": "txn_filler_0113",
+    "initiated_at": "2025-12-14T22:00:00Z",
+    "posted_at": "2025-12-14T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 54163,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 01",
+    "id": "txn_filler_0114",
+    "initiated_at": "2026-03-07T22:00:00Z",
+    "posted_at": "2026-03-07T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 61521,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 02",
+    "id": "txn_filler_0115",
+    "initiated_at": "2026-04-09T22:00:00Z",
+    "posted_at": "2026-04-09T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 71457,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 03",
+    "id": "txn_filler_0116",
+    "initiated_at": "2026-04-05T22:00:00Z",
+    "posted_at": "2026-04-05T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 82889,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 04",
+    "id": "txn_filler_0117",
+    "initiated_at": "2026-09-03T22:00:00Z",
+    "posted_at": "2026-09-03T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 91560,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 05",
+    "id": "txn_filler_0118",
+    "initiated_at": "2025-12-06T22:00:00Z",
+    "posted_at": "2025-12-06T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 98122,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 06",
+    "id": "txn_filler_0119",
+    "initiated_at": "2026-09-25T22:00:00Z",
+    "posted_at": "2026-09-25T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 108420,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 07",
+    "id": "txn_filler_0120",
+    "initiated_at": "2026-09-22T22:00:00Z",
+    "posted_at": "2026-09-22T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 117659,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 08",
+    "id": "txn_filler_0121",
+    "initiated_at": "2026-03-15T22:00:00Z",
+    "posted_at": "2026-03-15T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 130571,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 09",
+    "id": "txn_filler_0122",
+    "initiated_at": "2026-08-31T22:00:00Z",
+    "posted_at": "2026-08-31T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 135861,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 10",
+    "id": "txn_filler_0123",
+    "initiated_at": "2025-12-23T22:00:00Z",
+    "posted_at": "2025-12-23T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 145003,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 11",
+    "id": "txn_filler_0124",
+    "initiated_at": "2026-09-04T22:00:00Z",
+    "posted_at": "2026-09-04T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 157478,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 12",
+    "id": "txn_filler_0125",
+    "initiated_at": "2026-01-09T22:00:00Z",
+    "posted_at": "2026-01-09T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 166662,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 13",
+    "id": "txn_filler_0126",
+    "initiated_at": "2026-01-25T22:00:00Z",
+    "posted_at": "2026-01-25T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 175417,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 14",
+    "id": "txn_filler_0127",
+    "initiated_at": "2026-04-23T22:00:00Z",
+    "posted_at": "2026-04-23T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 188407,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 15",
+    "id": "txn_filler_0128",
+    "initiated_at": "2026-09-20T22:00:00Z",
+    "posted_at": "2026-09-20T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 201164,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 16",
+    "id": "txn_filler_0129",
+    "initiated_at": "2025-12-16T22:00:00Z",
+    "posted_at": "2025-12-16T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 209132,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 17",
+    "id": "txn_filler_0130",
+    "initiated_at": "2026-08-11T22:00:00Z",
+    "posted_at": "2026-08-11T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 224867,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 18",
+    "id": "txn_filler_0131",
+    "initiated_at": "2026-05-02T22:00:00Z",
+    "posted_at": "2026-05-02T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 232768,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 19",
+    "id": "txn_filler_0132",
+    "initiated_at": "2026-04-23T22:00:00Z",
+    "posted_at": "2026-04-23T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 46889,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 01",
+    "id": "txn_filler_0133",
+    "initiated_at": "2026-08-25T22:00:00Z",
+    "posted_at": "2026-08-25T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 62634,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 02",
+    "id": "txn_filler_0134",
+    "initiated_at": "2026-02-19T22:00:00Z",
+    "posted_at": "2026-02-19T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 72927,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 03",
+    "id": "txn_filler_0135",
+    "initiated_at": "2026-02-23T22:00:00Z",
+    "posted_at": "2026-02-23T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 76407,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 04",
+    "id": "txn_filler_0136",
+    "initiated_at": "2026-05-20T22:00:00Z",
+    "posted_at": "2026-05-20T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 86674,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 05",
+    "id": "txn_filler_0137",
+    "initiated_at": "2026-08-14T22:00:00Z",
+    "posted_at": "2026-08-14T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 99337,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 06",
+    "id": "txn_filler_0138",
+    "initiated_at": "2026-05-04T22:00:00Z",
+    "posted_at": "2026-05-04T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 107645,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 07",
+    "id": "txn_filler_0139",
+    "initiated_at": "2026-02-23T22:00:00Z",
+    "posted_at": "2026-02-23T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 115378,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 08",
+    "id": "txn_filler_0140",
+    "initiated_at": "2026-02-04T22:00:00Z",
+    "posted_at": "2026-02-04T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 133654,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 09",
+    "id": "txn_filler_0141",
+    "initiated_at": "2026-07-13T22:00:00Z",
+    "posted_at": "2026-07-13T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 137401,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 10",
+    "id": "txn_filler_0142",
+    "initiated_at": "2026-04-24T22:00:00Z",
+    "posted_at": "2026-04-24T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 153899,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 11",
+    "id": "txn_filler_0143",
+    "initiated_at": "2025-11-07T22:00:00Z",
+    "posted_at": "2025-11-07T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 163652,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 12",
+    "id": "txn_filler_0144",
+    "initiated_at": "2026-10-13T22:00:00Z",
+    "posted_at": "2026-10-13T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 166491,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 13",
+    "id": "txn_filler_0145",
+    "initiated_at": "2026-05-27T22:00:00Z",
+    "posted_at": "2026-05-27T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 179278,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 14",
+    "id": "txn_filler_0146",
+    "initiated_at": "2025-11-04T22:00:00Z",
+    "posted_at": "2025-11-04T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 191008,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 15",
+    "id": "txn_filler_0147",
+    "initiated_at": "2026-02-03T22:00:00Z",
+    "posted_at": "2026-02-03T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 200827,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 16",
+    "id": "txn_filler_0148",
+    "initiated_at": "2026-08-02T22:00:00Z",
+    "posted_at": "2026-08-02T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  },
+  {
+    "account_id": "acct_seed_checking_01",
+    "amount": {
+      "amount": 213725,
+      "currency": "USD"
+    },
+    "counterparty_name": "Synthetic supplier 17",
+    "id": "txn_filler_0149",
+    "initiated_at": "2026-07-04T22:00:00Z",
+    "posted_at": "2026-07-04T22:00:00Z",
+    "status": "settled",
+    "transaction_type": "ach_debit"
+  }
+]
