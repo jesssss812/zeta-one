@@ -22,8 +22,8 @@ def test_fixture_context_parity(path):
     expected = Context.model_validate(fixture['context'])
     actual = context_for(Store())(Proposal.model_validate(fixture['proposal']), expected.business.id, SEED_NOW)
     # The fixtures predate the bill's status and the bill each history payment settled.
-    newer = {'open_bills': True, 'bill': {'status'}, 'payment_history': {'recent': {'__all__': {'bill_id'}}},
-             'bill_counterparty_payment_history': {'recent': {'__all__': {'bill_id'}}}}
+    newer = {'open_bills': True, 'bill': {'status'}, 'payment_history': {'recent': {'__all__': {'bill_id'}}, 'duplicate_candidates': True},
+             'bill_counterparty_payment_history': {'recent': {'__all__': {'bill_id'}}, 'duplicate_candidates': True}}
     assert actual.model_dump(exclude=newer) == expected.model_dump(exclude=newer)
 
 
@@ -133,3 +133,22 @@ def test_context_can_be_read_from_gateway_worker_thread():
     with ThreadPoolExecutor(max_workers=1) as worker:
         context = worker.submit(source, routine(), 'biz_seed_01', SEED_NOW).result()
     assert context.counterparty.id == 'cp_0012'
+
+
+@pytest.mark.parametrize('days_ago, duplicate', [(4, True), (7, True), (8, False)])
+def test_duplicate_window_includes_payments_beyond_the_three_item_summary(days_ago, duplicate):
+    from zeta_one.risk.tier0 import Tier0
+    from zeta_one.risk.assess import assess
+    from zeta_one.contracts import Configuration
+
+    store = Store()
+    proposal = routine()
+    for age, amount in [(days_ago, 185000), (1, 185001), (2, 185002), (3, 185003)]:
+        apply(store, SetupOp(op='add_payments', args={'counterparty_id': proposal.counterparty_id,
+                                                    'amount': amount, 'days_ago': age}))
+    context = context_for(store)(proposal, 'biz_seed_01', SEED_NOW)
+    assert len(context.payment_history.recent) == 3
+    assert all(payment.amount.amount != 185000 for payment in context.payment_history.recent)
+    risk = assess(proposal, context, SEED_NOW, Tier0(), {}, Configuration(tiers=['tier0']))
+    assert risk.features['duplicate_candidate'].value is duplicate
+    assert bool(risk.floor) is duplicate

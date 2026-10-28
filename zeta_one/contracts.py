@@ -138,11 +138,15 @@ class PaymentRecord(_Open):
 
 
 class PaymentHistory(_Open):
+    """`recent` is a short summary (up to three payments in 90 days); `duplicate_candidates` is every
+    payment in the duplicate window, so a matching payment can't hide behind three newer ones."""
+
     count: int = 0
     first_at: datetime | None = None
     last_at: datetime | None = None
     median_amount: Money | None = None
     recent: list[PaymentRecord] = Field(default_factory=list)
+    duplicate_candidates: list[PaymentRecord] = Field(default_factory=list)
 
 
 class BusinessView(_Open):

@@ -91,7 +91,9 @@ def duplicate_candidate(proposal: Proposal, context: Context, now: datetime) -> 
     bill = context.bill if proposal.bill_id is not None else None
     if bill is not None and bill.status == 'paid':
         matched.append(bill.id)
-    for payment in [*context.payment_history.recent, *context.gateway_payments]:
+    payments = {payment.id: payment for payment in [*context.payment_history.recent,
+                *context.payment_history.duplicate_candidates, *context.gateway_payments]}
+    for payment in payments.values():
         same_bill = proposal.bill_id is not None and getattr(payment, 'bill_id', None) == proposal.bill_id
         same_amount = payment.amount == proposal.amount and payment.posted_at >= window
         if same_bill or same_amount:

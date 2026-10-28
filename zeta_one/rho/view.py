@@ -1,10 +1,11 @@
-"""Gateway-owned context lookup. Recent history means latest three payments within 90 days."""
+"""Gateway-owned context lookup, with a three-payment summary and a complete duplicate window."""
 from datetime import datetime, timedelta
 from statistics import median
 
 from zeta_one.contracts import (BillView, BusinessView, Context, CounterpartyView,
     InvalidProposal, PaymentHistory, PaymentMethodChange, PaymentMethodView, PaymentRecord)
 from zeta_one.rho.models import Money
+from zeta_one.risk.features import DUPLICATE_DAYS
 
 METHOD_TYPES = {'ach_debit':'ach', 'wire_out':'wire', 'check_payment':'check',
                 'international_wire_out':'international_wire'}
@@ -51,7 +52,8 @@ def context_for(store):
             return PaymentHistory()
         return PaymentHistory(count=len(records), first_at=records[-1].posted_at, last_at=records[0].posted_at,
             median_amount=Money(amount=int(median(r.amount.amount for r in records)),currency=currency),
-            recent=[r for r in records if r.posted_at >= now-timedelta(days=90)][:3])
+            recent=[r for r in records if r.posted_at >= now-timedelta(days=90)][:3],
+            duplicate_candidates=[r for r in records if r.posted_at >= now-timedelta(days=DUPLICATE_DAYS)])
 
     def source(proposal, business_id, now):
         business = store.get('businesses', business_id)
