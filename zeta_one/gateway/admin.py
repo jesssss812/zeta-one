@@ -12,6 +12,7 @@ from pathlib import Path
 from zeta_one.gateway.wiring import ROOT
 
 AGENT_HEADER_PREFIX = "zeta-agent-"
+AGENT_SIGNATURE_HEADERS = ("zeta-signature", "zeta-nonce", "zeta-timestamp")
 TOKEN_NAME = "ZETA_ADMIN_TOKEN"
 
 
@@ -35,7 +36,7 @@ def admin_token(env_file: Path = ROOT / ".env") -> str | None:
 
 def require_admin(headers: Mapping[str, str], token: str | None) -> None:
     """Raises AdminRefused unless the request is a person's, carrying the admin token."""
-    if any(name.lower().startswith(AGENT_HEADER_PREFIX) for name in headers):
+    if any(name.lower().startswith(AGENT_HEADER_PREFIX) or name.lower() in AGENT_SIGNATURE_HEADERS for name in headers):
         raise AdminRefused(403, "agent_signed", "admin actions refuse agent-signed requests")
     if not token:
         raise AdminRefused(503, "admin_disabled", f"{TOKEN_NAME} is not set; run scripts/keygen.py")

@@ -47,6 +47,18 @@ endpoints. A scenario run returns its record in full.
 | `GET /v1/decisions/{decision_id}` | the **evidence record** of an earlier run (admin token) |
 | `GET /v1/eval/latest` | the evaluation report as JSON once one exists; `404` before |
 
+Admin endpoints, for a person with the admin token; each refuses a request carrying an agent's
+signature headers:
+
+| Method and path | Does |
+| --- | --- |
+| `GET /v1/decisions` | lists evidence records, newest first (`?limit=`, at most 500) |
+| `POST /v1/challenges/{challenge_id}/resolve` | `{"outcome": "approve" \| "reject", "by", "note"}`; approval executes (simulated) only if a recheck finds nothing changed |
+| `POST /v1/agents` | registers an agent: `{"agent_id", "business_id", "owner", "public_key"}`, the Ed25519 key as 32 raw bytes in base64; `409` if it exists |
+| `POST /v1/agents/{agent_id}/revoke` | revokes the agent's future requests |
+| `POST /v1/authorizations` | grants an authorization document to a registered agent of its business; its version must increase |
+| `POST /v1/authorizations/{authorization_id}/revoke` | revokes the current version of that authorization |
+
 Error responses are `{"error": {"code", "message"}}` with a 4xx or 5xx status, framework errors
 (unknown route, bad parameter, wrong method) and unexpected crashes included.
 A signed proposal that is malformed or names records that don't exist or don't belong together is

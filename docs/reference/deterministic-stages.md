@@ -112,7 +112,8 @@ count as recent. An absent, zero or wrong-currency median yields no amount-ratio
 registry and authorization store, the seed as the context source, tier 0 and the strong tier. The
 default app (`zeta_one.gateway.app:app`) uses it with `data/zeta.db` and registers the built-in demo
 agent from `data/keys/ap_assistant.pem` with the demo authorization, if the key exists (run
-`scripts/keygen.py` once). The live gateway's clock is the real time; demo scenarios and the evaluation use
+`scripts/keygen.py` once). Admin endpoints register and revoke agents and grant and revoke
+authorizations ([demo-api.md](demo-api.md)). The live gateway's clock is the real time; demo scenarios and the evaluation use
 `SEED_NOW`.
 
 `tests/test_stage_integration.py` composes all four callables into `Engine`, uses the seed clock,

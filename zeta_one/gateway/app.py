@@ -5,7 +5,10 @@ Translates HTTP to and from the service; holds no decision logic. Run it on 127.
 first access, so importing `create_app` opens no database and reads no `.env`.
 """
 
+import base64
+import binascii
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal
 
@@ -14,11 +17,11 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, ConfigDict, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from starlette.exceptions import HTTPException
 
 from zeta_one import db
-from zeta_one.contracts import POLICY_VERSION, InvalidProposal, SignedRequest
+from zeta_one.contracts import POLICY_VERSION, Authorization, InvalidProposal, SignedRequest
 from zeta_one.gateway import admin, scenarios
 from zeta_one.gateway.ledger import Ledger
 from zeta_one.gateway.reuse import RiskReuse
@@ -27,6 +30,15 @@ from zeta_one.gateway.wiring import ROOT, engine_version, real_stages, register_
 
 HOST = "127.0.0.1"
 EVAL_REPORT = ROOT / "data" / "eval" / "report.json"
+
+
+class AgentRegistration(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    agent_id: str = Field(min_length=1, max_length=128)
+    business_id: str = Field(min_length=1, max_length=128)
+    owner: str = Field(min_length=1, max_length=200)
+    public_key: str = Field(description="the Ed25519 public key, 32 raw bytes in base64")
 
 
 class Resolution(BaseModel):
@@ -103,6 +115,77 @@ def create_app(gateway: Gateway, token: str | None, eval_report: Path = EVAL_REP
             return _error(404, "unknown_challenge", f"no challenge {challenge_id}")
         except NotHeld as error:
             return _error(409, "not_held", str(error))
+
+    # --- Admin: agents and authorizations (S6). A person with the admin token, never an agent. ---
+
+    def _admin_stores(request: Request):
+        admin.require_admin(request.headers, token)
+        stages = gateway.stages
+        if stages.registry is None or stages.authorizations is None:
+            raise admin.AdminRefused(503, "admin_unavailable", "this gateway has no registry or authorization store")
+        return stages.registry, stages.authorizations
+
+    def _body(model, raw: bytes):
+        try:
+            return model.model_validate_json(raw), None
+        except ValidationError as error:
+            return None, _error(400, "invalid_body", f"{error.error_count()} invalid fields")
+
+    @app.post("/v1/agents", status_code=201)
+    async def register_agent(request: Request):
+        registry, _ = _admin_stores(request)
+        registration, problem = _body(AgentRegistration, await request.body())
+        if problem:
+            return problem
+        try:
+            public_key = base64.b64decode(registration.public_key, validate=True)
+        except (binascii.Error, ValueError):
+            return _error(400, "invalid_public_key", "public_key must be base64")
+        with gateway.lock:
+            if registry.get(registration.agent_id) is not None:
+                return _error(409, "agent_exists", f"agent {registration.agent_id} is already registered")
+            try:
+                agent = registry.register(registration.agent_id, registration.business_id, registration.owner,
+                                          public_key, datetime.now(UTC))
+            except ValueError:
+                return _error(400, "invalid_public_key", "public_key must be a 32-byte Ed25519 key")
+        return agent.model_dump(exclude={"public_key"})
+
+    @app.post("/v1/agents/{agent_id}/revoke")
+    def revoke_agent(agent_id: str, request: Request):
+        registry, _ = _admin_stores(request)
+        with gateway.lock:
+            if registry.get(agent_id) is None:
+                return _error(404, "unknown_agent", f"no agent {agent_id}")
+            registry.revoke(agent_id, datetime.now(UTC))
+            return registry.get(agent_id).model_dump(exclude={"public_key"})
+
+    @app.post("/v1/authorizations", status_code=201)
+    async def grant_authorization(request: Request):
+        registry, authorizations = _admin_stores(request)
+        authorization, problem = _body(Authorization, await request.body())
+        if problem:
+            return problem
+        with gateway.lock:
+            agent = registry.get(authorization.agent_id)
+            if agent is None or agent.business_id != authorization.business_id:
+                return _error(400, "unknown_agent", "the authorization must name a registered agent of its business")
+            try:
+                authorizations.grant(authorization)
+            except ValueError as error:
+                return _error(409, "invalid_grant", str(error))
+        return authorization.model_dump(mode="json")
+
+    @app.post("/v1/authorizations/{authorization_id}/revoke")
+    def revoke_authorization(authorization_id: str, request: Request):
+        _, authorizations = _admin_stores(request)
+        with gateway.lock:
+            found = authorizations.connection.execute(
+                "SELECT 1 FROM authorization_documents WHERE authorization_id = ?", (authorization_id,)).fetchone()
+            if found is None:
+                return _error(404, "unknown_authorization", f"no authorization {authorization_id}")
+            authorizations.revoke(authorization_id, datetime.now(UTC))
+        return {"authorization_id": authorization_id, "status": "revoked"}
 
     # Records name the signals and the model's rationale, which the agent's own response leaves out
     # (S4), so reading them is an admin action.
