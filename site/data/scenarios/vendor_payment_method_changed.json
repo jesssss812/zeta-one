@@ -1,0 +1,344 @@
+{
+  "_note": "Illustrative result. Synthetic data in Rho's shapes; no model was run; latency and cost are unmeasured (null). Replace with a live POST /v1/scenarios/vendor_payment_method_changed/run response once the engine exists. See docs/reference/demo-api.md.",
+  "context": {
+    "bill": {
+      "amount": {
+        "amount": 251500,
+        "currency": "USD"
+      },
+      "counterparty_id": "cp_0007",
+      "counterparty_name": "Harbor Office Supply Co.",
+      "document_excerpt": "Invoice HOS-10488. Total due $2,515.00 by Nov 3, 2026. Thank you for your business.",
+      "due_date": "2026-11-03",
+      "id": "bill_0193",
+      "invoice_date": "2026-10-20",
+      "invoice_number": "HOS-10488",
+      "memo": "October office supplies",
+      "status": null
+    },
+    "bill_counterparty": null,
+    "bill_counterparty_payment_history": null,
+    "business": {
+      "id": "biz_seed_01",
+      "name": "Larkspur Analytics (synthetic)"
+    },
+    "counterparty": {
+      "created_at": "2025-06-12T15:04:00Z",
+      "id": "cp_0007",
+      "name": "Harbor Office Supply Co.",
+      "payment_methods": [
+        {
+          "added_at": "2026-10-24T18:42:00Z",
+          "bank_name": "Meridian Trust Bank",
+          "id": "pm_0007_03",
+          "is_default": true,
+          "type": "ach"
+        },
+        {
+          "added_at": "2025-06-12T15:04:00Z",
+          "bank_name": "First Harbor Savings",
+          "id": "pm_0007_01",
+          "is_default": false,
+          "type": "ach"
+        },
+        {
+          "added_at": "2025-06-12T15:04:00Z",
+          "bank_name": null,
+          "id": "pm_0007_02",
+          "is_default": false,
+          "type": "check"
+        }
+      ],
+      "status": "active"
+    },
+    "gateway_payments": [],
+    "open_bills": [],
+    "payment_history": {
+      "count": 16,
+      "first_at": "2025-07-02T14:10:00Z",
+      "last_at": "2026-09-30T14:05:00Z",
+      "median_amount": {
+        "amount": 248000,
+        "currency": "USD"
+      },
+      "recent": [
+        {
+          "amount": {
+            "amount": 246000,
+            "currency": "USD"
+          },
+          "id": "txn_0812",
+          "method_type": "ach",
+          "posted_at": "2026-09-30T14:05:00Z"
+        },
+        {
+          "amount": {
+            "amount": 251000,
+            "currency": "USD"
+          },
+          "id": "txn_0781",
+          "method_type": "ach",
+          "posted_at": "2026-08-29T14:11:00Z"
+        },
+        {
+          "amount": {
+            "amount": 243500,
+            "currency": "USD"
+          },
+          "id": "txn_0749",
+          "method_type": "ach",
+          "posted_at": "2026-07-31T14:02:00Z"
+        }
+      ]
+    },
+    "payment_method_history": [
+      {
+        "change": "added_as_default",
+        "changed_at": "2026-10-24T18:42:00Z",
+        "changed_by": "counterparty_profile_update",
+        "id": "pmh_0042",
+        "method_id": "pm_0007_03",
+        "summary": "Default ACH changed from First Harbor Savings (pm_0007_01) to Meridian Trust Bank (pm_0007_03)"
+      }
+    ]
+  },
+  "decision_record": {
+    "authorization": {
+      "authorization_id": "auth_0001",
+      "snapshot": {
+        "actions": [
+          "propose_payment"
+        ],
+        "agent_id": "agent_ap_assistant_01",
+        "allow_new_counterparties": false,
+        "authorization_id": "auth_0001",
+        "business_id": "biz_seed_01",
+        "counterparties": {
+          "ids": [],
+          "mode": "any"
+        },
+        "expires_at": "2026-12-31T23:59:59Z",
+        "granted_at": "2026-10-01T16:00:00Z",
+        "granted_by": "finance-owner@larkspur.example",
+        "human_approval_above": {
+          "amount": 1000000,
+          "currency": "USD"
+        },
+        "limits": {
+          "per_payment": {
+            "amount": 500000,
+            "currency": "USD"
+          },
+          "rolling": null
+        },
+        "policy_version": "2026-10-28.1",
+        "revoked_at": null,
+        "status": "active",
+        "version": 1
+      },
+      "version": 1,
+      "violations": []
+    },
+    "challenge": {
+      "routed_to": "authorization grantor (finance-owner@larkspur.example)",
+      "type": "confirm",
+      "user_sees": "Something about this payment needs a second look; confirm before it is sent."
+    },
+    "configuration": {
+      "escalation": "engineered",
+      "jev_min_confidence": 0.8,
+      "jev_min_finding_confidence": 0.9,
+      "tiers": [
+        "tier0",
+        "strong"
+      ]
+    },
+    "cost": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "prices_used": {},
+      "unpriced_models": [],
+      "usd": 0.0
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "decision": "challenge",
+    "decision_id": "dec_e0fbe64f384f4650",
+    "engine_version": null,
+    "execution": {
+      "simulated": true,
+      "status": "held"
+    },
+    "friction_rung": 2,
+    "identity": {
+      "business_id": "biz_seed_01",
+      "checked": [
+        "present",
+        "known",
+        "active",
+        "timestamp",
+        "nonce",
+        "signature"
+      ],
+      "claimed_agent_id": "agent_ap_assistant_01",
+      "key_id": "agent_ap_assistant_01",
+      "nonce": "8a2ab6a3dd187d31e629ee801f685a4f",
+      "owner": "finance-owner@larkspur.example",
+      "result": "verified",
+      "timestamp": "2026-10-27T22:00:00+00:00"
+    },
+    "latency_ms": {
+      "authorization": 0,
+      "identity": 3,
+      "risk": 5,
+      "total": 10
+    },
+    "policy_version": "2026-10-28.3",
+    "reasons": [
+      "risk:elevated"
+    ],
+    "review": null,
+    "risk": {
+      "features": {
+        "amount_ratio_to_vendor_median": {
+          "evidence": [
+            "txn_0812",
+            "txn_0781",
+            "txn_0749"
+          ],
+          "raw_value": 1.0141129032258065,
+          "value": 1.01
+        },
+        "bill_mismatch": {
+          "evidence": [
+            "bill_0193"
+          ],
+          "value": false
+        },
+        "bill_not_referenced": {
+          "evidence": [],
+          "value": false
+        },
+        "counterparty_is_new": {
+          "evidence": [
+            "cp_0007"
+          ],
+          "value": false
+        },
+        "document_instruction_patterns": {
+          "evidence": [
+            "bill_0194"
+          ],
+          "value": true
+        },
+        "duplicate_candidate": {
+          "evidence": [],
+          "value": false
+        },
+        "payment_method_changed_days_ago": {
+          "evidence": [
+            "pmh_0042"
+          ],
+          "value": 3
+        }
+      },
+      "floor": {
+        "flags": [
+          "document_instruction_patterns",
+          "payment_method_changed_days_ago"
+        ],
+        "level": "elevated"
+      },
+      "level": "elevated",
+      "level_set_by": "strong",
+      "lowered": null,
+      "model_rationale": null,
+      "repeat_limit_reached": false,
+      "reused_from": null,
+      "signals": [
+        {
+          "evidence": [
+            "bill_0194"
+          ],
+          "name": "document_instruction_patterns",
+          "severity": "elevated",
+          "source": "tier0"
+        },
+        {
+          "evidence": [
+            "pmh_0042"
+          ],
+          "name": "payment_method_changed",
+          "severity": "elevated",
+          "source": "tier0"
+        }
+      ],
+      "tier_results": [
+        {
+          "confidence": null,
+          "error": null,
+          "latency_ms": null,
+          "level": "elevated",
+          "model": null,
+          "signals": [
+            "document_instruction_patterns",
+            "payment_method_changed"
+          ],
+          "tier": "tier0",
+          "usage": null
+        },
+        {
+          "confidence": null,
+          "error": null,
+          "latency_ms": null,
+          "level": "elevated",
+          "model": "illustrative",
+          "signals": [
+            "payment_method_changed"
+          ],
+          "tier": "strong",
+          "usage": null
+        }
+      ],
+      "tiers_run": [
+        "tier0",
+        "strong"
+      ]
+    },
+    "sandbox": {
+      "scenario": "vendor_payment_method_changed"
+    },
+    "schema_version": 1,
+    "seed_version": "3574ce8f0cef1de72c159f3b2c98128410721da8c4016114bf90928e6958909c"
+  },
+  "illustrative": true,
+  "proposal": {
+    "agent_rationale": "Monthly supplies invoice from an established vendor; amount in line with prior months; paying to the vendor's current default ACH method before the due date.",
+    "amount": {
+      "amount": 251500,
+      "currency": "USD"
+    },
+    "bill_id": "bill_0193",
+    "counterparty_id": "cp_0007",
+    "memo": "Invoice HOS-10488",
+    "payment_method_id": "pm_0007_03",
+    "source_account_id": "acct_seed_checking_01",
+    "source_document_ids": [
+      "bill_0193"
+    ]
+  },
+  "recorded": {
+    "at": "2026-10-28T12:50:40+00:00",
+    "live_models": false
+  },
+  "replayed_stages": [
+    "strong"
+  ],
+  "scenario": {
+    "expected": "challenge",
+    "name": "vendor_payment_method_changed",
+    "summary": "A verified, authorized agent proposes a routine bill payment to a long-standing vendor whose default ACH method was replaced three days ago.",
+    "title": "Known vendor, bank details changed three days ago"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "engine_version": "e5d2aca",
+  "eval_report": "eval_report.json",
+  "live_models": false,
+  "note": "Recorded results of real engine runs on synthetic data. Payments are simulated. Model tiers replay the fixtures' recorded answers, so those scenarios are marked illustrative.",
+  "policy_version": "2026-10-28.3",
+  "recorded": true,
+  "recorded_at": "2026-10-28T12:50:40+00:00",
+  "scenarios": [
+    {
+      "decision": "challenge",
+      "illustrative": true,
+      "name": "vendor_payment_method_changed",
+      "reasons": [
+        "risk:elevated"
+      ],
+      "replayed_stages": [
+        "strong"
+      ]
+    },
+    {
+      "decision": "allow",
+      "illustrative": false,
+      "name": "routine_bill_payment",
+      "reasons": [
+        "clean"
+      ],
+      "replayed_stages": []
+    },
+    {
+      "decision": "block",
+      "illustrative": false,
+      "name": "over_per_payment_limit",
+      "reasons": [
+        "authorization:limits.per_payment"
+      ],
+      "replayed_stages": []
+    },
+    {
+      "decision": "block",
+      "illustrative": false,
+      "name": "unknown_agent",
+      "reasons": [
+        "identity:unknown_agent"
+      ],
+      "replayed_stages": []
+    },
+    {
+      "decision": "block",
+      "illustrative": true,
+      "name": "invoice_redirect_instructions",
+      "reasons": [
+        "risk:high_with_redirect_pattern"
+      ],
+      "replayed_stages": [
+        "strong"
+      ]
+    }
+  ],
+  "simulated": true
+}

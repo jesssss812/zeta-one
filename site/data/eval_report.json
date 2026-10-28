@@ -1,0 +1,1999 @@
+{
+  "backends": [
+    "real"
+  ],
+  "dev_is_demo_only": true,
+  "discordant": {
+    "always_allow vs always_challenge on dev": {
+      "per_category": {
+        "A": {
+          "both": 0,
+          "neither": 0,
+          "only_a": 1,
+          "only_b": 0
+        },
+        "D": {
+          "both": 0,
+          "neither": 0,
+          "only_a": 0,
+          "only_b": 1
+        },
+        "E": {
+          "both": 0,
+          "neither": 1,
+          "only_a": 0,
+          "only_b": 0
+        }
+      },
+      "pooled_risk": {
+        "only_a": 1,
+        "only_b": 1,
+        "p": 1.0
+      }
+    },
+    "always_allow vs rules on dev": {
+      "per_category": {
+        "A": {
+          "both": 1,
+          "neither": 0,
+          "only_a": 0,
+          "only_b": 0
+        },
+        "D": {
+          "both": 0,
+          "neither": 0,
+          "only_a": 0,
+          "only_b": 1
+        },
+        "E": {
+          "both": 0,
+          "neither": 0,
+          "only_a": 0,
+          "only_b": 1
+        }
+      },
+      "pooled_risk": {
+        "only_a": 0,
+        "only_b": 2,
+        "p": 0.5
+      }
+    },
+    "always_challenge vs rules on dev": {
+      "per_category": {
+        "A": {
+          "both": 0,
+          "neither": 0,
+          "only_a": 0,
+          "only_b": 1
+        },
+        "D": {
+          "both": 1,
+          "neither": 0,
+          "only_a": 0,
+          "only_b": 0
+        },
+        "E": {
+          "both": 0,
+          "neither": 0,
+          "only_a": 0,
+          "only_b": 1
+        }
+      },
+      "pooled_risk": {
+        "only_a": 0,
+        "only_b": 2,
+        "p": 0.5
+      }
+    }
+  },
+  "failures_by_stage": {
+    "rules": {
+      "dev": {}
+    }
+  },
+  "frozen": {
+    "deterministic": "not frozen",
+    "dev": "not frozen",
+    "hard": "not frozen",
+    "test": "not frozen"
+  },
+  "generated": "2026-10-28",
+  "label_agreement": null,
+  "limitations": [
+    "The data is synthetic; no rate here is a production rate, and the sets say nothing about how often each case occurs.",
+    "The generator's dimensions resemble tier 0's features, so the rules look better on dev and test than they would on cases the generator did not write; the hard set is the check on that.",
+    "The plan has Claude Haiku 5.5 write the case wording, Claude Sonnet 5.5 label, and Claude Opus 5.5 serve as the strong tier: all three from one family. The Run section lists the models that actually ran.",
+    "With about 30 cases in a class a rate near 85% has a 95% interval of roughly \u00b112 points: enough to tell configurations apart in aggregate, not to rank them within a category.",
+    "Latency, where shown, is a single run on one machine, including network time when a model ran. A repeated proposal reuses its earlier risk result (decision 0010), and the strong tier's fixed system prompt is prompt-cached; nothing else is cached.",
+    "Payments are simulated."
+  ],
+  "metrics": {
+    "always_allow": {
+      "deterministic": {
+        "B": {
+          "accuracy": {
+            "high": 0.3331395092109959,
+            "k": 1,
+            "low": 0.013710421242556586,
+            "n": 13,
+            "rate": 0.07692307692307693
+          },
+          "accuracy_with_acceptable": {
+            "high": 0.3331395092109959,
+            "k": 1,
+            "low": 0.013710421242556586,
+            "n": 13,
+            "rate": 0.07692307692307693
+          },
+          "confusion": {
+            "allow": {
+              "allow": 1,
+              "block": 0,
+              "challenge": 0
+            },
+            "block": {
+              "allow": 11,
+              "block": 0,
+              "challenge": 0
+            },
+            "challenge": {
+              "allow": 1,
+              "block": 0,
+              "challenge": 0
+            }
+          },
+          "cost_per_action_usd": null,
+          "detection": {
+            "high": 0.2588329669680317,
+            "k": 0,
+            "low": 0.0,
+            "n": 11,
+            "rate": 0.0
+          },
+          "latency_ms": {
+            "p50": null,
+            "p95": null
+          },
+          "legit_block_rate": {
+            "high": 0.6576197724933469,
+            "k": 0,
+            "low": 0.0,
+            "n": 2,
+            "rate": 0.0
+          },
+          "legit_challenge_rate": {
+            "high": 0.6576197724933469,
+            "k": 0,
+            "low": 0.0,
+            "n": 2,
+            "rate": 0.0
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 13,
+          "not_run": 0,
+          "undetectable": 0,
+          "unstable": 0
+        },
+        "C": {
+          "accuracy": {
+            "high": 0.35433043506668743,
+            "k": 0,
+            "low": 5.551115123125783e-17,
+            "n": 7,
+            "rate": 0.0
+          },
+          "accuracy_with_acceptable": {
+            "high": 0.35433043506668743,
+            "k": 0,
+            "low": 5.551115123125783e-17,
+            "n": 7,
+            "rate": 0.0
+          },
+          "confusion": {
+            "allow": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "block": {
+              "allow": 7,
+              "block": 0,
+              "challenge": 0
+            },
+            "challenge": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            }
+          },
+          "cost_per_action_usd": null,
+          "detection": {
+            "high": 0.35433043506668743,
+            "k": 0,
+            "low": 5.551115123125783e-17,
+            "n": 7,
+            "rate": 0.0
+          },
+          "latency_ms": {
+            "p50": null,
+            "p95": null
+          },
+          "legit_block_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "legit_challenge_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 7,
+          "not_run": 0,
+          "undetectable": 0,
+          "unstable": 0
+        },
+        "D": {
+          "accuracy": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "accuracy_with_acceptable": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "confusion": {
+            "allow": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "block": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "challenge": {
+              "allow": 1,
+              "block": 0,
+              "challenge": 0
+            }
+          },
+          "cost_per_action_usd": null,
+          "detection": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "latency_ms": {
+            "p50": null,
+            "p95": null
+          },
+          "legit_block_rate": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "legit_challenge_rate": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 1,
+          "not_run": 0,
+          "undetectable": 0,
+          "unstable": 0
+        },
+        "E": {
+          "accuracy": {
+            "high": 0.6576197724933469,
+            "k": 0,
+            "low": 0.0,
+            "n": 2,
+            "rate": 0.0
+          },
+          "accuracy_with_acceptable": {
+            "high": 0.6576197724933469,
+            "k": 0,
+            "low": 0.0,
+            "n": 2,
+            "rate": 0.0
+          },
+          "confusion": {
+            "allow": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "block": {
+              "allow": 2,
+              "block": 0,
+              "challenge": 0
+            },
+            "challenge": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            }
+          },
+          "cost_per_action_usd": null,
+          "detection": {
+            "high": 0.6576197724933469,
+            "k": 0,
+            "low": 0.0,
+            "n": 2,
+            "rate": 0.0
+          },
+          "latency_ms": {
+            "p50": null,
+            "p95": null
+          },
+          "legit_block_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "legit_challenge_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 2,
+          "not_run": 0,
+          "undetectable": 0,
+          "unstable": 0
+        }
+      },
+      "dev": {
+        "A": {
+          "accuracy": {
+            "high": 1.0,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
+            "rate": 1.0
+          },
+          "accuracy_with_acceptable": {
+            "high": 1.0,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
+            "rate": 1.0
+          },
+          "confusion": {
+            "allow": {
+              "allow": 1,
+              "block": 0,
+              "challenge": 0
+            },
+            "block": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "challenge": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            }
+          },
+          "cost_per_action_usd": null,
+          "detection": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "latency_ms": {
+            "p50": null,
+            "p95": null
+          },
+          "legit_block_rate": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "legit_challenge_rate": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 1,
+          "not_run": 0,
+          "undetectable": 0,
+          "unstable": 0
+        },
+        "D": {
+          "accuracy": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "accuracy_with_acceptable": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "confusion": {
+            "allow": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "block": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "challenge": {
+              "allow": 1,
+              "block": 0,
+              "challenge": 0
+            }
+          },
+          "cost_per_action_usd": null,
+          "detection": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "latency_ms": {
+            "p50": null,
+            "p95": null
+          },
+          "legit_block_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "legit_challenge_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 1,
+          "not_run": 0,
+          "undetectable": 0,
+          "unstable": 0
+        },
+        "E": {
+          "accuracy": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "accuracy_with_acceptable": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "confusion": {
+            "allow": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "block": {
+              "allow": 1,
+              "block": 0,
+              "challenge": 0
+            },
+            "challenge": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            }
+          },
+          "cost_per_action_usd": null,
+          "detection": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "latency_ms": {
+            "p50": null,
+            "p95": null
+          },
+          "legit_block_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "legit_challenge_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 1,
+          "not_run": 0,
+          "undetectable": 0,
+          "unstable": 0
+        },
+        "risk (A, D, E, F)": {
+          "accuracy": {
+            "high": 0.7923403991979522,
+            "k": 1,
+            "low": 0.06149194472039621,
+            "n": 3,
+            "rate": 0.3333333333333333
+          },
+          "accuracy_with_acceptable": {
+            "high": 0.7923403991979522,
+            "k": 1,
+            "low": 0.06149194472039621,
+            "n": 3,
+            "rate": 0.3333333333333333
+          },
+          "confusion": {
+            "allow": {
+              "allow": 1,
+              "block": 0,
+              "challenge": 0
+            },
+            "block": {
+              "allow": 1,
+              "block": 0,
+              "challenge": 0
+            },
+            "challenge": {
+              "allow": 1,
+              "block": 0,
+              "challenge": 0
+            }
+          },
+          "cost_per_action_usd": null,
+          "detection": {
+            "high": 0.6576197724933469,
+            "k": 0,
+            "low": 0.0,
+            "n": 2,
+            "rate": 0.0
+          },
+          "latency_ms": {
+            "p50": null,
+            "p95": null
+          },
+          "legit_block_rate": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "legit_challenge_rate": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 3,
+          "not_run": 0,
+          "undetectable": 0,
+          "unstable": 0
+        }
+      }
+    },
+    "always_challenge": {
+      "deterministic": {
+        "B": {
+          "accuracy": {
+            "high": 0.3331395092109959,
+            "k": 1,
+            "low": 0.013710421242556586,
+            "n": 13,
+            "rate": 0.07692307692307693
+          },
+          "accuracy_with_acceptable": {
+            "high": 0.4223463101948254,
+            "k": 2,
+            "low": 0.043258178358081184,
+            "n": 13,
+            "rate": 0.15384615384615385
+          },
+          "confusion": {
+            "allow": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 1
+            },
+            "block": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 11
+            },
+            "challenge": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 1
+            }
+          },
+          "cost_per_action_usd": null,
+          "detection": {
+            "high": 1.0,
+            "k": 11,
+            "low": 0.7411670330319684,
+            "n": 11,
+            "rate": 1.0
+          },
+          "latency_ms": {
+            "p50": null,
+            "p95": null
+          },
+          "legit_block_rate": {
+            "high": 0.6576197724933469,
+            "k": 0,
+            "low": 0.0,
+            "n": 2,
+            "rate": 0.0
+          },
+          "legit_challenge_rate": {
+            "high": 1.0,
+            "k": 2,
+            "low": 0.34238022750665303,
+            "n": 2,
+            "rate": 1.0
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 13,
+          "not_run": 0,
+          "undetectable": 0,
+          "unstable": 0
+        },
+        "C": {
+          "accuracy": {
+            "high": 0.35433043506668743,
+            "k": 0,
+            "low": 5.551115123125783e-17,
+            "n": 7,
+            "rate": 0.0
+          },
+          "accuracy_with_acceptable": {
+            "high": 0.35433043506668743,
+            "k": 0,
+            "low": 5.551115123125783e-17,
+            "n": 7,
+            "rate": 0.0
+          },
+          "confusion": {
+            "allow": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "block": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 7
+            },
+            "challenge": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            }
+          },
+          "cost_per_action_usd": null,
+          "detection": {
+            "high": 1.0,
+            "k": 7,
+            "low": 0.6456695649333126,
+            "n": 7,
+            "rate": 1.0
+          },
+          "latency_ms": {
+            "p50": null,
+            "p95": null
+          },
+          "legit_block_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "legit_challenge_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 7,
+          "not_run": 0,
+          "undetectable": 0,
+          "unstable": 0
+        },
+        "D": {
+          "accuracy": {
+            "high": 1.0,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
+            "rate": 1.0
+          },
+          "accuracy_with_acceptable": {
+            "high": 1.0,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
+            "rate": 1.0
+          },
+          "confusion": {
+            "allow": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "block": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "challenge": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 1
+            }
+          },
+          "cost_per_action_usd": null,
+          "detection": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "latency_ms": {
+            "p50": null,
+            "p95": null
+          },
+          "legit_block_rate": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "legit_challenge_rate": {
+            "high": 1.0,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
+            "rate": 1.0
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 1,
+          "not_run": 0,
+          "undetectable": 0,
+          "unstable": 0
+        },
+        "E": {
+          "accuracy": {
+            "high": 0.6576197724933469,
+            "k": 0,
+            "low": 0.0,
+            "n": 2,
+            "rate": 0.0
+          },
+          "accuracy_with_acceptable": {
+            "high": 1.0,
+            "k": 2,
+            "low": 0.34238022750665303,
+            "n": 2,
+            "rate": 1.0
+          },
+          "confusion": {
+            "allow": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "block": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 2
+            },
+            "challenge": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            }
+          },
+          "cost_per_action_usd": null,
+          "detection": {
+            "high": 1.0,
+            "k": 2,
+            "low": 0.34238022750665303,
+            "n": 2,
+            "rate": 1.0
+          },
+          "latency_ms": {
+            "p50": null,
+            "p95": null
+          },
+          "legit_block_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "legit_challenge_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 2,
+          "not_run": 0,
+          "undetectable": 0,
+          "unstable": 0
+        }
+      },
+      "dev": {
+        "A": {
+          "accuracy": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "accuracy_with_acceptable": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "confusion": {
+            "allow": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 1
+            },
+            "block": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "challenge": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            }
+          },
+          "cost_per_action_usd": null,
+          "detection": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "latency_ms": {
+            "p50": null,
+            "p95": null
+          },
+          "legit_block_rate": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "legit_challenge_rate": {
+            "high": 1.0,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
+            "rate": 1.0
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 1,
+          "not_run": 0,
+          "undetectable": 0,
+          "unstable": 0
+        },
+        "D": {
+          "accuracy": {
+            "high": 1.0,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
+            "rate": 1.0
+          },
+          "accuracy_with_acceptable": {
+            "high": 1.0,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
+            "rate": 1.0
+          },
+          "confusion": {
+            "allow": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "block": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "challenge": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 1
+            }
+          },
+          "cost_per_action_usd": null,
+          "detection": {
+            "high": 1.0,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
+            "rate": 1.0
+          },
+          "latency_ms": {
+            "p50": null,
+            "p95": null
+          },
+          "legit_block_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "legit_challenge_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 1,
+          "not_run": 0,
+          "undetectable": 0,
+          "unstable": 0
+        },
+        "E": {
+          "accuracy": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "accuracy_with_acceptable": {
+            "high": 1.0,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
+            "rate": 1.0
+          },
+          "confusion": {
+            "allow": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "block": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 1
+            },
+            "challenge": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            }
+          },
+          "cost_per_action_usd": null,
+          "detection": {
+            "high": 1.0,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
+            "rate": 1.0
+          },
+          "latency_ms": {
+            "p50": null,
+            "p95": null
+          },
+          "legit_block_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "legit_challenge_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 1,
+          "not_run": 0,
+          "undetectable": 0,
+          "unstable": 0
+        },
+        "risk (A, D, E, F)": {
+          "accuracy": {
+            "high": 0.7923403991979522,
+            "k": 1,
+            "low": 0.06149194472039621,
+            "n": 3,
+            "rate": 0.3333333333333333
+          },
+          "accuracy_with_acceptable": {
+            "high": 0.9385080552796037,
+            "k": 2,
+            "low": 0.2076596008020477,
+            "n": 3,
+            "rate": 0.6666666666666666
+          },
+          "confusion": {
+            "allow": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 1
+            },
+            "block": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 1
+            },
+            "challenge": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 1
+            }
+          },
+          "cost_per_action_usd": null,
+          "detection": {
+            "high": 1.0,
+            "k": 2,
+            "low": 0.34238022750665303,
+            "n": 2,
+            "rate": 1.0
+          },
+          "latency_ms": {
+            "p50": null,
+            "p95": null
+          },
+          "legit_block_rate": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "legit_challenge_rate": {
+            "high": 1.0,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
+            "rate": 1.0
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 3,
+          "not_run": 0,
+          "undetectable": 0,
+          "unstable": 0
+        }
+      }
+    },
+    "rules": {
+      "deterministic": {
+        "B": {
+          "accuracy": {
+            "high": 0.9862895787574435,
+            "k": 12,
+            "low": 0.6668604907890041,
+            "n": 13,
+            "rate": 0.9230769230769231
+          },
+          "accuracy_with_acceptable": {
+            "high": 0.9999999999999999,
+            "k": 13,
+            "low": 0.7719046276458016,
+            "n": 13,
+            "rate": 1.0
+          },
+          "confusion": {
+            "allow": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 1
+            },
+            "block": {
+              "allow": 0,
+              "block": 11,
+              "challenge": 0
+            },
+            "challenge": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 1
+            }
+          },
+          "cost_per_action_usd": 0.0,
+          "detection": {
+            "high": 1.0,
+            "k": 11,
+            "low": 0.7411670330319684,
+            "n": 11,
+            "rate": 1.0
+          },
+          "latency_ms": {
+            "p50": 22.0,
+            "p95": 25.8
+          },
+          "legit_block_rate": {
+            "high": 0.6576197724933469,
+            "k": 0,
+            "low": 0.0,
+            "n": 2,
+            "rate": 0.0
+          },
+          "legit_challenge_rate": {
+            "high": 1.0,
+            "k": 2,
+            "low": 0.34238022750665303,
+            "n": 2,
+            "rate": 1.0
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 13,
+          "not_run": 0,
+          "undetectable": 0,
+          "unstable": 0
+        },
+        "C": {
+          "accuracy": {
+            "high": 1.0,
+            "k": 7,
+            "low": 0.6456695649333126,
+            "n": 7,
+            "rate": 1.0
+          },
+          "accuracy_with_acceptable": {
+            "high": 1.0,
+            "k": 7,
+            "low": 0.6456695649333126,
+            "n": 7,
+            "rate": 1.0
+          },
+          "confusion": {
+            "allow": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "block": {
+              "allow": 0,
+              "block": 7,
+              "challenge": 0
+            },
+            "challenge": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            }
+          },
+          "cost_per_action_usd": 0.0,
+          "detection": {
+            "high": 1.0,
+            "k": 7,
+            "low": 0.6456695649333126,
+            "n": 7,
+            "rate": 1.0
+          },
+          "latency_ms": {
+            "p50": 0.0,
+            "p95": 3.8000000000000007
+          },
+          "legit_block_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "legit_challenge_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 7,
+          "not_run": 0,
+          "undetectable": 0,
+          "unstable": 0
+        },
+        "D": {
+          "accuracy": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "accuracy_with_acceptable": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "confusion": {
+            "allow": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "block": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "challenge": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            }
+          },
+          "cost_per_action_usd": null,
+          "detection": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "latency_ms": {
+            "p50": null,
+            "p95": null
+          },
+          "legit_block_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "legit_challenge_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 0,
+          "not_run": 1,
+          "undetectable": 0,
+          "unstable": 0
+        },
+        "E": {
+          "accuracy": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "accuracy_with_acceptable": {
+            "high": 1.0,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
+            "rate": 1.0
+          },
+          "confusion": {
+            "allow": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "block": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 1
+            },
+            "challenge": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            }
+          },
+          "cost_per_action_usd": 0.0,
+          "detection": {
+            "high": 1.0,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
+            "rate": 1.0
+          },
+          "latency_ms": {
+            "p50": 14.0,
+            "p95": 14.0
+          },
+          "legit_block_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "legit_challenge_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 1,
+          "not_run": 1,
+          "undetectable": 0,
+          "unstable": 0
+        }
+      },
+      "dev": {
+        "A": {
+          "accuracy": {
+            "high": 1.0,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
+            "rate": 1.0
+          },
+          "accuracy_with_acceptable": {
+            "high": 1.0,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
+            "rate": 1.0
+          },
+          "confusion": {
+            "allow": {
+              "allow": 1,
+              "block": 0,
+              "challenge": 0
+            },
+            "block": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "challenge": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            }
+          },
+          "cost_per_action_usd": 0.0,
+          "detection": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "latency_ms": {
+            "p50": 12.0,
+            "p95": 12.0
+          },
+          "legit_block_rate": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "legit_challenge_rate": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 1,
+          "not_run": 0,
+          "undetectable": 0,
+          "unstable": 0
+        },
+        "D": {
+          "accuracy": {
+            "high": 1.0,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
+            "rate": 1.0
+          },
+          "accuracy_with_acceptable": {
+            "high": 1.0,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
+            "rate": 1.0
+          },
+          "confusion": {
+            "allow": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "block": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "challenge": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 1
+            }
+          },
+          "cost_per_action_usd": 0.0,
+          "detection": {
+            "high": 1.0,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
+            "rate": 1.0
+          },
+          "latency_ms": {
+            "p50": 15.0,
+            "p95": 15.0
+          },
+          "legit_block_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "legit_challenge_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 1,
+          "not_run": 0,
+          "undetectable": 0,
+          "unstable": 0
+        },
+        "E": {
+          "accuracy": {
+            "high": 1.0,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
+            "rate": 1.0
+          },
+          "accuracy_with_acceptable": {
+            "high": 1.0,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
+            "rate": 1.0
+          },
+          "confusion": {
+            "allow": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            },
+            "block": {
+              "allow": 0,
+              "block": 1,
+              "challenge": 0
+            },
+            "challenge": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 0
+            }
+          },
+          "cost_per_action_usd": 0.0,
+          "detection": {
+            "high": 1.0,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
+            "rate": 1.0
+          },
+          "latency_ms": {
+            "p50": 16.0,
+            "p95": 16.0
+          },
+          "legit_block_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "legit_challenge_rate": {
+            "high": 1.0,
+            "k": 0,
+            "low": 0.0,
+            "n": 0,
+            "rate": null
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 1,
+          "not_run": 0,
+          "undetectable": 0,
+          "unstable": 0
+        },
+        "risk (A, D, E, F)": {
+          "accuracy": {
+            "high": 1.0,
+            "k": 3,
+            "low": 0.4385029682449546,
+            "n": 3,
+            "rate": 1.0
+          },
+          "accuracy_with_acceptable": {
+            "high": 1.0,
+            "k": 3,
+            "low": 0.4385029682449546,
+            "n": 3,
+            "rate": 1.0
+          },
+          "confusion": {
+            "allow": {
+              "allow": 1,
+              "block": 0,
+              "challenge": 0
+            },
+            "block": {
+              "allow": 0,
+              "block": 1,
+              "challenge": 0
+            },
+            "challenge": {
+              "allow": 0,
+              "block": 0,
+              "challenge": 1
+            }
+          },
+          "cost_per_action_usd": 0.0,
+          "detection": {
+            "high": 1.0,
+            "k": 2,
+            "low": 0.34238022750665303,
+            "n": 2,
+            "rate": 1.0
+          },
+          "latency_ms": {
+            "p50": 15.0,
+            "p95": 15.9
+          },
+          "legit_block_rate": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "legit_challenge_rate": {
+            "high": 0.7934506856227626,
+            "k": 0,
+            "low": 0.0,
+            "n": 1,
+            "rate": 0.0
+          },
+          "lowerings": {
+            "legitimate": 0,
+            "not_legitimate": 0
+          },
+          "n": 3,
+          "not_run": 0,
+          "undetectable": 0,
+          "unstable": 0
+        }
+      }
+    }
+  },
+  "models": [],
+  "not_run": {
+    "always_allow": {
+      "deterministic": 0,
+      "dev": 0
+    },
+    "always_challenge": {
+      "deterministic": 0,
+      "dev": 0
+    },
+    "rules": {
+      "deterministic": 2,
+      "dev": 0
+    }
+  },
+  "prices_used": {},
+  "seeds": {},
+  "set_hashes": {
+    "deterministic": [
+      "c6b67bcf16858b0b288d51ca87ff8746f41c5e822ef35f57b51aceee097a42e9"
+    ],
+    "dev": [
+      "d015f457ed5d92f7080071ef586e755b34c0a18c09a47febd252687c21aa7e46"
+    ]
+  },
+  "sets": {
+    "deterministic": {
+      "B": 13,
+      "C": 7,
+      "D": 1,
+      "E": 2
+    },
+    "dev": {
+      "A": 1,
+      "D": 1,
+      "E": 1
+    }
+  },
+  "side_by_side": {
+    "always_allow": {
+      "dev": {
+        "accuracy": {
+          "high": 0.7923403991979522,
+          "k": 1,
+          "low": 0.06149194472039621,
+          "n": 3,
+          "rate": 0.3333333333333333
+        },
+        "accuracy_with_acceptable": {
+          "high": 0.7923403991979522,
+          "k": 1,
+          "low": 0.06149194472039621,
+          "n": 3,
+          "rate": 0.3333333333333333
+        },
+        "confusion": {
+          "allow": {
+            "allow": 1,
+            "block": 0,
+            "challenge": 0
+          },
+          "block": {
+            "allow": 1,
+            "block": 0,
+            "challenge": 0
+          },
+          "challenge": {
+            "allow": 1,
+            "block": 0,
+            "challenge": 0
+          }
+        },
+        "cost_per_action_usd": null,
+        "detection": {
+          "high": 0.6576197724933469,
+          "k": 0,
+          "low": 0.0,
+          "n": 2,
+          "rate": 0.0
+        },
+        "latency_ms": {
+          "p50": null,
+          "p95": null
+        },
+        "legit_block_rate": {
+          "high": 0.7934506856227626,
+          "k": 0,
+          "low": 0.0,
+          "n": 1,
+          "rate": 0.0
+        },
+        "legit_challenge_rate": {
+          "high": 0.7934506856227626,
+          "k": 0,
+          "low": 0.0,
+          "n": 1,
+          "rate": 0.0
+        },
+        "lowerings": {
+          "legitimate": 0,
+          "not_legitimate": 0
+        },
+        "n": 3,
+        "not_run": 0,
+        "undetectable": 0,
+        "unstable": 0
+      }
+    },
+    "always_challenge": {
+      "dev": {
+        "accuracy": {
+          "high": 0.7923403991979522,
+          "k": 1,
+          "low": 0.06149194472039621,
+          "n": 3,
+          "rate": 0.3333333333333333
+        },
+        "accuracy_with_acceptable": {
+          "high": 0.9385080552796037,
+          "k": 2,
+          "low": 0.2076596008020477,
+          "n": 3,
+          "rate": 0.6666666666666666
+        },
+        "confusion": {
+          "allow": {
+            "allow": 0,
+            "block": 0,
+            "challenge": 1
+          },
+          "block": {
+            "allow": 0,
+            "block": 0,
+            "challenge": 1
+          },
+          "challenge": {
+            "allow": 0,
+            "block": 0,
+            "challenge": 1
+          }
+        },
+        "cost_per_action_usd": null,
+        "detection": {
+          "high": 1.0,
+          "k": 2,
+          "low": 0.34238022750665303,
+          "n": 2,
+          "rate": 1.0
+        },
+        "latency_ms": {
+          "p50": null,
+          "p95": null
+        },
+        "legit_block_rate": {
+          "high": 0.7934506856227626,
+          "k": 0,
+          "low": 0.0,
+          "n": 1,
+          "rate": 0.0
+        },
+        "legit_challenge_rate": {
+          "high": 1.0,
+          "k": 1,
+          "low": 0.20654931437723745,
+          "n": 1,
+          "rate": 1.0
+        },
+        "lowerings": {
+          "legitimate": 0,
+          "not_legitimate": 0
+        },
+        "n": 3,
+        "not_run": 0,
+        "undetectable": 0,
+        "unstable": 0
+      }
+    },
+    "rules": {
+      "dev": {
+        "accuracy": {
+          "high": 1.0,
+          "k": 3,
+          "low": 0.4385029682449546,
+          "n": 3,
+          "rate": 1.0
+        },
+        "accuracy_with_acceptable": {
+          "high": 1.0,
+          "k": 3,
+          "low": 0.4385029682449546,
+          "n": 3,
+          "rate": 1.0
+        },
+        "confusion": {
+          "allow": {
+            "allow": 1,
+            "block": 0,
+            "challenge": 0
+          },
+          "block": {
+            "allow": 0,
+            "block": 1,
+            "challenge": 0
+          },
+          "challenge": {
+            "allow": 0,
+            "block": 0,
+            "challenge": 1
+          }
+        },
+        "cost_per_action_usd": 0.0,
+        "detection": {
+          "high": 1.0,
+          "k": 2,
+          "low": 0.34238022750665303,
+          "n": 2,
+          "rate": 1.0
+        },
+        "latency_ms": {
+          "p50": 15.0,
+          "p95": 15.9
+        },
+        "legit_block_rate": {
+          "high": 0.7934506856227626,
+          "k": 0,
+          "low": 0.0,
+          "n": 1,
+          "rate": 0.0
+        },
+        "legit_challenge_rate": {
+          "high": 0.7934506856227626,
+          "k": 0,
+          "low": 0.0,
+          "n": 1,
+          "rate": 0.0
+        },
+        "lowerings": {
+          "legitimate": 0,
+          "not_legitimate": 0
+        },
+        "n": 3,
+        "not_run": 0,
+        "undetectable": 0,
+        "unstable": 0
+      }
+    }
+  },
+  "stale_sets": [],
+  "test_combinations_shared_with_dev": null,
+  "undetectable": [],
+  "versions": {
+    "engine_version": [
+      "a41533b"
+    ],
+    "policy_version": [
+      "2026-10-28.3"
+    ],
+    "seed_version": [
+      "3574ce8f0cef1de72c159f3b2c98128410721da8c4016114bf90928e6958909c"
+    ]
+  }
+}

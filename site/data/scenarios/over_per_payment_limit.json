@@ -1,0 +1,215 @@
+{
+  "_note": "Illustrative result. Synthetic data in Rho's shapes; no model was run; latency and cost are unmeasured (null). Replace with a live POST /v1/scenarios/{name}/run response once the engine exists. See docs/reference/demo-api.md.",
+  "context": {
+    "bill": {
+      "amount": {
+        "amount": 720000,
+        "currency": "USD"
+      },
+      "counterparty_id": "cp_0019",
+      "counterparty_name": "Pinecrest IT Services",
+      "document_excerpt": "Invoice PIT-4471. Network hardware refresh: 2 switches, installation. Total due $7,200.00 by Nov 5, 2026.",
+      "due_date": "2026-11-05",
+      "id": "bill_0207",
+      "invoice_date": "2026-10-22",
+      "invoice_number": "PIT-4471",
+      "memo": "Network hardware refresh",
+      "status": null
+    },
+    "bill_counterparty": null,
+    "bill_counterparty_payment_history": null,
+    "business": {
+      "id": "biz_seed_01",
+      "name": "Larkspur Analytics (synthetic)"
+    },
+    "counterparty": {
+      "created_at": "2025-09-15T16:00:00Z",
+      "id": "cp_0019",
+      "name": "Pinecrest IT Services",
+      "payment_methods": [
+        {
+          "added_at": "2025-09-15T16:00:00Z",
+          "bank_name": "Summit National Bank",
+          "id": "pm_0019_01",
+          "is_default": true,
+          "type": "ach"
+        }
+      ],
+      "status": "active"
+    },
+    "gateway_payments": [],
+    "open_bills": [],
+    "payment_history": {
+      "count": 5,
+      "first_at": "2025-10-03T15:00:00Z",
+      "last_at": "2026-08-14T15:30:00Z",
+      "median_amount": {
+        "amount": 240000,
+        "currency": "USD"
+      },
+      "recent": [
+        {
+          "amount": {
+            "amount": 260000,
+            "currency": "USD"
+          },
+          "id": "txn_0770",
+          "method_type": "ach",
+          "posted_at": "2026-08-14T15:30:00Z"
+        }
+      ]
+    },
+    "payment_method_history": []
+  },
+  "decision_record": {
+    "authorization": {
+      "authorization_id": "auth_0001",
+      "snapshot": {
+        "actions": [
+          "propose_payment"
+        ],
+        "agent_id": "agent_ap_assistant_01",
+        "allow_new_counterparties": false,
+        "authorization_id": "auth_0001",
+        "business_id": "biz_seed_01",
+        "counterparties": {
+          "ids": [],
+          "mode": "any"
+        },
+        "expires_at": "2026-12-31T23:59:59Z",
+        "granted_at": "2026-10-01T16:00:00Z",
+        "granted_by": "finance-owner@larkspur.example",
+        "human_approval_above": {
+          "amount": 1000000,
+          "currency": "USD"
+        },
+        "limits": {
+          "per_payment": {
+            "amount": 500000,
+            "currency": "USD"
+          },
+          "rolling": null
+        },
+        "policy_version": "2026-10-28.1",
+        "revoked_at": null,
+        "status": "active",
+        "version": 1
+      },
+      "version": 1,
+      "violations": [
+        {
+          "field": "limits.per_payment",
+          "kind": "limit",
+          "limit": {
+            "amount": 500000,
+            "currency": "USD"
+          },
+          "observed": {
+            "amount": 720000,
+            "currency": "USD"
+          }
+        }
+      ]
+    },
+    "challenge": null,
+    "configuration": {
+      "escalation": "engineered",
+      "jev_min_confidence": 0.8,
+      "jev_min_finding_confidence": 0.9,
+      "tiers": [
+        "tier0",
+        "strong"
+      ]
+    },
+    "cost": {
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "prices_used": {},
+      "unpriced_models": [],
+      "usd": 0.0
+    },
+    "created_at": "2026-10-27T22:00:00Z",
+    "decision": "block",
+    "decision_id": "dec_400300acf9bb4f85",
+    "engine_version": null,
+    "execution": {
+      "simulated": true,
+      "status": "blocked"
+    },
+    "friction_rung": 5,
+    "identity": {
+      "business_id": "biz_seed_01",
+      "checked": [
+        "present",
+        "known",
+        "active",
+        "timestamp",
+        "nonce",
+        "signature"
+      ],
+      "claimed_agent_id": "agent_ap_assistant_01",
+      "key_id": "agent_ap_assistant_01",
+      "nonce": "8525beb568d50a451e78397e0575c493",
+      "owner": "finance-owner@larkspur.example",
+      "result": "verified",
+      "timestamp": "2026-10-27T22:00:00+00:00"
+    },
+    "latency_ms": {
+      "authorization": 0,
+      "identity": 0,
+      "total": 3
+    },
+    "policy_version": "2026-10-28.3",
+    "reasons": [
+      "authorization:limits.per_payment"
+    ],
+    "review": null,
+    "risk": {
+      "features": {},
+      "floor": null,
+      "level": null,
+      "level_set_by": null,
+      "lowered": null,
+      "model_rationale": null,
+      "repeat_limit_reached": false,
+      "reused_from": null,
+      "signals": [],
+      "tier_results": [],
+      "tiers_run": []
+    },
+    "sandbox": {
+      "scenario": "over_per_payment_limit"
+    },
+    "schema_version": 1,
+    "seed_version": "3574ce8f0cef1de72c159f3b2c98128410721da8c4016114bf90928e6958909c"
+  },
+  "illustrative": false,
+  "proposal": {
+    "agent_rationale": "Approved hardware refresh invoice from our IT vendor; paying in full before the due date.",
+    "amount": {
+      "amount": 720000,
+      "currency": "USD"
+    },
+    "bill_id": "bill_0207",
+    "counterparty_id": "cp_0019",
+    "memo": "Invoice PIT-4471",
+    "payment_method_id": "pm_0019_01",
+    "source_account_id": "acct_seed_checking_01",
+    "source_document_ids": [
+      "bill_0207"
+    ]
+  },
+  "recorded": {
+    "at": "2026-10-28T12:50:40+00:00",
+    "live_models": false
+  },
+  "replayed_stages": [],
+  "scenario": {
+    "expected": "block",
+    "name": "over_per_payment_limit",
+    "summary": "A verified agent proposes a $7,200 payment; its authorization caps single payments at $5,000. Identity passes; the authorization check blocks before any risk model runs.",
+    "title": "Verified agent exceeds its per-payment limit"
+  }
+}

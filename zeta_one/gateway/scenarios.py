@@ -39,7 +39,9 @@ def list_scenarios() -> list[dict]:
     return [load_fixture(name).scenario.model_dump() for name in ORDER]
 
 
-def run(name: str) -> ScenarioResult:
+def run(name: str, live_models: bool = False) -> ScenarioResult:
+    """Run one scenario in its sandbox. With `live_models`, a model tier it escalates to is called for
+    real (paid, needs its key) instead of replaying the fixture's recorded answer."""
     from zeta_one.gateway.wiring import build_engine, real_stages
 
     if name not in ORDER:
@@ -55,8 +57,9 @@ def run(name: str) -> ScenarioResult:
                                      identity.owner or "the business owner", key.public_key(), SEED_NOW)
         if scenario.decision_record.authorization.snapshot:
             stages.authorizations.grant(Authorization.model_validate(scenario.decision_record.authorization.snapshot))
-        replayed = sorted(stages.tiers)
-        stages.tiers = {}  # model tiers replay the fixture's recorded answer
+        replayed = [] if live_models else sorted(stages.tiers)
+        if not live_models:
+            stages.tiers = {}  # model tiers replay the fixture's recorded answer
         engine = build_engine(stages, lambda *_: 0, replay=scenario, clock=lambda: SEED_NOW)
         engine = dataclasses.replace(engine, new_id=new_decision_id)
         body = scenario.proposal.model_dump_json().encode()

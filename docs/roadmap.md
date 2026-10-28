@@ -80,8 +80,8 @@ arm; expected cost and an evaluation chart.
 ## Submission (by Thu Oct 29, 5:00 PM CT)
 
 - **Owner:** connect the repo to Vercel, serving `site/` as a static site (decision 0011).
-- A script that records the real engine's five scenario results and the evaluation report into
-  `site/data/`, dated and labelled as recorded; run it after the final evaluation.
+- Run `.venv/bin/python scripts/record_runs.py --live` after the final evaluation, so `site/data/`
+  holds the final report and live scenario results; the site session renders them.
 
 - Confirm the track (aimed at Rho fintech).
 - README sections the checklist requires; see `docs/reference/hackathon.md`.

@@ -98,6 +98,7 @@ git config core.hooksPath .githooks  # once per clone: turns on the pre-push che
 .venv/bin/uvicorn zeta_one.gateway.app:app --port 8000  # the demo API, on 127.0.0.1 (ZETA_RISK_CONFIGURATION=jev for Jev)
 .venv/bin/python -m eval.run --set deterministic --config rules --backend real   # no model calls
 .venv/bin/python -m eval.report      # rebuild data/eval/report.{json,md} from the results
+.venv/bin/python scripts/record_runs.py   # record scenario results and the report into site/data/
 python3 scripts/check.py             # checks that must pass before every push to main
 python3 scripts/staging_check.py     # read-only Rho staging check; needs the VPN and RHO_API_TOKEN in .env
 ```
