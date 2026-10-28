@@ -11,14 +11,17 @@ class FakeBackend:
     """Answers from a table; unknown cases are not run."""
 
     name = "fake"
+    paid = False
+    measures_latency = True
 
-    def __init__(self, answers: dict[str, str]):
+    def __init__(self, answers: dict[str, str], decisions: dict[str, list[str]] | None = None):
         self.answers = answers
+        self.decisions = decisions or {}
 
     def run(self, case, configuration):
         if case.id not in self.answers:
             raise Unsupported("not in the table")
-        return Outcome(decision=self.answers[case.id])
+        return Outcome(decision=self.answers[case.id], decisions=self.decisions.get(case.id, []))
 
 
 def _case(case_id, set_, category, truth, expected, detectable=True, also=()):
@@ -126,3 +129,59 @@ def test_deterministic_cases_are_labelled_by_construction():
     assert all(c.provenance for c in group)
     assert {c.category for c in cases.deterministic_cases()} >= {"B", "C"}
     assert sum(c.set == "deterministic" for c in group) >= 20
+
+
+def test_a_case_whose_repeats_disagree_does_not_pass(data, tmp_path, monkeypatch):
+    monkeypatch.setattr(cases, "demo_cases", lambda: [])
+    answers = {"a1": "allow", "a2": "allow", "d1": "challenge", "e1": "block", "e2": "allow"}
+    backend = FakeBackend(answers, decisions={"e1": ["block", "allow", "block"], "a1": ["allow", "allow"]})
+    rows = {r["case_id"]: r for r in run.run_set("dev", "rules", backend, data=data, results=tmp_path / "r")}
+    assert rows["e1"]["stable"] is False and rows["e1"]["correct"] is False and rows["e1"]["acceptable"] is False
+    assert rows["a1"]["stable"] is True and rows["a1"]["correct"] is True
+
+
+def test_a_case_that_raises_is_not_run_and_the_rest_are_written(data, tmp_path, monkeypatch):
+    monkeypatch.setattr(cases, "demo_cases", lambda: [])
+
+    class Broken(FakeBackend):
+        def run(self, case, configuration):
+            if case.id == "d1":
+                raise RuntimeError("boom")
+            return super().run(case, configuration)
+
+    results = tmp_path / "r"
+    rows = run.run_set("dev", "rules", Broken({"a1": "allow", "a2": "allow", "e1": "block", "e2": "allow"}),
+                       data=data, results=results)
+    assert next(r for r in rows if r["case_id"] == "d1")["not_run"] == "error: RuntimeError: boom"
+    assert len(run.result_path("dev", "rules", results).read_text().splitlines()) == 5
+
+
+def test_rows_record_the_backend_and_the_run_time_set_hash(data, tmp_path, monkeypatch):
+    monkeypatch.setattr(cases, "demo_cases", lambda: [])
+    rows = run.run_set("dev", "rules", FakeBackend({}), data=data, results=tmp_path / "r")
+    digest = sets.set_hash(sets.load_set("dev", data))
+    assert {(r["backend"], r["set_hash"], r["measured_latency"]) for r in rows} == {("fake", digest, True)}
+
+
+class PaidBackend(FakeBackend):
+    name = "paid"
+    paid = True
+
+
+def test_a_paid_backend_needs_live_and_a_budget(data, tmp_path, monkeypatch):
+    monkeypatch.setattr(cases, "demo_cases", lambda: [])
+    with pytest.raises(run.BudgetRequired):
+        run.run_set("dev", "rules", PaidBackend({}), data=data, results=tmp_path / "r")
+    with pytest.raises(run.BudgetRequired):
+        run.run_set("dev", "rules", PaidBackend({}), data=data, results=tmp_path / "r", live=True)
+    run.run_set("dev", "always_allow", PaidBackend({}), data=data, results=tmp_path / "r")  # baselines are free
+
+
+def test_the_budget_stops_starting_cases(data, tmp_path, monkeypatch):
+    monkeypatch.setattr(cases, "demo_cases", lambda: [])
+    budget = run._Budget(1.5)
+    assert not budget.exhausted()
+    budget.add({"record": {"cost": {"usd": 1.0}}})
+    assert not budget.exhausted()
+    budget.add({"record": {"cost": {"usd": 1.0}}})
+    assert budget.exhausted()

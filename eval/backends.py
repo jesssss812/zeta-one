@@ -31,15 +31,21 @@ class Outcome:
 
 class Backend(Protocol):
     name: str
+    # True when a run can call a paid model: the runner then needs --live and a budget.
+    paid: bool
+    # True when the records' latency is the engine's, not a replay's wall-clock time.
+    measures_latency: bool
 
     def run(self, case: Case, configuration: Configuration) -> Outcome: ...
 
 
 class ReplayBackend:
     name = "replay"
+    paid = False
+    measures_latency = False
 
     def __init__(self) -> None:
-        self._fixture_of = {case_id: fixture for fixture, (case_id, *_rest) in hand_cases._DEMO.items()}
+        self._fixture_of = {case_id: fixture for fixture, (case_id, *_rest) in hand_cases.DEMO.items()}
 
     def run(self, case: Case, configuration: Configuration) -> Outcome:
         fixture = self._fixture_of.get(case.id)
