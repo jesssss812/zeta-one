@@ -128,7 +128,7 @@ Rules the site can count on:
 - `risk.lowered` is set when a model lowered soft signals below tier 0's level, and the reasons
   then include `risk:lowered_by_model`; show it, since an allow a model cleared is not the same as
   a clean one. `risk.reused_from` names an earlier decision whose risk result was reused for the
-  same proposal. A `tier_results` entry may carry `error` when that tier failed; the decision is
+  same proposal, after tier 0 ran again and found the same. A `tier_results` entry may carry `error` when that tier failed; the decision is
   then `challenge` with `risk:model_unavailable`. All three are optional; fixtures omit them.
 - `risk.floor` names the tier-0 facts no model was allowed to lower; `risk.level_set_by` names the
   tier that set the final level. `tier_results[].confidence` is non-null only for a calibrated

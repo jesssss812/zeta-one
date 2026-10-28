@@ -11,6 +11,7 @@ from zeta_one.contracts import (
     AuthorizationEvidence,
     Configuration,
     Context,
+    Feature,
     IdentityEvidence,
     InvalidProposal,
     Money,
@@ -45,6 +46,8 @@ class FakeWorld:
             scenario.context.counterparty.id: scenario.context.model_copy(deep=True) for scenario in (HELD, ROUTINE)
         }
         self.strong_calls = 0
+        self.tier0_calls = 0
+        self.extra_features: dict[str, Feature] = {}
 
     # --- stages ---
 
@@ -101,12 +104,13 @@ class FakeWorld:
         return context.model_copy(deep=True)
 
     def tier0(self, proposal: Proposal, context: Context, now: datetime) -> Tier0Output:
+        self.tier0_calls += 1
         source = HELD if context.payment_method_history else ROUTINE
         risk = source.decision_record.risk
         return Tier0Output(
             result=next(r for r in risk.tier_results if r.tier == "tier0"),
             signals=[s for s in risk.signals if s.source == "tier0"],
-            features=risk.features,
+            features={**risk.features, **self.extra_features},
         )
 
     class _Strong:

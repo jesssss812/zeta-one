@@ -2,9 +2,11 @@
 
 A proposal with the same fingerprint (agent, counterparty, payment method, amount, currency, bill)
 under the same configuration within 24 hours reuses the earlier risk result instead of asking the
-models again, provided the payee's payment methods haven't changed since. Identity and
-authorization still run every time. The reused result names the decision it came from in
-`risk.reused_from` and carries no token usage, since no model was called for it.
+models again, provided the payee's payment methods haven't changed since. Identity, authorization
+and tier 0 still run every time: the earlier result is reused only if tier 0 finds exactly what it
+found then, so a hard flag raised since (a bill that opened, new instruction text) is never skipped.
+The reused result names the decision it came from in `risk.reused_from` and carries no token usage,
+since no model was called for it.
 """
 
 import hashlib
@@ -12,7 +14,15 @@ import json
 import sqlite3
 from datetime import UTC, datetime, timedelta
 
-from zeta_one.contracts import Configuration, Context, EvidenceRecord, IdentityEvidence, Proposal, RiskEvidence
+from zeta_one.contracts import (
+    Configuration,
+    Context,
+    EvidenceRecord,
+    IdentityEvidence,
+    Proposal,
+    RiskEvidence,
+    Tier0Output,
+)
 from zeta_one.gateway.ledger import payment_method_state
 from zeta_one.gateway.pipeline import Engine
 
@@ -47,6 +57,16 @@ def _configuration_key(configuration: Configuration) -> str:
     return configuration.model_dump_json()
 
 
+def _same_tier0(fresh: Tier0Output, risk: RiskEvidence) -> bool:
+    earlier = next((result for result in risk.tier_results if result.tier == "tier0"), None)
+    features = {name: feature.model_dump(mode="json") for name, feature in fresh.features.items()}
+    return (
+        earlier is not None
+        and fresh.result.level == earlier.level
+        and features == {name: feature.model_dump(mode="json") for name, feature in risk.features.items()}
+    )
+
+
 def _iso(moment: datetime) -> str:
     return moment.astimezone(UTC).isoformat()
 
@@ -66,6 +86,8 @@ class RiskReuse:
         if earlier is None:
             return engine.run_tiers(proposal, context, now, identity)
         decision_id, risk = earlier
+        if not _same_tier0(engine.tier0(proposal, context, now), risk):
+            return engine.run_tiers(proposal, context, now, identity)
         results = [result.model_copy(update={"usage": None, "latency_ms": None}) for result in risk.tier_results]
         return risk.model_copy(update={"reused_from": decision_id, "tier_results": results})
 

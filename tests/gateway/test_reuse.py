@@ -6,7 +6,7 @@ from datetime import timedelta
 import pytest
 
 from tests.gateway.fakes import NOW, FakeWorld, agent_headers, held_proposal, routine_proposal
-from zeta_one.contracts import Money, SignedRequest
+from zeta_one.contracts import Feature, Money, SignedRequest
 from zeta_one.gateway.ledger import Ledger
 from zeta_one.gateway.reuse import RiskReuse, fingerprint
 from zeta_one.gateway.service import Gateway
@@ -95,3 +95,19 @@ def test_fingerprint_covers_agent_and_bill():
     assert fingerprint("a", proposal) != fingerprint("b", proposal)
     assert fingerprint("a", proposal) != fingerprint("a", held_proposal(bill_id=None))
     assert fingerprint("a", proposal) == fingerprint("a", held_proposal(memo="different words"))
+
+
+def test_tier_0_runs_again_on_reuse(gateway, world):
+    send(gateway, held_proposal())
+    send(gateway, held_proposal())
+    assert world.tier0_calls == 2 and world.strong_calls == 1
+
+
+def test_a_hard_flag_raised_since_means_a_fresh_assessment(gateway, world):
+    """A bill for the payee opened after the first decision: tier 0 now flags it, so no reuse."""
+    first = send(gateway, routine_proposal())
+    world.extra_features = {"bill_not_referenced": Feature(value=True, evidence=["bill_new"])}
+    second = send(gateway, routine_proposal())
+    assert second["risk"]["reused_from"] is None
+    assert second["risk"]["features"]["bill_not_referenced"]["value"] is True
+    assert first["decision"] == "allow" and second["decision"] != "allow"
