@@ -1,0 +1,10 @@
+{
+  "tool_calls": 0,
+  "tools_offered": [],
+  "route": "anthropic_api",
+  "model": "claude-sonnet-5-5",
+  "usage": {
+    "input_tokens": 36784,
+    "output_tokens": 3828
+  }
+}
