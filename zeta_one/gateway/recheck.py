@@ -1,7 +1,8 @@
 """The recheck before a held payment executes (security.md, S9).
 
 Approving a held payment reruns the deterministic checks on today's state; any change from the state
-it was decided on blocks it.
+it was decided on blocks it. A payment held because its context couldn't be loaded has no recorded
+payment-method state, so it can never be approved: reject it and have the agent propose it again.
 """
 
 from datetime import datetime

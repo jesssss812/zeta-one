@@ -123,7 +123,7 @@ describes how it is produced). Fields the site should rely on:
     "floor": null | {"level": "elevated" | "high", "flags": ["<feature name>"]},
     "tiers_run": ["tier0", "strong"],
     "features": {"<name>": {"value", "evidence": ["<record id>"]}},
-    "tier_results": [{"tier": "tier0" | "cheap" | "strong", "model": "<model id>" | null, "level", "confidence": 0.0-1.0 | null, "signals": ["<signal name>"], "latency_ms", "usage": null | {"input_tokens", "output_tokens"}}],
+    "tier_results": [{"tier": "tier0" | "cheap" | "strong", "model": "<model id>" | null, "level", "confidence": 0.0-1.0 | null, "signals": ["<signal name>"], "latency_ms", "usage": null | {"input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens"}, "error": null | "...", "recommended_decision": "allow" | "challenge" | "block" (strong tier only), "answered_level": "<level>" (when the tier raised the model's own level)}],
     "signals": [{"name", "severity": "low" | "elevated" | "high", "evidence": ["<record id>"], "source": "tier0" | "cheap" | "strong"}],
     "lowered": null | {"from": "elevated" | "high", "to": "low" | "elevated", "by": "cheap" | "strong", "signals": ["<soft signal name>"]},
     "reused_from": null | "dec_...",
@@ -150,6 +150,9 @@ Rules the site can count on:
   and a model with no known price is listed in `unpriced_models` and left out of `usd`.
   `latency_ms` has a key for each stage that ran (`identity`, `authorization`, `risk`) and
   `total`; a stage that didn't run has no key.
+- A strong tier result's `recommended_decision` is the model's suggestion, recorded for people;
+  the policy never reads it. Like `model_rationale`, it is model output an attacker may have
+  steered.
 - `model_rationale` is model output, and `proposal.agent_rationale` is the agent's own text; both
   can be written by an attacker. Label both as untrusted text, never as findings.
 - `friction_rung` is `0` for allow, `2`–`4` for the challenge types, `5` for block
