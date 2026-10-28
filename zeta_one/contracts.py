@@ -9,7 +9,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import Annotated, Any, Literal, Protocol
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
 
 from zeta_one.rho.models import Money
 
@@ -451,6 +451,35 @@ class SpendSource(Protocol):
     def __call__(self, agent_id: str, since: datetime, currency: str) -> int: ...
 
 
+# --- Verified outcomes: what a person established after a decision (decision 0012) -----------------
+
+Finding = Literal["legitimate", "payee_fraud", "manipulated_agent", "unauthorized"]
+Verification = Literal[
+    "callback_known_number", "vendor_portal", "bank_confirmation", "signed_customer_attestation",
+    "customer_report", "none",
+]
+# Methods that establish a fact. A customer's report or no check at all records a claim, never a label.
+VERIFYING_METHODS: frozenset[str] = frozenset(
+    {"callback_known_number", "vendor_portal", "bank_confirmation", "signed_customer_attestation"}
+)
+
+
+class VerifiedOutcome(_Open):
+    """What a person found about a decided payment, and how they know. Only a person records one."""
+
+    finding: Finding
+    verification: Verification
+    by: str = Field(min_length=1, max_length=200)
+    at: datetime
+    note: str | None = Field(default=None, max_length=1000)
+    source: Literal["resolve", "report"]
+
+    @computed_field
+    @property
+    def verified(self) -> bool:
+        return self.verification in VERIFYING_METHODS
+
+
 # --- Evaluation cases (seam 6 in the implementation plan) -------------------------------------------
 
 
@@ -473,7 +502,7 @@ class Case(BaseModel):
     """One evaluation case. Only `proposal` and the data its setup produces ever reach the engine."""
 
     id: str
-    set: Literal["deterministic", "dev", "test", "hard"]
+    set: Literal["deterministic", "dev", "test", "hard", "feedback"]
     category: Literal["A", "B", "C", "D", "E", "F"]
     setup: list[SetupOp] = Field(default_factory=list)
     agent: str = "builtin:ap_assistant"

@@ -58,3 +58,4 @@ What is not done yet is in [roadmap.md](roadmap.md). Every document under `docs/
 | [decisions/0009-engineered-escalation.md](decisions/0009-engineered-escalation.md) | Cost savings from engineered escalation, not weaker models; the cheap tier is Jev or nothing |
 | [decisions/0010-gateway-guardrails.md](decisions/0010-gateway-guardrails.md) | Guardrails on the gateway's own weak points: recorded model lowering, fail closed, no re-rolling, admin token, gateway-side bill lookup, rolling limit, recheck on resolve |
 | [decisions/0011-deployment-and-hosting.md](decisions/0011-deployment-and-hosting.md) | Live gateway on the laptop, SQLite state, Anthropic direct, a static Vercel site with recorded real runs, CI on every push |
+| [decisions/0012-verified-outcomes.md](decisions/0012-verified-outcomes.md) | People record what turned out to be true and how they know; only verified findings count, and they feed the stats and the evaluation |

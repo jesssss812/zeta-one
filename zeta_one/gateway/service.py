@@ -15,7 +15,16 @@ from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime, timedelta
 from typing import Any, Literal
 
-from zeta_one.contracts import Context, ContextSource, IdentityEvidence, Proposal, SignedRequest
+from zeta_one.contracts import (
+    Context,
+    ContextSource,
+    Finding,
+    IdentityEvidence,
+    Proposal,
+    SignedRequest,
+    Verification,
+    VerifiedOutcome,
+)
 from zeta_one.gateway.recheck import recheck
 from zeta_one.gateway.ledger import Ledger
 from zeta_one.gateway.pipeline import Engine
@@ -51,6 +60,10 @@ class UnknownChallenge(KeyError):
 
 
 class NotHeld(RuntimeError):
+    pass
+
+
+class UnknownDecision(KeyError):
     pass
 
 
@@ -100,11 +113,29 @@ class Gateway:
         return {"decision": record.decision, "decision_id": record.decision_id, "challenge_id": challenge_id}
 
     def resolve(
-        self, challenge_id: str, outcome: Literal["approve", "reject"], by: str, note: str | None = None
+        self, challenge_id: str, outcome: Literal["approve", "reject"], by: str, note: str | None = None,
+        finding: Finding | None = None, verification: Verification = "none",
     ) -> dict[str, Any]:
-        """A person approves or rejects a held payment. Approval executes it only if nothing changed."""
+        """A person approves or rejects a held payment. Approval executes it only if nothing changed.
+        With `finding`, what they established is recorded as an outcome, with how they know."""
         with self.lock:
-            return self._resolve(challenge_id, outcome, by, note)
+            resolved = self._resolve(challenge_id, outcome, by, note)
+            if finding is not None:
+                self.ledger.add_outcome(resolved["decision_id"], VerifiedOutcome(
+                    finding=finding, verification=verification, by=by, at=self.clock(), note=note, source="resolve"))
+            return resolved
+
+    def report_outcome(
+        self, decision_id: str, finding: Finding, verification: Verification, by: str, note: str | None = None
+    ) -> VerifiedOutcome:
+        """A person records what they later found about any decision, an allowed payment disputed as
+        fraud included. Raises UnknownDecision if there is no such decision."""
+        outcome = VerifiedOutcome(finding=finding, verification=verification, by=by, at=self.clock(), note=note,
+                                  source="report")
+        with self.lock:
+            if not self.ledger.add_outcome(decision_id, outcome):
+                raise UnknownDecision(decision_id)
+        return outcome
 
     def _resolve(
         self, challenge_id: str, outcome: Literal["approve", "reject"], by: str, note: str | None

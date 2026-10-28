@@ -4,6 +4,7 @@ Every decision's evidence record is written here before its payment is executed,
 No money moves: a payment row is the simulated execution (decision 0002). A held payment keeps the
 authorization version and payment-method state it was decided on, so resolving it can recheck them
 (security.md, S9). The executed and held rows are the rolling limit's input (`spend_source`).
+Verified outcomes a person records later are appended, never edited (decision 0012).
 """
 
 import json
@@ -14,7 +15,15 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 from typing import Any
 
-from zeta_one.contracts import Context, EvidenceRecord, ExecutionStatus, PaymentRecord, Proposal, SpendSource
+from zeta_one.contracts import (
+    Context,
+    EvidenceRecord,
+    ExecutionStatus,
+    PaymentRecord,
+    Proposal,
+    SpendSource,
+    VerifiedOutcome,
+)
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS decisions (
@@ -40,6 +49,13 @@ CREATE TABLE IF NOT EXISTS payments (
     payment_method_state TEXT
 );
 CREATE INDEX IF NOT EXISTS payments_spend ON payments (agent_id, currency, status);
+CREATE TABLE IF NOT EXISTS outcomes (
+    outcome_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    decision_id TEXT NOT NULL REFERENCES decisions(decision_id),
+    at TEXT NOT NULL,
+    outcome TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS outcomes_decision ON outcomes (decision_id);
 """
 
 
@@ -132,22 +148,71 @@ class Ledger:
             )
 
     def decision(self, decision_id: str) -> dict[str, Any] | None:
-        """The evidence record as served, with the payment's current status and any review."""
+        """The evidence record as served, with the payment's current status, any review and outcomes."""
         row = self._db.execute(
-            """SELECT d.record, d.review, p.status FROM decisions d
+            """SELECT d.decision_id, d.record, d.review, p.status FROM decisions d
                LEFT JOIN payments p ON p.decision_id = d.decision_id WHERE d.decision_id = ?""",
             (decision_id,),
         ).fetchone()
-        return _served(row) if row else None
+        return self._served(row) if row else None
 
     def decisions(self, limit: int = 50) -> list[dict[str, Any]]:
         rows = self._db.execute(
-            """SELECT d.record, d.review, p.status FROM decisions d
+            """SELECT d.decision_id, d.record, d.review, p.status FROM decisions d
                LEFT JOIN payments p ON p.decision_id = d.decision_id
                ORDER BY d.created_at DESC, d.rowid DESC LIMIT ?""",
             (limit,),
         ).fetchall()
-        return [_served(row) for row in rows]
+        return [self._served(row) for row in rows]
+
+    def add_outcome(self, decision_id: str, outcome: VerifiedOutcome) -> bool:
+        """Append a person's finding to a decision. False if there is no such decision."""
+        if self._db.execute("SELECT 1 FROM decisions WHERE decision_id = ?", (decision_id,)).fetchone() is None:
+            return False
+        with self._db:
+            self._db.execute("INSERT INTO outcomes (decision_id, at, outcome) VALUES (?, ?, ?)",
+                             (decision_id, _iso(outcome.at), outcome.model_dump_json()))
+        return True
+
+    def outcomes(self, decision_id: str) -> list[dict[str, Any]]:
+        rows = self._db.execute("SELECT outcome FROM outcomes WHERE decision_id = ? ORDER BY outcome_id",
+                                (decision_id,)).fetchall()
+        return [json.loads(row["outcome"]) for row in rows]
+
+    def stats(self) -> dict[str, Any]:
+        """Friction and feedback from real decisions: how often challenges end up approved, and what
+        verified outcomes say about allows and challenges. Sandbox scenario records are left out."""
+        rows = self._db.execute(
+            """SELECT d.decision_id, d.record, d.review, p.status FROM decisions d
+               LEFT JOIN payments p ON p.decision_id = d.decision_id""").fetchall()
+        records = [record for record in (self._served(row) for row in rows) if not record.get("sandbox")]
+        decided = {name: sum(r["decision"] == name for r in records) for name in ("allow", "challenge", "block")}
+        challenged = [r for r in records if r["decision"] == "challenge"]
+        reviewed = [r for r in challenged if r.get("review")]
+        approved = sum(r["review"]["outcome"] == "approved" for r in reviewed)
+        latest = {r["decision_id"]: _latest_verified(r.get("outcomes", [])) for r in records}
+        fraud = ("payee_fraud", "manipulated_agent", "unauthorized")
+        return {
+            "decisions": decided,
+            "challenges": {"total": len(challenged), "resolved": len(reviewed), "approved": approved,
+                           "rejected": sum(r["review"]["outcome"] == "rejected" for r in reviewed),
+                           "blocked_on_recheck": sum(r["review"]["outcome"] == "blocked" for r in reviewed),
+                           "approval_rate": approved / len(reviewed) if reviewed else None},
+            "verified_outcomes": {finding: sum(o is not None and o["finding"] == finding for o in latest.values())
+                                  for finding in ("legitimate", *fraud)},
+            "unverified_reports": sum(1 for r in records for o in r.get("outcomes", []) if not o["verified"]),
+            "missed_fraud": sorted(r["decision_id"] for r in records if r["decision"] == "allow"
+                                   and (latest[r["decision_id"]] or {}).get("finding") in fraud),
+            "unneeded_challenges": sorted(r["decision_id"] for r in challenged
+                                          if (latest[r["decision_id"]] or {}).get("finding") == "legitimate"),
+        }
+
+    def _served(self, row: sqlite3.Row) -> dict[str, Any]:
+        record = _served(row)
+        outcomes = self.outcomes(row["decision_id"])
+        if outcomes:
+            record["outcomes"] = outcomes
+        return record
 
     def held(self, challenge_id: str) -> HeldPayment | None:
         row = self._db.execute("SELECT * FROM payments WHERE challenge_id = ?", (challenge_id,)).fetchone()
@@ -213,6 +278,11 @@ class Ledger:
             return self.spend(agent_id, since, currency, exclude)
 
         return spend
+
+
+def _latest_verified(outcomes: list[dict[str, Any]]) -> dict[str, Any] | None:
+    verified = [outcome for outcome in outcomes if outcome.get("verified")]
+    return verified[-1] if verified else None
 
 
 def _served(row: sqlite3.Row) -> dict[str, Any]:

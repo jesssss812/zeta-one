@@ -21,11 +21,11 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from starlette.exceptions import HTTPException
 
 from zeta_one import db
-from zeta_one.contracts import POLICY_VERSION, Authorization, InvalidProposal, SignedRequest
+from zeta_one.contracts import POLICY_VERSION, Authorization, Finding, InvalidProposal, SignedRequest, Verification
 from zeta_one.gateway import admin, scenarios
 from zeta_one.gateway.ledger import Ledger
 from zeta_one.gateway.reuse import RiskReuse
-from zeta_one.gateway.service import EngineNotReady, Gateway, NotHeld, UnknownChallenge
+from zeta_one.gateway.service import EngineNotReady, Gateway, NotHeld, UnknownChallenge, UnknownDecision
 from zeta_one.gateway.wiring import ROOT, configuration_from_env, engine_version, real_stages, register_demo_agents
 
 HOST = "127.0.0.1"
@@ -45,8 +45,20 @@ class Resolution(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     outcome: Literal["approve", "reject"]
-    by: str
-    note: str | None = None
+    by: str = Field(min_length=1, max_length=200)
+    note: str | None = Field(default=None, max_length=1000)
+    # What the person established, and how (decision 0012); optional on a resolve.
+    finding: Finding | None = None
+    verification: Verification = "none"
+
+
+class OutcomeReport(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    finding: Finding
+    verification: Verification
+    by: str = Field(min_length=1, max_length=200)
+    note: str | None = Field(default=None, max_length=1000)
 
 
 def _error(status: int, code: str, message: str) -> JSONResponse:
@@ -109,7 +121,8 @@ def create_app(gateway: Gateway, token: str | None, eval_report: Path = EVAL_REP
             return _error(400, "invalid_resolution", str(error))
         try:
             return await run_in_threadpool(
-                gateway.resolve, challenge_id, resolution.outcome, resolution.by, resolution.note
+                gateway.resolve, challenge_id, resolution.outcome, resolution.by, resolution.note,
+                resolution.finding, resolution.verification,
             )
         except UnknownChallenge:
             return _error(404, "unknown_challenge", f"no challenge {challenge_id}")
@@ -183,6 +196,24 @@ def create_app(gateway: Gateway, token: str | None, eval_report: Path = EVAL_REP
             if not authorizations.revoke(authorization_id, datetime.now(UTC)):
                 return _error(404, "unknown_authorization", f"no current authorization {authorization_id}")
         return {"authorization_id": authorization_id, "status": "revoked"}
+
+    @app.post("/v1/decisions/{decision_id}/outcomes", status_code=201)
+    async def report_outcome(decision_id: str, request: Request):
+        admin.require_admin(request.headers, token)
+        report, problem = _body(OutcomeReport, await request.body())
+        if problem:
+            return problem
+        try:
+            outcome = gateway.report_outcome(decision_id, report.finding, report.verification, report.by, report.note)
+        except UnknownDecision:
+            return _error(404, "unknown_decision", f"no decision {decision_id}")
+        return outcome.model_dump(mode="json")
+
+    @app.get("/v1/stats")
+    def stats(request: Request):
+        admin.require_admin(request.headers, token)
+        with gateway.lock:
+            return gateway.ledger.stats()
 
     # Records name the signals and the model's rationale, which the agent's own response leaves out
     # (S4), so reading them is an admin action.

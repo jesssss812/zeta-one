@@ -53,7 +53,9 @@ signature headers:
 | Method and path | Does |
 | --- | --- |
 | `GET /v1/decisions` | lists evidence records, newest first (`?limit=`, at most 500) |
-| `POST /v1/challenges/{challenge_id}/resolve` | `{"outcome": "approve" \| "reject", "by", "note"}`; approval executes (simulated) only if a recheck finds nothing changed |
+| `POST /v1/challenges/{challenge_id}/resolve` | `{"outcome": "approve" \| "reject", "by", "note", "finding"?, "verification"?}`; approval executes (simulated) only if a recheck finds nothing changed; a `finding` is recorded as an outcome |
+| `POST /v1/decisions/{decision_id}/outcomes` | records a person's finding on any decision: `{"finding": "legitimate" \| "payee_fraud" \| "manipulated_agent" \| "unauthorized", "verification": "callback_known_number" \| "vendor_portal" \| "bank_confirmation" \| "signed_customer_attestation" \| "customer_report" \| "none", "by", "note"}`; returns it with `verified` (decision 0012) |
+| `GET /v1/stats` | decisions by kind, challenge approval rate, verified findings, unverified claims, `missed_fraud` and `unneeded_challenges` decision ids; sandbox scenario runs left out |
 | `POST /v1/agents` | registers an agent: `{"agent_id", "business_id", "owner", "public_key"}`, the Ed25519 key as 32 raw bytes in base64; `409` if it exists |
 | `POST /v1/agents/{agent_id}/revoke` | revokes the agent's future requests |
 | `POST /v1/authorizations` | grants an authorization document to a registered agent of its business; its version must increase |
@@ -182,6 +184,7 @@ Rules the site can count on:
   with Jev's level, confidence and probabilities. The live gateway runs `engineered` unless
   `ZETA_RISK_CONFIGURATION=jev`.
 - `execution.simulated` is always `true` in this build.
+- A record may carry `outcomes`: each `{"finding", "verification", "verified", "by", "at", "note", "source": "resolve" | "report"}`, oldest first. Show unverified ones as claims, never as findings.
 - A scenario result's `illustrative` is `true` when any stage replayed the fixture instead of
   running, and `replayed_stages` names them (`["strong"]` for the two scenarios that escalate).
   Show replayed model output as recorded, not as a live answer.
