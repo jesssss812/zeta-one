@@ -22,6 +22,7 @@ What is not done yet is in [roadmap.md](roadmap.md). Every document under `docs/
 | [reference/jev.md](reference/jev.md) | What Jev (TypeSafe's typed decision model) is, how it is called and priced, with the request and answer shapes |
 | [reference/deterministic-stages.md](reference/deterministic-stages.md) | Implemented seed, identity, authorization and tier-0 interfaces, provenance and gateway wiring |
 | [reference/evaluation-system.md](reference/evaluation-system.md) | How the evaluation's cases are made, labelled, frozen, run and reported, who does each step (a person, a model, code), and the configurations and models compared |
+| [reference/dev-baseline.md](reference/dev-baseline.md) | The first runs of every configuration on labelled `dev`, before tuning: results, cost, the misses and how to compare a later run |
 | [reference/demo-api.md](reference/demo-api.md) | The contract between the engine and the demo site: endpoints, scenario result, evidence record, ownership of directories |
 
 ## Runbooks

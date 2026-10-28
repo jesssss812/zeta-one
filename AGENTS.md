@@ -99,6 +99,7 @@ git config core.hooksPath .githooks  # once per clone: turns on the pre-push che
 .venv/bin/python -m eval.run --set deterministic --config rules --backend real   # no model calls
 .venv/bin/python -m eval.label ai dev   # blind AI labels through the Anthropic API, no tools (paid)
 .venv/bin/python -m eval.report      # rebuild data/eval/report.{json,md} from the results
+.venv/bin/python -m eval.baseline compare dev 2026-10-28   # what changed since the dev baseline
 .venv/bin/python -m eval.feedback    # verified outcomes in data/zeta.db -> the feedback set
 .venv/bin/python scripts/record_runs.py   # record scenario results and the report into site/data/
 .venv/bin/python scripts/demo_loop.py     # record the feedback loop end to end into site/data/loop.json
