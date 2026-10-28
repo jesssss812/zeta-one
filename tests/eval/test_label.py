@@ -137,3 +137,15 @@ def test_the_agreement_says_blindness_is_self_reported(prepared):
     sample = json.loads((out / "owner_sample.json").read_text())
     sets.write_jsonl(out / "owner.jsonl", [{"id": reverse[c], "expected": "challenge"} for c in sample])
     assert "self-reported" in label.merge("test", data=prepared)["agreement"]["labeller_blindness"]
+
+
+def test_blind_order_says_nothing_about_the_label(prepared):
+    """The generator samples manipulation cases first; the labeller must not see that order."""
+    ids = json.loads((prepared / "test" / "label" / "ids.json").read_text())
+    truths = {r["id"]: r["truth"] for r in sets.read_jsonl(prepared / "test" / "combos.jsonl")}
+    in_blind_order = [truths[case_id] for case_id in ids.values()]
+    first = in_blind_order[:12]
+    assert first.count("manipulated_agent") < 8
+    assert list(ids.values()) != sorted(ids.values())
+    views = json.loads((prepared / "test" / "label" / "owner_view.json").read_text())
+    assert [v["id"] for v in views] == sorted(v["id"] for v in views)

@@ -108,7 +108,11 @@ def export(set_name: str, context_for: ContextFor = seed_context, data: Path = s
     if not guide_path.exists():
         raise LabelError(f"write the labelling guide at {guide_path} first (after reading ~20 dev cases)")
     cases = [c for c in load_unlabelled(set_name, data) if c.category in ("A", "D", "E", "F")]
-    ids = {f"c{index:03d}": case.id for index, case in enumerate(sorted(cases, key=lambda c: c.id))}
+    # Case ids follow the generator's sampling order, which groups classes, so blind ids and the
+    # order of the prompts follow a seeded shuffle instead: position must say nothing about the label.
+    shuffled = sorted(cases, key=lambda c: c.id)
+    random.Random(f"blind:{set_name}").shuffle(shuffled)
+    ids = {f"c{index:03d}": case.id for index, case in enumerate(shuffled)}
     reverse = {case_id: blind for blind, case_id in ids.items()}
     by_id = {c.id: c for c in cases}
     views = {case_id: blind_view(case, reverse[case_id], context_for(case.setup, case.proposal))
@@ -117,7 +121,7 @@ def export(set_name: str, context_for: ContextFor = seed_context, data: Path = s
     out.mkdir(parents=True, exist_ok=True)
     (out / "ids.json").write_text(json.dumps(ids, indent=2) + "\n")
     template = (PROMPTS / "label.md").read_text()
-    ordered = [views[case_id] for case_id in sorted(views)]
+    ordered = [views[case_id] for case_id in ids.values()]
     for number, start in enumerate(range(0, len(ordered), BATCH)):
         text = template.replace("{{GUIDE}}", guide_path.read_text().strip()).replace(
             "{{CASES}}", json.dumps(ordered[start:start + BATCH], indent=2))
@@ -125,7 +129,8 @@ def export(set_name: str, context_for: ContextFor = seed_context, data: Path = s
     if set_name == "test":
         sample = sample_for_owner(cases)
         (out / "owner_sample.json").write_text(json.dumps(sample, indent=2) + "\n")
-        (out / "owner_view.json").write_text(json.dumps([views[case_id] for case_id in sample], indent=2) + "\n")
+        blind_order = sorted(sample, key=lambda case_id: reverse[case_id])
+        (out / "owner_view.json").write_text(json.dumps([views[case_id] for case_id in blind_order], indent=2) + "\n")
     return len(ordered)
 
 
