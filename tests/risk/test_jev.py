@@ -45,14 +45,15 @@ class Post:
 
 def run(reply, status=200, name="invoice_redirect_instructions"):
     post = Post(reply, status)
-    return JevTier(post=post, key="test-key").assess(risk_input(name)), post.calls
+    return JevTier(post=post, keys={"OPENROUTER_API_KEY": "test-key"}).assess(risk_input(name)), post.calls
 
 
 @pytest.mark.parametrize("shape", ["nested", "typed"])
 def test_an_answer_becomes_a_cheap_tier_result_with_its_probabilities(shape):
     output, calls = run(payload(shape=shape))
     result = output.result
-    assert (result.tier, result.model, result.level, result.confidence, result.error) == ("cheap", "jev-latest", "low", 0.95, None)
+    assert (result.tier, result.model, result.level, result.confidence, result.error) == ("cheap", "typesafe/jev-1.14", "low", 0.95, None)
+    assert result.route == "openrouter"
     assert result.probabilities["risk_level"] == 0.95 and result.answers["document_targets_agent"] is False
     assert result.usage.input_tokens == 812 and output.signals == []
 
@@ -65,8 +66,8 @@ def test_a_probability_distribution_is_read_as_its_most_likely_level():
 def test_the_request_sends_the_rendered_state_and_the_four_questions():
     _, calls = run(payload())
     url, headers, body = calls[0]
-    assert url == jev.ENDPOINT and headers == {"Authorization": "Bearer test-key"}
-    assert body["model"] == "jev-latest" and set(body["questions"]) == set(jev.QUESTIONS)
+    assert url == jev.ROUTES[0].endpoint and headers == {"Authorization": "Bearer test-key"}
+    assert body["model"] == "typesafe/jev-1.14" and set(body["questions"]) == set(jev.QUESTIONS)
     assert "<gateway_facts>" in body["state"] and "<untrusted_data boundary=" in body["state"]
     assert scenario("invoice_redirect_instructions").context.bill.document_excerpt in body["state"]
 
@@ -84,8 +85,7 @@ def test_a_mismatch_and_impersonation_are_elevated_findings():
 
 
 @pytest.mark.parametrize("reply, status, error", [
-    (payload(), 401, "http_401"),
-    (TimeoutError("slow"), 200, "TimeoutError"),
+    (payload(), 401, "openrouter: http_401"),
     ({"answers": {}}, 200, "invalid_output"),
     ({"answers": {**payload()["answers"], "risk_level": {"value": "catastrophic", "probability": 0.9}}}, 200, "invalid_output"),
     ({"answers": {**payload()["answers"], "risk_level": {"value": "low", "probability": 1.7}}}, 200, "invalid_output"),
@@ -94,11 +94,12 @@ def test_a_mismatch_and_impersonation_are_elevated_findings():
 ])
 def test_each_failure_is_an_error_and_no_level(reply, status, error):
     output, _ = run(reply, status)
-    assert output.result.error.startswith(error) and output.result.level is None
+    assert error in output.result.error and output.result.level is None
 
 
 def test_no_key_is_an_error_without_a_call(monkeypatch, tmp_path):
-    monkeypatch.delenv(jev.KEY_NAME, raising=False)
+    for route in jev.ROUTES:
+        monkeypatch.delenv(route.key_name, raising=False)
     monkeypatch.setattr(jev, "ROOT", tmp_path)
 
     def never(*args):
@@ -106,7 +107,54 @@ def test_no_key_is_an_error_without_a_call(monkeypatch, tmp_path):
 
     monkeypatch.setattr(jev, "_http_post", never)
     output = JevTier().assess(risk_input())
-    assert output.result.error == f"{jev.KEY_NAME} is not set"
+    assert output.result.error.startswith("no route reached") and "OPENROUTER_API_KEY is not set" in output.result.error
+
+
+class Routed:
+    """Answers per endpoint: an exception, a status, or a payload."""
+
+    def __init__(self, by_endpoint):
+        self.by_endpoint, self.calls = by_endpoint, []
+
+    def __call__(self, url, headers, body):
+        self.calls.append(url)
+        reply = self.by_endpoint[url]
+        if isinstance(reply, Exception):
+            raise reply
+        return reply
+
+
+BOTH = {"OPENROUTER_API_KEY": "or", "TYPESAFE_API_KEY": "ts"}
+OPENROUTER, TYPESAFE = (route.endpoint for route in jev.ROUTES)
+
+
+@pytest.mark.parametrize("unreachable", [TimeoutError("slow"), (503, None), (429, None)])
+def test_typesafe_answers_when_openrouter_is_unreachable(unreachable):
+    post = Routed({OPENROUTER: unreachable, TYPESAFE: (200, payload())})
+    result = JevTier(post=post, keys=BOTH).assess(risk_input()).result
+    assert post.calls == [OPENROUTER, TYPESAFE]
+    assert (result.route, result.model, result.error) == ("typesafe", "jev-latest", None)
+    assert result.routes_tried and result.routes_tried[0].startswith("openrouter:")
+
+
+def test_typesafe_answers_when_there_is_no_openrouter_key():
+    post = Routed({TYPESAFE: (200, payload())})
+    result = JevTier(post=post, keys={"TYPESAFE_API_KEY": "ts"}).assess(risk_input()).result
+    assert post.calls == [TYPESAFE] and result.route == "typesafe"
+
+
+@pytest.mark.parametrize("answer", [(200, {"answers": {}}), (400, None), (401, None)])
+def test_a_bad_answer_from_openrouter_is_not_retried_on_typesafe(answer):
+    """Asking the same model again after a bad answer would be re-rolling it (decision 0010)."""
+    post = Routed({OPENROUTER: answer, TYPESAFE: (200, payload())})
+    result = JevTier(post=post, keys=BOTH).assess(risk_input()).result
+    assert post.calls == [OPENROUTER] and result.error.startswith("openrouter:") and result.level is None
+
+
+def test_both_routes_unreachable_is_an_error():
+    post = Routed({OPENROUTER: (502, None), TYPESAFE: TimeoutError("slow")})
+    result = JevTier(post=post, keys=BOTH).assess(risk_input()).result
+    assert result.error.startswith("no route reached") and len(result.routes_tried) == 2
 
 
 def test_the_key_is_read_from_the_environment_or_env_file(tmp_path, monkeypatch):
@@ -171,7 +219,7 @@ def _assess(name, reply):
     t0 = tier0_output(name)
     strong = CountingStrong()
     risk = assess(fixture.proposal, fixture.context, fixture.decision_record.created_at,
-                  lambda *_: t0, {"cheap": JevTier(post=Post(reply), key="k"), "strong": strong}, JEV)
+                  lambda *_: t0, {"cheap": JevTier(post=Post(reply), keys={"OPENROUTER_API_KEY": "k"}), "strong": strong}, JEV)
     return risk, strong.calls
 
 
@@ -183,7 +231,7 @@ def test_a_confident_jev_saves_the_strong_call_and_its_lowering_is_recorded():
                        features={"amount_ratio_to_vendor_median": Feature(value=3.0, raw_value=3.0)})
     strong = CountingStrong()
     risk = assess(fixture.proposal, fixture.context, fixture.decision_record.created_at, lambda *_: soft,
-                  {"cheap": JevTier(post=Post(payload(level="low", p=0.97)), key="k"), "strong": strong}, JEV)
+                  {"cheap": JevTier(post=Post(payload(level="low", p=0.97)), keys={"OPENROUTER_API_KEY": "k"}), "strong": strong}, JEV)
     assert strong.calls == 0 and risk.tiers_run == ["tier0", "cheap"]
     assert risk.level == "low" and risk.lowered.by == "cheap"
 
@@ -227,8 +275,8 @@ def _grant():
 @pytest.mark.live_models
 def test_live_jev_call():
     """One real call, to settle TypeSafe's request and response shapes. Needs TYPESAFE_API_KEY."""
-    if not jev.api_key():
-        pytest.skip("TYPESAFE_API_KEY is not set")
+    if not any(jev.api_key(name=route.key_name) for route in jev.ROUTES):
+        pytest.skip("no Jev key (OPENROUTER_API_KEY or TYPESAFE_API_KEY) is set")
     output = JevTier().assess(risk_input())
     assert output.result.error is None, output.result.error
     assert output.result.level in ("elevated", "high")

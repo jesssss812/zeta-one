@@ -4,9 +4,10 @@ What is not done, as of 2026-10-27. Remove a line when it is done.
 
 ## Before implementation
 
-- **Owner:** create a TypeSafe key, put it in `.env` as `TYPESAFE_API_KEY`, and run
-  `.venv/bin/python -m pytest tests/risk/test_jev.py --live-models`; correct the parser and
-  `docs/reference/jev.md` to the real request and answer shapes.
+- **Owner:** put an OpenRouter key in `.env` as `OPENROUTER_API_KEY` (and a TypeSafe key as
+  `TYPESAFE_API_KEY` for the backup), then run
+  `.venv/bin/python -m pytest tests/risk/test_jev.py tests/risk/test_open_weight.py --live-models`;
+  correct the parsers and `docs/reference/jev.md` to the real shapes.
 - Confirm the Console key, the Claude model ids and the `messages.parse` call with one request.
 - Test Rho's MCP connector in claude.ai (Connectors → Rho): does it connect, and what tools does
   it list? Record the answer in `docs/reference/rho-api.md`.

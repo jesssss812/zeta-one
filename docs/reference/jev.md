@@ -52,8 +52,13 @@ sources differ on whether a choice takes `options` or `criteria` and whether a s
 
 ## How Zeta One calls it
 
-`zeta_one/risk/jev.py` is the cheap tier. It posts to the direct route above with
-`TYPESAFE_API_KEY` from the environment or `.env`, a `state` that is the strong tier's rendering
+`zeta_one/risk/jev.py` is the cheap tier. It posts to OpenRouter's decisions endpoint with
+`OPENROUTER_API_KEY` (model `typesafe/jev-1.14`), and to TypeSafe's direct route with
+`TYPESAFE_API_KEY` (`jev-latest`) only when OpenRouter can't be reached: no key, a timeout, 408,
+429 or a 5xx. A bad answer is not retried on the other route, which would re-roll the model
+(decision 0010). OpenRouter comes first so one key serves Jev and the open-weight arm; the cost is
+an alpha endpoint and one more processor that sees the invoice text. Each result names its
+`route` and any `routes_tried`. The request carries a `state` that is the strong tier's rendering
 (gateway facts, then untrusted text in bounded blocks), and four questions: `risk_level` (choice:
 low / elevated / high), `document_targets_agent`, `proposal_matches_documents` and
 `vendor_impersonation_signs` (nouls). The parser accepts the answer shapes the sources describe

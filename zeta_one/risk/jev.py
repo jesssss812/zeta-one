@@ -5,9 +5,11 @@ Jev gets a `state` string and typed questions and answers each with a probabilit
 strong tier's rendering (gateway facts, then untrusted text in delimited blocks with a per-request
 boundary), so Jev sees exactly what Claude would and never a case's category, setup or labels.
 
-TypeSafe's request and response shapes are unverified until the first real call: the request follows
-the most consistent shape in the reference doc, and `_answers` accepts the shapes sources describe.
-Anything else is invalid output. `JevTier.assess` never raises: a missing key, an HTTP error, a
+It is reached through OpenRouter's decisions endpoint by default and TypeSafe's own API when
+OpenRouter can't be reached; the result names the route that answered. The request and response
+shapes are unverified until the first real call on each route: the request follows the most
+consistent shape in the reference doc, and `_answers` accepts the shapes sources describe. Anything
+else is invalid output. `JevTier.assess` never raises: a missing key, an HTTP error, a
 timeout or an answer it can't read comes back as `result.error`, which the policy challenges.
 
 Like the strong tier, the level is at least the most severe finding, so a "low" risk_level can't
@@ -16,6 +18,7 @@ hide a yes to "does the document instruct an automated reader".
 
 import os
 import time
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -24,14 +27,31 @@ import httpx
 from zeta_one.contracts import Level, RiskInput, Signal, TierOutput, TierResult, Usage, max_level
 from zeta_one.risk import claude
 
-MODEL = "jev-latest"
-ENDPOINT = "https://api.typesafe.ai/v1/systemone"
+@dataclass(frozen=True)
+class Route:
+    name: str
+    endpoint: str
+    model: str
+    key_name: str
+
+
+# OpenRouter first, so one key serves Jev and the open-weight arm; TypeSafe direct when OpenRouter is
+# unreachable. Its Jev endpoint is an alpha, so its shape may change.
+ROUTES = (
+    Route("openrouter", "https://openrouter.ai/api/alpha/decisions", "typesafe/jev-1.14", "OPENROUTER_API_KEY"),
+    Route("typesafe", "https://api.typesafe.ai/v1/systemone", "jev-latest", "TYPESAFE_API_KEY"),
+)
+MODEL = ROUTES[0].model
 KEY_NAME = "TYPESAFE_API_KEY"
 TIMEOUT_SECONDS = 10.0
 ROOT = Path(__file__).resolve().parents[2]
+# An answer from a route ends the call. Only a route that can't be reached passes to the next: asking
+# the same model again after a bad answer would be re-rolling it (decision 0010).
+UNREACHABLE_STATUSES = frozenset({408, 429, 500, 502, 503, 504})
 
-# USD per million tokens, (input, output): TypeSafe's quoted price, output free (a vendor claim).
-PRICES: dict[str, tuple[float, float]] = {MODEL: (0.042, 0.0)}
+# USD per million tokens, (input, output): TypeSafe's quoted price, output free (a vendor claim), on
+# either route.
+PRICES: dict[str, tuple[float, float]] = {route.model: (0.042, 0.0) for route in ROUTES}
 
 LEVELS: tuple[Level, ...] = ("low", "elevated", "high")
 QUESTIONS: dict[str, dict[str, Any]] = {
@@ -69,15 +89,15 @@ class InvalidAnswer(ValueError):
     pass
 
 
-def api_key(env_file: Path | None = None) -> str | None:
-    """The TypeSafe key from the environment, else from `.env`; never printed or logged."""
+def api_key(env_file: Path | None = None, name: str = KEY_NAME) -> str | None:
+    """A key from the environment, else from `.env`; never printed or logged."""
     env_file = env_file or ROOT / ".env"
-    if os.environ.get(KEY_NAME):
-        return os.environ[KEY_NAME]
+    if os.environ.get(name):
+        return os.environ[name]
     if env_file.exists():
         for line in env_file.read_text().splitlines():
-            name, _, value = line.partition("=")
-            if name.strip().removeprefix("export ").strip() == KEY_NAME and value.strip():
+            key, _, value = line.partition("=")
+            if key.strip().removeprefix("export ").strip() == name and value.strip():
                 return value.strip().strip("'\"")
     return None
 
@@ -88,36 +108,48 @@ class JevTier:
 
     name = "cheap"
 
-    def __init__(self, post: Any = None, key: str | None = None, model: str = MODEL) -> None:
+    def __init__(self, post: Any = None, keys: dict[str, str] | None = None,
+                 routes: tuple[Route, ...] = ROUTES) -> None:
+        """`keys` maps a route's key name to a key, for tests; otherwise keys come from the environment."""
         self._post = post
-        self._key = key
-        self.model = model
+        self._keys = keys
+        self._routes = routes
+        self.model = routes[0].model
 
     def assess(self, risk_input: RiskInput) -> TierOutput:
         started = time.monotonic()
-        key = self._key or api_key()
-        if not key and self._post is None:
-            return self._failed(started, None, f"{KEY_NAME} is not set")
-        body = {"model": self.model, "state": claude.render(risk_input), "questions": QUESTIONS}
-        try:
-            status, payload = (self._post or _http_post)(ENDPOINT, {"Authorization": f"Bearer {key}"}, body)
-        except Exception as error:  # timeouts and connection errors
-            return self._failed(started, None, f"{type(error).__name__}")
-        if status != 200:
-            return self._failed(started, None, f"http_{status}")
-        usage = _usage(payload, body["state"])
-        try:
-            answers = _answers(payload)
-            return self._output(answers, risk_input, started, usage)
-        except InvalidAnswer as error:
-            return self._failed(started, usage, f"invalid_output: {error}")
+        state = claude.render(risk_input)
+        tried: list[str] = []
+        for route in self._routes:
+            key = (self._keys or {}).get(route.key_name) if self._keys is not None else api_key(name=route.key_name)
+            if not key:
+                tried.append(f"{route.name}: {route.key_name} is not set")
+                continue
+            self.model = route.model
+            body = {"model": route.model, "state": state, "questions": QUESTIONS}
+            try:
+                status, payload = (self._post or _http_post)(route.endpoint, {"Authorization": f"Bearer {key}"}, body)
+            except Exception as error:  # timeouts and connection errors: the route is unreachable
+                tried.append(f"{route.name}: {type(error).__name__}")
+                continue
+            if status in UNREACHABLE_STATUSES:
+                tried.append(f"{route.name}: http_{status}")
+                continue
+            if status != 200:
+                return self._failed(started, None, f"{route.name}: http_{status}", tried)
+            usage = _usage(payload, state)
+            try:
+                return self._output(_answers(payload), risk_input, started, usage, route, tried)
+            except InvalidAnswer as error:
+                return self._failed(started, usage, f"{route.name}: invalid_output: {error}", tried)
+        return self._failed(started, None, "no route reached: " + "; ".join(tried), tried)
 
-    def _failed(self, started: float, usage: Usage | None, error: str) -> TierOutput:
+    def _failed(self, started: float, usage: Usage | None, error: str, tried: list[str] | None = None) -> TierOutput:
         return TierOutput(result=TierResult(tier="cheap", model=self.model, latency_ms=_since(started),
-                                            usage=usage, error=error))
+                                            usage=usage, error=error, routes_tried=tried or []))
 
     def _output(self, answers: dict[str, tuple[Any, float]], risk_input: RiskInput, started: float,
-                usage: Usage) -> TierOutput:
+                usage: Usage, route: Route, tried: list[str]) -> TierOutput:
         level_answer, level_probability = answers["risk_level"]
         if level_answer not in LEVELS:
             raise InvalidAnswer(f"risk_level {level_answer!r}")
@@ -140,6 +172,8 @@ class JevTier:
             signals=[signal.name for signal in signals],
             latency_ms=_since(started),
             usage=usage,
+            route=route.name,
+            routes_tried=tried,
             probabilities={name: probability for name, (_value, probability) in answers.items()},
             answers={name: value for name, (value, _probability) in answers.items()},
             **({"answered_level": answered} if level != answered else {}),
