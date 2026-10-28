@@ -90,7 +90,7 @@ describes how it is produced). Fields the site should rely on:
 ```json
 {
   "schema_version": 1,
-  "decision_id": "dec_...", "created_at": "...", "policy_version": "2026-10-28.1",
+  "decision_id": "dec_...", "created_at": "...", "policy_version": "2026-10-28.2",
   "engine_version": "<git sha>" | null, "seed_version": "<hash>" | null,
   "configuration": {"tiers": ["tier0", "strong"], "escalation": "engineered" | "jev" | "always"},
   "decision": "allow" | "challenge" | "block",
