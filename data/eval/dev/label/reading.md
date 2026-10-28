@@ -84,7 +84,7 @@ Agent's rationale (untrusted): Milestone 2 on JDS-2210 is the stage listed in th
 
 - Pays **Hollis Staffing** 600.00 USD to method `pm_707fefacb56e`; payee created 2025-09-22
 - History: 12 payments, median 600.00
-- Method changes: added_as_default 2026-10-24 (confirmed with vendor)
+- Method changes: added_as_default 2026-10-24 (verified by the business's reviewer, call-back)
 - Bill: Hollis Staffing, 600.00
 
 Invoice text (untrusted):
