@@ -118,38 +118,45 @@ class StrongTier:
         )
 
     def _output(self, answer: StrongAnswer, risk_input: RiskInput, started: float, usage: Usage) -> TierOutput:
-        known = known_ids(risk_input)
-        signals = [
-            Signal(
-                name=signal.name,
-                severity=signal.severity,
-                evidence=[ref for ref in signal.evidence if ref in known],
-                source="strong",
-            )
-            for signal in answer.signals
-            if signal.name != "injection_detected"
-        ]
-        if answer.injection_detected:
-            bill = risk_input.context.bill
-            signals.insert(
-                0, Signal(name="injection_detected", severity="high", evidence=[bill.id] if bill else [], source="strong")
-            )
-        level = answer.risk_level
-        for signal in signals:
-            level = max_level(level, signal.severity)
-        raised = {"answered_level": answer.risk_level} if level != answer.risk_level else {}
-        result = TierResult(
-            tier="strong",
-            model=self.model,
-            level=level,
-            confidence=None,
-            signals=[signal.name for signal in signals],
-            latency_ms=_since(started),
-            usage=usage,
-            recommended_decision=answer.recommended_decision,
-            **raised,
+        return answer_output(answer, risk_input, "strong", self.model, _since(started), usage)
+
+
+def answer_output(answer: StrongAnswer, risk_input: RiskInput, tier: str, model: str, latency_ms: int,
+                  usage: Usage) -> TierOutput:
+    """A language-model tier's validated answer as its tier output: evidence kept only where the
+    request named it, an injection made a high signal, and the level at least the worst signal."""
+    known = known_ids(risk_input)
+    signals = [
+        Signal(
+            name=signal.name,
+            severity=signal.severity,
+            evidence=[ref for ref in signal.evidence if ref in known],
+            source=tier,
         )
-        return TierOutput(result=result, signals=signals, rationale=answer.rationale)
+        for signal in answer.signals
+        if signal.name != "injection_detected"
+    ]
+    if answer.injection_detected:
+        bill = risk_input.context.bill
+        signals.insert(
+            0, Signal(name="injection_detected", severity="high", evidence=[bill.id] if bill else [], source=tier)
+        )
+    level = answer.risk_level
+    for signal in signals:
+        level = max_level(level, signal.severity)
+    raised = {"answered_level": answer.risk_level} if level != answer.risk_level else {}
+    result = TierResult(
+        tier=tier,
+        model=model,
+        level=level,
+        confidence=None,
+        signals=[signal.name for signal in signals],
+        latency_ms=latency_ms,
+        usage=usage,
+        recommended_decision=answer.recommended_decision,
+        **raised,
+    )
+    return TierOutput(result=result, signals=signals, rationale=answer.rationale)
 
 
 # --- Rendering the request -------------------------------------------------------------------------
