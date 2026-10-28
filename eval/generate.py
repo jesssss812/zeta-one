@@ -11,7 +11,7 @@ Per set, under data/eval/<set>/:
     wording/batch_NN.output.jsonl  what it returns: {id, invoice_text, agent_rationale, memo}
     cases_unlabelled.jsonl       assembled cases, expected not yet set; eval.label merges the labels
 
-The setup ops assume W1's `mutations.apply` takes the args built in `setup_for`.
+The setup ops are those of `zeta_one.rho.mutations.apply`.
 """
 
 import argparse

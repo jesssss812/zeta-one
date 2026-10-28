@@ -1,16 +1,16 @@
 """The deterministic cases and the five demo cases, as `Case` objects with labels by construction.
 
 Every deterministic case must pass in every configuration that runs the identity and authorization
-stages; there are no statistics on them. The demo cases come from `data/fixtures/`, so the proposals
-match the seed exactly.
+stages; there are no statistics on them. The demo cases take their proposals from `data/fixtures/`,
+whose entities the seed holds.
 
 Agents. `Case.agent` is `builtin:<name>`, optionally followed by `+<fault>` to break the request:
 `unsigned`, `bad_signature`, `stale_timestamp`, `replay` (the same signed bytes are sent twice, and
 the second send is judged), `unknown` (a key the registry has never seen).
 
-Setup ops. W1's `mutations.apply` handles the Rho-side ops. The ops below are the evaluation's own;
-the backend (`eval/backends.py`) applies them to the authorization and agent stores of the engine it
-builds, so W2's and W5's stores are touched only through the backend:
+Setup ops. `zeta_one.rho.mutations.apply` handles the Rho-side ops. The ops below are the
+evaluation's own; the backend (`eval/backends.py`) applies them to the registry, authorization store
+and ledger of the gateway it builds for each case:
 
 | op | args |
 | --- | --- |
