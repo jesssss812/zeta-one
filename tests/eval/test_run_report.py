@@ -232,3 +232,16 @@ def test_unstable_repeats_show_in_the_deterministic_section(tmp_path):
              "detectable": True, "expected": "block", "decision": "block", "correct": False, "acceptable": False,
              "stable": False, "not_run": None}]
     assert report.cell(rows)["unstable"] == 1
+
+
+def test_a_frozen_set_is_not_refrozen_without_force_and_a_note(tmp_path):
+    sets.write_jsonl(tmp_path / "test" / "cases.jsonl", [_case("t1", "test", "A", "legitimate", "allow").model_dump(mode="json")])
+    sets.freeze("test", tmp_path)
+    with pytest.raises(sets.AlreadyFrozen):
+        sets.freeze("test", tmp_path)
+    with pytest.raises(sets.AlreadyFrozen):
+        sets.freeze("test", tmp_path, force=True)
+    sets.freeze("test", tmp_path, force=True, note="relabelled a typo in t1")
+    log = [json.loads(line) for line in (tmp_path / "test" / "frozen.log.jsonl").read_text().splitlines()]
+    assert [entry["note"] for entry in log] == [None, "relabelled a typo in t1"]
+    assert all(entry["frozen_at"] and entry["commit"] for entry in log)

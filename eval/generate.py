@@ -282,13 +282,15 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("command", choices=["combos", "assemble", "freeze"])
     parser.add_argument("set", choices=["dev", "test"])
     parser.add_argument("--seed", type=int)
+    parser.add_argument("--force", action="store_true", help="freeze: re-freeze a frozen set (needs --note)")
+    parser.add_argument("--note", help="freeze: why a frozen set is re-frozen")
     args = parser.parse_args(argv)
     if args.command == "combos":
         print(f"{len(combos(args.set, args.seed))} combinations written")
     elif args.command == "assemble":
         print(f"{len(assemble(args.set))} cases assembled")
     else:
-        print(sets.freeze(args.set))
+        print(sets.freeze(args.set, force=args.force, note=args.note))
     return 0
 
 

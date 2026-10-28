@@ -6,6 +6,8 @@ data/eval/test/cases.jsonl. hard: data/eval/hard/*.jsonl, written by the owner.
 
 import hashlib
 import json
+import subprocess
+from datetime import UTC, datetime
 from pathlib import Path
 
 from eval import cases as hand_cases
@@ -57,11 +59,34 @@ def set_hash(cases: list[Case]) -> str:
     return hashlib.sha256(payload.encode()).hexdigest()
 
 
-def freeze(name: str, data: Path = DATA) -> str:
-    """Record the set's hash; later runs refuse a set that no longer matches."""
+class AlreadyFrozen(RuntimeError):
+    pass
+
+
+def freeze(name: str, data: Path = DATA, force: bool = False, note: str | None = None) -> str:
+    """Record the set's hash, and when and at which commit it was frozen; later runs refuse a set that
+    no longer matches. A frozen set is not re-frozen unless `force`, and a forced re-freeze records why:
+    `test` is frozen before its first scored run and never tuned on."""
+    path = data / name / "frozen.sha256"
+    if path.exists() and not force:
+        raise AlreadyFrozen(f"{name} is already frozen; re-freezing needs force and a note saying why")
+    if force and path.exists() and not note:
+        raise AlreadyFrozen("a forced re-freeze needs a note saying why")
     digest = set_hash(load_set(name, data))
-    (data / name / "frozen.sha256").write_text(digest + "\n")
+    path.write_text(digest + "\n")
+    meta = {"sha256": digest, "frozen_at": datetime.now(UTC).isoformat(), "commit": _git_sha(), "note": note}
+    history = data / name / "frozen.log.jsonl"
+    with history.open("a") as log:
+        log.write(json.dumps(meta, sort_keys=True) + "\n")
     return digest
+
+
+def _git_sha() -> str:
+    try:
+        return subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True, check=True,
+                              cwd=ROOT).stdout.strip()
+    except Exception:
+        return "unknown"
 
 
 def check_frozen(name: str, cases: list[Case], data: Path = DATA) -> str | None:
