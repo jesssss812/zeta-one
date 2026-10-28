@@ -92,7 +92,7 @@ describes how it is produced). Fields the site should rely on:
   "schema_version": 1,
   "decision_id": "dec_...", "created_at": "...", "policy_version": "2026-10-28.2",
   "engine_version": "<git sha>" | null, "seed_version": "<hash>" | null,
-  "configuration": {"tiers": ["tier0", "strong"], "escalation": "engineered" | "jev" | "always"},
+  "configuration": {"tiers": ["tier0", "strong"], "escalation": "engineered" | "jev" | "always" | "none"},
   "decision": "allow" | "challenge" | "block",
   "reasons": ["risk:elevated"],
   "challenge": null | {"type": "confirm" | "renew_authorization" | "verify_payee", "routed_to": "...", "user_sees": "..."},
@@ -153,6 +153,8 @@ Rules the site can count on:
   `strong`; the model id is in `model`. In the first engine version the configuration is
   `["tier0", "strong"]` with engineered escalation: the strong tier runs only when tier 0 isn't
   clean, so a routine payment shows `tiers_run: ["tier0"]` and no model.
+  `escalation: "none"` runs tier 0 alone (the evaluation's rules-only arm); `"always"` runs the
+  model tiers on every case.
 - `execution.simulated` is always `true` in this build.
 - Proposal amounts must be positive integer minor units, at most 10^12 ($10 billion), in an
   uppercase three-letter ISO 4217 currency code. Ids are 1 to 128 characters, `memo` at most
