@@ -1,10 +1,17 @@
 """What the gateway does with a request: decide it, record it, then execute, hold or block (simulated).
 
 The HTTP layer in app.py only translates to and from JSON; this holds the order of operations.
+
+Every use of the gateway's database goes through `Gateway.lock`, one request at a time. The
+modules share one SQLite connection, whose transactions are not per thread, and a decision must
+read the rolling spend and the reuse table and write its record without another decision in
+between (security.md, S3 and S8). The demo's volume makes the lost concurrency, including while a
+model call runs, a fair price.
 """
 
+import threading
 from collections.abc import Callable
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from typing import Any, Literal
 
@@ -39,6 +46,7 @@ class Gateway:
     clock: Callable[[], datetime] = _now
     reuse: RiskReuse | None = None
     version: str | None = None
+    lock: threading.RLock = field(default_factory=threading.RLock)
 
     def __post_init__(self) -> None:
         self._capture: ContextCapture | None = None
@@ -63,18 +71,25 @@ class Gateway:
         Raises InvalidProposal for a malformed body, before anything is recorded.
         """
         engine = self.engine
-        with self._capture.recording() as seen:
-            record, proposal = engine.evaluate(request)
-        context = seen[-1] if seen else None
-        challenge_id = self.ledger.record(record, proposal, context=context)
-        if self.reuse:
-            self.reuse.remember(record, proposal, context)
+        with self.lock:
+            with self._capture.recording() as seen:
+                record, proposal = engine.evaluate(request)
+            context = seen[-1] if seen else None
+            challenge_id = self.ledger.record(record, proposal, context=context)
+            if self.reuse:
+                self.reuse.remember(record, proposal, context)
         return {"decision": record.decision, "decision_id": record.decision_id, "challenge_id": challenge_id}
 
     def resolve(
         self, challenge_id: str, outcome: Literal["approve", "reject"], by: str, note: str | None = None
     ) -> dict[str, Any]:
         """A person approves or rejects a held payment. Approval executes it only if nothing changed."""
+        with self.lock:
+            return self._resolve(challenge_id, outcome, by, note)
+
+    def _resolve(
+        self, challenge_id: str, outcome: Literal["approve", "reject"], by: str, note: str | None
+    ) -> dict[str, Any]:
         held = self.ledger.held(challenge_id)
         if held is None:
             raise UnknownChallenge(challenge_id)

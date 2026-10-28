@@ -4,6 +4,7 @@ Two counterparties, each with its fixture's context: cp_0007 (vendor_payment_met
 recent method change makes tier 0 elevated, and cp_0012 (routine_bill_payment), which is clean.
 """
 
+import time
 from datetime import UTC, datetime, timedelta
 
 from zeta_one.contracts import (
@@ -47,6 +48,7 @@ class FakeWorld:
         }
         self.strong_calls = 0
         self.tier0_calls = 0
+        self.delay = 0.0  # seconds each risk stage takes, to widen race windows in tests
         self.extra_features: dict[str, Feature] = {}
 
     # --- stages ---
@@ -105,6 +107,7 @@ class FakeWorld:
 
     def tier0(self, proposal: Proposal, context: Context, now: datetime) -> Tier0Output:
         self.tier0_calls += 1
+        time.sleep(self.delay)
         source = HELD if context.payment_method_history else ROUTINE
         risk = source.decision_record.risk
         return Tier0Output(
@@ -121,6 +124,7 @@ class FakeWorld:
 
         def assess(self, risk_input: RiskInput) -> TierOutput:
             self.world.strong_calls += 1
+            time.sleep(self.world.delay)
             risk = HELD.decision_record.risk
             return TierOutput(
                 result=next(r for r in risk.tier_results if r.tier == "strong"),

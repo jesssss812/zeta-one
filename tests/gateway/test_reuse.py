@@ -111,3 +111,14 @@ def test_a_hard_flag_raised_since_means_a_fresh_assessment(gateway, world):
     assert second["risk"]["reused_from"] is None
     assert second["risk"]["features"]["bill_not_referenced"]["value"] is True
     assert first["decision"] == "allow" and second["decision"] != "allow"
+
+
+def test_concurrent_identical_proposals_get_one_model_call(gateway, world):
+    from concurrent.futures import ThreadPoolExecutor
+
+    world.delay = 0.05
+    with ThreadPoolExecutor(max_workers=5) as pool:
+        records = list(pool.map(lambda _: send(gateway, held_proposal()), range(5)))
+    assert world.strong_calls == 1
+    assert len({r["decision_id"] for r in records}) == 5
+    assert sum(r["risk"]["reused_from"] is None for r in records) == 1

@@ -176,3 +176,21 @@ def test_bad_resolution_body_is_400(client):
     held = hold(client)
     response = client.post(f"/v1/challenges/{held['challenge_id']}/resolve", json={"outcome": "maybe"}, headers=ADMIN)
     assert response.status_code == 400
+
+
+def test_concurrent_proposals_cannot_both_fit_under_the_rolling_limit(gateway, world):
+    from concurrent.futures import ThreadPoolExecutor
+
+    from zeta_one.contracts import SignedRequest
+
+    world.set_rolling_limit(300000)
+    world.delay = 0.05
+    body = routine_proposal().model_dump_json().encode()
+
+    def send(_):
+        request = SignedRequest(method="POST", path=PROPOSE, headers=agent_headers(), body=body)
+        return gateway.propose(request)["decision"]
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        decisions = sorted(pool.map(send, range(2)))
+    assert decisions == ["allow", "block"]

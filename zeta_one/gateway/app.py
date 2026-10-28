@@ -87,11 +87,13 @@ def create_app(gateway: Gateway, token: str | None) -> FastAPI:
 
     @app.get("/v1/decisions")
     def list_decisions(limit: int = 50) -> list[dict]:
-        return gateway.ledger.decisions(min(max(limit, 1), 500))
+        with gateway.lock:
+            return gateway.ledger.decisions(min(max(limit, 1), 500))
 
     @app.get("/v1/decisions/{decision_id}")
     def get_decision(decision_id: str):
-        record = gateway.ledger.decision(decision_id)
+        with gateway.lock:
+            record = gateway.ledger.decision(decision_id)
         if record is None:
             return _error(404, "unknown_decision", f"no decision {decision_id}")
         return record
@@ -106,7 +108,8 @@ def create_app(gateway: Gateway, token: str | None) -> FastAPI:
             result = scenarios.run(name)
         except KeyError:
             return _error(404, "unknown_scenario", f"no scenario named {name}")
-        gateway.ledger.save_record(result.decision_record)
+        with gateway.lock:
+            gateway.ledger.save_record(result.decision_record)
         return scenarios.dump(result)
 
     @app.get("/v1/eval/latest")
