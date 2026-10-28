@@ -2,7 +2,9 @@
 
 The system prompt is fixed and cached. Per-request content goes last, in two parts: gateway facts
 the engine trusts, and untrusted text (invoice, memos, payee and bank names, the agent's rationale)
-in delimited blocks labelled as data an attacker may have written (security.md, S1).
+in delimited blocks labelled as data an attacker may have written (security.md, S1). Each request's
+blocks carry a fresh random boundary on both tags, so text inside a block can't end it, even with a
+lookalike tag the filter misses.
 
 The tier's level is at least its most severe signal, and `high` when the model reports an injection
 attempt: a model that names a high-severity finding can't also answer `low` (security.md, S1).
@@ -13,6 +15,7 @@ back as a `TierOutput` with `result.error` set, which the policy turns into a ch
 
 import json
 import re
+import secrets
 import time
 from pathlib import Path
 from typing import Any
@@ -152,11 +155,16 @@ class StrongTier:
 # --- Rendering the request -------------------------------------------------------------------------
 
 
-def render(risk_input: RiskInput) -> str:
-    """The user message: gateway facts as JSON, then each untrusted field in its own block."""
+def render(risk_input: RiskInput, boundary: str | None = None) -> str:
+    """The user message: gateway facts as JSON, then each untrusted field in its own block.
+
+    `boundary` defaults to a fresh random value; tests pass a fixed one.
+    """
+    boundary = boundary or secrets.token_hex(8)
     facts, untrusted = _split(risk_input)
     blocks = [
-        f'<untrusted_data field="{field}" record="{record}">\n{_neutralize(text)}\n</untrusted_data>'
+        f'<untrusted_data boundary="{boundary}" field="{field}" record="{record}">\n{_neutralize(text)}\n'
+        f'</untrusted_data boundary="{boundary}">'
         for field, record, text in untrusted
     ]
     return "\n\n".join(
