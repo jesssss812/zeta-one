@@ -150,3 +150,15 @@ def test_blind_order_says_nothing_about_the_label(prepared):
     assert list(ids.values()) != sorted(ids.values())
     views = json.loads((prepared / "test" / "label" / "owner_view.json").read_text())
     assert [v["id"] for v in views] == sorted(v["id"] for v in views)
+
+
+def test_the_reading_sheet_shows_cases_blind(tmp_path):
+    rows = generate.combos("dev", data=tmp_path)
+    wording = [{"id": r["id"], "invoice_text": "Invoice for October services.", "agent_rationale": "Paying it.", "memo": "m"}
+               for r in rows]
+    sets.write_jsonl(tmp_path / "dev" / "wording" / "batch_00.output.jsonl", wording)
+    generate.assemble("dev", data=tmp_path)
+    text = label.reading_sheet("dev", n=5, data=tmp_path).read_text()
+    assert text.count("\n## c") == 5 and "Agent's rationale (untrusted)" in text
+    for word in ("payee_fraud", "manipulated_agent", "legitimate", "category", "truth", "dev_0"):
+        assert word not in text.split("No labels:")[1]

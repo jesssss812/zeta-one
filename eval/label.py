@@ -1,6 +1,7 @@
 """Blind labelling: `export` the view the labeller may see, `merge` the AI labels, the owner's labels
 and adjudications into labelled cases.
 
+    python -m eval.label sheet dev           # 20 cases to read before writing the labelling guide
     python -m eval.label export dev          # after `eval.generate assemble dev`
     python -m eval.label merge dev
 
@@ -134,6 +135,44 @@ def export(set_name: str, context_for: ContextFor = seed_context, data: Path = s
     return len(ordered)
 
 
+def reading_sheet(set_name: str, n: int = 20, context_for: ContextFor = seed_context, data: Path = sets.DATA) -> Path:
+    """A Markdown sheet of `n` cases as the labeller will see them, for the owner to read before writing
+    the labelling guide. Cases are in the blind, shuffled order, under blind ids; no labels."""
+    cases = [c for c in load_unlabelled(set_name, data) if c.category in ("A", "D", "E", "F")]
+    shuffled = sorted(cases, key=lambda c: c.id)
+    random.Random(f"blind:{set_name}").shuffle(shuffled)
+    lines = [f"# {set_name}: {min(n, len(shuffled))} cases as the labeller sees them", "",
+             "Synthetic cases from eval/generate.py. No labels: read them, then write eval/prompts/label_guide.md.", ""]
+    for index, case in enumerate(shuffled[:n]):
+        context = context_for(case.setup, case.proposal)
+        payee, history = context["counterparty"], context["payment_history"]
+        bill = context.get("bill")
+        changes = context.get("payment_method_history") or []
+        lines += [
+            f"## c{index:03d}",
+            "",
+            f"- Pays **{payee['name']}** {case.proposal.amount.amount / 100:,.2f} {case.proposal.amount.currency}"
+            f" to method `{case.proposal.payment_method_id}`; payee created {payee['created_at'][:10]}",
+            f"- History: {history['count']} payments"
+            + (f", median {history['median_amount']['amount'] / 100:,.2f}" if history.get("median_amount") else ""),
+            "- Method changes: " + ("; ".join(f"{c['change']} {c['changed_at'][:10]}"
+                                              + (" (confirmed with vendor)" if c.get("verified_with_vendor") else "")
+                                              for c in changes) or "none"),
+            f"- Bill: " + (f"{bill['counterparty_name']}, {bill['amount']['amount'] / 100:,.2f}" if bill else "none named"),
+            "",
+            "Invoice text (untrusted):",
+            "",
+            *[f"> {line}" for line in ((bill or {}).get("document_excerpt") or "(none)").splitlines()],
+            "",
+            f"Agent's rationale (untrusted): {case.proposal.agent_rationale}",
+            "",
+        ]
+    path = label_dir(set_name, data) / "reading.md"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("\n".join(lines))
+    return path
+
+
 def _read_ai(set_name: str, ids: dict[str, str], data: Path) -> dict[str, dict]:
     labels: dict[str, dict] = {}
     for path in sorted((label_dir(set_name, data) / "ai").glob("batch_*.jsonl")):
@@ -195,10 +234,12 @@ def merge(set_name: str, data: Path = sets.DATA) -> dict:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("command", choices=["export", "merge"])
+    parser.add_argument("command", choices=["export", "merge", "sheet"])
     parser.add_argument("set", choices=["dev", "test"])
     args = parser.parse_args(argv)
-    if args.command == "export":
+    if args.command == "sheet":
+        print(f"wrote {reading_sheet(args.set)}")
+    elif args.command == "export":
         print(f"{export(args.set)} cases exported")
     else:
         print(json.dumps(merge(args.set), indent=2))
