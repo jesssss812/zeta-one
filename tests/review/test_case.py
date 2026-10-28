@@ -21,7 +21,7 @@ def message(text, stop="end_turn"):
         "usage": {"input_tokens": 1000, "output_tokens": 200}})
 
 
-RESEARCH = json.dumps({"findings": [{"claim": "The vendor's site lists a different phone number.",
+RESEARCH = json.dumps({"official_domain": "vendor.example", "findings": [{"claim": "The vendor's site lists a different phone number.",
                                      "url": "https://vendor.example/contact"}], "summary": "Found the vendor."})
 
 
@@ -141,3 +141,12 @@ def test_the_review_page_holds_no_data_and_renders_text_as_text(client):
     page = client.get("/review")
     assert page.status_code == 200 and "Case review" in page.text
     assert "innerHTML" not in page.text and "textContent" in page.text
+
+
+def test_research_reports_the_vendors_own_domain_and_refuses_a_malformed_one(client, gateway):
+    allowed = propose(client, routine_proposal()).json()
+    case = open_case(client, gateway, Stub(message(RESEARCH), message(case_file())), allowed["decision_id"]).json()
+    assert case["research"]["official_domain"] == "vendor.example"
+    bad = json.dumps({"official_domain": "javascript:alert(1)", "findings": [], "summary": "x"})
+    case = open_case(client, gateway, Stub(message(bad), message(case_file())), allowed["decision_id"]).json()
+    assert case["research"] is None and case["errors"] == ["research: invalid output"]
