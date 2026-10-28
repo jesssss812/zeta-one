@@ -6,7 +6,9 @@ owner's own time or accounts.
 ## Live models
 
 - **Owner:** to use the case chat, run `ollama serve` and `ollama pull qwen2.5:7b` (about 4.7 GB).
-- One live case file on the review page, to check the research and assembly calls.
+- The first live case file reported its web research cut short after one query, with the limit set
+  at five searches. Find out what counts against the limit with dynamic filtering (the response's
+  server-tool usage), then set the limit.
 
 ## Evaluation
 
