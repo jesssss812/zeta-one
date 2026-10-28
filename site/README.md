@@ -16,8 +16,8 @@ Open http://localhost:4173. FastAPI can also serve this directory unchanged. All
 
 ## Content
 
-- `index.html`: project story, synthetic decision example, engineering approach, evaluation space,
-  and demo video space. Replace the labeled video placeholder with an accessible video/embed once
+- `index.html`: project story, the decision flow, synthetic decision example, engineering approach,
+  the feedback loop, evaluation space and demo video space. Replace the labeled video placeholder with an accessible video/embed once
   a recording exists; add a link to the actual app when it is ready.
 - `fonts.html`: four wordmark studies for choosing the name and ζ typography; separate from the submission page.
 - `styles.css`: responsive presentation, keyboard focus, reduced-motion support, and decorative curve/background animation. The wave loops with a pause control and pauses offscreen; reduced-motion disables it.
@@ -29,7 +29,8 @@ Open http://localhost:4173. FastAPI can also serve this directory unchanged. All
 
 The site prioritizes a fast, coherent presentation over an interactive demo. Engine decisions and
 API integration remain in the actual application. The video and evaluation areas explicitly show
-that their content is forthcoming. The review assistant and learning loop are planned extensions.
+that their content is forthcoming. The decision flow under "Why this matters" and the feedback loop in
+section 04 match the diagram in the root README; change them together.
 
 Checks: `python3 scripts/check.py` from the repository root. Manually verify page anchors, desktop
 and narrow layouts, visible focus, and absence of missing assets. Run `node --check site/motion.js` for JavaScript syntax. There is no frontend build step.

@@ -111,7 +111,7 @@ pre{font:11px/1.7 monospace;white-space:pre-wrap;overflow-wrap:anywhere;max-heig
 .allow{background:#cfe68a}
 .challenge{background:#f3cd7c}
 .block{background:#e9937a}
-.comparison{display:grid;grid-template-columns:repeat(4,1fr);border-block:1px solid var(--line)}
+.comparison{display:grid;grid-template-columns:repeat(5,1fr);border-block:1px solid var(--line)}
 .comparison>span{padding:25px 15px;font-size:13px}
 .comparison .selected{background:#e8eddc}
 .proof-bottom{display:grid;grid-template-columns:1fr 1fr;gap:75px;margin-top:40px}
@@ -221,3 +221,5 @@ footer p{display:none}
 
 .film .video-placeholder{margin-inline:auto}
 .curve{height:160px}.curve .ghost{stroke:#7d925d;stroke-width:2.4;transform-origin:50% 51.7857%}
+.decision-flow{margin:40px 0 0}.flow-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr) 1.35fr;border-block:1px solid var(--line)}.flow-steps li{position:relative;padding:22px 26px 22px 20px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:6px}.flow-steps li:last-child{border-right:0}.flow-steps li:not(:last-child)::after{content:'→';position:absolute;right:-9px;top:50%;transform:translateY(-50%);background:var(--paper);color:var(--green);font-size:14px;line-height:1;padding:2px 0}.flow-steps span{font:9px monospace;letter-spacing:.6px;color:var(--muted)}.flow-steps strong{font-size:17px;font-weight:500}.flow-steps small{font-size:12px;color:var(--muted)}.flow-out{background:#edf1e5}.flow-out strong{font-size:15px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}.flow-out .outcome-dot{margin-right:4px}.flow-loop{margin:0;padding:14px 20px;background:var(--ink);color:#f5f6ec;font-size:13px}.flow-loop span{color:var(--accent);margin-right:8px}
+@media(max-width:800px){.flow-steps{grid-template-columns:1fr}.flow-steps li{border-right:0;border-bottom:1px solid var(--line);padding:16px 4px}.flow-out{padding-inline:14px!important}.flow-steps li:not(:last-child)::after{content:'↓';right:auto;left:50%;top:auto;bottom:-9px;transform:translateX(-50%)}}
