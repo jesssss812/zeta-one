@@ -1,0 +1,229 @@
+{
+  "engine_version": "5aad1da",
+  "live_models": false,
+  "note": "A recorded run of the feedback loop on the real engine and synthetic data. Payments are simulated. Models were off: escalations show where a model would review.",
+  "policy_version": "2026-10-28.4",
+  "recorded": true,
+  "recorded_at": "2026-10-28T14:35:52+00:00",
+  "simulated": true,
+  "steps": [
+    {
+      "at": "2026-10-27T22:00:00+00:00",
+      "decision": {
+        "adjustments": [],
+        "decision": "allow",
+        "decision_id": "dec_f69db63454f54e95",
+        "execution": {
+          "simulated": true,
+          "status": "executed"
+        },
+        "floor": null,
+        "level": "low",
+        "reasons": [
+          "clean"
+        ],
+        "tiers_run": [
+          "tier0"
+        ]
+      },
+      "title": "A routine payment",
+      "what": "The agent pays a recurring invoice to a long-standing vendor."
+    },
+    {
+      "adjustments": [],
+      "at": "2026-10-29T22:00:00+00:00",
+      "outcome": {
+        "at": "2026-10-29T22:00:00Z",
+        "by": "AP controller",
+        "finding": "payee_fraud",
+        "note": "The vendor says the payment never arrived.",
+        "source": "report",
+        "verification": "customer_report",
+        "verified": false
+      },
+      "title": "A customer reports fraud",
+      "what": "Recorded as a claim: a report alone is not a fraud label."
+    },
+    {
+      "adjustments": [
+        {
+          "adjustment_id": "adj_6cb436e36b914fad",
+          "at": "2026-10-30T01:00:00Z",
+          "business_id": "biz_seed_01",
+          "by": "AP controller",
+          "decision_id": "dec_f69db63454f54e95",
+          "expires_at": null,
+          "finding": "payee_fraud",
+          "kind": "blocked_payment_method",
+          "reason": "verified fraud on a payment to this method",
+          "subject": "pm_0012_01",
+          "verification": "bank_confirmation"
+        }
+      ],
+      "at": "2026-10-30T01:00:00+00:00",
+      "outcome": {
+        "at": "2026-10-30T01:00:00Z",
+        "by": "AP controller",
+        "finding": "payee_fraud",
+        "note": "The receiving bank confirmed the account is not the vendor's.",
+        "source": "report",
+        "verification": "bank_confirmation",
+        "verified": true
+      },
+      "title": "A reviewer verifies it",
+      "what": "A verified finding blocks the payment method it went to."
+    },
+    {
+      "at": "2026-11-07T01:00:00+00:00",
+      "decision": {
+        "adjustments": [
+          "adj_6cb436e36b914fad"
+        ],
+        "decision": "block",
+        "decision_id": "dec_0b0462d9efb242c1",
+        "execution": {
+          "simulated": true,
+          "status": "blocked"
+        },
+        "floor": {
+          "flags": [
+            "payment_method_blocked"
+          ],
+          "level": "high"
+        },
+        "level": "high",
+        "reasons": [
+          "risk:high_with_redirect_pattern"
+        ],
+        "tiers_run": [
+          "tier0"
+        ]
+      },
+      "title": "The agent pays that account again",
+      "what": "Blocked: the decision cites the finding behind the block."
+    },
+    {
+      "at": "2026-11-07T01:00:00+00:00",
+      "decision": {
+        "adjustments": [],
+        "decision": "challenge",
+        "decision_id": "dec_cc430bb59ed143e4",
+        "execution": {
+          "simulated": true,
+          "status": "held"
+        },
+        "floor": {
+          "flags": [
+            "payment_method_changed_days_ago"
+          ],
+          "level": "elevated"
+        },
+        "level": "elevated",
+        "reasons": [
+          "risk:elevated"
+        ],
+        "tiers_run": [
+          "tier0"
+        ]
+      },
+      "title": "A payment after a recent bank change",
+      "what": "Held: a recent change is a floor no model may lower."
+    },
+    {
+      "adjustments": [
+        {
+          "adjustment_id": "adj_6cb436e36b914fad",
+          "at": "2026-10-30T01:00:00Z",
+          "business_id": "biz_seed_01",
+          "by": "AP controller",
+          "decision_id": "dec_f69db63454f54e95",
+          "expires_at": null,
+          "finding": "payee_fraud",
+          "kind": "blocked_payment_method",
+          "reason": "verified fraud on a payment to this method",
+          "subject": "pm_0012_01",
+          "verification": "bank_confirmation"
+        },
+        {
+          "adjustment_id": "adj_99817854f29b4787",
+          "at": "2026-11-07T01:00:00Z",
+          "business_id": "biz_seed_01",
+          "by": "AP controller",
+          "decision_id": "dec_cc430bb59ed143e4",
+          "expires_at": "2027-02-05T01:00:00Z",
+          "finding": "legitimate",
+          "kind": "confirmed_method_change",
+          "reason": "the bank change on this payment was verified legitimate",
+          "subject": "pmh_setup_00001",
+          "verification": "callback_known_number"
+        }
+      ],
+      "at": "2026-11-07T01:00:00+00:00",
+      "resolution": {
+        "challenge_id": "chl_d73b08279a364310",
+        "decision_id": "dec_cc430bb59ed143e4",
+        "reasons": [],
+        "status": "executed"
+      },
+      "title": "The reviewer confirms the change",
+      "what": "Approved after a call-back; that change is now confirmed."
+    },
+    {
+      "at": "2026-11-15T01:00:00+00:00",
+      "decision": {
+        "adjustments": [
+          "adj_99817854f29b4787"
+        ],
+        "decision": "challenge",
+        "decision_id": "dec_e80ed3013c674654",
+        "execution": {
+          "simulated": true,
+          "status": "held"
+        },
+        "floor": null,
+        "level": "elevated",
+        "reasons": [
+          "risk:elevated"
+        ],
+        "tiers_run": [
+          "tier0"
+        ]
+      },
+      "title": "That vendor's next payment",
+      "what": "The confirmed change is no longer a floor: a soft signal a model reviews (models are off in this run, so it is held for a person)."
+    },
+    {
+      "at": "2026-11-15T01:00:00+00:00",
+      "stats": {
+        "challenges": {
+          "approval_rate": 1.0,
+          "approved": 1,
+          "blocked_on_recheck": 0,
+          "rejected": 0,
+          "resolved": 1,
+          "total": 2
+        },
+        "decisions": {
+          "allow": 1,
+          "block": 1,
+          "challenge": 2
+        },
+        "missed_fraud": [
+          "dec_f69db63454f54e95"
+        ],
+        "unneeded_challenges": [
+          "dec_cc430bb59ed143e4"
+        ],
+        "unverified_reports": 1,
+        "verified_outcomes": {
+          "legitimate": 1,
+          "manipulated_agent": 0,
+          "payee_fraud": 1,
+          "unauthorized": 0
+        }
+      },
+      "title": "What the business sees",
+      "what": "Friction and missed fraud from real decisions."
+    }
+  ]
+}
