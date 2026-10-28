@@ -49,3 +49,19 @@ def test_each_scenario_run_is_a_new_decision(client):
     assert fixture.decision_id not in (first["decision_id"], second["decision_id"])
     assert first["created_at"] != fixture.created_at.isoformat().replace("+00:00", "Z")
     assert len(client.get("/v1/decisions", headers=ADMIN).json()) == 2
+
+
+def test_importing_the_app_module_opens_no_database_or_env():
+    import subprocess
+    import sys
+
+    probe = (
+        "import zeta_one.db as db, zeta_one.gateway.admin as admin\n"
+        "db.connect = lambda *a, **k: (_ for _ in ()).throw(AssertionError('db opened'))\n"
+        "admin.admin_token = lambda *a, **k: (_ for _ in ()).throw(AssertionError('.env read'))\n"
+        "import zeta_one.gateway.app as app_module\n"
+        "assert app_module._app is None\n"
+    )
+    result = subprocess.run([sys.executable, "-c", probe], capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+

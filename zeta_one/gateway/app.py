@@ -1,7 +1,8 @@
 """The gateway's HTTP API (docs/reference/demo-api.md and the implementation plan's Gateway API).
 
 Translates HTTP to and from the service; holds no decision logic. Run it on 127.0.0.1 only:
-`python -m zeta_one.gateway.app`, or uvicorn without `--host`.
+`python -m zeta_one.gateway.app`, or uvicorn without `--host`. The module-level `app` is built on
+first access, so importing `create_app` opens no database and reads no `.env`.
 """
 
 from typing import Literal
@@ -143,10 +144,20 @@ def default_gateway() -> Gateway:
     return Gateway(stages=real_stages(), ledger=Ledger(connection), reuse=RiskReuse(connection), version=engine_version())
 
 
-app = create_app(default_gateway(), admin.admin_token())
+_app: FastAPI | None = None
+
+
+def __getattr__(name: str) -> FastAPI:
+    """`app` for uvicorn (`zeta_one.gateway.app:app`), built on first access."""
+    global _app
+    if name != "app":
+        raise AttributeError(name)
+    if _app is None:
+        _app = create_app(default_gateway(), admin.admin_token())
+    return _app
 
 
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host=HOST, port=8000)
+    uvicorn.run(__getattr__("app"), host=HOST, port=8000)
