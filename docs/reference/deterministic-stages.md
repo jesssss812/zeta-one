@@ -38,6 +38,8 @@ historical payment to its counterparty, so the total bill count exceeds the plan
 - History joins paid bills to settled outgoing transactions, deduplicates transaction IDs, and
   excludes future transactions and other currencies. Count and median use all qualifying history;
   `recent` contains at most three payments within 90 days.
+- Bills carry their Rho status, and each history payment the bill it settled (`bill_id`). The
+  gateway drops bills it has already paid from `open_bills`, since the stand-in records keep them open.
 - Open bills are looked up independently of the proposal's bill reference. A bill for another
   payee also supplies that payee and its history for the risk assessment.
 - Amounts and payee records follow the portions of Rho's shapes the engine reads. Ownership,
@@ -97,7 +99,7 @@ these arguments and carry evidence IDs. The lexicon in `risk/features.py` is fro
 | `bill_mismatch` | Named bill differs in ID, amount/currency, payee, or an explicitly supplied optional method ID |
 | `document_instruction_patterns` | Fixed case-insensitive patterns in the named bill and independently discovered open bills |
 | `bill_not_referenced` | No bill named and an open bill exists, or the payee is new or recently changed |
-| `duplicate_candidate` | The named bill was already paid, or the same amount went to the payee within 7 days, in Rho's history or the gateway's own simulated payments (`context.gateway_payments`) |
+| `duplicate_candidate` | The named bill is already paid (its status is `paid`, or a payment in Rho's history or the gateway's own simulated payments in `context.gateway_payments` names it), or the same amount went to the payee within 7 days |
 
 A duplicate candidate sets an elevated floor, so the payment is challenged. Paying a vendor in a
 currency it has never been paid in leaves no same-currency history, so the payee counts as new.

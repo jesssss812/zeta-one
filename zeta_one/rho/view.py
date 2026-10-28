@@ -29,7 +29,7 @@ def context_for(store):
         return BillView(id=bill['id'], counterparty_id=cp['id'], counterparty_name=cp['legal_name'],
             amount=bill['amount'], invoice_number=bill['invoice_number'], invoice_date=bill['invoice_date'],
             due_date=bill['due_date'], memo=bill['memo'], document_excerpt=text['text'] if text else None,
-            status=None)
+            status=bill['status'])
 
     def history(cp_id, currency, business_id, now):
         transactions = {}
@@ -45,7 +45,7 @@ def context_for(store):
             posted = datetime.fromisoformat(txn['posted_at'].replace('Z','+00:00'))
             if posted <= now:
                 transactions[txn['id']] = PaymentRecord(id=txn['id'], posted_at=posted,
-                    amount=txn['amount'], method_type=METHOD_TYPES[txn['transaction_type']])
+                    amount=txn['amount'], method_type=METHOD_TYPES[txn['transaction_type']], bill_id=bill['id'])
         records = sorted(transactions.values(), key=lambda r:(r.posted_at,r.id), reverse=True)
         if not records:
             return PaymentHistory()

@@ -83,10 +83,13 @@ DUPLICATE_DAYS = 7
 
 
 def duplicate_candidate(proposal: Proposal, context: Context, now: datetime) -> Feature:
-    """The same bill paid already, or the same amount to the same payee within DUPLICATE_DAYS, in Rho's
-    history or in the gateway's own simulated payments."""
+    """The named bill is already paid (Rho marks it paid, or a payment in Rho's history or the gateway's
+    own simulated payments names it), or the same amount went to the payee within DUPLICATE_DAYS."""
     window = now - timedelta(days=DUPLICATE_DAYS)
     matched = []
+    bill = context.bill if proposal.bill_id is not None else None
+    if bill is not None and bill.status == 'paid':
+        matched.append(bill.id)
     for payment in [*context.payment_history.recent, *context.gateway_payments]:
         same_bill = proposal.bill_id is not None and getattr(payment, 'bill_id', None) == proposal.bill_id
         same_amount = payment.amount == proposal.amount and payment.posted_at >= window

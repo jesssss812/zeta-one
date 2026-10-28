@@ -21,7 +21,10 @@ def test_fixture_context_parity(path):
     fixture = json.loads(path.read_text())
     expected = Context.model_validate(fixture['context'])
     actual = context_for(Store())(Proposal.model_validate(fixture['proposal']), expected.business.id, SEED_NOW)
-    assert actual.model_dump(exclude={'open_bills'}) == expected.model_dump(exclude={'open_bills'})
+    # The fixtures predate the bill's status and the bill each history payment settled.
+    newer = {'open_bills': True, 'bill': {'status'}, 'payment_history': {'recent': {'__all__': {'bill_id'}}},
+             'bill_counterparty_payment_history': {'recent': {'__all__': {'bill_id'}}}}
+    assert actual.model_dump(exclude=newer) == expected.model_dump(exclude=newer)
 
 
 @pytest.mark.parametrize('field,value', [('counterparty_id','missing'), ('payment_method_id','pm_0007_01'), ('source_account_id','missing'), ('bill_id','missing')])

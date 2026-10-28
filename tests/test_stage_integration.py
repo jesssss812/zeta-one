@@ -136,3 +136,42 @@ def test_signed_uncapped_payment_respects_the_supported_amount_range(amount):
             ledger.record(record, proposal)
             assert connection.execute('SELECT amount FROM payments').fetchone()[0] == amount
     connection.close()
+
+
+def test_a_bill_rho_already_paid_is_a_duplicate():
+    """Naming a bill the seed shows as paid sets the duplicate floor, so it can't execute again."""
+    from zeta_one.gateway.scenarios import load_fixture
+
+    proposal = load_fixture('routine_bill_payment').proposal.model_copy(
+        update={'bill_id': 'paid_txn_history_cp_0012_000', 'source_document_ids': []})
+    with Store() as store:
+        context = context_for(store)(proposal, 'biz_seed_01', SEED_NOW)
+        assert context.bill.status == 'paid'
+        assert all(record.bill_id for record in context.payment_history.recent)
+        output = Tier0()(proposal, context, SEED_NOW)
+    assert output.features['duplicate_candidate'].value is True
+    assert 'paid_txn_history_cp_0012_000' in output.features['duplicate_candidate'].evidence
+    assert output.result.level == 'elevated'
+
+
+def test_a_bill_the_gateway_paid_leaves_the_open_bills():
+    """Rho's stand-in records keep the bill open, so the gateway drops it itself; a later proposal
+    without a bill reference then isn't challenged for not naming it."""
+    from datetime import timedelta
+
+    from zeta_one.gateway.ledger import Ledger
+    from zeta_one.gateway.scenarios import load_fixture
+    from zeta_one.gateway.service import with_gateway_payments
+
+    scenario = load_fixture('routine_bill_payment')
+    connection = sqlite3.connect(':memory:', check_same_thread=False)
+    connection.row_factory = sqlite3.Row
+    ledger = Ledger(connection)
+    record = scenario.decision_record.model_copy(update={'decision_id': 'dec_paid', 'created_at': SEED_NOW - timedelta(days=40)})
+    ledger.record(record, scenario.proposal)
+    with Store() as store:
+        load = with_gateway_payments(context_for(store), ledger)
+        context = load(scenario.proposal.model_copy(update={'bill_id': None, 'source_document_ids': []}),
+                       'biz_seed_01', SEED_NOW)
+    assert scenario.proposal.bill_id not in {bill.id for bill in context.open_bills}
+    assert [p.bill_id for p in context.gateway_payments] == [scenario.proposal.bill_id]

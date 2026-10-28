@@ -193,7 +193,7 @@ class Ledger:
     def payments_to(self, business_id: str, counterparty_id: str, since: datetime) -> list[PaymentRecord]:
         """The business's executed and held simulated payments to one payee since a time, newest first."""
         rows = self._db.execute(
-            """SELECT payment_id, proposal, created_at FROM payments
+            """SELECT payment_id, proposal, created_at, status FROM payments
                WHERE business_id = ? AND status IN ('executed', 'held') AND created_at >= ?
                ORDER BY created_at DESC""",
             (business_id, _iso(since)),
@@ -203,7 +203,7 @@ class Ledger:
             proposal = Proposal.model_validate_json(row["proposal"])
             if proposal.counterparty_id == counterparty_id:
                 records.append(PaymentRecord(id=row["payment_id"], posted_at=row["created_at"],
-                                             amount=proposal.amount, bill_id=proposal.bill_id))
+                                             amount=proposal.amount, bill_id=proposal.bill_id, status=row["status"]))
         return records
 
     def spend_source(self, exclude: str | None = None) -> SpendSource:

@@ -23,17 +23,21 @@ from zeta_one.gateway.reuse import RiskReuse
 from zeta_one.gateway.wiring import ContextCapture, Stages, build_engine
 
 
-# How far back the context's `gateway_payments` reach: what the duplicate check can see.
-GATEWAY_PAYMENT_WINDOW = timedelta(days=30)
+# How far back the context's `gateway_payments` reach: what the duplicate check can see. A bill paid
+# by the gateway stays open in Rho's stand-in records, so this covers any bill a demo could repeat.
+GATEWAY_PAYMENT_WINDOW = timedelta(days=365)
 
 
 def with_gateway_payments(load_context: ContextSource, ledger: Ledger) -> ContextSource:
-    """A ContextSource that adds the gateway's own recent simulated payments to the payee."""
+    """A ContextSource that adds the gateway's own recent simulated payments to the payee, and drops
+    the bills it has already paid from `open_bills`."""
 
     def load(proposal: Proposal, business_id: str, now: datetime) -> Context:
         context = load_context(proposal, business_id, now)
         payments = ledger.payments_to(business_id, proposal.counterparty_id, now - GATEWAY_PAYMENT_WINDOW)
-        return context.model_copy(update={"gateway_payments": payments})
+        paid = {payment.bill_id for payment in payments if payment.bill_id and payment.status == "executed"}
+        open_bills = [bill for bill in context.open_bills if bill.id not in paid]
+        return context.model_copy(update={"gateway_payments": payments, "open_bills": open_bills})
 
     return load
 
