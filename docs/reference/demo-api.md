@@ -43,7 +43,7 @@ endpoints. A scenario run returns its record in full.
 | --- | --- |
 | `GET /v1/health` | `{"engine_version", "policy_version", "data_backend": "seed" \| "live", "simulated": true}` |
 | `GET /v1/scenarios` | `[{"name", "title", "summary", "expected"}]` |
-| `POST /v1/scenarios/{name}/run` | a **scenario result** (below); runs the scenario fresh each time |
+| `POST /v1/scenarios/{name}/run` | a **scenario result** (below); runs the scenario fresh each time. Send `Content-Type: application/json` (a body of `{}`): anything else is `415`, so another site can't trigger runs without a CORS preflight. Its record carries `"sandbox": {"scenario": "<name>"}` |
 | `GET /v1/decisions/{decision_id}` | the **evidence record** of an earlier run (admin token) |
 | `GET /v1/eval/latest` | the evaluation report as JSON once one exists; `404` before |
 

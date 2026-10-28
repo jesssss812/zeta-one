@@ -209,7 +209,11 @@ def create_app(gateway: Gateway, token: str | None, eval_report: Path = EVAL_REP
         return scenarios.list_scenarios()
 
     @app.post("/v1/scenarios/{name}/run")
-    def run_scenario(name: str):
+    def run_scenario(name: str, request: Request):
+        # A JSON content type can't be sent cross-site without a CORS preflight, which only local
+        # origins pass, so another web page can't write sandbox records into this gateway.
+        if request.headers.get("content-type", "").split(";")[0].strip() != "application/json":
+            return _error(415, "json_required", "send Content-Type: application/json")
         try:
             result = scenarios.run(name)
         except KeyError:

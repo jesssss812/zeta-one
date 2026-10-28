@@ -28,7 +28,7 @@ def test_every_scenario_runs_and_its_decision_can_be_fetched(client):
     listed = [s["name"] for s in client.get("/v1/scenarios").json()]
     assert listed == ORDER
     for name in ORDER:
-        body = client.post(f"/v1/scenarios/{name}/run").json()
+        body = client.post(f"/v1/scenarios/{name}/run", json={}).json()
         record = body["decision_record"]
         assert record["decision"] == body["scenario"]["expected"]
         assert record["execution"]["simulated"] is True
@@ -36,14 +36,14 @@ def test_every_scenario_runs_and_its_decision_can_be_fetched(client):
 
 
 def test_unknown_scenario_is_404(client):
-    response = client.post("/v1/scenarios/nope/run")
+    response = client.post("/v1/scenarios/nope/run", json={})
     assert response.status_code == 404
     assert response.json()["error"]["code"] == "unknown_scenario"
 
 
 def test_each_scenario_run_is_a_new_decision(client):
-    first = client.post("/v1/scenarios/routine_bill_payment/run").json()["decision_record"]
-    second = client.post("/v1/scenarios/routine_bill_payment/run").json()["decision_record"]
+    first = client.post("/v1/scenarios/routine_bill_payment/run", json={}).json()["decision_record"]
+    second = client.post("/v1/scenarios/routine_bill_payment/run", json={}).json()["decision_record"]
     assert first["decision_id"] != second["decision_id"]
     fixture = load_fixture("routine_bill_payment").decision_record
     assert fixture.decision_id not in (first["decision_id"], second["decision_id"])
@@ -78,7 +78,7 @@ def test_the_latest_evaluation_report_is_served(tmp_path):
 
 @pytest.mark.parametrize("name", ORDER)
 def test_scenarios_run_on_the_real_stages(client, name):
-    body = client.post(f"/v1/scenarios/{name}/run").json()
+    body = client.post(f"/v1/scenarios/{name}/run", json={}).json()
     record = body["decision_record"]
     fixture = load_fixture(name)
     assert record["decision"] == fixture.scenario.expected
@@ -116,3 +116,15 @@ def test_the_live_endpoint_decides_a_signed_demo_agent_request_on_the_real_stage
     assert record["identity"]["result"] == "verified" and record["execution"]["status"] == "executed"
     replayed = client.post(path, content=body, headers=headers).json()
     assert client.get(f"/v1/decisions/{replayed['decision_id']}", headers=ADMIN).json()["reasons"] == ["identity:replay"]
+
+
+def test_a_scenario_run_needs_a_json_request_so_other_sites_cannot_trigger_it(client):
+    response = client.post("/v1/scenarios/routine_bill_payment/run", content=b"", headers={"Content-Type": "text/plain"})
+    assert response.status_code == 415
+    assert client.get("/v1/decisions", headers=ADMIN).json() == []
+
+
+def test_a_scenario_record_says_it_is_a_sandbox_run(client):
+    record = client.post("/v1/scenarios/routine_bill_payment/run", json={}).json()["decision_record"]
+    assert record["sandbox"] == {"scenario": "routine_bill_payment"}
+    assert client.get("/v1/decisions", headers=ADMIN).json()[0]["sandbox"] == {"scenario": "routine_bill_payment"}

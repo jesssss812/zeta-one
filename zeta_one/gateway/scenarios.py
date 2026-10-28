@@ -65,6 +65,8 @@ def run(name: str) -> ScenarioResult:
         record, _ = engine.evaluate(request)
     connection.close()
     ran_models = [name for name in replayed if name in record.risk.tiers_run]
+    # The record says it came from a sandboxed demo run, so no one reads it as a real agent's decision.
+    record = EvidenceRecord.model_validate({**record.model_dump(by_alias=True), "sandbox": {"scenario": name}})
     return scenario.model_copy(update={"decision_record": record, "illustrative": bool(ran_models),
                                        "replayed_stages": ran_models})
 
