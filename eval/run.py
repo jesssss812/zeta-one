@@ -92,7 +92,8 @@ def run_set(set_name: str, config: str, backend: Backend, workers: int = 4, data
             results: Path = RESULTS, live: bool = False, max_usd: float | None = None) -> list[dict]:
     if config not in CONFIGS:
         raise ValueError(f"unknown configuration {config!r}; choose from {list(CONFIGS)}")
-    paid = getattr(backend, "paid", True) and config not in BASELINES
+    models = config not in BASELINES and any(tier != "tier0" for tier in CONFIGS[config].tiers)
+    paid = getattr(backend, "paid", True) and models
     if paid and (not live or max_usd is None):
         raise BudgetRequired(f"the {backend.name} backend calls a paid model: pass live=True and max_usd")
     cases = sets.load_set(set_name, data)

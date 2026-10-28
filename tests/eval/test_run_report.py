@@ -175,10 +175,12 @@ class PaidBackend(FakeBackend):
 def test_a_paid_backend_needs_live_and_a_budget(data, tmp_path, monkeypatch):
     monkeypatch.setattr(cases, "demo_cases", lambda: [])
     with pytest.raises(run.BudgetRequired):
-        run.run_set("dev", "rules", PaidBackend({}), data=data, results=tmp_path / "r")
+        run.run_set("dev", "engineered", PaidBackend({}), data=data, results=tmp_path / "r")
     with pytest.raises(run.BudgetRequired):
-        run.run_set("dev", "rules", PaidBackend({}), data=data, results=tmp_path / "r", live=True)
+        run.run_set("dev", "engineered", PaidBackend({}), data=data, results=tmp_path / "r", live=True)
+    run.run_set("dev", "engineered", PaidBackend({}), data=data, results=tmp_path / "r", live=True, max_usd=1.0)
     run.run_set("dev", "always_allow", PaidBackend({}), data=data, results=tmp_path / "r")  # baselines are free
+    run.run_set("dev", "rules", PaidBackend({}), data=data, results=tmp_path / "r")  # no model in rules
 
 
 def test_the_budget_stops_starting_cases(data, tmp_path, monkeypatch):

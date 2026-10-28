@@ -77,3 +77,8 @@ def test_generated_cases_run_through_the_real_backend(tmp_path, backend):
         outcome = backend.run(Case.model_validate({**raw, "expected": "allow"}), run.CONFIGS["engineered"])
         assert outcome.decision in ("allow", "challenge", "block")
         assert outcome.record.identity.result == "verified" and outcome.record.risk.tiers_run[0] == "tier0"
+
+
+def test_a_rules_only_run_needs_no_budget_even_on_the_live_backend(tmp_path):
+    rows = run.run_set("deterministic", "rules", backends.get_backend("real"), results=tmp_path)
+    assert rows and all(r["model_calls"] == 0 for r in rows if not r["not_run"])
