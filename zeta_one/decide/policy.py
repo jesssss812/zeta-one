@@ -1,5 +1,7 @@
 """The policy: identity, then authorization, then an ordered table of risk rows; first match wins.
 
+A verified agent with no authorization document is blocked even if the checker reported nothing.
+
 The table is data under contracts.POLICY_VERSION. A new rung is a new row (decision 0008). Rows that read
 risk read the merged level, which no model can lower below the tier-0 floor (decision 0007).
 """
@@ -93,6 +95,10 @@ def decide(p: PolicyInput) -> Outcome:
     if p.authorization.violations:
         reasons = [f"authorization:{violation.field}" for violation in p.authorization.violations]
         return Outcome("block", reasons, None, FRICTION_RUNG["block"])
+    if p.authorization_doc is None:
+        # No grant at all blocks here too, whatever the checker returned: scope, expiry and
+        # revocation can't rest on a checker remembering to report a missing grant.
+        return Outcome("block", ["authorization:authorization"], None, FRICTION_RUNG["block"])
     for row in ROWS:
         if row.condition(p):
             reasons = [row.reason]

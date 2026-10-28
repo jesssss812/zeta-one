@@ -6,6 +6,7 @@ from hypothesis import given, strategies as st
 
 from zeta_one.contracts import (
     LEVEL_ORDER,
+    Authorization,
     AuthorizationEvidence,
     Configuration,
     Feature,
@@ -37,6 +38,8 @@ model_answers = st.lists(
 PROPOSAL = Proposal(counterparty_id="cp", payment_method_id="pm", source_account_id="acct",
                     amount=Money(amount=100, currency="USD"))
 VERIFIED = IdentityEvidence(result="verified", claimed_agent_id="agent", business_id="biz")
+GRANT = Authorization(authorization_id="a", version=1, policy_version="p", business_id="biz", agent_id="agent",
+                      granted_by="owner", granted_at="2026-10-01T00:00:00Z")
 
 
 def _tier0(level, feats) -> Tier0Output:
@@ -56,14 +59,14 @@ def test_every_lowering_is_recorded_and_flagged_in_reasons(tier0_level, feats, a
     risk = escalation.merge(_tier0(tier0_level, feats), answers)
     lowered = LEVEL_ORDER[risk.level] < LEVEL_ORDER[tier0_level]
     assert (risk.lowered is not None) == lowered
-    outcome = policy.decide(policy.PolicyInput(VERIFIED, AuthorizationEvidence(), None, risk, PROPOSAL))
+    outcome = policy.decide(policy.PolicyInput(VERIFIED, AuthorizationEvidence(), GRANT, risk, PROPOSAL))
     assert ("risk:lowered_by_model" in outcome.reasons) == lowered
 
 
 @given(levels, features, model_answers)
 def test_a_failed_model_never_ends_in_allow(tier0_level, feats, answers):
     risk = escalation.merge(_tier0(tier0_level, feats), answers)
-    outcome = policy.decide(policy.PolicyInput(VERIFIED, AuthorizationEvidence(), None, risk, PROPOSAL))
+    outcome = policy.decide(policy.PolicyInput(VERIFIED, AuthorizationEvidence(), GRANT, risk, PROPOSAL))
     if any(answer.result.error for answer in answers):
         assert outcome.decision != "allow"
 
@@ -83,6 +86,13 @@ def test_authorization_violation_blocks_whatever_risk_says(tier0_level, feats, a
     authorization = AuthorizationEvidence(violations=[violation])
     outcome = policy.decide(policy.PolicyInput(VERIFIED, authorization, None, risk, PROPOSAL))
     assert outcome.decision == "block" and outcome.reasons == ["authorization:limits.per_payment"]
+
+
+@given(levels, features, model_answers)
+def test_no_authorization_document_blocks_whatever_risk_says(tier0_level, feats, answers):
+    risk = escalation.merge(_tier0(tier0_level, feats), answers)
+    outcome = policy.decide(policy.PolicyInput(VERIFIED, AuthorizationEvidence(), None, risk, PROPOSAL))
+    assert outcome.decision == "block" and outcome.reasons == ["authorization:authorization"]
 
 
 def test_clean_tier0_does_not_escalate_and_soft_signal_does():

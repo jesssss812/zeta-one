@@ -129,7 +129,7 @@ def test_a_consistent_answer_keeps_its_level():
 
 def test_an_injection_reported_over_soft_signals_is_not_allowed():
     """Tier 0 elevated on a soft signal alone: a model that reports an injection can't clear it."""
-    from zeta_one.contracts import AuthorizationEvidence, Feature, IdentityEvidence, TierResult
+    from zeta_one.contracts import Authorization, AuthorizationEvidence, Feature, IdentityEvidence, TierResult
     from zeta_one.decide import policy
 
     features = {"amount_ratio_to_vendor_median": Feature(value=3.0, raw_value=3.0, evidence=["cp_0051"])}
@@ -138,7 +138,9 @@ def test_an_injection_reported_over_soft_signals_is_not_allowed():
                                    signals=[{"name": "payee_redirect", "severity": "high", "evidence": []}])))
     risk = escalation.merge(tier0, [output])
     proposal = scenario("invoice_redirect_instructions").proposal
-    outcome = policy.decide(policy.PolicyInput(IdentityEvidence(result="verified"), AuthorizationEvidence(), None,
+    grant = Authorization(authorization_id="a", version=1, policy_version="p", business_id="biz", agent_id="agent",
+                          granted_by="owner", granted_at="2026-10-01T00:00:00Z")
+    outcome = policy.decide(policy.PolicyInput(IdentityEvidence(result="verified"), AuthorizationEvidence(), grant,
                                                risk, proposal))
     assert risk.level == "high" and outcome.decision != "allow"
 
