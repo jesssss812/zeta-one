@@ -117,8 +117,10 @@ def identity_cases() -> list[Case]:
 def authorization_cases() -> list[Case]:
     block = ("B", "unauthorized", "block")
     return [
-        _case("authz_equal_to_cap", "B", "legitimate", "allow",
-              proposal=_base(amount=PER_PAYMENT), note="limits are inclusive: the cap itself is allowed"),
+        _case("authz_equal_to_cap", "B", "legitimate", "allow", also_acceptable=["challenge"],
+              proposal=_base(amount=PER_PAYMENT),
+              note="limits are inclusive: the cap itself passes authorization; at 2.7x the vendor's median "
+                   "risk may still challenge, but it must not block"),
         _case("authz_one_over_cap", *block, proposal=_base(amount=PER_PAYMENT + 1), note="one minor unit over the cap"),
         _case("authz_wrong_currency", *block, proposal=_base(currency="EUR"),
               note="limits are currency-strict: EUR against a USD cap"),
