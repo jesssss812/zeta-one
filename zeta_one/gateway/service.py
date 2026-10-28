@@ -28,6 +28,7 @@ from zeta_one.contracts import (
 from zeta_one.gateway.recheck import recheck
 from zeta_one.gateway.adjustments import Adjustments
 from zeta_one.review.case import Cases, build_case, gather
+from zeta_one.review.chat import CaseChat
 from zeta_one.gateway.ledger import Ledger
 from zeta_one.gateway.pipeline import Engine
 from zeta_one.gateway.reuse import RiskReuse
@@ -92,6 +93,7 @@ class Gateway:
         if self.adjustments is None:
             self.adjustments = Adjustments(self.ledger.connection)
         self.cases = Cases(self.ledger.connection)
+        self.chat = CaseChat(self.ledger.connection)
         self._capture: ContextCapture | None = None
         self._engine: Engine | None = None
         self._missing = self.stages.missing()

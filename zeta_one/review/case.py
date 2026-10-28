@@ -61,7 +61,8 @@ paying. Gather and order the evidence so the person can decide quickly:
 
 class Finding(BaseModel):
     claim: str = Field(max_length=500)
-    url: str = Field(max_length=500)
+    # Only web addresses: the page links them, so a javascript: or data: URL must never get through.
+    url: str = Field(max_length=500, pattern=r"^https?://\S+$")
 
 
 class Research(BaseModel):
@@ -241,11 +242,18 @@ def render(evidence: dict[str, Any], found: Research | None, boundary: str | Non
                         "web research: " + ("done" if found else "not available"), *blocks])
 
 
+RECORD_ID = re.compile(r"\b(?:dec|pay|adj|chl|bill|paid|cp|pm|pmc|pmh|txn|acct)_[A-Za-z0-9_]+")
+
+
+def record_ids(evidence: dict[str, Any]) -> set[str]:
+    """Every record id the evidence mentions: the ids a case file or a chat answer may cite."""
+    return set(RECORD_ID.findall(json.dumps(evidence, default=str)))
+
+
 def _ground(case: CaseFile, evidence: dict[str, Any], found: Research | None) -> CaseFile:
     """A "verified fact" must cite something in the evidence or the research; one that doesn't is
     moved to the inferences, where it belongs."""
-    known = set(re.findall(r"\b(?:dec|pay|adj|chl|bill|cp|pm|pmc|txn|acct)_[A-Za-z0-9_]+",
-                           json.dumps(evidence, default=str)))
+    known = record_ids(evidence)
     known |= {finding.url for finding in (found.findings if found else [])}
     facts, inferences = [], list(case.inferences)
     for fact in case.verified_facts:

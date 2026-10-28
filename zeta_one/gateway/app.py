@@ -26,6 +26,8 @@ from zeta_one.gateway import admin, scenarios
 from zeta_one.gateway.ledger import Ledger
 from zeta_one.gateway.reuse import RiskReuse
 from zeta_one.gateway.service import EngineNotReady, Gateway, NotHeld, UnknownChallenge, UnknownDecision
+from zeta_one.review.chat import ChatUnavailable
+from zeta_one.review.records import resolve as resolve_record
 from zeta_one.gateway.wiring import ROOT, configuration_from_env, engine_version, real_stages, register_demo_agents
 
 HOST = "127.0.0.1"
@@ -64,6 +66,13 @@ class CaseRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     decision_id: str = Field(min_length=1, max_length=128)
+    by: str = Field(min_length=1, max_length=200)
+
+
+class CaseQuestion(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    question: str = Field(min_length=1, max_length=1000)
     by: str = Field(min_length=1, max_length=200)
 
 
@@ -267,6 +276,37 @@ def create_app(gateway: Gateway, token: str | None, eval_report: Path = EVAL_REP
         admin.require_admin(request.headers, token)
         with gateway.lock:
             return gateway.cases.for_decision(decision_id)
+
+    @app.post("/v1/cases/{case_id}/chat")
+    async def ask_about_case(case_id: str, request: Request):
+        """A case worker's question, answered by the local model from this case's evidence only."""
+        admin.require_admin(request.headers, token)
+        body, problem = _body(CaseQuestion, await request.body())
+        if problem:
+            return problem
+        with gateway.lock:
+            case = gateway.cases.get(case_id)
+        if case is None:
+            return _error(404, "unknown_case", f"no case {case_id}")
+        try:
+            return await run_in_threadpool(gateway.chat.ask, case, body.question, body.by, gateway.clock())
+        except ChatUnavailable as error:
+            return _error(503, "chat_unavailable", str(error))
+
+    @app.get("/v1/cases/{case_id}/chat")
+    def case_chat_history(case_id: str, request: Request):
+        admin.require_admin(request.headers, token)
+        with gateway.lock:
+            return gateway.chat.history(case_id)
+
+    @app.get("/v1/records/{record_id}")
+    def get_record(record_id: str, request: Request):
+        """Any record the case review cites, with the system it came from (decisions, payments,
+        adjustments, and the Rho stand-in's bills, payees, methods, changes, transactions, accounts)."""
+        admin.require_admin(request.headers, token)
+        with gateway.lock:
+            found = resolve_record(record_id, gateway.ledger, gateway.adjustments, gateway.stages.seed)
+        return found if found else _error(404, "unknown_record", f"no record {record_id}")
 
     @app.get("/review", response_class=HTMLResponse)
     def review_page():

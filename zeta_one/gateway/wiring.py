@@ -82,6 +82,8 @@ class Stages:
     # Where admin endpoints register agents and grant authorizations; None when the stages are stand-ins.
     registry: Registry | None = None
     authorizations: AuthorizationStore | None = None
+    # The seed store the context reads, so the case review can show the records it cites.
+    seed: SeedStore | None = None
 
     def missing(self) -> list[str]:
         required = ["verify_identity", "load_authorization", "make_checker", "load_context", "tier0", "agent_status"]
@@ -123,6 +125,7 @@ def real_stages(connection: sqlite3.Connection, store: SeedStore | None = None,
         seed_version=store.seed_version,
         registry=registry,
         authorizations=authorizations,
+        seed=store,
     )
 
 
