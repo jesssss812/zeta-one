@@ -100,6 +100,11 @@ def test_each_failure_is_an_error_and_no_level(reply, status, error):
 def test_no_key_is_an_error_without_a_call(monkeypatch, tmp_path):
     monkeypatch.delenv(jev.KEY_NAME, raising=False)
     monkeypatch.setattr(jev, "ROOT", tmp_path)
+
+    def never(*args):
+        raise AssertionError("a test without a key made a real Jev call")
+
+    monkeypatch.setattr(jev, "_http_post", never)
     output = JevTier().assess(risk_input())
     assert output.result.error == f"{jev.KEY_NAME} is not set"
 
@@ -227,3 +232,16 @@ def test_live_jev_call():
     output = JevTier().assess(risk_input())
     assert output.result.error is None, output.result.error
     assert output.result.level in ("elevated", "high")
+
+
+def test_missing_usage_is_estimated_high_not_free():
+    output, calls = run({"answers": payload()["answers"]})
+    state = calls[0][2]["state"]
+    assert output.result.usage.input_tokens >= len(state) // 4 and output.result.usage.estimated is True
+
+
+def test_the_missing_key_test_never_reads_the_checkouts_env(monkeypatch, tmp_path):
+    monkeypatch.delenv(jev.KEY_NAME, raising=False)
+    monkeypatch.setattr(jev, "ROOT", tmp_path)
+    (tmp_path / ".env").write_text("")
+    assert jev.api_key() is None

@@ -69,8 +69,9 @@ class InvalidAnswer(ValueError):
     pass
 
 
-def api_key(env_file: Path = ROOT / ".env") -> str | None:
+def api_key(env_file: Path | None = None) -> str | None:
     """The TypeSafe key from the environment, else from `.env`; never printed or logged."""
+    env_file = env_file or ROOT / ".env"
     if os.environ.get(KEY_NAME):
         return os.environ[KEY_NAME]
     if env_file.exists():
@@ -104,7 +105,7 @@ class JevTier:
             return self._failed(started, None, f"{type(error).__name__}")
         if status != 200:
             return self._failed(started, None, f"http_{status}")
-        usage = _usage(payload)
+        usage = _usage(payload, body["state"])
         try:
             answers = _answers(payload)
             return self._output(answers, risk_input, started, usage)
@@ -197,12 +198,16 @@ def _yes_no(value: Any) -> bool:
     raise InvalidAnswer(f"a yes/no answer was {value!r}")
 
 
-def _usage(payload: Any) -> Usage:
+# Without reported usage the input is estimated high, so spend is never undercounted.
+CHARS_PER_TOKEN_ESTIMATE = 2
+
+
+def _usage(payload: Any, state: str) -> Usage:
     usage = payload.get("usage") if isinstance(payload, dict) else None
-    if not isinstance(usage, dict):
-        return Usage()
-    tokens = usage.get("input_tokens", usage.get("prompt_tokens", 0))
-    return Usage(input_tokens=tokens if isinstance(tokens, int) else 0)
+    tokens = usage.get("input_tokens", usage.get("prompt_tokens")) if isinstance(usage, dict) else None
+    if isinstance(tokens, int) and tokens >= 0:
+        return Usage(input_tokens=tokens)
+    return Usage(input_tokens=len(state) // CHARS_PER_TOKEN_ESTIMATE + 1, estimated=True)
 
 
 def _since(started: float) -> int:
