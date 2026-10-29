@@ -13,9 +13,9 @@ Zeta One checks each proposed payment before execution and returns **allow**, **
 | --- | --- | --- |
 | **Verify the actor** | Who is acting, and for which business? | Signed requests; unknown or revoked agents are blocked |
 | **Bound its authority** | Did the business authorize this payment? | Scope, limits, expiry and revocation, checked in code |
-| **Assess the action** | Is it fraud anyway? | Risk rules → optional Jev typed decisions → deeper model review where needed → human verification for held payments |
+| **Assess the action** | Is it fraud anyway? | Rules first; Jev, a typed decision model, next; a language model only where needed; a person verifies held payments |
 
-Built for the [AITX & MLOps World Community Hackathon](https://luma.com/aitx-mlops-techweek-hack)
+Built for the [AITX & MLOps World Community Hackathon](https://common-scooter-829.notion.site/AITX-MLOps-World-Community-Hackathon-Austin-Tech-Week-4021e636288e81e08278fd9a977d7639)
 (Austin Tech Week, October 2026), in the [Rho](https://www.rho.co/) fintech track, using Rho's API
 shapes and a read-only staging connection. It is not a Rho product. **Payment execution is simulated.**
 
@@ -45,7 +45,7 @@ shapes and a read-only staging connection. It is not a Rho product. **Payment ex
   legitimate payments held or blocked alongside fraud allowed, model spend and latency. A
   legitimate payment needing verification is not automatically an unnecessary challenge.
 - **Evaluation using traditional ML methods.** Separate development and frozen test/hard sets,
-  blind labelling with human checks and adjudication, simple baselines, per-category confusion
+  blind labeling with human checks and adjudication, simple baselines, per-category confusion
   matrices and confidence intervals, paired comparisons, and error analysis. We report where the
   models help and where they fail, with the data and label limitations alongside the results.
 - **A feedback loop with people in control.** A person's verified finding can block a payment
@@ -61,6 +61,10 @@ One run per configuration on synthetic cases, recorded on 29 October 2026:
 - **Models reduced friction, with a safety trade-off.** On 100 generated test cases, rules held or
   blocked 39 of 51 legitimate payments and allowed none of 49 frauds. The Jev cascade reduced that
   legitimate workload to 14, but allowed two frauds.
+- **A self-hosted open-weight model held its own.** Qwen 3.6 27B on one rented GPU decided 94 of
+  100 test cases acceptably, the most of any configuration, at about an eighth of the cost of Opus
+  on the same escalated cases. Its
+  prompt was tuned on its own development errors, and on the hard set it scored 7 of 12 to Opus's 10.
 - **Selective inference has a blind spot.** Two detectable frauds in the separately authored hard
   set triggered no rule and bypassed selective model review. Opus on every payment caught both.
 
@@ -175,7 +179,7 @@ a person. Raw Rho staging data never leaves the laptop. See
   occur in development, so generated cases flatter the rules.
 - The datasets are small: 100 generated test cases and 14 separately authored hard cases, of which
   12 are scored. Each configuration ran once; uncertainty is wide and comparisons are limited.
-- Labels are only partly human-checked. Initial AI–human agreement on 40 test cases was 45%;
+- Labels are only partly human-checked. Initial AI–human agreement on 40 test cases was 45%, about chance;
   disagreements were adjudicated, while 60 test labels remain AI-only. These limits constrain
   what the scores establish.
 
@@ -194,7 +198,7 @@ a person. Raw Rho staging data never leaves the laptop. See
 ## Documentation
 
 - [Product](docs/strategy/product.md): the problem, decision model and scope.
-- [Evaluation design](docs/strategy/evaluation.md): datasets, labelling, comparisons and metrics.
+- [Evaluation design](docs/strategy/evaluation.md): datasets, labeling, comparisons and metrics.
 - [Evaluation system](docs/reference/evaluation-system.md): how to run it and reproduce the report.
 - [Fintech integration](docs/reference/fintech-integration.md): the path from this demo to platform enforcement.
 - [Architecture](docs/strategy/architecture.md): components, deployment and data boundaries.
