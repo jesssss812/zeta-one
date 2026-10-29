@@ -101,8 +101,42 @@ No decision changed against the baseline; the two misses are the same. `jev`, at
 cheapest configuration with a model. The open-weight arm follows the same rule but was not rerun:
 its `dev` results are from before the change.
 
+## 5. Payment destinations, method details and scoped confirmations
+
+The context can now say which bank account each past payment went to and which bill it paid, a
+payment method's account ending and beneficiary, the payee's email, and which bank change a
+confirmation covers ([demo-api.md](demo-api.md#scenario-result) lists the fields). They were added
+so the hand-written `hard` cases can be represented. `dev`'s setup records none of the first three,
+so on `dev` two things changed in what the models see; every other input is byte-identical:
+
+- The strong tier sees a confirmation's id on the change it covers, in the 11 cases with a
+  confirmed change. Before, it saw the confirmation only as a tier-0 flag.
+- Jev's state words the new-payee check as "added in the last 30 days or has never been paid",
+  in 4 cases, all for payees never paid. It used to say "has never been paid before", which is
+  wrong for a young payee that has been paid.
+
+`jev` and `engineered` rerun on `dev`, one run each, per-case record in
+[data/eval/baselines/dev-2026-10-28-supports/](../../data/eval/baselines/dev-2026-10-28-supports/):
+
+| On `dev` | `jev` before | `jev` after | `engineered` before | `engineered` after |
+| --- | --- | --- | --- | --- |
+| Acceptable | 49/51 | 49/51 | 49/51 | 49/51 |
+| Fraud caught | 22/22 | 22/22 | 22/22 | 22/22 |
+| Legitimate challenged / blocked | 9/29 / 0 | 9/29 / 0 | 9/29 / 0 | 9/29 / 0 |
+| Cases that reached Claude Opus 5.5 | 22 | 23 | 29 | 29 |
+| $ per 1,000 decisions | 12.14 | 12.04 | 15.53 | 15.26 |
+| Latency p50 / p95 | 0.4 s / 9.9 s | 0.9 s / 11.0 s | 5.5 s / 9.6 s | 5.5 s / 9.3 s |
+
+No decision changed in either arm. Of the cases whose input changed, 6 reached Opus under `jev`
+and all 11 under `engineered`; the 4 with the new wording all reached Jev. The level or tier
+differences there were are on cases whose input did not change, so they are run-to-run variance:
+under `jev`, Jev sent `dev_016` on to Opus this time and Opus rated `dev_032` high rather than
+elevated; under `engineered`, Opus rated `dev_035` elevated rather than high.
+
 ## Limits
 
-- One run of each arm. Jev answered almost identically on repeat passes; Opus did not always.
+- `jev` and `engineered` have two runs each with the tuned rule (sections 3 to 5), with no decision
+  changed between them; the other arms have one. Jev answered almost identically on repeat passes;
+  Opus did not always.
 - The wording and the state were chosen by looking at `dev` labels. A gain that holds on `dev` only
   is overfitting; `test` and `hard` decide.

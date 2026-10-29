@@ -8,15 +8,15 @@ Rates are shown as `rate (k/n, 95% Wilson interval)`. There is no overall accura
 
 - Models that ran: claude-opus-5-5, qwen/qwen3-235b-a22b-2507, typesafe/jev-1.14
 - Prices used: `{"claude-opus-5-5": {"cache_read_multiplier": 0.1, "cache_write_multiplier": 1.25, "input_per_mtok": 4.0, "output_per_mtok": 20.0}, "typesafe/jev-1.14": {"cache_read_multiplier": 0.1, "cache_write_multiplier": 1.25, "input_per_mtok": 0.042, "output_per_mtok": 0.0}}`
-- Engine version: `7ba6857`, `8be8e8e`, `d40bade`, `e4a4e41`, `e853f63`
+- Engine version: `23c489e`, `7ba6857`, `d40bade`
 - Policy version: `2026-10-28.4`
-- Seed version: `3574ce8f0cef1de72c159f3b2c98128410721da8c4016114bf90928e6958909c`
+- Seed version: `15c5c875071bd93485ba9b3a8afce94db723925924e4ab2207e43650d442d215`, `3574ce8f0cef1de72c159f3b2c98128410721da8c4016114bf90928e6958909c`
 - Generator seeds: dev: [7]; test: [11]
 - test combinations also in dev: 15 (the routine class has too few to keep apart; only wording and vendor differ)
 - Set hashes the results ran against:
   - deterministic: `095c6492168c4f11` (not frozen)
   - dev: `a4fbf0d6e02ece3e` (not frozen)
-- Cases by category: deterministic: {'B': 13, 'C': 7, 'D': 1, 'E': 2}; dev: {'A': 16, 'D': 15, 'E': 13, 'F': 7}
+- Cases by category: deterministic: {'B': 13, 'C': 7, 'D': 1, 'E': 2}; dev: {'A': 16, 'D': 15, 'E': 13, 'F': 7}; hard: {'A': 1, 'D': 8, 'E': 3, 'F': 2}
 
 ## Deterministic cases
 
@@ -56,8 +56,8 @@ How many decisions reached any model, and what they cost. Tier 0 is free; dollar
 | Configuration | Set | Reached a model | $ per 1,000 decisions | $ per fraud caught | Notes |
 | --- | --- | --- | --- | --- | --- |
 | rules | dev | 0% (0/51, 0%–7%) | 0.00 | 0.0000 |  |
-| engineered | dev | 57% (29/51, 43%–69%) | 15.53 | 0.0360 |  |
-| jev | dev | 84% (43/51, 72%–92%) | 12.14 | 0.0281 |  |
+| engineered | dev | 57% (29/51, 43%–69%) | 15.26 | 0.0354 |  |
+| jev | dev | 84% (43/51, 72%–92%) | 12.04 | 0.0279 |  |
 | open_weight | dev | 84% (43/51, 72%–92%) | 0.00 | 0.0000 | unpriced: qwen/qwen3-235b-a22b-2507 |
 | strong | dev | 100% (51/51, 93%–100%) | 23.96 | 0.0556 |  |
 
@@ -121,11 +121,11 @@ Confusion matrix over the risk categories (rows expected, columns decided):
 
 | Category | n | Accuracy | With acceptable | Detection | Legit challenged | Lowerings (legit / other) | $ per action | p50 / p95 ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| A | 16 | 94% (15/16, 72%–99%) | 94% (15/16, 72%–99%) | – | 0% (0/16, 0%–19%) | 9 / 0 | 0.0132 | 5182 / 8739 |
-| D | 15 | 93% (14/15, 70%–99%) | 93% (14/15, 70%–99%) | 100% (10/10, 72%–100%) | 100% (5/5, 57%–100%) | 0 / 0 | 0.0224 | 7540 / 10079 |
-| E | 13 | 92% (12/13, 67%–99%) | 100% (13/13, 77%–100%) | 100% (12/12, 76%–100%) | 100% (1/1, 21%–100%) | 0 / 0 | 0.0105 | 9 / 9383 |
-| F | 7 | 86% (6/7, 49%–97%) | 100% (7/7, 65%–100%) | – | 43% (3/7, 16%–75%) | 3 / 0 | 0.0153 | 7118 / 9676 |
-| risk (A, D, E, F) | 51 | 92% (47/51, 82%–97%) | 96% (49/51, 87%–99%) | 100% (22/22, 85%–100%) | 31% (9/29, 17%–49%) | 12 / 0 | 0.0155 | 5529 / 9568 |
+| A | 16 | 94% (15/16, 72%–99%) | 94% (15/16, 72%–99%) | – | 0% (0/16, 0%–19%) | 9 / 0 | 0.0131 | 5151 / 7506 |
+| D | 15 | 93% (14/15, 70%–99%) | 93% (14/15, 70%–99%) | 100% (10/10, 72%–100%) | 100% (5/5, 57%–100%) | 0 / 0 | 0.0221 | 7004 / 10448 |
+| E | 13 | 92% (12/13, 67%–99%) | 100% (13/13, 77%–100%) | 100% (12/12, 76%–100%) | 100% (1/1, 21%–100%) | 0 / 0 | 0.0102 | 23 / 9260 |
+| F | 7 | 86% (6/7, 49%–97%) | 100% (7/7, 65%–100%) | – | 43% (3/7, 16%–75%) | 3 / 0 | 0.0151 | 7408 / 9471 |
+| risk (A, D, E, F) | 51 | 92% (47/51, 82%–97%) | 96% (49/51, 87%–99%) | 100% (22/22, 85%–100%) | 31% (9/29, 17%–49%) | 12 / 0 | 0.0153 | 5510 / 9284 |
 
 Confusion matrix over the risk categories (rows expected, columns decided):
 
@@ -139,11 +139,11 @@ Confusion matrix over the risk categories (rows expected, columns decided):
 
 | Category | n | Accuracy | With acceptable | Detection | Legit challenged | Lowerings (legit / other) | $ per action | p50 / p95 ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| A | 16 | 94% (15/16, 72%–99%) | 94% (15/16, 72%–99%) | – | 0% (0/16, 0%–19%) | 9 / 0 | 0.0064 | 211 / 7752 |
-| D | 15 | 93% (14/15, 70%–99%) | 93% (14/15, 70%–99%) | 100% (10/10, 72%–100%) | 100% (5/5, 57%–100%) | 0 / 0 | 0.0192 | 7341 / 9870 |
-| E | 13 | 92% (12/13, 67%–99%) | 100% (13/13, 77%–100%) | 100% (12/12, 76%–100%) | 100% (1/1, 21%–100%) | 0 / 0 | 0.0097 | 327 / 10166 |
-| F | 7 | 86% (6/7, 49%–97%) | 100% (7/7, 65%–100%) | – | 43% (3/7, 16%–75%) | 3 / 0 | 0.0147 | 7056 / 8437 |
-| risk (A, D, E, F) | 51 | 92% (47/51, 82%–97%) | 96% (49/51, 87%–99%) | 100% (22/22, 85%–100%) | 31% (9/29, 17%–49%) | 12 / 0 | 0.0121 | 371 / 9920 |
+| A | 16 | 94% (15/16, 72%–99%) | 94% (15/16, 72%–99%) | – | 0% (0/16, 0%–19%) | 9 / 0 | 0.0068 | 222 / 9763 |
+| D | 15 | 93% (14/15, 70%–99%) | 93% (14/15, 70%–99%) | 100% (10/10, 72%–100%) | 100% (5/5, 57%–100%) | 0 / 0 | 0.0186 | 6981 / 10513 |
+| E | 13 | 92% (12/13, 67%–99%) | 100% (13/13, 77%–100%) | 100% (12/12, 76%–100%) | 100% (1/1, 21%–100%) | 0 / 0 | 0.0090 | 548 / 10968 |
+| F | 7 | 86% (6/7, 49%–97%) | 100% (7/7, 65%–100%) | – | 43% (3/7, 16%–75%) | 3 / 0 | 0.0157 | 8125 / 10607 |
+| risk (A, D, E, F) | 51 | 92% (47/51, 82%–97%) | 96% (49/51, 87%–99%) | 100% (22/22, 85%–100%) | 31% (9/29, 17%–49%) | 12 / 0 | 0.0120 | 854 / 10992 |
 
 Confusion matrix over the risk categories (rows expected, columns decided):
 
@@ -321,7 +321,8 @@ Not yet measured.
 
 Kept few and left out of accuracy and detection: what is observable depends on which features exist today, so each is listed here rather than excused.
 
-- none
+- `hard_19d4fe5fcc02`
+- `hard_bd1f2df9ab56`
 
 ## Limitations
 
