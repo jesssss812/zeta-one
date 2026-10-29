@@ -20,7 +20,9 @@ against their own data and requirements; sharing the engine does not establish p
 
 ## What the demo actually runs
 
-1. The browser calls `POST /v1/demo/next` on the local server.
+1. The browser selects a payment recipe in `/workspace/`, or calls `POST /v1/demo/next`
+   in the original guided story. The [workspace](payment-workspace.md) also offers a public
+   recorded preview that makes no gateway or model calls.
 2. For a payment step, the story controller creates and signs the proposal as its registered demo
    agent. It submits it to the gateway through an in-process HTTP test client; it is scripted
    orchestration, not a separate autonomous agent reasoning about which payment to make.

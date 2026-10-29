@@ -120,14 +120,16 @@ python3 scripts/check.py             # compile, secret, link and docs checks, th
 .venv/bin/uvicorn zeta_one.gateway.app:app --port 8000
 ```
 
-For the whole story on one screen (a payment, a fraud report, a verified finding, what changes
-next), run the demo on its own sandbox and open `http://127.0.0.1:8001/demo`:
+For the payment-review workspace, run the demo on its own sandbox and open
+`http://127.0.0.1:8001/workspace/`. The original guided story remains at `/demo`:
 
 ```bash
 .venv/bin/uvicorn zeta_one.demo.app:app --port 8001
 ```
 
-Each step can open its evidence on the review page. Models are off unless it is started with
+Choose a scenario, inspect its evidence and review held payments. The
+[workspace guide](docs/reference/payment-workspace.md) explains the recorded public preview and
+fresh local assessments. Models are off unless it is started with
 `ZETA_DEMO_LIVE=1`, which calls Claude for escalations and case files (paid).
 
 Or, with the gateway running:
