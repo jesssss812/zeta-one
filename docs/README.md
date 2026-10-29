@@ -27,6 +27,12 @@ What is not done yet is in [roadmap.md](roadmap.md). Every document under `docs/
 | [reference/demo-api.md](reference/demo-api.md) | The contract between the engine and the demo site: endpoints, scenario result, evidence record, ownership of directories |
 | [reference/fintech-integration.md](reference/fintech-integration.md) | The shared decision engine in the working demo and a proposed fintech integration; live inference, static hosting and engineering required before real execution |
 
+## Images
+
+| File | What it shows |
+| --- | --- |
+| [images/decision-flow-light.svg](images/decision-flow-light.svg), [images/decision-flow-dark.svg](images/decision-flow-dark.svg) | The README's decision flow and feedback loop, for light and dark themes; one colour per role (code, model, person, record) and per outcome |
+
 ## Runbooks
 
 | Doc | What it covers |
@@ -43,7 +49,7 @@ What is not done yet is in [roadmap.md](roadmap.md). Every document under `docs/
 | [strategy/security.md](strategy/security.md) | Where Zeta One adds risk of its own (models, design, build, claims), the guardrails for each, and the detailed work |
 | [strategy/messaging.md](strategy/messaging.md) | Tagline, project explanation, design philosophy, visual identity |
 | [strategy/implementation-plan.md](strategy/implementation-plan.md) | Architecture, modules, API, policy table, evidence record, seed and scenarios, schedule and cut list |
-| [strategy/architecture.md](strategy/architecture.md) | Every component, how they connect, what runs where (laptop, judges' machines, the web), and the tradeoffs behind each technology and hosting choice |
+| [strategy/architecture.md](strategy/architecture.md) | Every component, how they connect, what runs where (laptop, judges' machines, the web), the trade-offs behind each technology and hosting choice, and the design trade-offs: what each product choice buys, costs and what would reopen it |
 | [strategy/parallel-build.md](strategy/parallel-build.md) | The engine's kernel, six workstreams with their files, seams and briefs, and how coding agents land work together |
 | [strategy/vision.md](strategy/vision.md) | The narrative for judges and Rho, and the draft submission write-up |
 

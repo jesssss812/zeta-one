@@ -20,42 +20,32 @@ track, on Rho's API. It is not a Rho product. **Payment execution is simulated.*
 
 ## How a decision is made
 
-```mermaid
-flowchart TD
-  A["Agent proposes a payment<br/>(signed)"] --> ID{"Verify the actor<br/>identity"}
-  ID -- "unknown, revoked or bad signature" --> BLOCK
-  ID --> AU{"Bound its authority<br/>scope, limits, expiry"}
-  AU -- "outside what was granted" --> BLOCK
-  AU --> T0["Assess the action<br/>deterministic risk rules<br/>on the vendor's history"]
-  T0 -- "uncertain" --> M["Model review<br/>Claude; Jev first when configured"]
-  T0 -- "clear" --> P
-  M -- "may lower soft signals only,<br/>never a hard floor" --> P{"Policy"}
-  P --> ALLOW["Allow<br/>(simulated payment)"]
-  P --> CH["Challenge<br/>a person verifies"]
-  P --> BLOCK["Block"]
-  ALLOW & CH & BLOCK --> EV[("Evidence record<br/>every decision")]
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/images/decision-flow-dark.svg">
+  <img src="docs/images/decision-flow-light.svg" width="900" alt="How a decision is made. A signed payment proposal is checked in code for identity (an unknown, revoked or badly signed agent is blocked), then authorization (anything outside the grant is blocked), then tier-0 risk rules on the vendor's records. A clear case goes straight to the policy; an uncertain case below a high floor goes to a model, which may lower soft signals but never a hard flag. The policy returns block, allow (payment simulated) or challenge (held for a person), each with an evidence record. In the feedback loop, a person records what turned out to be true and how it was verified, after a challenge or after a case review assistant gathers the evidence for a disputed payment. A verified finding becomes an append-only risk adjustment that the next payment to that account cites, and an evaluation case; a claim alone changes nothing.">
+</picture>
 
-  EV -. "customer disputes a payment" .-> CASE["Case review assistant<br/>gathers evidence for a person"]
-  CASE -.-> OUT["A person records what was true<br/>and how it was verified"]
-  CH -.-> OUT
-  OUT -. "verified finding" .-> ADJ[("Risk adjustment<br/>append-only")]
-  OUT -. "claim only" .-> NONE["Kept, changes nothing"]
-  ADJ -. "next payment to that account" .-> T0
-  ADJ -. "feedback cases" .-> EVAL["Evaluation"]
-```
-
-Solid lines are the decision; dotted lines are the feedback loop.
+Blue runs in code, purple is a model, pink is a person and grey is an input or a record; green,
+amber and red are allow, challenge and block. Solid arrows are the decision, dashed arrows the
+feedback loop. Which model reviews depends on the configuration: Claude Opus 5.5 by default, Jev
+first in the `jev` configuration, or an open-weight model in Opus's place.
 
 **What makes it different**
 
 - **No model can talk a payment past a hard check.** Identity, authorization and hard risk flags
   are deterministic floors. A model may only lower soft signals, and each lowering is recorded.
-- **Most payments need no model.** Only the uncertain fraction is escalated. The evaluation reports
-  cost per 1,000 decisions next to fraud caught and friction caused, for rules alone, Jev, an
-  open-weight model and Claude on everything.
-- **The loop closes, and it is audited.** A verified fraud blocks that bank account for the
-  business; a verified bank-detail change stops costing friction. A customer's report alone changes
-  nothing. Each change is an append-only record the next decision cites.
+- **Routine payments need no model.** A payment reaches a model only when tier 0, the deterministic
+  risk rules, finds something to question and has not already set a high floor. The evaluation
+  reports how often that happened and the cost per 1,000 decisions, next to fraud caught and honest
+  payments stopped, for rules alone, Jev, an open-weight model and Claude Opus. Under `engineered`,
+  59 of the 100 `test` cases reached a model, on a set built mostly from flagged cases; how often it
+  would happen on a real business's payments is not measured.
+- **The loop closes, and it is audited.** A finding of fraud that a person verified blocks that bank
+  account for the business; a bank change that a person confirmed stops being a hard flag, so a
+  model may clear it. A customer's report alone changes nothing. Each change is an append-only
+  record the next decision cites. "Verified" means a person with the admin token recorded the
+  finding with one of four recognised methods, such as a call-back on a number already on file;
+  the gateway keeps that statement and who made it, and does not check the call-back itself.
 - **Agents help people, not instead of them.** When a customer disputes a payment, an assistant
   gathers the internal records, researches the vendor on the web and links every point to its
   source. It has no verdict field; a person decides.
@@ -65,11 +55,60 @@ Solid lines are the decision; dotted lines are the feedback loop.
 | Part | State |
 | --- | --- |
 | Gateway: identity, authorization, risk rules, policy, evidence, simulated payments | Working end to end over HTTP, on synthetic data in Rho's shapes |
-| Model review: Claude Opus 5.5; Jev (OpenRouter, TypeSafe as backup); open-weight arm | Each answers live calls; not yet run on the evaluation |
+| Model review: Claude Opus 5.5; Jev (OpenRouter, TypeSafe as backup); an open-weight model, Qwen 3.6 27B, on a GPU we rent | Each ran once on the full evaluation |
 | Feedback loop: verified outcomes and risk adjustments | Working; recorded end to end in `site/data/loop.json` |
 | Case review page with source links and a local chat model | Research and assembly ran live; the chat needs a local model |
-| Evaluation: labelled `dev`, `test` and hand-written `hard` sets, seven configurations, cost table ([how it works](docs/reference/evaluation-system.md)) | Sets generated; labelling and the scored run are in progress |
+| Evaluation: labelled `dev` and `test` sets and a `hard` set written outside the generator, seven configurations, cost table ([how it works](docs/reference/evaluation-system.md)) | Scored, one run each: [the report](data/eval/report.md) |
 | Rho | Read-only: the API cannot make payments, so execution is simulated |
+
+## Results
+
+One run of each configuration on synthetic cases, on 29 October 2026, so none of these is a
+production rate. "Acceptable" means the decision matched the case's label or one of its listed
+alternatives; "stopped" means challenged or blocked.
+
+| Configuration | `test`: acceptable, of 100 | `test`: fraud let through, of 49 | `test`: honest payments stopped, of 51 | `hard`: acceptable, of 12 | `hard`: fraud let through, of 6 | $ per 1,000 decisions on `test` |
+| --- | --- | --- | --- | --- | --- | --- |
+| `rules`: tier 0 alone | 79 | 0 | 39 | 6 | 2 | 0 |
+| `jev`: tier 0, then Jev, then Opus where Jev escalates | 90 | 2 | 14 | 7 | 2 | 12.00 |
+| `engineered`: tier 0, then Opus where needed | 91 | 1 | 16 | 8 | 2 | 15.15 |
+| `open_weight`: tier 0, then Qwen 3.6 27B on our GPU where needed | 94 | 0 | 19 | 7 | 2 | 1.85, GPU time |
+| `strong`: Opus on every payment | 90 | 2 | 14 | 10 | 0 | 23.77 |
+
+- **The rules alone let no generated fraud through, and stop 39 of 51 honest payments.** What the
+  models add on `test` is clearing honest payments: down to 14–19 stopped.
+- **Opus cleared fraud twice.** It took recent payments to the vendor as proof that an old,
+  unconfirmed bank change was safe, though none of them was linked to the new account.
+- **The open-weight model scored highest on `test`**, at about an eighth of the cost of Opus where
+  needed. Its prompt has a section written from its own `dev` errors, which Opus's prompt does not,
+  and on `hard` it scored 7 of 12 against 10 for Opus on every payment.
+- **The rules' blind spot shows on `hard`.** Two detectable frauds there trip no tier-0 rule, so
+  every configuration that escalates only uncertain cases allowed them without asking a model; Opus
+  on every payment caught both.
+- **A defect the evaluation found:** once a model rates a payment high, the policy treats an amount
+  that differs from the bill as a redirect and blocks it, where two authorization cases require a
+  challenge. It is not fixed.
+
+What the numbers cannot show:
+
+- `hard` has 14 cases written outside the generator; 12 are scored. The other two are frauds no
+  configuration can see from the evidence, and every configuration but always-challenge allowed
+  them. At this size an interval spans about ±25 points, and the open-weight arm ran on `hard` under
+  a newer policy version than the others (they differ on one case).
+- Generated `dev` and `test` cases share one structure (steady monthly payments, a few synthetic
+  banks), the generator's dimensions resemble tier 0's own features, and 15 `test` combinations
+  also appear in `dev`. `test` measures overfitting to the tuning within that structure, not
+  behaviour on unlike cases.
+- The labels are weakly checked. A person labelled 40 `test` cases blind; the AI labeller agreed on
+  45%, chance level (Cohen's κ −0.01). After reading the AI's reasons, the person took its label on
+  15 of the 22 disagreements and kept their own on 7. The other 60 labels, all 35 routine cases
+  among them, are the AI labeller's alone.
+- Opus's cost uses cache reads at 0.1× the input price, where Anthropic bills 0.05×, so it is
+  slightly high. The open-weight cost is the rented GPU's hourly rent ($0.59) for each call's time,
+  an upper bound; a business running its own GPU pays a fixed cost whatever the volume.
+
+The [report](data/eval/report.md) has the intervals, the per-category rates, the baselines and the
+limits.
 
 ## Quick start
 
@@ -122,17 +161,26 @@ With no keys, everything runs: escalated cases are held for a person and the tes
 
 ## Tech stack
 
-Python 3.14, FastAPI, Pydantic, SQLite, pytest and Hypothesis. Claude Opus 5.5 through the
-Anthropic API; Jev through OpenRouter; the open-weight model through vLLM on a GPU we rent; the chat
-through Ollama. A static site in `site/`. Where each piece runs is in
+Python 3.13 or later (CI runs 3.14), FastAPI, Pydantic, SQLite, pytest and Hypothesis.
+
+| Piece | What it is | How Zeta One reaches it |
+| --- | --- | --- |
+| [Claude Opus 5.5](https://www.anthropic.com/claude) | Anthropic's large language model; the strong risk tier | The Anthropic API |
+| [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) | TypeSafe's typed decision model (a "System One" model): it answers fixed questions with probabilities instead of writing text; the cheap risk tier ([details](docs/reference/jev.md)) | [OpenRouter](https://openrouter.ai), a service that routes one API to many model providers; TypeSafe's own API as the backup |
+| [Qwen 3.6 27B](https://huggingface.co/Qwen/Qwen3.6-27B-FP8) | An open-weight model (weights published under Apache 2.0), compared in Opus's place | [vLLM](https://docs.vllm.ai), an open-source model server, on one GPU we rent |
+| [Ollama](https://ollama.com) | Runs a small model locally | The case review page's chat |
+
+A static site is in `site/`. Where each piece runs is in
 [docs/strategy/architecture.md](docs/strategy/architecture.md).
 
 ## Data
 
 All data in this repository is synthetic. The seed (`data/seed/`) is generated by
 `zeta_one/rho/seed.py` with a fixed random seed, in the shapes of Rho's API; its provenance is in
-`data/seed/provenance.json`. Evaluation cases are generated from a fixed seed with independently
-written wording, and are labelled blind. Raw Rho staging data never leaves the laptop. See
+`data/seed/provenance.json`. Evaluation cases are generated from a fixed seed; Claude Haiku 5.5
+writes their wording without seeing the labels, Claude Sonnet 5.5 labels them blind, and a person
+checks a sample. The `hard` set is written outside the generator, drafted with Claude and approved by
+a person. Raw Rho staging data never leaves the laptop. See
 [docs/reference/staging-data.md](docs/reference/staging-data.md) and
 [docs/strategy/evaluation.md](docs/strategy/evaluation.md).
 
@@ -145,6 +193,10 @@ written wording, and are labelled blind. Raw Rho staging data never leaves the l
   gateway.
 - Bank-detail changes made before monitoring began may be invisible.
 - Jev's probabilities are treated as uncalibrated until our cases can measure them.
+- The evaluation is one run per configuration on small synthetic sets with weakly checked labels;
+  its limits are listed under [Results](#results).
+- "Verified" findings are a person's recorded statement of how they checked; the gateway does not
+  confirm the check, and the admin token is shared rather than per person.
 
 What is not done is in [docs/roadmap.md](docs/roadmap.md).
 
