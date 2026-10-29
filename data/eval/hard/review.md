@@ -1447,4 +1447,12 @@ override to its $20,000 cap, which the setup can already do.
 
 Representing all five means new fields in the context and both model renderings, new setup ops,
 and tests. It changes what the models see on every set, so `dev` would be rerun for a fair
-comparison. Support 1 alone unlocks 8 cases, and is also what `dev_043` lacks.
+comparison. What each combination unlocks:
+
+| Built | Cases it makes convertible | Hard set size |
+| --- | --- | --- |
+| 1 | H09, H14, H21, H24, H28 | 11 |
+| 1, 3 and 4 | also H01, H03, H12 | 14 |
+| all five | also H07, H10, H16, H18, H25, H30 | 20 |
+
+Support 1 is also what `dev_043` lacks.
