@@ -31,7 +31,7 @@ What is not done yet is in [roadmap.md](roadmap.md). Every document under `docs/
 
 | File | What it shows |
 | --- | --- |
-| [images/decision-flow-light.svg](images/decision-flow-light.svg), [images/decision-flow-dark.svg](images/decision-flow-dark.svg) | The README's decision flow and feedback loop, for light and dark themes; one colour per role (code, model, person, record) and per outcome |
+| [images/decision-flow-light.svg](images/decision-flow-light.svg), [images/decision-flow-dark.svg](images/decision-flow-dark.svg) | The README's decision flow and feedback loop, for light and dark themes; distinct roles for rules, Jev typed decisions, language models, people and records, plus decision outcomes |
 
 ## Runbooks
 

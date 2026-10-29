@@ -234,3 +234,13 @@ footer p{display:none}
 .integration-requirements{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}
 .integration-requirements article{border-top:1px solid var(--line);padding-top:18px}.integration-requirements h3{font-size:20px;font-weight:500;margin:10px 0}.integration-requirements p{color:var(--muted);font-size:14px;line-height:1.65}
 @media(max-width:800px){.integration-section{padding:45px 5%}.integration-status{grid-template-columns:1fr;gap:12px}.integration-requirements{grid-template-columns:1fr;gap:20px}}
+
+/* Five product principles shared with the public README. */
+.difference-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--line)}
+.difference-grid article{padding:30px 30px 30px 0;border-bottom:1px solid var(--line)}
+.difference-grid article:nth-child(even){padding-left:30px;border-left:1px solid var(--line)}
+.difference-grid article:last-child{grid-column:1/-1;max-width:100%}
+.difference-grid h3{font-size:30px;margin:18px 0}
+.difference-grid p{font-size:15px;color:var(--muted);max-width:76ch}
+.difference-grid .text-link{font-size:12px;display:inline-block}
+@media(max-width:800px){.difference-grid{grid-template-columns:1fr}.difference-grid article,.difference-grid article:nth-child(even){padding:25px 0;border-left:0}.difference-grid h3 br{display:none}}

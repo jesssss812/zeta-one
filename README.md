@@ -1,114 +1,72 @@
-# Zeta One
+# <img src="site/zeta-mark.svg" width="32" height="40" alt="Zeta One logo"> Zeta One
 
-**Trust and risk checks for AI agents that move money.**
+**Trust and risk intelligence for AI agents that move money.**
 
-> Autonomy without instability.
+*Autonomy without instability.*
 
 Businesses are starting to let AI agents pay their bills. A known agent with valid permissions can
 still be manipulated: an invoice can carry instructions, and a vendor's bank details can be swapped.
-Before a financial platform carries out an agent's payment, Zeta One answers three separate
-questions and returns **allow**, **challenge** or **block**, with an evidence record saying why.
+Zeta One checks each proposed payment before execution and returns **allow**, **challenge** or
+**block**, with an evidence record saying why.
 
 | | Question | How it is answered |
 | --- | --- | --- |
-| **Verify the actor** | Who is acting, and for which business? | The agent signs each request (Ed25519); unknown or revoked agents are blocked |
+| **Verify the actor** | Who is acting, and for which business? | Signed requests; unknown or revoked agents are blocked |
 | **Bound its authority** | Did the business authorize this payment? | Scope, limits, expiry and revocation, checked in code |
-| **Assess the action** | Is it fraud anyway? | Deterministic risk rules on the payment's context; a model reviews only the uncertain cases |
+| **Assess the action** | Is it fraud anyway? | Risk rules → optional Jev typed decisions → deeper model review where needed → human verification for held payments |
 
-Built for the AITX & MLOps World Community Hackathon (Austin Tech Week, October 2026), Rho fintech
-track, on Rho's API. It is not a Rho product. **Payment execution is simulated.**
+Built for the [AITX & MLOps World Community Hackathon](https://luma.com/aitx-mlops-techweek-hack)
+(Austin Tech Week, October 2026), in the [Rho](https://www.rho.co/) fintech track, using Rho's API
+shapes and a read-only staging connection. It is not a Rho product. **Payment execution is simulated.**
 
 ## How a decision is made
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/images/decision-flow-dark.svg">
-  <img src="docs/images/decision-flow-light.svg" width="900" alt="How a decision is made. A signed payment proposal is checked in code for identity (an unknown, revoked or badly signed agent is blocked), then authorization (anything outside the grant is blocked), then tier-0 risk rules on the vendor's records. A clear case goes straight to the policy; an uncertain case below a high floor goes to a model, which may lower soft signals but never a hard flag. The policy returns block, allow (payment simulated) or challenge (held for a person), each with an evidence record. In the feedback loop, a person records what turned out to be true and how it was verified, after a challenge or after a case review assistant gathers the evidence for a disputed payment. A verified finding becomes an append-only risk adjustment that the next payment to that account cites, and an evaluation case; a claim alone changes nothing.">
+  <img src="docs/images/decision-flow-light.svg" width="1000" alt="Signed proposals pass identity, authorization and risk rules. Optional Jev supplies typed probabilistic decisions; Claude or a self-hosted open-weight language model provides deeper review. Configurations can bypass Jev or skip models. Code enforces hard constraints and returns allow, challenge or block with evidence. People verify held payments and record findings; a case review assistant gathers evidence but cannot decide. Scoped adjustments inform later decisions. Payments are simulated.">
 </picture>
 
-Blue runs in code, purple is a model, pink is a person and grey is an input or a record; green,
-amber and red are allow, challenge and block. Solid arrows are the decision, dashed arrows the
-feedback loop. Which model reviews depends on the configuration: Claude Opus 5.5 by default, Jev
-first in the `jev` configuration, or an open-weight model in Opus's place.
+## What makes it different
 
-**What makes it different**
-
-- **No model can talk a payment past a hard check.** Identity, authorization and hard risk flags
-  are deterministic floors. A model may only lower soft signals, and each lowering is recorded.
-- **Routine payments need no model.** A payment reaches a model only when tier 0, the deterministic
-  risk rules, finds something to question and has not already set a high floor. The evaluation
-  reports how often that happened and the cost per 1,000 decisions, next to fraud caught and honest
-  payments stopped, for rules alone, Jev, an open-weight model and Claude Opus. Under `engineered`,
-  59 of the 100 `test` cases reached a model, on a set built mostly from flagged cases; how often it
-  would happen on a real business's payments is not measured.
-- **The loop closes, and it is audited.** A finding of fraud that a person verified blocks that bank
-  account for the business; a bank change that a person confirmed stops being a hard flag, so a
-  model may clear it. A customer's report alone changes nothing. Each change is an append-only
-  record the next decision cites. "Verified" means a person with the admin token recorded the
-  finding with one of four recognised methods, such as a call-back on a number already on file;
-  the gateway keeps that statement and who made it, and does not check the call-back itself.
-- **Agents help people, not instead of them.** When a customer disputes a payment, an assistant
-  gathers the internal records, researches the vendor on the web and links every point to its
-  source. It has no verdict field; a person decides.
-
-## What runs today
-
-| Part | State |
-| --- | --- |
-| Gateway: identity, authorization, risk rules, policy, evidence, simulated payments | Working end to end over HTTP, on synthetic data in Rho's shapes |
-| Model review: Claude Opus 5.5; Jev (OpenRouter, TypeSafe as backup); an open-weight model, Qwen 3.6 27B, on a GPU we rent | Each ran once on the full evaluation |
-| Feedback loop: verified outcomes and risk adjustments | Working; recorded end to end in `site/data/loop.json` |
-| Case review page with source links and a local chat model | Research and assembly ran live; the chat needs a local model |
-| Evaluation: labelled `dev` and `test` sets and a `hard` set written outside the generator, seven configurations, cost table ([how it works](docs/reference/evaluation-system.md)) | Scored, one run each: [the report](data/eval/report.md) |
-| Rho | Read-only: the API cannot make payments, so execution is simulated |
+- **Cost savings through the right intelligence at each step.** Rules handle routine checks.
+  [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) answers fixed questions with
+  typed values and probabilities rather than generating prose, making it a deliberate low-cost
+  decision tier. Language models handle deeper interpretation; people supply verification that
+  models cannot establish. Configurations let us compare this cascade with direct model review.
+- **Security with a path to private inference.** Hard permissions stay in code, outside the agent's
+  control. We evaluated Qwen 3.6 27B on a rented GPU we controlled, simulating a fintech serving a
+  model on its own infrastructure. This demonstrates the risk-model deployment path for keeping
+  case data within a fintech's environment; hosted Jev, Claude and web research still send data to
+  external services when used. [OpenJev](https://github.com/TheoLeeCJ/SemIf-OpenJev), an independent
+  Jev-style implementation, is a possible self-hosted decision tier, not one we evaluated.
+  [Deployment details](docs/decisions/0018-self-hosted-open-weight-arm.md).
+- **Customer friction counts as a cost.** Match the interruption to the risk: allow routine
+  payments, hold unresolved questions for a person, and block clear violations. We measure
+  legitimate payments held or blocked alongside fraud allowed, model spend and latency. A
+  legitimate payment needing verification is not automatically an unnecessary challenge.
+- **Evaluation using traditional ML methods.** Separate development and frozen test/hard sets,
+  blind labelling with human checks and adjudication, simple baselines, per-category confusion
+  matrices and confidence intervals, paired comparisons, and error analysis. We report where the
+  models help and where they fail, with the data and label limitations alongside the results.
+- **A feedback loop with people in control.** A person's verified finding can block a payment
+  method or turn a confirmed bank change into a soft signal. Reports alone change no trust.
+  Each adjustment is scoped, revocable and cited by later decisions. An assistant gathers records,
+  researches the vendor and links its claims to sources for case review; people record findings
+  and make consequential decisions.
 
 ## Results
 
-One run of each configuration on synthetic cases, on 29 October 2026, so none of these is a
-production rate. "Acceptable" means the decision matched the case's label or one of its listed
-alternatives; "stopped" means challenged or blocked.
+One run per configuration on synthetic cases, recorded on 29 October 2026:
 
-| Configuration | `test`: acceptable, of 100 | `test`: fraud let through, of 49 | `test`: honest payments stopped, of 51 | `hard`: acceptable, of 12 | `hard`: fraud let through, of 6 | $ per 1,000 decisions on `test` |
-| --- | --- | --- | --- | --- | --- | --- |
-| `rules`: tier 0 alone | 79 | 0 | 39 | 6 | 2 | 0 |
-| `jev`: tier 0, then Jev, then Opus where Jev escalates | 90 | 2 | 14 | 7 | 2 | 12.00 |
-| `engineered`: tier 0, then Opus where needed | 91 | 1 | 16 | 8 | 2 | 15.15 |
-| `open_weight`: tier 0, then Qwen 3.6 27B on our GPU where needed | 94 | 0 | 19 | 7 | 2 | 1.85, GPU time |
-| `strong`: Opus on every payment | 90 | 2 | 14 | 10 | 0 | 23.77 |
+- **Models reduced friction, with a safety trade-off.** On 100 generated test cases, rules held or
+  blocked 39 of 51 legitimate payments and allowed none of 49 frauds. The Jev cascade reduced that
+  legitimate workload to 14, but allowed two frauds.
+- **Selective inference has a blind spot.** Two detectable frauds in the separately authored hard
+  set triggered no rule and bypassed selective model review. Opus on every payment caught both.
 
-- **The rules alone let no generated fraud through, and stop 39 of 51 honest payments.** What the
-  models add on `test` is clearing honest payments: down to 14–19 stopped.
-- **Opus cleared fraud twice.** It took recent payments to the vendor as proof that an old,
-  unconfirmed bank change was safe, though none of them was linked to the new account.
-- **The open-weight model scored highest on `test`**, at about an eighth of the cost of Opus where
-  needed. Its prompt has a section written from its own `dev` errors, which Opus's prompt does not,
-  and on `hard` it scored 7 of 12 against 10 for Opus on every payment.
-- **The rules' blind spot shows on `hard`.** Two detectable frauds there trip no tier-0 rule, so
-  every configuration that escalates only uncertain cases allowed them without asking a model; Opus
-  on every payment caught both.
-- **A defect the evaluation found:** once a model rates a payment high, the policy treats an amount
-  that differs from the bill as a redirect and blocks it, where two authorization cases require a
-  challenge. It is not fixed.
-
-What the numbers cannot show:
-
-- `hard` has 14 cases written outside the generator; 12 are scored. The other two are frauds no
-  configuration can see from the evidence, and every configuration but always-challenge allowed
-  them. At this size an interval spans about ±25 points, and the open-weight arm ran on `hard` under
-  a newer policy version than the others (they differ on one case).
-- Generated `dev` and `test` cases share one structure (steady monthly payments, a few synthetic
-  banks), the generator's dimensions resemble tier 0's own features, and 15 `test` combinations
-  also appear in `dev`. `test` measures overfitting to the tuning within that structure, not
-  behaviour on unlike cases.
-- The labels are weakly checked. A person labelled 40 `test` cases blind; the AI labeller agreed on
-  45%, chance level (Cohen's κ −0.01). After reading the AI's reasons, the person took its label on
-  15 of the 22 disagreements and kept their own on 7. The other 60 labels, all 35 routine cases
-  among them, are the AI labeller's alone.
-- Opus's cost uses cache reads at 0.1× the input price, where Anthropic bills 0.05×, so it is
-  slightly high. The open-weight cost is the rented GPU's hourly rent ($0.59) for each call's time,
-  an upper bound; a business running its own GPU pays a fixed cost whatever the volume.
-
-The [report](data/eval/report.md) has the intervals, the per-category rates, the baselines and the
-limits.
+These are findings about this small synthetic evaluation, not production accuracy or savings.
+See the [full report](data/eval/report.md) for costs, latency, intervals, label agreement, known
+policy errors and comparison limits, or the [evaluation walkthrough](docs/reference/evaluation-system.md).
 
 ## Quick start
 
@@ -170,6 +128,11 @@ Python 3.13 or later (CI runs 3.14), FastAPI, Pydantic, SQLite, pytest and Hypot
 | [Qwen 3.6 27B](https://huggingface.co/Qwen/Qwen3.6-27B-FP8) | An open-weight model (weights published under Apache 2.0), compared in Opus's place | [vLLM](https://docs.vllm.ai), an open-source model server, on one GPU we rent |
 | [Ollama](https://ollama.com) | Runs a small model locally | The case review page's chat |
 
+Requests use **Ed25519**, a digital-signature scheme. Each registered agent signs a request with
+its private key; the gateway uses the corresponding public key to verify who signed it and that
+its contents have not changed. Timestamps and one-use nonces guard against replay. A valid signature
+establishes possession of the registered key, not that the payment is legitimate.
+
 A static site is in `site/`. Where each piece runs is in
 [docs/strategy/architecture.md](docs/strategy/architecture.md).
 
@@ -186,23 +149,51 @@ a person. Raw Rho staging data never leaves the laptop. See
 
 ## Limitations
 
-- Synthetic results are not production accuracy.
-- Protection covers only payments routed through the gateway; an agent that bypasses it is not
-  checked.
-- Authorization records are unsigned and the evidence store is editable by whoever runs the
-  gateway.
-- Bank-detail changes made before monitoring began may be invisible.
-- Jev's probabilities are treated as uncalibrated until our cases can measure them.
-- The evaluation is one run per configuration on small synthetic sets with weakly checked labels;
-  its limits are listed under [Results](#results).
-- "Verified" findings are a person's recorded statement of how they checked; the gateway does not
-  confirm the check, and the admin token is shared rather than per person.
+### Product design and trust boundaries
 
-What is not done is in [docs/roadmap.md](docs/roadmap.md).
+- Only payments routed through the gateway are protected; an agent with another execution route
+  can bypass it. Real deployment needs mandatory checks before money moves.
+- A “verified” finding is a person's recorded statement of how they checked. The gateway does not
+  confirm that check, and the admin token is shared rather than tied to an individual.
+- Authorization records are unsigned, and the evidence store is editable by its operator.
+
+### Engineering
+
+- Jev's probabilities have not been calibrated on this task and are treated as uncalibrated.
+- Self-hosted risk inference was tested on rented hardware with synthetic data. A fully private
+  deployment also needs local alternatives or disabled hosted review and research services.
+- Known policy errors and differences between evaluated versions remain documented in the
+  [report](data/eval/report.md); this is not a production-ready payment integration.
+
+### Evaluation
+
+- Synthetic results are not production accuracy. **Improving generator diversity is the first
+  evaluation priority:** time constraints left a narrow range of vendor histories, billing
+  patterns and bank records. Its dimensions resemble the rules, and 15 test combinations also
+  occur in development, so generated cases flatter the rules.
+- The datasets are small: 100 generated test cases and 14 separately authored hard cases, of which
+  12 are scored. Each configuration ran once; uncertainty is wide and comparisons are limited.
+- Labels are only partly human-checked. Initial AI–human agreement on 40 test cases was 45%;
+  disagreements were adjudicated, while 60 test labels remain AI-only. These limits constrain
+  what the scores establish.
+
+## Next steps
+
+1. **Broaden and strengthen evaluation.** Start with more varied histories and unfamiliar fraud
+   wording, independent human labels and a fresh holdout; repeat runs to measure model variability.
+2. **Resolve the observed policy errors and validate uncertainty.** Add development regressions,
+   measure Jev's calibration, and test attacks that evade the escalation rules.
+3. **Validate private deployment.** Evaluate a self-hosted Jev-style tier such as OpenJev, including
+   prompt-injection resistance, and establish data boundaries for every review component.
+4. **Pilot with a fintech in shadow mode.** Connect representative records, per-person review
+   permissions and reliable execution controls before enabling real payments. The
+   [integration guide](docs/reference/fintech-integration.md) explains the work required.
 
 ## Documentation
 
-- [docs/strategy/product.md](docs/strategy/product.md): the problem, the decision model and scope.
-- [docs/reference/evaluation-system.md](docs/reference/evaluation-system.md): how it is evaluated, and who does each step.
-- [docs/reference/demo-api.md](docs/reference/demo-api.md): the HTTP API and the evidence record.
-- [docs/README.md](docs/README.md): every document.
+- [Product](docs/strategy/product.md): the problem, decision model and scope.
+- [Evaluation design](docs/strategy/evaluation.md): datasets, labelling, comparisons and metrics.
+- [Evaluation system](docs/reference/evaluation-system.md): how to run it and reproduce the report.
+- [Fintech integration](docs/reference/fintech-integration.md): the path from this demo to platform enforcement.
+- [Architecture](docs/strategy/architecture.md): components, deployment and data boundaries.
+- [Documentation README](docs/README.md): the complete documentation index.

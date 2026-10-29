@@ -22,6 +22,7 @@ Open http://localhost:4173. FastAPI can also serve this directory unchanged. All
 - `evaluation.html`: how the evaluation works and who does each step (a person, a model, code), in
   the same colours as the flow in `docs/reference/evaluation-system.md`; change the two together.
 - `fonts.html`: four wordmark studies for choosing the name and ζ typography; separate from the submission page.
+- `zeta-mark.svg`: the existing zeta logo exported for the root README.
 - `styles.css`: responsive presentation, keyboard focus, reduced-motion support, and decorative curve/background animation. The wave loops with a pause control and pauses offscreen; reduced-motion disables it.
 - `motion.js`: one-time scroll reveals using IntersectionObserver and opacity/transform animations. Section 01 and supporting content reveal on entry; the compact example uses a native disclosure for evidence. content remains readable without JavaScript. Keyboard focus and reduced-motion preferences cancel reveals. No libraries, scroll listeners, or delayed content fetching.
 - The decision example is drawn from the engine-owned
@@ -39,9 +40,9 @@ diagram in the root README (`docs/images/decision-flow-*.svg`); change them toge
 Checks: `python3 scripts/check.py` from the repository root. Manually verify page anchors, desktop
 and narrow layouts, visible focus, and absence of missing assets. Run `node --check site/motion.js` for JavaScript syntax. There is no frontend build step.
 
-All changes stay in `site/`; the engine owns the root README and docs. Suggested root README text:
-“Preview the submission site with `python3 -m http.server 4173 --bind 127.0.0.1 --directory site`.
-It includes a labeled synthetic decision example. Payment execution is simulated.”
+The root README and section 02 share five product principles: cost, security and private inference,
+customer friction, evaluation methods, and human-controlled feedback. Keep their claims consistent.
+Hosted and self-hosted data boundaries must remain explicit; OpenJev is a possibility, not a tested arm.
 
 ## Demo and fintech integration
 

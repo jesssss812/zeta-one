@@ -1,122 +1,107 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 760" width="1100" height="760" role="img" aria-labelledby="title desc">
-<title id="title">How Zeta One decides on an agent's payment</title>
-<desc id="desc">A signed payment proposal is checked for identity, then authorization, then risk rules (tier 0). Uncertain cases below a high floor go to a model, which may lower only soft signals. The policy returns block, allow (simulated payment) or challenge, each with an evidence record. A person records what turned out to be true; a verified finding becomes an append-only risk adjustment that the next decision cites, and a feedback case for the evaluation; a claim alone changes nothing.</desc>
-<defs>
-<marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#4a525c"/></marker>
-<marker id="loop" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#6a43b5"/></marker>
-<style>
-text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; }
-.t { font-size: 15px; font-weight: 600; fill: #1b1f24; }
-.s { font-size: 12.5px; fill: #4a525c; }
-.e { font-size: 12px; fill: #4a525c; }
-.eb { font-size: 12px; fill: #b3261e; font-weight: 600; }
-.h { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; fill: #4a525c; }
-.l { stroke: #4a525c; stroke-width: 1.6; }
-.ld { stroke: #6a43b5; stroke-width: 1.6; }
-</style>
-</defs>
-<rect width="1100" height="760" rx="12" fill="#ffffff"/>
-<text x="70" y="30" class="h" text-anchor="start">THE DECISION</text>
-<text x="720" y="180" class="h" text-anchor="start">THE FEEDBACK LOOP</text>
-<rect x="70" y="44" width="320" height="52" rx="8" fill="#eef0f2" stroke="#6b7480" stroke-width="1.6"/>
-<text x="84" y="66" class="t">Agent proposes a payment</text>
-<text x="84" y="84" class="s">signed request: payee, method, amount, bill</text>
-<rect x="70" y="126" width="320" height="60" rx="8" fill="#dbe7fb" stroke="#2f5fa8" stroke-width="1.6"/>
-<text x="84" y="152" class="t">1 · Verify the actor</text>
-<text x="84" y="170" class="s">Ed25519 signature, registered and active</text>
-<text x="400" y="151" class="eb" text-anchor="start">unknown, revoked or</text>
-<text x="400" y="166" class="eb" text-anchor="start">bad signature: block</text>
-<rect x="70" y="216" width="320" height="60" rx="8" fill="#dbe7fb" stroke="#2f5fa8" stroke-width="1.6"/>
-<text x="84" y="242" class="t">2 · Bound its authority</text>
-<text x="84" y="260" class="s">scope, limits, expiry, revocation</text>
-<text x="400" y="241" class="eb" text-anchor="start">outside what was</text>
-<text x="400" y="256" class="eb" text-anchor="start">granted: block</text>
-<rect x="70" y="306" width="320" height="68" rx="8" fill="#dbe7fb" stroke="#2f5fa8" stroke-width="1.6"/>
-<text x="84" y="328" class="t">3 · Assess the action: tier 0</text>
-<text x="84" y="345" class="s">risk rules on the vendor's records;</text>
-<text x="84" y="362" class="s">hard flags set a floor</text>
-<rect x="450" y="306" width="230" height="68" rx="8" fill="#ece3fb" stroke="#6a43b5" stroke-width="1.6"/>
-<text x="464" y="328" class="t">Model review</text>
-<text x="464" y="345" class="s">Claude Opus 5.5; Jev first</text>
-<text x="464" y="362" class="s">or an open-weight model</text>
-<rect x="70" y="424" width="610" height="50" rx="8" fill="#dbe7fb" stroke="#2f5fa8" stroke-width="1.6"/>
-<text x="84" y="446" class="t">Policy</text>
-<text x="84" y="462" class="s">identity, authorization and risk in, one decision out</text>
-<rect x="70" y="526" width="180" height="56" rx="8" fill="#f9d6d5" stroke="#b3261e" stroke-width="1.6"/>
-<text x="84" y="559" class="t">Block</text>
-<rect x="285" y="526" width="180" height="56" rx="8" fill="#d9f2dc" stroke="#2e7d32" stroke-width="1.6"/>
-<text x="299" y="550" class="t">Allow</text>
-<text x="299" y="568" class="s">payment simulated</text>
-<rect x="500" y="526" width="180" height="56" rx="8" fill="#fdebc8" stroke="#a35f00" stroke-width="1.6"/>
-<text x="514" y="550" class="t">Challenge</text>
-<text x="514" y="568" class="s">held for a person</text>
-<rect x="70" y="626" width="610" height="50" rx="8" fill="#eef0f2" stroke="#6b7480" stroke-width="1.6"/>
-<text x="84" y="648" class="t">Evidence record, for every decision</text>
-<text x="84" y="664" class="s">what was verified, what was authorized, what was judged, and why</text>
-<path d="M230 96 V124" fill="none" class="l" marker-end="url(#arr)"/>
-<path d="M230 186 V214" fill="none" class="l" marker-end="url(#arr)"/>
-<path d="M230 276 V304" fill="none" class="l" marker-end="url(#arr)"/>
-<path d="M390 340 H448" fill="none" class="l" marker-end="url(#arr)"/>
-<text x="419" y="357" class="e" text-anchor="middle">uncertain</text>
-<path d="M230 374 V422" fill="none" class="l" marker-end="url(#arr)"/>
-<text x="238" y="402" class="e" text-anchor="start">clear: no model</text>
-<path d="M565 374 V422" fill="none" class="l" marker-end="url(#arr)"/>
-<text x="573" y="396" class="e" text-anchor="start">may lower soft signals,</text>
-<text x="573" y="411" class="e" text-anchor="start">never a hard flag</text>
-<path d="M70 156 H44 V554 H68" fill="none" class="l" marker-end="url(#arr)"/>
-<path d="M70 246 H44" fill="none" class="l"/>
-<path d="M160 474 V524" fill="none" class="l" marker-end="url(#arr)"/>
-<path d="M375 474 V524" fill="none" class="l" marker-end="url(#arr)"/>
-<path d="M590 474 V524" fill="none" class="l" marker-end="url(#arr)"/>
-<path d="M160 582 V624" fill="none" class="l" marker-end="url(#arr)"/>
-<path d="M375 582 V624" fill="none" class="l" marker-end="url(#arr)"/>
-<path d="M590 582 V624" fill="none" class="l" marker-end="url(#arr)"/>
-<rect x="720" y="526" width="360" height="56" rx="8" fill="#ece3fb" stroke="#6a43b5" stroke-width="1.6"/>
-<text x="734" y="550" class="t">Case review assistant</text>
-<text x="734" y="568" class="s">gathers records, researches the vendor; no verdict</text>
-<rect x="720" y="424" width="360" height="50" rx="8" fill="#f8e1f0" stroke="#a3367f" stroke-width="1.6"/>
-<text x="734" y="446" class="t">A person records what was true</text>
-<text x="734" y="462" class="s">and how it was verified</text>
-<rect x="720" y="306" width="220" height="68" rx="8" fill="#eef0f2" stroke="#6b7480" stroke-width="1.6"/>
-<text x="734" y="328" class="t">Risk adjustment</text>
-<text x="734" y="345" class="s">append-only, scoped to</text>
-<text x="734" y="362" class="s">the business; cited next time</text>
-<rect x="960" y="306" width="120" height="68" rx="8" fill="#eef0f2" stroke="#6b7480" stroke-width="1.6"/>
-<text x="974" y="328" class="t">Claim only</text>
-<text x="974" y="345" class="s">kept; changes</text>
-<text x="974" y="362" class="s">nothing</text>
-<rect x="720" y="196" width="220" height="56" rx="8" fill="#dbe7fb" stroke="#2f5fa8" stroke-width="1.6"/>
-<text x="734" y="220" class="t">Evaluation</text>
-<text x="734" y="238" class="s">verified outcomes as cases</text>
-<path d="M680 651 H700 V554 H718" fill="none" class="ld" stroke-dasharray="6 5" marker-end="url(#loop)"/>
-<text x="712" y="606" class="e" text-anchor="start">a customer disputes a payment</text>
-<path d="M900 526 V476" fill="none" class="ld" stroke-dasharray="6 5" marker-end="url(#loop)"/>
-<path d="M650 526 V500 H705 V449 H718" fill="none" class="ld" stroke-dasharray="6 5" marker-end="url(#loop)"/>
-<path d="M830 424 V376" fill="none" class="ld" stroke-dasharray="6 5" marker-end="url(#loop)"/>
-<text x="838" y="402" class="e" text-anchor="start">verified finding</text>
-<path d="M1020 424 V376" fill="none" class="ld" stroke-dasharray="6 5" marker-end="url(#loop)"/>
-<text x="1012" y="402" class="e" text-anchor="end">claim</text>
-<path d="M830 306 V254" fill="none" class="ld" stroke-dasharray="6 5" marker-end="url(#loop)"/>
-<text x="838" y="286" class="e" text-anchor="start">feedback cases</text>
-<path d="M760 306 V290 H420 V316 H392" fill="none" class="ld" stroke-dasharray="6 5" marker-end="url(#loop)"/>
-<text x="430" y="284" class="e" text-anchor="start">next payment to that account or bank change</text>
-<rect x="70" y="712" width="18" height="14" rx="3" fill="#dbe7fb" stroke="#2f5fa8" stroke-width="1.4"/>
-<text x="96" y="724" class="s" text-anchor="start">Code, deterministic</text>
-<rect x="240" y="712" width="18" height="14" rx="3" fill="#ece3fb" stroke="#6a43b5" stroke-width="1.4"/>
-<text x="266" y="724" class="s" text-anchor="start">A model</text>
-<rect x="410" y="712" width="18" height="14" rx="3" fill="#f8e1f0" stroke="#a3367f" stroke-width="1.4"/>
-<text x="436" y="724" class="s" text-anchor="start">A person</text>
-<rect x="580" y="712" width="18" height="14" rx="3" fill="#eef0f2" stroke="#6b7480" stroke-width="1.4"/>
-<text x="606" y="724" class="s" text-anchor="start">Input or record</text>
-<rect x="750" y="712" width="18" height="14" rx="3" fill="#d9f2dc" stroke="#2e7d32" stroke-width="1.4"/>
-<text x="776" y="724" class="s" text-anchor="start">Allow</text>
-<rect x="842" y="712" width="18" height="14" rx="3" fill="#fdebc8" stroke="#a35f00" stroke-width="1.4"/>
-<text x="868" y="724" class="s" text-anchor="start">Challenge</text>
-<rect x="950" y="712" width="18" height="14" rx="3" fill="#f9d6d5" stroke="#b3261e" stroke-width="1.4"/>
-<text x="976" y="724" class="s" text-anchor="start">Block</text>
-<path d="M70 738 H100" class="l" marker-end="url(#arr)"/>
-<text x="108" y="742" class="s" text-anchor="start">decision path</text>
-<path d="M240 738 H270" class="ld" stroke-dasharray="6 5" marker-end="url(#loop)"/>
-<text x="278" y="742" class="s" text-anchor="start">feedback loop, after the decision</text>
-<text x="1080" y="742" class="s" text-anchor="end">Payments are simulated.</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 1030" width="1160" height="1030" role="img" aria-labelledby="title desc">
+<title id="title">Zeta One: rules, typed decisions, language models and human verification</title>
+<desc id="desc">Identity and authorization are checked in code before risk rules. Rules can decide without models. The Jev configuration uses a typed decision model before deeper language-model review where needed; direct model configurations skip Jev. No model can override hard constraints. Policy allows, holds or blocks the simulated payment, always recording evidence. A case assistant helps a person review; verified findings create scoped, revocable adjustments for future decisions. Claims alone do not change trust.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#4a525c"/></marker>
+<marker id="feedback" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#6a43b5"/></marker>
+<style>text{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;fill:#1b1f24}.title{font-size:16px;font-weight:600}.small{font-size:13px;fill:#4a525c}.label{font-size:12px;fill:#4a525c}.head{font-size:12px;letter-spacing:1px;font-weight:700;fill:#4a525c}</style></defs>
+<rect width="1160" height="1030" rx="12" fill="#ffffff"/>
+<text x="60" y="28" class="head" text-anchor="start">THE DECISION</text>
+<rect x="60" y="44" width="300" height="52" rx="8" fill="#eef0f2" stroke="#6b7480" stroke-width="1.5"/>
+<text x="75" y="68" class="title" text-anchor="start">Agent proposes a payment</text>
+<text x="75" y="87" class="small" text-anchor="start">Signed payee, destination, amount, bill</text>
+<rect x="60" y="126" width="300" height="60" rx="8" fill="#dbe7fb" stroke="#2f5fa8" stroke-width="1.5"/>
+<text x="75" y="150" class="title" text-anchor="start">1 · Verify the actor</text>
+<text x="75" y="169" class="small" text-anchor="start">Registered key; valid, fresh signature</text>
+<rect x="60" y="216" width="300" height="60" rx="8" fill="#dbe7fb" stroke="#2f5fa8" stroke-width="1.5"/>
+<text x="75" y="240" class="title" text-anchor="start">2 · Bound its authority</text>
+<text x="75" y="259" class="small" text-anchor="start">Scope, limits, expiry and revocation</text>
+<text x="385" y="151" class="small" text-anchor="start">Unknown, revoked or bad signature: block</text>
+<text x="385" y="241" class="small" text-anchor="start">Outside the authorization: block</text>
+<rect x="60" y="326" width="300" height="80" rx="8" fill="#dbe7fb" stroke="#2f5fa8" stroke-width="1.5"/>
+<text x="75" y="350" class="title" text-anchor="start">3 · Assess the action: rules</text>
+<text x="75" y="369" class="small" text-anchor="start">Read business records and risk signals.</text>
+<text x="75" y="386" class="small" text-anchor="start">Hard flags set a minimum risk level.</text>
+<rect x="450" y="326" width="240" height="80" rx="8" fill="#d9f2eb" stroke="#217969" stroke-width="1.5"/>
+<text x="465" y="350" class="title" text-anchor="start">Jev · typed decisions</text>
+<text x="465" y="369" class="small" text-anchor="start">Fixed questions and probabilities.</text>
+<text x="465" y="386" class="small" text-anchor="start">Optional, in the Jev configuration.</text>
+<rect x="790" y="326" width="310" height="80" rx="8" fill="#ece3fb" stroke="#6a43b5" stroke-width="1.5"/>
+<text x="805" y="350" class="title" text-anchor="start">Language-model review</text>
+<text x="805" y="369" class="small" text-anchor="start">Claude Opus or self-hosted Qwen.</text>
+<text x="805" y="386" class="small" text-anchor="start">Deeper interpretation where needed.</text>
+<path d="M210 96 V124" fill="none" stroke="#4a525c" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M210 186 V214" fill="none" stroke="#4a525c" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M210 276 V324" fill="none" stroke="#4a525c" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M360 366 H448" fill="none" stroke="#4a525c" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M690 366 H788" fill="none" stroke="#4a525c" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="405" y="387" class="label" text-anchor="middle">Jev arm</text>
+<text x="740" y="351" class="label" text-anchor="middle">escalate</text>
+<path d="M360 338 H380 V306 H945 V324" fill="none" stroke="#4a525c" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="620" y="300" class="label" text-anchor="middle">Direct model configurations skip Jev</text>
+<rect x="60" y="476" width="1040" height="60" rx="8" fill="#dbe7fb" stroke="#2f5fa8" stroke-width="1.5"/>
+<text x="75" y="500" class="title" text-anchor="start">Policy · enforced in code</text>
+<text x="75" y="519" class="small" text-anchor="start">Identity, authorization and risk determine the outcome. No model can override a hard constraint.</text>
+<path d="M210 406 V474" fill="none" stroke="#4a525c" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M570 406 V474" fill="none" stroke="#4a525c" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M945 406 V474" fill="none" stroke="#4a525c" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="220" y="447" class="label" text-anchor="start">No model needed</text>
+<text x="580" y="447" class="label" text-anchor="start">When resolved</text>
+<text x="935" y="438" class="label" text-anchor="middle">May lower soft signals,</text>
+<text x="935" y="455" class="label" text-anchor="middle">never hard flags</text>
+<rect x="60" y="586" width="260" height="60" rx="8" fill="#f9d6d5" stroke="#b3261e" stroke-width="1.5"/>
+<text x="75" y="610" class="title" text-anchor="start">Block</text>
+<text x="75" y="629" class="small" text-anchor="start">Do not execute</text>
+<rect x="450" y="586" width="260" height="60" rx="8" fill="#d9f2dc" stroke="#2e7d32" stroke-width="1.5"/>
+<text x="465" y="610" class="title" text-anchor="start">Allow</text>
+<text x="465" y="629" class="small" text-anchor="start">Payment execution is simulated</text>
+<rect x="840" y="586" width="260" height="60" rx="8" fill="#fdebc8" stroke="#a35f00" stroke-width="1.5"/>
+<text x="855" y="610" class="title" text-anchor="start">Challenge</text>
+<text x="855" y="629" class="small" text-anchor="start">Hold for human verification</text>
+<path d="M190 536 V584" fill="none" stroke="#4a525c" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M580 536 V584" fill="none" stroke="#4a525c" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M970 536 V584" fill="none" stroke="#4a525c" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M60 156 H40 V616 H58" fill="none" stroke="#4a525c" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M60 246 H40" fill="none" stroke="#4a525c" stroke-width="1.5" marker-end="url(#arrow)"/>
+<rect x="60" y="696" width="1040" height="56" rx="8" fill="#eef0f2" stroke="#6b7480" stroke-width="1.5"/>
+<text x="75" y="720" class="title" text-anchor="start">Evidence record · for every decision</text>
+<text x="75" y="739" class="small" text-anchor="start">The action, identity, authorization, risk signals, source references, reasons and policy version.</text>
+<path d="M190 646 V694" fill="none" stroke="#4a525c" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M580 646 V694" fill="none" stroke="#4a525c" stroke-width="1.5" marker-end="url(#arrow)"/>
+<path d="M970 646 V694" fill="none" stroke="#4a525c" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="60" y="788" class="head" text-anchor="start">REVIEW AND FEEDBACK</text>
+<rect x="60" y="826" width="330" height="80" rx="8" fill="#ece3fb" stroke="#6a43b5" stroke-width="1.5"/>
+<text x="75" y="850" class="title" text-anchor="start">Case review assistant</text>
+<text x="75" y="869" class="small" text-anchor="start">Gathers records and researches sources.</text>
+<text x="75" y="886" class="small" text-anchor="start">Helps a person; cannot decide or pay.</text>
+<rect x="440" y="826" width="300" height="80" rx="8" fill="#f8e1f0" stroke="#a3367f" stroke-width="1.5"/>
+<text x="455" y="850" class="title" text-anchor="start">A person records a finding</text>
+<text x="455" y="869" class="small" text-anchor="start">States what was verified and how.</text>
+<text x="455" y="886" class="small" text-anchor="start">Claims alone change no trust.</text>
+<rect x="790" y="826" width="310" height="80" rx="8" fill="#eef0f2" stroke="#6b7480" stroke-width="1.5"/>
+<text x="805" y="850" class="title" text-anchor="start">Scoped risk adjustment</text>
+<text x="805" y="869" class="small" text-anchor="start">Block a method or confirm a change.</text>
+<text x="805" y="886" class="small" text-anchor="start">Revocable; cited by future decisions.</text>
+<path d="M225 752 V824" fill="none" stroke="#6a43b5" stroke-width="1.5" stroke-dasharray="6 5" marker-end="url(#feedback)"/>
+<text x="235" y="807" class="label" text-anchor="start">Disputed payment</text>
+<path d="M590 752 V824" fill="none" stroke="#6a43b5" stroke-width="1.5" stroke-dasharray="6 5" marker-end="url(#feedback)"/>
+<text x="600" y="807" class="label" text-anchor="start">Human review</text>
+<path d="M390 866 H438" fill="none" stroke="#6a43b5" stroke-width="1.5" stroke-dasharray="6 5" marker-end="url(#feedback)"/>
+<path d="M740 866 H788" fill="none" stroke="#6a43b5" stroke-width="1.5" stroke-dasharray="6 5" marker-end="url(#feedback)"/>
+<path d="M945 906 V936 H20 V366 H58" fill="none" stroke="#6a43b5" stroke-width="1.5" stroke-dasharray="6 5" marker-end="url(#feedback)"/>
+<text x="530" y="929" class="label" text-anchor="middle">A verified finding informs the next payment assessment</text>
+<rect x="60" y="964" width="17" height="13" rx="3" fill="#dbe7fb" stroke="#2f5fa8"/>
+<text x="85" y="976" class="label" text-anchor="start">Code / rules</text>
+<rect x="245" y="964" width="17" height="13" rx="3" fill="#d9f2eb" stroke="#217969"/>
+<text x="270" y="976" class="label" text-anchor="start">Typed decision model</text>
+<rect x="505" y="964" width="17" height="13" rx="3" fill="#ece3fb" stroke="#6a43b5"/>
+<text x="530" y="976" class="label" text-anchor="start">Language model</text>
+<rect x="735" y="964" width="17" height="13" rx="3" fill="#f8e1f0" stroke="#a3367f"/>
+<text x="760" y="976" class="label" text-anchor="start">Person</text>
+<rect x="900" y="964" width="17" height="13" rx="3" fill="#eef0f2" stroke="#6b7480"/>
+<text x="925" y="976" class="label" text-anchor="start">Input / record</text>
+<path d="M60 1000 H90" fill="none" stroke="#4a525c" stroke-width="1.5" marker-end="url(#arrow)"/>
+<text x="100" y="1004" class="label" text-anchor="start">Decision path</text>
+<path d="M270 1000 H300" fill="none" stroke="#6a43b5" stroke-width="1.5" stroke-dasharray="6 5" marker-end="url(#feedback)"/>
+<text x="310" y="1004" class="label" text-anchor="start">Review / feedback</text>
+<text x="1100" y="1004" class="label" text-anchor="end">Payments are simulated.</text>
 </svg>
