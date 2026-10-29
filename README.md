@@ -19,6 +19,15 @@ Built for the [AITX & MLOps World Community Hackathon](https://common-scooter-82
 (Austin Tech Week, October 2026), in the [Rho](https://www.rho.co/) fintech track, using Rho's API
 shapes and a read-only staging connection. It is not a Rho product. **Payment execution is simulated.**
 
+## Features
+
+| Feature | What it does |
+| --- | --- |
+| **Decision engine** | Checks each signed payment proposal before it moves: identity, then authorization, then risk (rules first, Jev next, a language model only where needed). Code enforces the hard limits and returns allow, challenge or block with an evidence record |
+| **Case review assistant** | Helps the people who work fraud disputes. Code gathers the decision, the payee's payment history and the bank-change timeline; a separate call researches the vendor on the web from public facts only. The case file cites a record or URL for every fact, and a local model answers questions about it. It has no verdict field: a person records the finding |
+| **Feedback loop** | A finding a person verified becomes a scoped, revocable risk adjustment that the next payment cites. A customer's report alone changes nothing |
+| **Payment workspace** | An inbox of synthetic payments: open one, read its invoice and evidence, review held payments. The public site shows recorded engine runs; run it locally for fresh decisions ([guide](docs/reference/payment-workspace.md)) |
+
 ## How a decision is made
 
 <picture>

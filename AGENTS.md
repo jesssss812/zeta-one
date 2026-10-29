@@ -119,11 +119,12 @@ integrator; every other module programs to their protocols.
 ## Keeping docs true
 
 `docs/reference/` and `docs/runbooks/` describe things as they are: a change that makes one wrong
-fixes it in the same commit. `docs/strategy/` and `docs/decisions/` are dated intent and are not
-rewritten to match the code, except `docs/strategy/evaluation.md`, which changes with how things are
-measured. Each fact has one home; link to it rather than copying it. A new doc gets a row in
-[docs/README.md](docs/README.md). Rules for one area of code go in `.claude/rules/` with `paths:`
-frontmatter, once that code exists.
+fixes it in the same commit. The README and the public site (`site/index.html`) tell one story: a
+change to either's content changes the other in the same commit. `docs/strategy/` and
+`docs/decisions/` are dated intent and are not rewritten to match the code, except
+`docs/strategy/evaluation.md`, which changes with how things are measured. Each fact has one home;
+link to it rather than copying it. A new doc gets a row in [docs/README.md](docs/README.md). Rules
+for one area of code go in `.claude/rules/` with `paths:` frontmatter, once that code exists.
 
 ## Where detail lives
 

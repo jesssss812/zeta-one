@@ -244,3 +244,5 @@ footer p{display:none}
 .difference-grid p{font-size:15px;color:var(--muted);max-width:76ch}
 .difference-grid .text-link{font-size:12px;display:inline-block}
 @media(max-width:800px){.difference-grid{grid-template-columns:1fr}.difference-grid article,.difference-grid article:nth-child(even){padding:25px 0;border-left:0}.difference-grid h3 br{display:none}}
+.features .integration-requirements{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:800px){.features .integration-requirements{grid-template-columns:1fr}}
