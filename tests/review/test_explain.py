@@ -25,7 +25,7 @@ def record(name):
 
 
 @pytest.mark.parametrize("name, action, headline", [
-    ("routine_bill_payment", "Paid (simulated)", "Agent verified · within its $5,000.00 limit · nothing unusual about the payment"),
+    ("routine_bill_payment", "Paid", "Agent verified · within its $5,000.00 limit · nothing unusual about the payment"),
     ("over_per_payment_limit", "Blocked", "Agent verified · $7,200.00 is over its $5,000.00 limit"),
     ("unknown_agent", "Blocked", "Agent not verified: unknown agent"),
 ])

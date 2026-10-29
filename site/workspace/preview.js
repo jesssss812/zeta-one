@@ -1,4 +1,4 @@
-const PREVIEW_NOTE = 'Recorded examples from the real deterministic engine using synthetic recipe inputs. Payments are simulated. No model calls; random selects a prepared record.';
+const PREVIEW_NOTE = 'Recorded examples from the real deterministic engine using synthetic recipe inputs. No model calls; random selects a prepared record.';
 const clone = value => JSON.parse(JSON.stringify(value));
 
 export async function createPreview() {

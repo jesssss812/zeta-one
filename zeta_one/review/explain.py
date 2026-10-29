@@ -6,7 +6,7 @@ what about the payment needs attention. Each answer carries the record ids that 
 
 from typing import Any
 
-ACTIONS = {"allow": "Paid (simulated)", "challenge": "Confirm before paying", "block": "Blocked"}
+ACTIONS = {"allow": "Paid", "challenge": "Confirm before paying", "block": "Blocked"}
 # How many times the vendor's usual amount reads as unusual.
 UNUSUAL_RATIO = 1.5
 
