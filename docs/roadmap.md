@@ -16,10 +16,8 @@ The plan is in [strategy/evaluation.md](strategy/evaluation.md). `dev` (48 cases
 are generated; the report so far covers only the deterministic cases.
 
 - AI-label `dev` and `test` with the guide, blind.
-- **Owner:** check the 14 converted `hard` cases in
-  [data/eval/hard/review.md](../data/eval/hard/review.md), including the choice on H21's change
-  date, then freeze the set. The other 6 specs need the business's own supporting records (5) or
-  the lookalike vendor's record in the models' input (1) before they can be converted.
+- `hard` is frozen with 14 cases. The other 6 specs need the business's own supporting records (5)
+  or the lookalike vendor's record in the models' input (1) before they can be converted.
 - **Owner:** label 40 stratified `test` cases blind, then adjudicate disagreements (~1 h).
 - Runs on `dev` with the real backend (`--backend real --live --max-usd`); tune on `dev` only;
   freeze; then the scored run of every configuration on `test`, `hard` and the deterministic cases.

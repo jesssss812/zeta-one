@@ -1,6 +1,6 @@
 # Hard set: owner fidelity check
 
-Converted from [specs.md](specs.md) for the owner to check before the set is frozen and scored. Nothing here has been scored. Case ids are opaque; [owner_map.json](owner_map.json) maps them to H-numbers. Truth, labels, titles and H-numbers are evaluator-only: the engine sees only the setup and the proposal.
+Converted from [specs.md](specs.md); the owner checked these cases, and the set was frozen on 2026-10-28 before its first scored run. Case ids are opaque; [owner_map.json](owner_map.json) maps them to H-numbers. Truth, labels, titles and H-numbers are evaluator-only: the engine sees only the setup and the proposal.
 
 For each case: the labels, what the setup holds, where the representation falls short of the spec, and the input each model tier receives. Ids and dates are the sandbox's.
 
