@@ -71,6 +71,34 @@ def test_merge_records_provenance_agreement_and_owner_final(prepared):
     assert ai_only.label_provenance.sources == [label.AI_SOURCE] and ai_only.label_provenance.agreed is None
 
 
+def test_an_adjudication_is_final_and_agreement_stays_on_the_blind_labels(prepared):
+    ids = _write_ai(prepared, lambda case_id: "block")
+    out = prepared / "test" / "label"
+    reverse = {case_id: blind for blind, case_id in ids.items()}
+    sample = json.loads((out / "owner_sample.json").read_text())
+    sets.write_jsonl(out / "owner.jsonl", [{"id": reverse[c], "expected": "challenge", "also_acceptable": []} for c in sample])
+    sets.write_jsonl(out / "adjudicated.jsonl", [{"id": reverse[sample[0]], "expected": "block", "also_acceptable": ["challenge"]}])
+
+    result = label.merge("test", data=prepared)
+    assert result["agreement"]["agreement"] == 0.0
+    assert (result["agreement"]["adjudicated"], result["agreement"]["adjudicated_to_ai"]) == (1, 1)
+    cases = {c.id: c for c in sets.load_set("test", prepared)}
+    settled, kept = cases[sample[0]], cases[sample[1]]
+    assert (settled.expected, settled.also_acceptable) == ("block", ["challenge"])
+    assert settled.label_provenance.agreed is False and settled.label_provenance.adjudicated_by == "owner"
+    assert kept.expected == "challenge"
+
+
+def test_an_adjudication_must_settle_a_case_the_owner_labelled(prepared):
+    ids = _write_ai(prepared, lambda case_id: "block")
+    out = prepared / "test" / "label"
+    sample = set(json.loads((out / "owner_sample.json").read_text()))
+    outside = next(blind for blind, case_id in ids.items() if case_id not in sample)
+    sets.write_jsonl(out / "adjudicated.jsonl", [{"id": outside, "expected": "allow", "also_acceptable": []}])
+    with pytest.raises(label.LabelError, match="did not label"):
+        label.merge("test", data=prepared)
+
+
 def test_merge_refuses_a_labeller_that_used_tools(prepared):
     _write_ai(prepared, lambda case_id: "allow", tool_calls=3)
     with pytest.raises(label.LabelError):

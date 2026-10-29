@@ -391,6 +391,10 @@ def render(report: dict) -> str:
                      f"Cohen's κ {kappa}{interval}.")
         if agreement.get("labeller_blindness"):
             lines.append(f"Labeller blindness: {agreement['labeller_blindness']}.")
+        if agreement.get("adjudicated"):
+            lines.append(f"Agreement is on the owner's blind labels. After reading the AI's, the owner settled "
+                         f"{agreement['adjudicated']} disagreements, {agreement['adjudicated_to_ai']} of them by "
+                         f"taking the AI's label; the settled labels are the final ones.")
     else:
         lines.append("Not yet measured.")
     lines += ["", "## Not run", ""]

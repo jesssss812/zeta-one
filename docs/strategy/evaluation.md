@@ -123,8 +123,9 @@ report says that all three are from one family.
 4. **Agreement is reported on those 40**: raw agreement, and Cohen's κ with a bootstrap 95%
    interval (about ±0.15–0.2 at this size). Identity and authorization cases are left out, since
    agreeing on them is trivial and would inflate κ.
-5. **Disagreements go to the owner**, whose label is final. Each case records
-   `label_provenance: {sources, agreed, adjudicated_by}`.
+5. **Disagreements go to the owner**, whose label is final. The owner settles them after reading
+   the AI's label and reason, in a separate file (`adjudicated.jsonl`), so κ stays the agreement of
+   the blind labels. Each case records `label_provenance: {sources, agreed, adjudicated_by}`.
 
 Labels are fixed before the system is scored on them.
 

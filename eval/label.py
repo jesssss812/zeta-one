@@ -16,7 +16,10 @@ Under data/eval/<set>/label/:
                                   "route": "anthropic_api" and no tools offered, so the labeller could
                                   not open a file; a batch from a subagent run carries the count the
                                   owner copied from it, which is self-reported. The agreement says which.
-    owner.jsonl                   {id (blind), expected, also_acceptable}: the owner's labels, final
+    owner.jsonl                   {id (blind), expected, also_acceptable}: the owner's blind labels,
+                                  written before the AI labels are read; agreement is measured on these
+    adjudicated.jsonl             {id (blind), expected, also_acceptable}: the owner's label after reading
+                                  the AI's, for disagreements the owner settled; final where present
 
 Export reads the assembled, unlabelled cases. The labeller sees the proposal and the context its
 setup produces on a fresh copy of the seed, never `truth`, the category, the setup or the dimension
@@ -277,21 +280,27 @@ def merge(set_name: str, data: Path = sets.DATA) -> dict:
     ai = _read_ai(set_name, ids, data)
     owner_path = out / "owner.jsonl"
     owner = {_case_id(ids, row, "owner.jsonl"): row for row in sets.read_jsonl(owner_path)} if owner_path.exists() else {}
-    for row in owner.values():
+    adjudicated_path = out / "adjudicated.jsonl"
+    adjudicated = ({_case_id(ids, row, "adjudicated.jsonl"): row for row in sets.read_jsonl(adjudicated_path)}
+                   if adjudicated_path.exists() else {})
+    for row in [*owner.values(), *adjudicated.values()]:
         _check_label(row)
+    if set(adjudicated) - set(owner):
+        raise LabelError("adjudicated.jsonl settles a case the owner did not label")
 
     cases, pairs = [], []
     for raw in sets.read_jsonl(data / set_name / "cases_unlabelled.jsonl"):
         case_id = raw["id"]
         if case_id not in ai and case_id not in owner:
             raise LabelError(f"{case_id} has no label")
-        final = owner.get(case_id) or ai[case_id]
+        final = adjudicated.get(case_id) or owner.get(case_id) or ai[case_id]
         sources = [AI_SOURCE] * (case_id in ai) + ["owner"] * (case_id in owner)
         both = case_id in ai and case_id in owner
         agreed = ai[case_id]["expected"] == owner[case_id]["expected"] if both else None
         if both and raw["category"] in JUDGED_CATEGORIES:
             pairs.append((ai[case_id]["expected"], owner[case_id]["expected"]))
-        provenance = LabelProvenance(sources=sources, agreed=agreed, adjudicated_by="owner" if agreed is False else None)
+        settled = agreed is False or case_id in adjudicated
+        provenance = LabelProvenance(sources=sources, agreed=agreed, adjudicated_by="owner" if settled else None)
         cases.append(Case.model_validate({**raw, "expected": final["expected"],
                                           "also_acceptable": final.get("also_acceptable", []),
                                           "label_provenance": provenance.model_dump()}).model_dump(mode="json"))
@@ -301,6 +310,9 @@ def merge(set_name: str, data: Path = sets.DATA) -> dict:
     for path in paths:
         if agreement:
             agreement["labeller_blindness"] = _blindness(set_name, data)
+            agreement["adjudicated"] = len(adjudicated)
+            agreement["adjudicated_to_ai"] = sum(adjudicated[c]["expected"] == ai[c]["expected"] for c in adjudicated
+                                                 if c in ai)
             path.write_text(json.dumps(agreement, indent=2) + "\n")
         else:
             path.unlink(missing_ok=True)  # a relabel with no owner overlap must not leave old agreement behind
