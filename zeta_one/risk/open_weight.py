@@ -1,7 +1,8 @@
 """The open-weight comparison tier: an open-weight model in the strong tier's place (decision 0009).
 
-It gets the strong tier's system prompt and rendered request (gateway facts, then untrusted text in
-bounded blocks) and must answer the same schema, through any OpenAI-compatible chat API: OpenRouter
+It gets the strong tier's system prompt, plus a section on what the business's confirmation records
+mean, and its rendered request (gateway facts, then untrusted text in bounded blocks), and must
+answer the same schema, through any OpenAI-compatible chat API: OpenRouter
 by default, or another provider by setting OPEN_WEIGHT_BASE_URL. The answer is handled exactly as
 the strong tier's: evidence kept only where the request named it, the level at least the worst
 signal, and its self-reported confidence never used.
@@ -14,6 +15,7 @@ the provider's support for JSON output are unverified until the first live call.
 import json
 import re
 import time
+from pathlib import Path
 from typing import Any
 
 import httpx
@@ -31,9 +33,12 @@ MAX_TOKENS = 4096
 CHARS_PER_TOKEN_ESTIMATE = 2
 
 ANSWER_SCHEMA = claude.StrongAnswer.model_json_schema()
+# The strong tier's prompt, plus what the business's confirmation records mean (decision 0019).
+RECORDS_NOTE = (Path(__file__).parent / "prompts" / "open_weight_records.md").read_text()
 SYSTEM_PROMPT = (
     claude.SYSTEM_PROMPT
-    + "\n\n## Output format\n\nReply with one JSON object and nothing else, matching this JSON schema:\n\n"
+    + "\n" + RECORDS_NOTE
+    + "\n## Output format\n\nReply with one JSON object and nothing else, matching this JSON schema:\n\n"
     + json.dumps(ANSWER_SCHEMA, indent=1)
 )
 

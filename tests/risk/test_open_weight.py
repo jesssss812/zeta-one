@@ -53,6 +53,13 @@ def test_the_request_is_the_strong_tiers_prompt_and_rendering_with_the_schema():
     assert "<untrusted_data boundary=" in user["content"] and body["temperature"] == 0
 
 
+def test_the_prompt_adds_what_a_confirmation_record_means_to_the_strong_tiers():
+    _, calls = run(reply(answer()))
+    system = calls[0][2]["messages"][0]["content"]
+    assert system.startswith(claude.SYSTEM_PROMPT) and open_weight.RECORDS_NOTE in system
+    assert "confirmed_by" in open_weight.RECORDS_NOTE and "confirmed_by" not in claude.SYSTEM_PROMPT
+
+
 def test_the_request_enforces_the_answer_schema_and_asks_for_no_thinking():
     _, calls = run(reply(answer()))
     body = calls[0][2]
