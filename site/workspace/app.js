@@ -46,15 +46,35 @@ function setWorking(value, label = '') {
   });
   $('detail').setAttribute('aria-busy', String(value));
 }
+// What the page shows while an action that may call a model is running: the engine itself answers in
+// well under a second, so this appears only when the server is still working after a moment.
+function pendingNote(action, payload) {
+  const live = workspace?.mode === 'live';
+  if (action === 'assemble') return {eyebrow: 'CASE FILE', title: 'Gathering the case', text: live
+    ? 'The records are gathered by code; then a model researches the vendor on the web and writes the case file. This can take up to a minute.'
+    : 'Gathering the records without a model.'};
+  if (!['add', 'random', 'repeat'].includes(action)) return null;
+  const recipe = action === 'add' ? workspace?.recipes.find(r => r.id === payload.recipe_id)?.title : null;
+  return {eyebrow: (recipe || (action === 'random' ? 'Random payment' : 'Repeated payment')).toUpperCase(), title: 'Assessing the payment',
+    text: live ? 'The gateway checks the agent, its authorization and the risk rules. If the rules leave the payment uncertain, a model reviews it, which takes about 5–15 seconds; a clear case is decided at once.'
+               : 'The gateway checks the agent, its authorization and the risk rules.'};
+}
+function showPending(note) {
+  const card = node('div', {class:'pending', role:'status'}, node('div', {class:'eyebrow', text:note.eyebrow}), node('h2', {text:note.title}),
+    node('p', {text:note.text}), node('div', {class:'pending-bar', 'aria-hidden':'true'}));
+  if (note.title === 'Gathering the case') $('detail').prepend(card); else $('detail').replaceChildren(card);
+}
 async function act(action, payload = {}) {
   if (working) return;
   error(''); setWorking(true, action === 'assemble' ? 'Gathering the case…' : 'Updating workspace…');
+  const note = pendingNote(action, payload);
+  const timer = note ? setTimeout(() => showPending(note), 300) : null;
   try {
     workspace = await adapter.act(action, payload);
     selected = workspace.selected_id || (workspace.payments.some(p => p.id === selected) ? selected : workspace.payments[0]?.id);
     render();
-  } catch (e) { error(e.message || String(e)); }
-  finally { setWorking(false); }
+  } catch (e) { error(e.message || String(e)); if (note) render(); }
+  finally { clearTimeout(timer); setWorking(false); }
 }
 function recipeDescription() { $('recipe-description').textContent = workspace?.recipes.find(r => r.id === $('recipe').value)?.description || ''; }
 function render() {
