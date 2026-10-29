@@ -93,11 +93,15 @@ class SignedRequest(BaseModel):
 
 
 class PaymentMethodView(_Open):
+    """`account_ending` is a display label of up to six digits; `beneficiary_name` is vendor-supplied text."""
+
     id: str
     type: str
     bank_name: str | None = None
     is_default: bool = False
     added_at: datetime | None = None
+    account_ending: str | None = Field(default=None, pattern=r"^[0-9]{2,6}$")
+    beneficiary_name: str | None = None
 
 
 class CounterpartyView(_Open):
@@ -106,6 +110,7 @@ class CounterpartyView(_Open):
     status: str
     created_at: datetime
     payment_methods: list[PaymentMethodView] = Field(default_factory=list)
+    email: str | None = None
 
 
 class PaymentMethodChange(_Open):

@@ -47,7 +47,8 @@ historical payment to its counterparty, so the total bill count exceeds the plan
 - Open bills are looked up independently of the proposal's bill reference. A bill for another
   payee also supplies that payee and its history for the risk assessment.
 - Amounts and payee records follow the portions of Rho's shapes the engine reads. Ownership,
-  method dates/history, payment destinations and invoice text are synthetic stand-in records.
+  method dates/history, method details (account ending, beneficiary name), payment destinations
+  and invoice text are synthetic stand-in records.
 
 `rho.mutations.apply(store, SetupOp(...))` supports `change_payment_method`, `set_bill_text`,
 `add_counterparty`, `add_bill` and `add_payments`. Its

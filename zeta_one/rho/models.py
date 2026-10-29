@@ -44,6 +44,7 @@ class Counterparty(BaseModel):
     status: str
     is_business: bool = True
     payment_methods: list[CounterpartyPaymentMethod] = Field(default_factory=list)
+    email: str | None = None
     created_at: datetime
     updated_at: datetime
 

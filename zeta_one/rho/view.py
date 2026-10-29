@@ -20,9 +20,11 @@ def context_for(store):
         methods = []
         for method in cp['payment_methods']:
             date = store.get('method_dates', method['id']) if method['id'] else None
-            methods.append(PaymentMethodView(**method, added_at=date['added_at'] if date else None))
+            details = (store.get('method_details', method['id']) if method['id'] else None) or {}
+            methods.append(PaymentMethodView(**method, added_at=date['added_at'] if date else None,
+                account_ending=details.get('account_ending'), beneficiary_name=details.get('beneficiary_name')))
         return CounterpartyView(id=cp['id'], name=cp['legal_name'], status=cp['status'],
-                                created_at=cp['created_at'], payment_methods=methods)
+                                created_at=cp['created_at'], payment_methods=methods, email=cp.get('email'))
 
     def settled(bill, business_id, now, currency=None):
         """The settled payment a paid bill is linked to, or None."""

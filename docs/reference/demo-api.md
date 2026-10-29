@@ -85,7 +85,7 @@ is the same whatever the amount.
   "scenario": {"name": "vendor_payment_method_changed", "title": "...", "summary": "...", "expected": "challenge"},
   "context": {
     "business": {"id", "name"},
-    "counterparty": {"id", "name", "status", "created_at", "payment_methods": [{"id", "type", "bank_name", "is_default", "added_at"}]},
+    "counterparty": {"id", "name", "status", "created_at", "email", "payment_methods": [{"id", "type", "bank_name", "is_default", "added_at", "account_ending", "beneficiary_name"}]},
     "payment_method_history": [{"id", "method_id", "change", "changed_at", "changed_by", "summary"}],
     "bill": {"id", "counterparty_id", "counterparty_name", "invoice_number", "invoice_date", "due_date", "amount": {"amount", "currency"}, "memo", "document_excerpt", "status", "paid_by": "the settled payment that paid it, same shape as a `recent` payment, or null"},
     "payment_history": {"count", "first_at", "last_at", "median_amount": {"amount", "currency"}, "recent": [{"id", "posted_at", "amount", "method_type", "payment_method_id", "bill_id"}], "by_method": [{"payment_method_id", "count", "first_at", "last_at", "since_latest_change"}]},
@@ -103,12 +103,13 @@ and an ISO 4217 code. Only `zeta_one/rho/models.py` follows Rho's schemas exactl
 fields Rho doesn't have, from the stand-in's own tables: `payment_methods[].added_at` and the
 whole `payment_method_history` (Rho exposes no method timestamps), `bill.document_excerpt` (bill
 text), `payment_history.recent[].method_type` (derived from Rho's `transaction_type`), and
-`counterparty.name` (Rho's `legal_name`). The destination of a past payment comes only from
-synthetic setup, because Rho's transactions as staging shows them don't carry it:
-`recent[].payment_method_id`, and `by_method`, which counts only payments whose destination is
-recorded. `null` there means the records don't say, not that there was none. Vendor payment
-history is joined through paid bills, because Rho's transactions carry a counterparty name and no
-id. `context.counterparty` is always
+`counterparty.name` (Rho's `legal_name`). Three more come only from synthetic setup, because Rho's
+records as staging shows them don't carry them: `payment_methods[].account_ending` and
+`beneficiary_name`, and the destination of a past payment (`recent[].payment_method_id`, and
+`by_method`, which counts only payments whose destination is recorded). `null` there means the
+records don't say, not that there was none. `counterparty.email` is Rho's own field. Vendor
+payment history is joined through paid bills, because Rho's transactions carry a counterparty name
+and no id. `context.counterparty` is always
 the **proposed** payee. `bill` and `payment_method_history` may be `null` or empty for scenarios
 without them; `payment_history.count` is `0` with `median_amount: null` for a payee never paid
 before.

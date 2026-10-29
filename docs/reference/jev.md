@@ -74,8 +74,8 @@ carries `cost` in dollars: about $0.0001 for a 2,700-token state.
 an alpha endpoint and one more processor that sees the invoice text. Each result names its
 `route` and any `routes_tried`. The request carries a compact `state`, about 1,100 tokens on `dev`
 against 2,600 for the strong tier's JSON: the gateway facts and the tier-0 checks that came out
-true as short sentences, then the untrusted text (agent rationale, memo, payee and bank names,
-invoice text) in blocks with a per-request boundary, neutralized as the strong tier's are. Four
+true as short sentences, then the untrusted text (agent rationale, memo, payee name and email,
+bank and beneficiary names, invoice text) in blocks with a per-request boundary, neutralized as the strong tier's are. Four
 questions: `risk_level` (choice: low / elevated / high), `document_targets_agent`,
 `proposal_matches_documents` and `vendor_impersonation_signs` (nouls). How the state and wording
 were chosen, and what they changed, is in [dev-tuning.md](dev-tuning.md). The parser reads the shape above: a choice's confidence is

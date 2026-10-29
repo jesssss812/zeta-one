@@ -1,8 +1,9 @@
 """An isolated, synthetic Rho stand-in in SQLite; never accesses live Rho or snapshots.
 
-Rho entities retain their API shape. Business ownership, method timestamps/history, payment
-destinations and bill text are local stand-in records, since Rho's records as staging shows them
-don't carry them. All table names are prefixed rho_.
+Rho entities retain their API shape. Business ownership, method timestamps/history, method
+details (account ending, beneficiary name), payment destinations and bill text are local
+stand-in records, since Rho's records as staging shows them don't carry them. All table names
+are prefixed rho_.
 """
 import hashlib
 import json
@@ -14,7 +15,7 @@ from zeta_one.rho.models import Account, Bill, Business, Counterparty, Transacti
 SEED_DIR = Path(__file__).resolve().parents[2] / 'data' / 'seed'
 MODELS = {'businesses':Business, 'accounts':Account, 'counterparties':Counterparty,
           'bills':Bill, 'transactions':Transaction}
-TABLES = (*MODELS, 'ownership', 'method_dates', 'method_history', 'payment_destinations', 'bill_text')
+TABLES = (*MODELS, 'ownership', 'method_dates', 'method_history', 'method_details', 'payment_destinations', 'bill_text')
 
 
 class Store:

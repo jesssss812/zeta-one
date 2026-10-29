@@ -154,9 +154,9 @@ def test_duplicate_window_includes_payments_beyond_the_three_item_summary(days_a
     assert bool(risk.floor) is duplicate
 
 
-def _vendor(store):
+def _vendor(store, **details):
     apply(store, SetupOp(op='add_counterparty', args={'counterparty_id': 'cp_dest', 'name': 'Destination vendor',
-          'created_days_ago': 400, 'payment_method_id': 'pm_old'}))
+          'created_days_ago': 400, 'payment_method_id': 'pm_old', **details}))
     return routine().model_copy(update={'counterparty_id': 'cp_dest', 'payment_method_id': 'pm_old', 'bill_id': None})
 
 
@@ -168,7 +168,7 @@ def test_payments_record_their_destination_and_count_since_the_latest_change():
               'days_ago': days, 'payment_method_id': 'pm_old'}))
     apply(store, SetupOp(op='add_payments', args={'counterparty_id': 'cp_dest', 'amount': 500, 'days_ago': 70}))
     apply(store, SetupOp(op='change_payment_method', args={'counterparty_id': 'cp_dest', 'days_ago': 50,
-          'new_method_id': 'pm_new'}))
+          'new_method_id': 'pm_new', 'account_ending': '9088'}))
     for days in (40, 10):
         apply(store, SetupOp(op='add_payments', args={'counterparty_id': 'cp_dest', 'amount': 500,
               'days_ago': days, 'payment_method_id': 'pm_new'}))
@@ -195,3 +195,17 @@ def test_a_payment_can_pay_a_named_bill_once():
         apply(store, SetupOp(op='add_payments', args={'counterparty_id': 'cp_dest', 'bill_id': 'bill_named'}))
     with pytest.raises(ValueError):
         apply(store, SetupOp(op='add_payments', args={'counterparty_id': 'cp_dest', 'payment_method_id': 'pm_other'}))
+
+
+def test_method_details_and_email_reach_the_context():
+    store = Store()
+    proposal = _vendor(store, email='ap@vendor.example', account_ending='4821', beneficiary_name='Vendor Ltd')
+    apply(store, SetupOp(op='change_payment_method', args={'counterparty_id': 'cp_dest', 'new_method_id': 'pm_new',
+          'beneficiary_name': 'Vendor Settlement Partners'}))
+    cp = context_for(store)(proposal, 'biz_seed_01', SEED_NOW).counterparty
+    assert cp.email == 'ap@vendor.example'
+    assert {m.id: (m.account_ending, m.beneficiary_name) for m in cp.payment_methods} == {
+        'pm_old': ('4821', 'Vendor Ltd'), 'pm_new': (None, 'Vendor Settlement Partners')}
+    assert all(m.added_at is not None for m in cp.payment_methods)
+    with pytest.raises(ValueError):
+        apply(store, SetupOp(op='change_payment_method', args={'counterparty_id': 'cp_dest', 'account_ending': '48-21'}))

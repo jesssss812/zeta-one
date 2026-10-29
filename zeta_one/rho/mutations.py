@@ -2,10 +2,12 @@
 
 Operations and args (all optional defaults are synthetic):
 - add_counterparty: counterparty_id (alias id), name, created_days_ago (alias
-  days_ago, default 40), payment_method_id, business_id (default biz_seed_01).
+  days_ago, default 40), payment_method_id, business_id (default biz_seed_01),
+  email, and the method's account_ending and beneficiary_name.
 - change_payment_method: counterparty_id, days_ago (default 0), new_method_id
   (optional; otherwise update the default method), bank_name, type (default ach),
-  verified_with_vendor (stored provenance, never a trusted risk override).
+  account_ending, beneficiary_name, verified_with_vendor (stored provenance, never
+  a trusted risk override).
 - set_bill_text: bill_id, text (alias document_text).
 - add_bill: bill_id (alias id), counterparty_id, amount (Money dict or integer
   minor units with currency, default USD), document_text (alias text), status
@@ -52,6 +54,16 @@ def _own(store, table, record_id, business_id):
     store.put('ownership', {'id': f'{table}:{record_id}', 'business_id': business_id})
 
 
+METHOD_DETAILS = ('account_ending', 'beneficiary_name')
+
+
+def _details(args):
+    ending = args.get('account_ending')
+    if ending is not None and not (isinstance(ending, str) and ending.isdigit() and 2 <= len(ending) <= 6):
+        raise ValueError('account_ending must be 2 to 6 digits')
+    return {key: args[key] for key in METHOD_DETAILS if args.get(key) is not None}
+
+
 def _money(args):
     value = args.get('amount', args.get('median_amount', 10000))
     return Money.model_validate(value if isinstance(value, dict) else
@@ -69,10 +81,13 @@ def apply(store, op: SetupOp):
         _require(store, 'businesses', business)
         method_id = a.get('payment_method_id', f'pm_{cp_id}')
         stamp = _stamp(a.get('created_days_ago', a.get('days_ago', 40)))
+        details = _details(a)
         _new(store, 'counterparties', {'id': cp_id, 'legal_name': a.get('name', 'Synthetic vendor'),
              'status': 'active', 'is_business': True, 'created_at': stamp, 'updated_at': stamp,
-             'payment_methods': [{'id': method_id, 'type': 'ach', 'is_default': True,
-                                  'bank_name': 'Synthetic Community Bank'}]})
+             'email': a.get('email'), 'payment_methods': [{'id': method_id, 'type': 'ach', 'is_default': True,
+                                                           'bank_name': 'Synthetic Community Bank'}]})
+        if details:
+            store.put('method_details', {'id': method_id, **details})
         _own(store, 'counterparties', cp_id, business)
         store.put('method_dates', {'id': method_id, 'added_at': stamp})
     elif op.op == 'change_payment_method':
@@ -84,6 +99,7 @@ def apply(store, op: SetupOp):
             raise ValueError('new_method_id is required for a counterparty without a default method')
         stamp = _stamp(a.get('days_ago', 0))
         found = False
+        details = _details(a)
         for method in cp['payment_methods']:
             method['is_default'] = method['id'] == method_id
             if method['is_default']:
@@ -93,6 +109,8 @@ def apply(store, op: SetupOp):
             cp['payment_methods'].insert(0, {'id': method_id, 'type': a.get('type', 'ach'),
                 'is_default': True, 'bank_name': a.get('bank_name', 'Synthetic Updated Bank')})
             store.put('method_dates', {'id': method_id, 'added_at': stamp})
+        if details:
+            store.put('method_details', {'id': method_id, **(store.get('method_details', method_id) or {}), **details})
         cp['updated_at'] = stamp
         store.put('counterparties', cp)
         index = len(store.all('method_history'))

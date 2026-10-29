@@ -266,13 +266,16 @@ def _split(risk_input: RiskInput) -> tuple[dict[str, Any], list[tuple[str, str, 
 
 def _counterparty(counterparty, field: str, text) -> dict[str, Any]:
     text(f"{field}.name", counterparty.id, counterparty.name)
+    text(f"{field}.email", counterparty.id, counterparty.email)
     methods = []
     for method in counterparty.payment_methods:
         text(f"{field}.payment_methods.bank_name", method.id, method.bank_name)
-        methods.append(
-            {"id": method.id, "type": method.type, "is_default": method.is_default,
-             "added_at": method.added_at.isoformat() if method.added_at else None}
-        )
+        text(f"{field}.payment_methods.beneficiary_name", method.id, method.beneficiary_name)
+        view = {"id": method.id, "type": method.type, "is_default": method.is_default,
+                "added_at": method.added_at.isoformat() if method.added_at else None}
+        if method.account_ending:
+            view["account_ending"] = method.account_ending
+        methods.append(view)
     return {"id": counterparty.id, "status": counterparty.status, "created_at": counterparty.created_at.isoformat(),
             "payment_methods": methods}
 

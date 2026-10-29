@@ -357,6 +357,14 @@ def test_the_state_says_how_many_past_payments_went_to_this_account():
     assert "; 2 of them after its last change." in facts
 
 
+def test_the_state_gives_the_account_ending_and_keeps_beneficiary_and_email_untrusted():
+    state = jev.render(linked_input(), boundary="B")
+    facts = state.partition("Text from invoices")[0]
+    assert "- The bank account on this payment ends 4821." in facts
+    for untrusted in ("Alder Receivables", "accounts@alder-mechanical.example"):
+        assert untrusted not in facts and untrusted in state
+
+
 def test_a_bill_the_records_show_paid_is_said():
     from zeta_one.contracts import PaymentRecord
 
@@ -370,5 +378,5 @@ def test_a_bill_the_records_show_paid_is_said():
 
 def test_records_without_these_details_add_no_sentence():
     state = jev.render(risk_input("routine_bill_payment"), boundary="B")
-    assert "records link" not in state
+    assert "records link" not in state and "ends " not in state
     assert "was confirmed by a person" not in state

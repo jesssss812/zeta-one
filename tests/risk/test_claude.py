@@ -28,7 +28,8 @@ def risk_input(name: str = "invoice_redirect_instructions") -> RiskInput:
 
 
 def linked_input() -> RiskInput:
-    """The routine payment, with the records saying where past payments went after a change to its method."""
+    """The routine payment, with the records saying where past payments went after a change to its method,
+    the method's ending and beneficiary, and the payee's email."""
     from datetime import timedelta
 
     from zeta_one.contracts import MethodUse, PaymentMethodChange
@@ -36,6 +37,8 @@ def linked_input() -> RiskInput:
     ri = risk_input("routine_bill_payment")
     context, now = ri.context, ri.context.payment_history.last_at
     method = context.counterparty.payment_methods[0]
+    method.account_ending, method.beneficiary_name = "4821", "Alder Receivables"
+    context.counterparty.email = "accounts@alder-mechanical.example"
     context.payment_method_history = [
         PaymentMethodChange(id="pmh_2", method_id=method.id, change="added_as_default", changed_at=now - timedelta(days=20))]
     for record in context.payment_history.recent:
@@ -293,10 +296,20 @@ def test_past_payment_destinations_and_paid_bills_are_facts():
     assert "txn_paid" in claude.known_ids(linked)
 
 
+def test_the_account_ending_is_a_fact_and_beneficiary_and_email_are_untrusted():
+    text = claude.render(linked_input(), boundary="B")
+    facts = _facts(text)
+    assert facts["counterparty"]["payment_methods"][0]["account_ending"] == "4821"
+    for untrusted, field in (("Alder Receivables", "counterparty.payment_methods.beneficiary_name"),
+                             ("accounts@alder-mechanical.example", "counterparty.email")):
+        assert untrusted not in json.dumps(facts)
+        assert f'field="{field}"' in text and untrusted in text
+
+
 def test_records_without_these_details_render_as_before():
     facts = _facts(claude.render(risk_input("routine_bill_payment"), boundary="B"))
     assert all("payment_method_id" not in record for record in facts["payment_history"]["recent"])
-    for key in ("by_payment_method", "paid_by"):
+    for key in ("by_payment_method", "paid_by", "account_ending"):
         assert f'"{key}"' not in json.dumps(facts)
 
 

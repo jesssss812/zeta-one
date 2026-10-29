@@ -229,6 +229,8 @@ def render(risk_input: RiskInput, boundary: str | None = None) -> str:
         facts.append(f"- The payee's bank account was changed {changed.value} days ago; the change was {who}.")
     elif method:
         facts.append("- The payee's bank account on this payment has not changed recently.")
+    if method and method.account_ending:
+        facts.append(f"- The bank account on this payment ends {method.account_ending}.")
     if history.by_method:
         use = next((u for u in history.by_method if u.payment_method_id == proposal.payment_method_id), None)
         changed_ever = any(c.method_id == proposal.payment_method_id for c in context.payment_method_history)
@@ -253,10 +255,12 @@ def render(risk_input: RiskInput, boundary: str | None = None) -> str:
     text("Agent's reason for the payment", proposal.agent_rationale)
     text("Payment memo", proposal.memo)
     text("Payee name", payee.name)
+    text("Payee email on record", payee.email)
     if bill and bill.counterparty_name != payee.name:
         text("Vendor name on the bill", bill.counterparty_name)
     if method:
         text("Bank on the payment method", method.bank_name)
+        text("Beneficiary name on the payment method", method.beneficiary_name)
     for each in ([bill] if bill else []) + others:
         text(f"Invoice text, bill {each.id}" + ("" if each is bill else " (another open bill)"), each.document_excerpt)
     blocks = [f'<untrusted_data boundary="{boundary}" field="{field}">\n{claude._neutralize(value)}\n'
