@@ -2,7 +2,7 @@
 
 import pytest
 
-from zeta_one.contracts import RiskEvidence, TierResult, Usage
+from zeta_one.contracts import GpuRate, RiskEvidence, TierResult, Usage
 from zeta_one.decide.evidence import _cost
 
 PRICES = {"claude-opus-5-5": (4.0, 20.0)}
@@ -29,3 +29,15 @@ def test_an_unpriced_model_is_named_not_silently_free():
 def test_no_model_call_costs_nothing():
     cost = _cost(RiskEvidence(tier_results=[TierResult(tier="tier0")]), PRICES)
     assert (cost.usd, cost.input_tokens, cost.unpriced_models) == (0.0, 0, [])
+
+
+def test_a_self_hosted_model_is_charged_its_gpu_time_per_call_failed_calls_included():
+    risk = RiskEvidence(tier_results=[
+        TierResult(tier="tier0"),
+        TierResult(tier="open_weight", model="own-model", latency_ms=18_000, usage=Usage(input_tokens=4000, output_tokens=300)),
+        TierResult(tier="open_weight", model="own-model", latency_ms=3_600, error="http_500"),
+    ])
+    cost = _cost(risk, {"own-model": GpuRate(0.59)})
+    assert cost.usd == pytest.approx((18_000 + 3_600) / 3_600_000 * 0.59)
+    assert cost.input_tokens == 4000 and cost.unpriced_models == []
+    assert cost.prices_used["own-model"]["gpu_usd_per_hour"] == 0.59

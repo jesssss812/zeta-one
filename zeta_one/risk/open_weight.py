@@ -19,7 +19,7 @@ from typing import Any
 import httpx
 from pydantic import ValidationError
 
-from zeta_one.contracts import RiskInput, TierOutput, TierResult, Usage
+from zeta_one.contracts import GpuRate, Price, RiskInput, TierOutput, TierResult, Usage
 from zeta_one.risk import claude
 from zeta_one.settings import setting
 
@@ -38,9 +38,13 @@ SYSTEM_PROMPT = (
 )
 
 
-def prices() -> dict[str, tuple[float, float]]:
-    """USD per million (input, output) tokens from OPEN_WEIGHT_PRICES ("0.2,0.6"); empty if unset, so
-    the cost lists the model as unpriced rather than free."""
+def prices() -> dict[str, Price]:
+    """The model's price: a self-hosted GPU's hourly rent from OPEN_WEIGHT_GPU_HOURLY ("0.59"), else
+    USD per million (input, output) tokens from OPEN_WEIGHT_PRICES ("0.2,0.6"); empty if neither is
+    set, so the cost lists the model as unpriced rather than free."""
+    hourly = setting("OPEN_WEIGHT_GPU_HOURLY")
+    if hourly:
+        return {model(): GpuRate(float(hourly))}
     raw = setting("OPEN_WEIGHT_PRICES")
     if not raw:
         return {}

@@ -24,6 +24,7 @@ from zeta_one.contracts import (
     Context,
     ContextSource,
     IdentityVerifier,
+    Price,
     Proposal,
     RiskTier,
     ScenarioResult,
@@ -77,7 +78,7 @@ class Stages:
     tiers: dict[TierName, RiskTier] = field(default_factory=dict)
     agent_status: AgentStatus | None = None
     configuration: Configuration = field(default_factory=Configuration)
-    prices: dict[str, tuple[float, float]] = field(default_factory=dict)
+    prices: dict[str, Price] = field(default_factory=dict)
     seed_version: str | None = None
     # Where admin endpoints register agents and grant authorizations; None when the stages are stand-ins.
     registry: Registry | None = None

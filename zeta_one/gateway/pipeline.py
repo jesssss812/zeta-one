@@ -23,6 +23,7 @@ from zeta_one.contracts import (
     IdentityEvidence,
     IdentityVerifier,
     InvalidProposal,
+    Price,
     Proposal,
     RiskEvidence,
     RiskTier,
@@ -51,7 +52,7 @@ class Engine:
     tier0: Tier0
     tiers: dict[TierName, RiskTier] = field(default_factory=dict)
     configuration: Configuration = field(default_factory=Configuration)
-    prices: dict[str, tuple[float, float]] = field(default_factory=dict)
+    prices: dict[str, Price] = field(default_factory=dict)
     clock: Callable[[], datetime] = _now
     new_id: Callable[[], str] = new_decision_id
     engine_version: str | None = None

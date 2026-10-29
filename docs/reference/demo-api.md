@@ -148,7 +148,7 @@ describes how it is produced). Fields the site should rely on:
     "model_rationale": null | "..."
   },
   "execution": {"status": "executed" | "held" | "blocked", "simulated": true},
-  "cost": null | {"input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens", "usd", "prices_used": {"<model>": {"input_per_mtok", "output_per_mtok", "cache_read_multiplier", "cache_write_multiplier"}}, "unpriced_models": ["<model>"]},
+  "cost": null | {"input_tokens", "output_tokens", "cache_read_input_tokens", "cache_creation_input_tokens", "usd", "prices_used": {"<model>": {"input_per_mtok", "output_per_mtok", "cache_read_multiplier", "cache_write_multiplier"} | {"gpu_usd_per_hour", "charged_for"}}, "unpriced_models": ["<model>"]},
   "latency_ms": null | {"identity", "authorization", "risk", "total"},
   "review": null | {"by", "at", "outcome", "note", "provenance"},
   "proposal": null | {the proposal as above, as it was submitted},
@@ -166,7 +166,10 @@ Rules the site can count on:
 - `cost` and `latency_ms` are `null` when not measured. The site shows "not measured", never a
   placeholder number. Fixtures always have them `null`. Records the engine writes always carry
   `cost`: `usd` is `0` when no model ran, cache reads and writes are priced from the input price,
-  and a model with no known price is listed in `unpriced_models` and left out of `usd`.
+  and a model with no known price is listed in `unpriced_models` and left out of `usd`. A model on a
+  GPU we rent or own (`OPEN_WEIGHT_GPU_HOURLY`) is charged the GPU's hourly rent for each call's
+  time, failed calls included; calls that share the GPU are each charged in full, so that `usd` is
+  an upper bound.
   `latency_ms` has a key for each stage that ran (`identity`, `authorization`, `risk`) and
   `total`; a stage that didn't run has no key.
 - A strong tier result's `recommended_decision` is the model's suggestion, recorded for people;

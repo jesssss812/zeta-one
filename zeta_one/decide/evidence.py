@@ -12,7 +12,9 @@ from zeta_one.contracts import (
     Cost,
     EvidenceRecord,
     Execution,
+    GpuRate,
     IdentityEvidence,
+    Price,
     Proposal,
     RiskEvidence,
 )
@@ -32,7 +34,7 @@ def build(
     risk: RiskEvidence,
     outcome: Outcome,
     latency_ms: dict[str, int] | None,
-    prices: dict[str, tuple[float, float]] | None = None,
+    prices: dict[str, Price] | None = None,
     engine_version: str | None = None,
     seed_version: str | None = None,
     proposal: Proposal | None = None,
@@ -74,10 +76,17 @@ CACHE_READ_MULTIPLIER = 0.1
 CACHE_WRITE_MULTIPLIER = 1.25
 
 
-def _cost(risk: RiskEvidence, prices: dict[str, tuple[float, float]]) -> Cost:
-    """Cost from reported token usage at per-million-token (input, output) prices, cache included."""
+def _cost(risk: RiskEvidence, prices: dict[str, Price]) -> Cost:
+    """Cost from reported token usage at per-million-token (input, output) prices, cache included, or
+    for a self-hosted model the GPU's hourly rent for the call's time, failed calls included."""
     cost = Cost()
     for result in risk.tier_results:
+        price = prices.get(result.model) if result.model else None
+        if isinstance(price, GpuRate) and result.latency_ms is not None:
+            # Each call is charged its full time, so calls that share the GPU are counted more than once.
+            cost.usd += result.latency_ms / 3_600_000 * price.usd_per_hour
+            cost.prices_used[result.model] = {"gpu_usd_per_hour": price.usd_per_hour,
+                                              "charged_for": "model latency per call"}
         if not result.usage:
             continue
         usage = result.usage
@@ -85,11 +94,13 @@ def _cost(risk: RiskEvidence, prices: dict[str, tuple[float, float]]) -> Cost:
         cost.output_tokens += usage.output_tokens
         cost.cache_read_input_tokens += usage.cache_read_input_tokens
         cost.cache_creation_input_tokens += usage.cache_creation_input_tokens
-        if result.model not in prices:
+        if isinstance(price, GpuRate):
+            continue
+        if price is None:
             if result.model and result.model not in cost.unpriced_models:
                 cost.unpriced_models.append(result.model)
             continue
-        input_price, output_price = prices[result.model]
+        input_price, output_price = price
         input_equivalent = (
             usage.input_tokens
             + usage.cache_read_input_tokens * CACHE_READ_MULTIPLIER

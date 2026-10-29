@@ -7,7 +7,7 @@ required keys are checked, extra keys are allowed. A change here is a change to 
 import re
 from datetime import datetime
 from enum import StrEnum
-from typing import Annotated, Any, Literal, Protocol
+from typing import Annotated, Any, Literal, NamedTuple, Protocol
 
 from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
 
@@ -338,6 +338,16 @@ class Challenge(_Open):
 class Execution(_Open):
     status: ExecutionStatus
     simulated: Literal[True] = True
+
+
+class GpuRate(NamedTuple):
+    """A self-hosted model's price: the GPU's rent per hour, charged for the model's time on each call."""
+
+    usd_per_hour: float
+
+
+# Per model: (input, output) USD per million tokens, or a GPU's hourly rent.
+Price = tuple[float, float] | GpuRate
 
 
 class Cost(_Open):

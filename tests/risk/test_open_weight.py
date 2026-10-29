@@ -7,6 +7,7 @@ import pytest
 from tests.risk.test_claude import answer, risk_input
 from zeta_one import settings
 from zeta_one.risk import claude, open_weight
+from zeta_one.contracts import GpuRate
 from zeta_one.risk.open_weight import OpenWeightTier
 
 
@@ -108,6 +109,14 @@ def test_prices_are_unset_until_configured(monkeypatch, tmp_path):
     monkeypatch.setenv("OPEN_WEIGHT_PRICES", "0.2,0.6")
     monkeypatch.setenv("OPEN_WEIGHT_MODEL", "org/open-model")
     assert open_weight.prices() == {"org/open-model": (0.2, 0.6)}
+
+
+def test_a_gpu_hourly_rate_prices_the_model_by_its_time(monkeypatch, tmp_path):
+    monkeypatch.setattr(settings, "ROOT", tmp_path)
+    monkeypatch.setenv("OPEN_WEIGHT_GPU_HOURLY", "0.59")
+    monkeypatch.setenv("OPEN_WEIGHT_PRICES", "0.2,0.6")
+    monkeypatch.setenv("OPEN_WEIGHT_MODEL", "own-model")
+    assert open_weight.prices() == {"own-model": GpuRate(0.59)}
 
 
 @pytest.mark.live_models
