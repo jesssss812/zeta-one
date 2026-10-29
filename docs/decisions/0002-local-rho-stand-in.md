@@ -17,7 +17,7 @@ bill arriving with a malicious invoice. Also:
 ## Decision
 
 Build a small local stand-in that uses Rho's own data shapes (generated from
-[../reference/rho-openapi.json](../reference/rho-openapi.json)), with two backends behind one
+[Rho's public OpenAPI description](https://docs.rho.co/api/v1/openapi)), with two backends behind one
 interface:
 
 - **Live:** read-only calls to Rho staging.

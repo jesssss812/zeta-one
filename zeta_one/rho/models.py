@@ -1,6 +1,7 @@
 """Rho's data shapes, as far as the engine reads them.
 
-Written by hand from docs/reference/rho-openapi.json. Fields the engine doesn't read are left out.
+Written by hand from Rho's public OpenAPI description (https://docs.rho.co/api/v1/openapi).
+Fields the engine doesn't read are left out.
 """
 
 from datetime import datetime
