@@ -12,7 +12,6 @@ evidence are flagged, not trusted. Every question and answer is kept with the ca
 import json
 import sqlite3
 from datetime import datetime
-from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
@@ -27,7 +26,6 @@ DEFAULT_MODEL = "qwen2.5:7b"
 TIMEOUT_SECONDS = 90.0
 MAX_TOKENS = 1024
 MAX_HISTORY = 6
-ROOT = Path(__file__).resolve().parents[2]
 LOCAL_HOSTS = {"127.0.0.1", "localhost", "::1"}
 
 SYSTEM_PROMPT = """You help a payments case worker understand one case. Answer only from the case below:
