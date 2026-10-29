@@ -1,7 +1,7 @@
 # Zeta One submission site
 
 Static, dependency-free presentation site with optional lightweight motion. No API calls, model runs, or payment actions.
-The page explains the project and shows one labeled illustrative decision. Payment execution is
+The page explains the project and links to a recorded payment review workspace. Payment execution is
 simulated throughout the project.
 
 ## Preview
@@ -18,7 +18,7 @@ Open http://localhost:4173. FastAPI can also serve this directory unchanged. All
 
 - `index.html`: project story, the decision flow, synthetic decision example, engineering approach,
   the feedback loop, the evaluation summary with the main design trade-offs, and the demo video space. Replace the labeled video placeholder with an accessible video/embed once
-  a recording exists; add a link to the actual app when it is ready.
+  a recording exists.
 - `evaluation.html`: how the evaluation works and who does each step (a person, a model, code), in
   the same colours as the flow in `docs/reference/evaluation-system.md`; change the two together.
 - `fonts.html`: four wordmark studies for choosing the name and ζ typography; separate from the submission page.
@@ -27,11 +27,16 @@ Open http://localhost:4173. FastAPI can also serve this directory unchanged. All
 - The decision example is drawn from the engine-owned
   [vendor payment-method change fixture](../data/fixtures/vendor_payment_method_changed.json).
   It is authored synthetic data, not a live engine result. No latency, savings, or accuracy figures
-  are invented. The recorded live run of the same scenario in `site/data/scenarios/` gives the
-  same challenge. Update the example if the canonical scenario changes.
+  are invented. The older `site/data/scenarios/` files include illustrative fixtures; they are
+  not evidence of real model runs. Update the example if the canonical scenario changes.
 
-The site prioritizes a fast, coherent presentation over an interactive demo. Engine decisions and
-API integration remain in the actual application. The video area says its content is forthcoming;
+The public workspace at `workspace/` browses prepared real deterministic engine results from
+versioned synthetic recipes. Add and random copy prepared records; they do not assess fresh
+requests. Review mutations require the local workspace and are disabled publicly. Rebuild its
+`data.json` with `python scripts/record_workspace.py` using the project environment; the script
+does not call models, read staging data, or move money. Recording provenance is included in the
+JSON, and each payment includes its evidence record. The local demo serves the same interface
+with a fresh sandbox backend at `/workspace/`. The video area says its content is forthcoming;
 the evaluation figures are copied by hand from `data/eval/report.md`, so change them when the report
 changes. The decision flow under "Why this matters" and the feedback loop in section 04 match the
 diagram in the root README (`docs/images/decision-flow-*.svg`); change them together.
@@ -39,9 +44,8 @@ diagram in the root README (`docs/images/decision-flow-*.svg`); change them toge
 Checks: `python3 scripts/check.py` from the repository root. Manually verify page anchors, desktop
 and narrow layouts, visible focus, and absence of missing assets. Run `node --check site/motion.js` for JavaScript syntax. There is no frontend build step.
 
-All changes stay in `site/`; the engine owns the root README and docs. Suggested root README text:
-“Preview the submission site with `python3 -m http.server 4173 --bind 127.0.0.1 --directory site`.
-It includes a labeled synthetic decision example. Payment execution is simulated.”
+Preview the submission site with the static server above. Its payment workspace contains
+recorded deterministic decisions on synthetic inputs. Payment execution is simulated.
 
 ## Demo and fintech integration
 
