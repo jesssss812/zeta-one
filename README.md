@@ -63,8 +63,8 @@ One run per configuration on synthetic cases, recorded on 29 October 2026:
   legitimate workload to 14, but allowed two frauds.
 - **A self-hosted open-weight model held its own.** Qwen 3.6 27B on one rented GPU decided 94 of
   100 test cases acceptably, the most of any configuration, at about an eighth of the cost of Opus
-  on the same escalated cases. Its
-  prompt was tuned on its own development errors, and on the hard set it scored 7 of 12 to Opus's 10.
+  on the same escalated cases. Its prompt was tuned on its own development errors, and on the hard
+  set it scored 7 of 12 to Opus's 10.
 - **Selective inference has a blind spot.** Two detectable frauds in the separately authored hard
   set triggered no rule and bypassed selective model review. Opus on every payment caught both.
 
