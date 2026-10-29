@@ -134,7 +134,7 @@ its `dev` results are from before the change.
 The context can now say which bank account each past payment went to and which bill it paid, a
 payment method's account ending and beneficiary, the payee's email, and which bank change a
 confirmation covers ([demo-api.md](demo-api.md#scenario-result) lists the fields). They were added
-so the hand-written `hard` cases can be represented. `dev`'s setup records none of the first three,
+so the `hard` cases, written outside the generator, can be represented. `dev`'s setup records none of the first three,
 so on `dev` two things changed in what the models see; every other input is byte-identical:
 
 - The strong tier sees a confirmation's id on the change it covers, in the 11 cases with a

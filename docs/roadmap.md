@@ -1,6 +1,6 @@
 # Roadmap
 
-What is not done, as of 2026-10-28. Remove a line when it is done. Items marked **owner** need the
+What is not done, as of 2026-10-29. Remove a line when it is done. Items marked **owner** need the
 owner's own time or accounts.
 
 ## Live models
@@ -12,30 +12,22 @@ owner's own time or accounts.
 
 ## Evaluation
 
-The plan is in [strategy/evaluation.md](strategy/evaluation.md). `dev` (48 cases) and `test` (100)
-are generated; the report so far covers only the deterministic cases.
+The plan is in [strategy/evaluation.md](strategy/evaluation.md). Every configuration has been scored
+once on the deterministic cases, `dev`, the frozen `test` and the frozen `hard` set; the results are
+in [data/eval/report.md](../data/eval/report.md). Not done:
 
-- AI-label `dev` and `test` with the guide, blind.
-- `hard` is frozen with 14 cases and scored under every configuration; the run is kept in
-  [data/eval/baselines/hard-2026-10-28-scored/](../data/eval/baselines/hard-2026-10-28-scored/report.md).
-  That run is the record, under policy 2026-10-28.4, where H24 was challenged as a new payee under
-  every configuration. Policy 2026-10-28.5 applies that rule only to a payee with no settled history,
-  as decision 0006 says, so H24 now reaches the risk tiers; no `dev` or deterministic decision changed.
-  The open-weight arm was then run on `hard` with Qwen 3.6 27B on our GPU (decisions 0018 and 0019),
-  under policy .5: 9 of 14 acceptable, against 7 for the hosted Qwen3 235B in the record; kept in
-  [data/eval/baselines/hard-2026-10-29-open-weight/](../data/eval/baselines/hard-2026-10-29-open-weight/report.md).
-  The other 6 specs need the business's own
-  supporting records (5) or the lookalike vendor's record in the models' input (1) before they can
-  be converted.
-- **Owner:** label 40 stratified `test` cases blind, then adjudicate disagreements (~1 h).
-- Runs on `dev` with the real backend (`--backend real --live --max-usd`); tune on `dev` only;
-  freeze; then the scored run of every configuration on `test` and the deterministic cases.
-- Final report: per-category rates with intervals, confusion matrices, agreement, the Cost table,
-  limitations. Then `scripts/record_runs.py --live` and `scripts/demo_loop.py --live`, so
-  `site/data/` holds the final runs.
-
-If time allows: repeat runs with pass^3; an attacking model aimed at model lowering of soft
-signals; expected cost with the missed-fraud weight halved and doubled.
+- **A defect the scored run found:** once a model rates a payment high, the policy treats an amount
+  that differs from its bill as a redirect and blocks it, where the deterministic authorization
+  cases require a challenge. The model arms fail one or two of those cases.
+- **The `vendor_payment_method_changed` demo scenario** shares the seed with the redirect scenario,
+  so its context includes the vendor's other open bill with injected text; the recorded live run
+  was blocked, where the scenario expects a challenge ([reference/demo-api.md](reference/demo-api.md#scenarios)).
+- The other 6 `hard` specs need the business's own supporting records (5) or the lookalike vendor's
+  record in the models' input (1) before they can be converted.
+- Repeat runs with pass^3; an attacking model aimed at model lowering of soft signals; expected cost
+  with the missed-fraud weight halved and doubled.
+- Jev's calibration on our cases, and whether Opus would gain from the open-weight model's prompt
+  section on confirmation records.
 
 ## Submission (by Thu Oct 29, 5:00 PM CT)
 
@@ -63,7 +55,7 @@ connector in claude.ai and recording the answer in [reference/rho-api.md](refere
 - Security follow-ups in [strategy/security.md](strategy/security.md#later): snapshot comparison
   of payment methods, signed authorizations, hash-chained evidence, rate limits, key rotation.
 - Approval side panel: poll Rho items waiting for approval and score them (decision 0003).
-- For a customer that wants no case data to leave its servers: evaluate an open model built like
+- For a customer that wants no case data to leave its servers: evaluate an open-weight model built like
   Jev, such as openjev, as a self-hosted cheap tier, including against prompt injection (decision 0018).
 - Case review assistant: dual control on findings, a per-day model budget, and an evaluation of the
   assistant on adversarial web pages (decision 0015).

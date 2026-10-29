@@ -3,8 +3,9 @@
 Compiled 2026-10-27 from search results quoting TypeSafe AI's own pages (the
 [announcement](https://typesafe.ai/blog/introducing-system-one-models-and-jev),
 [homepage](https://typesafe.ai/) and [docs](https://docs.typesafe.ai/introduction)); the planning
-session could not open those pages directly. `jevai.net` is not the vendor. Prices and latency are
-**vendor claims**; rate limits are unverified. The request and answer shapes were confirmed by live
+session could not open those pages directly; the announcement was read directly on 2026-10-29 and
+gives the same price and latency. `jevai.net` is not the vendor. Prices and latency are **vendor
+claims**; rate limits are unverified. The request and answer shapes were confirmed by live
 calls on both routes on 2026-10-28.
 
 ## From TypeSafe's own material

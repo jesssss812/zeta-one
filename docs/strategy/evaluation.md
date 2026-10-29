@@ -57,16 +57,16 @@ They differ on purpose. A fraud that leaves no observable trace has `truth: paye
 listed by name in the report, and they are counted apart from accuracy: what counts as observable
 depends on which features exist today, so the list must not quietly excuse misses.
 With today's features every generated fraud leaves a trace tier 0 flags, so the generator marks
-none undetectable; such cases come from the hand-written `hard` set.
+none undetectable; such cases come from the `hard` set.
 
 ### Sets
 
 | Set | Size | Rule |
 | --- | --- | --- |
-| Deterministic | ~20 | One case per identity and authorization check, plus one per guardrail in [security.md](security.md) (self-approval refused, model failure challenged, a repeated proposal not re-rolled, a missing bill reference caught, split payments limited, approval after revocation blocked); labels by construction; every case must pass; no statistics |
-| Risk `dev` | ~50 | Legitimate, suspicious, adversarial and ambiguous cases, including the five demo cases. Thresholds, prompts and rules are tuned here only |
-| Risk `test` | ~100 | About 35 legitimate, 35 suspicious, 30 adversarial; a different random seed and different wording from `dev`; frozen and hashed before the first scored run; never used for tuning |
-| Risk `hard` | 14, of 20 specs | Written by hand by the owner, outside the generator's templates: unfamiliar impersonation styles, instructions arriving through the real vendor's compromised channel, subtle injection, and legitimate urgent payments that look like fraud |
+| Deterministic | 23 | One case per identity and authorization check, plus one per guardrail in [security.md](security.md) (self-approval refused, model failure challenged, a repeated proposal not re-rolled, a missing bill reference caught, split payments limited, approval after revocation blocked); labels by construction; every case must pass; no statistics |
+| Risk `dev` | 51 | 48 generated legitimate, suspicious, adversarial and ambiguous cases, plus the three risk demo scenarios. Thresholds, prompts and rules are tuned here only |
+| Risk `test` | 100 | 35 routine, 35 suspicious and 30 adversarial cases (51 legitimate and 49 fraud by their built-in truth); a different random seed and different wording from `dev`; frozen and hashed before the first scored run; never used for tuning. 15 of its combinations also appear in `dev`, because the routine class has too few to keep apart |
+| Risk `hard` | 14, of 20 specs | Written outside the generator's templates, as prose drafted with Claude and approved by the owner with its labels: unfamiliar impersonation styles, instructions arriving through the real vendor's compromised channel, subtle injection, and legitimate urgent payments that look like fraud. Two are frauds marked undetectable, so 12 are scored |
 | `feedback` | grows with use | Real decisions whose verified outcome (decision 0012) is a finding, labelled by it, exported by `eval/feedback.py`; claims are left out. Replayed on the seed, so the context is today's, not the decision's |
 
 With about 30 cases in a class, a rate near 85% has a 95% interval of roughly ±12 points: enough to
@@ -92,17 +92,17 @@ the vendor.
    an agent rationale, from the committed prompt `eval/prompts/wording.md`, in batches of ~20.
 3. Code applies each case's setup to a fresh copy of the seed.
 
-The dimensions are close to tier 0's features, so the rules would look near-perfect by construction
-if nothing stopped it. Against that:
+The dimensions are close to tier 0's features, so the rules catch every generated fraud by
+construction (they did, on `dev` and `test`), and generated cases flatter them. Against that:
 
-- **Harmless look-alikes**: legitimate cases with a recent, verified change of bank details, or an
+- **Harmless look-alikes**: legitimate cases with a recent, confirmed change of bank details, or an
   urgent but honest invoice, so a flag alone is not the answer.
 - **Frozen lexicon**: tier 0's instruction-pattern list is fixed before `test` is generated, and the
   call that writes `test` text never sees it.
 - **Varied wording**: the wording call is asked for realistic and varied phrasing, including subtle
   versions, and is never given the label.
-- **The `hard` set** is the headline for the risk categories, because nothing in it came from the
-  generator.
+- **The `hard` set** is the check on the generator, because nothing in it came from it. It is
+  small: 12 scored cases.
 
 Wording, labelling and the strong tier all use Claude, with three different models: Claude Haiku
 5.5 writes the wording, Claude Sonnet 5.5 labels, and Claude Opus 5.5 is the strong tier. The
@@ -118,8 +118,9 @@ report says that all three are from one family.
    dimension values. No tools are offered, so it cannot open a file: the blindness holds by
    construction, and each batch's meta records the route. Its labels are committed; a rerun may
    label differently, which is why the committed file is the record.
-3. **The owner labels** the whole `hard` set and 40 suspicious, adversarial and ambiguous cases
-   from `test`, stratified, without seeing the AI label.
+3. **The owner labels** 40 suspicious, adversarial and ambiguous cases from `test`, stratified,
+   without seeing the AI label, and approves the labels proposed with the `hard` set's specs (an
+   approval, not a blind label).
 4. **Agreement is reported on those 40**: raw agreement, and Cohen's κ with a bootstrap 95%
    interval (about ±0.15–0.2 at this size). Identity and authorization cases are left out, since
    agreeing on them is trivial and would inflate κ.
@@ -131,14 +132,17 @@ Labels are fixed before the system is scored on them.
 
 ### Comparisons
 
-Run the same cases through:
+Run the same cases through seven configurations:
 
-1. trivial baselines: always allow, always challenge
-2. deterministic rules only
-3. rules, then the strong model only on engineered escalation (decision 0009)
-4. the strong model on every request
+1. trivial baselines: `always_allow`, `always_challenge`
+2. deterministic rules only: `rules`
+3. rules, then the strong model only on engineered escalation: `engineered` (decisions 0009, 0017)
+4. rules, then Jev, then the strong model on Jev's rule: `jev` (decisions 0007, 0016)
+5. rules, then an open-weight model in the strong model's place on engineered escalation:
+   `open_weight` (decisions 0014, 0018, 0019)
+6. the strong model on every request: `strong`
 
-The report names the models and prices that actually ran. The language-model tiers see only the
+Each runs once per set. The report names the models and prices that actually ran. The language-model tiers see only the
 proposal and its context, never a case's category, setup, name or labels.
 
 ### Metrics
@@ -192,9 +196,16 @@ list of failure kinds grouped from the notes.
   payment or bank account carries an identifier that ties them together. The owner, labelling the
   `test` sample, found the cases too alike to say much beyond that structure. `dev` and `test`
   therefore measure overfitting to the tuning within one structure, not behaviour on unlike
-  cases; `hard`, written by hand, is the check on that.
+  cases; `hard`, written outside the generator, is the check on that.
 - Which model families wrote, labelled and decided the cases.
 - The cases marked `detectable: false`, by name.
+- Each configuration ran once per set.
+- How many `test` labels are the AI labeller's alone, the agreement on the owner's blind labels, and
+  how many disagreements the owner settled by taking the AI's label.
+- That the open-weight model's prompt has a section written from its `dev` failures, which the
+  strong tier's prompt lacks.
+- That the open-weight cost is GPU rent per call's time, an upper bound.
+- Any set scored under more than one policy version.
 
 ## If time allows, in order
 
@@ -227,10 +238,8 @@ list of failure kinds grouped from the notes.
    legitimate actions that saw no prompt. With only `confirm`, it equals the challenge rate and adds
    nothing.
 
-The configuration with Jev (rules, then Jev, then the strong model when Jev is unsure) joins the
-comparisons when that tier lands, as does the optional open-weight arm (decision 0009). Too few
-cases reach Jev for a reliability table, so its probabilities are reported raw and labelled as
-uncalibrated on our data.
+Jev's probabilities are reported raw and labelled as uncalibrated on our data: no reliability table
+has been built from the cases that reached it.
 
 The judges score "performance: did they optimize for speed or scale?"
 ([../reference/hackathon.md](../reference/hackathon.md)), so cost and latency are reported next to

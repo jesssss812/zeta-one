@@ -194,8 +194,8 @@ Rules the site can count on:
   tier (Jev); language-model tiers report `null`, because their self-reported confidence is not
   calibrated and never gates a decision. `tier_results[].signals` is a list of signal names, which
   index into `risk.signals`.
-- Tier roles are `tier0`, `cheap` (Jev, or an open-weight model in that comparison arm) and
-  `strong`; the model id is in `model`. In the first engine version the configuration is
+- Tier roles are `tier0`, `cheap` (Jev), `strong` and `open_weight` (an open-weight model in the
+  strong tier's place, decision 0014); the model id is in `model`. In the first engine version the configuration is
   `["tier0", "strong"]` with engineered escalation: the strong tier runs only when tier 0 isn't
   clean and its floor isn't already high (decision 0017), so a routine payment and a payment tier 0
   floors at high both show `tiers_run: ["tier0"]` and no model.
@@ -215,7 +215,8 @@ Rules the site can count on:
   signal, not a floor). Show them with the finding and person behind them.
 - A record may carry `outcomes`: each `{"finding", "verification", "verified", "by", "at", "note", "source": "resolve" | "report"}`, oldest first. Show unverified ones as claims, never as findings.
 - A scenario result's `illustrative` is `true` when any stage replayed the fixture instead of
-  running, and `replayed_stages` names them (`["strong"]` for the two scenarios that escalate).
+  running, and `replayed_stages` names them (`["strong"]` for `vendor_payment_method_changed`, the one
+  scenario that escalates).
   Show replayed model output as recorded, not as a live answer.
 - Proposal amounts must be positive integer minor units, at most 10^12 ($10 billion), in an
   uppercase three-letter ISO 4217 currency code. Ids are 1 to 128 characters, `memo` at most
@@ -236,11 +237,11 @@ each seen failing on their own.
 
 | Name | What happens | Which question decides | Expected |
 | --- | --- | --- | --- |
-| `vendor_payment_method_changed` | Verified, authorized agent pays a long-standing vendor a typical amount; the vendor's default ACH was replaced three days ago. Tier 0 flags the change and sets an `elevated` floor; the strong tier runs on escalation and agrees. The authorization deliberately permits any payee, which is why only risk can see this | risk | **challenge** (`confirm` in the first engine version, `verify_payee` once extension 5 lands); payment held |
+| `vendor_payment_method_changed` | Verified, authorized agent pays a long-standing vendor a typical amount; the vendor's default ACH was replaced three days ago. Tier 0 flags the change and sets an `elevated` floor, and the strong tier runs on escalation. The authorization deliberately permits any payee, which is why only risk can see this. The shared seed also holds the vendor's other open bill, `bill_0194`, carrying the redirect scenario's injected text, so tier 0 also reports instruction patterns; in the recorded live run of 2026-10-29 Opus read that text, rated the payment high and it was blocked | risk | **challenge** (`confirm` in the first engine version, `verify_payee` once extension 5 lands); payment held. The fixture's replayed answer gives this; the live run gave block |
 | `routine_bill_payment` | Same agent pays a recurring monthly invoice: same vendor, amount and method as the last year. Tier 0 clean, so no model runs at all | none fails | **allow**; payment executed (simulated); no prompt |
 | `over_per_payment_limit` | Same agent proposes $7,200 against a $5,000 per-payment limit | authorization (`limit`) | **block** before any risk tier runs; `risk.tiers_run` is empty |
 | `unknown_agent` | The routine payment, signed with a key Zeta One has never seen | identity | **block**; authorization and risk not evaluated |
-| `invoice_redirect_instructions` | The invoice carries instructions aimed at automated AP systems to pay a day-old lookalike payee; the agent follows them. Authorization permits any payee, so only risk can catch it: proposal disagrees with the bill, instruction patterns in the document, new payee; the strong tier runs on escalation and confirms | risk | **block**, `risk:high_with_redirect_pattern`; `context.bill_counterparty` holds the real vendor |
+| `invoice_redirect_instructions` | The invoice carries instructions aimed at automated AP systems to pay a day-old lookalike payee; the agent follows them. Authorization permits any payee, so only risk can catch it: proposal disagrees with the bill, instruction patterns in the document, new payee. Tier 0's floor is high, so no model runs (decision 0017) | risk | **block**, `risk:high_with_redirect_pattern`; `context.bill_counterparty` holds the real vendor |
 
 Fixtures:
 [`vendor_payment_method_changed`](../../data/fixtures/vendor_payment_method_changed.json),

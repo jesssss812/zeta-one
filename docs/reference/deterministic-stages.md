@@ -7,12 +7,15 @@ stages and no model calls. These are synthetic acceptance tests, not fraud-accur
 ```mermaid
 flowchart LR
   Request[Signed payment proposal] --> Identity[Ed25519 identity]
-  Identity --> Authorization[Scope and spending limits]
-  Authorization --> Context[Synthetic seed context]
-  Context --> Risk[Deterministic risk features]
+  Identity --> Context[Synthetic seed context]
+  Context --> Authorization[Scope and spending limits]
+  Authorization --> Risk[Deterministic risk features]
   Risk --> Policy[Kernel policy and evidence]
   Policy --> Result[Allow / challenge / block]
 ```
+
+The context is loaded before authorization runs, so a proposal naming records that don't exist is
+refused the same way whatever its amount; risk runs only when authorization has no violation.
 
 ## Data and context
 
