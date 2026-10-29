@@ -16,11 +16,16 @@ The plan is in [strategy/evaluation.md](strategy/evaluation.md). `dev` (48 cases
 are generated; the report so far covers only the deterministic cases.
 
 - AI-label `dev` and `test` with the guide, blind.
-- `hard` is frozen with 14 cases. The other 6 specs need the business's own supporting records (5)
-  or the lookalike vendor's record in the models' input (1) before they can be converted.
+- `hard` is frozen with 14 cases and scored under every configuration; the run is kept in
+  [data/eval/baselines/hard-2026-10-28-scored/](../data/eval/baselines/hard-2026-10-28-scored/report.md).
+  **Owner:** decide H24, which the authorization stage challenges as a new payee under every
+  configuration: decision 0006 says the rule is for a payee with no settled history, but the policy
+  also applies it to a payee added in the last 30 days. The other 6 specs need the business's own
+  supporting records (5) or the lookalike vendor's record in the models' input (1) before they can
+  be converted.
 - **Owner:** label 40 stratified `test` cases blind, then adjudicate disagreements (~1 h).
 - Runs on `dev` with the real backend (`--backend real --live --max-usd`); tune on `dev` only;
-  freeze; then the scored run of every configuration on `test`, `hard` and the deterministic cases.
+  freeze; then the scored run of every configuration on `test` and the deterministic cases.
 - Final report: per-category rates with intervals, confusion matrices, agreement, the Cost table,
   limitations. Then `scripts/record_runs.py --live` and `scripts/demo_loop.py --live`, so
   `site/data/` holds the final runs.
