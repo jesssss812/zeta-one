@@ -21,6 +21,9 @@ are generated; the report so far covers only the deterministic cases.
   That run is the record, under policy 2026-10-28.4, where H24 was challenged as a new payee under
   every configuration. Policy 2026-10-28.5 applies that rule only to a payee with no settled history,
   as decision 0006 says, so H24 now reaches the risk tiers; no `dev` or deterministic decision changed.
+  The open-weight arm was then run on `hard` with Qwen 3.6 27B on our GPU (decisions 0018 and 0019),
+  under policy .5: 9 of 14 acceptable, against 7 for the hosted Qwen3 235B in the record; kept in
+  [data/eval/baselines/hard-2026-10-29-open-weight/](../data/eval/baselines/hard-2026-10-29-open-weight/report.md).
   The other 6 specs need the business's own
   supporting records (5) or the lookalike vendor's record in the models' input (1) before they can
   be converted.

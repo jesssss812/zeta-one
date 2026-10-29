@@ -6,10 +6,10 @@ Rates are shown as `rate (k/n, 95% Wilson interval)`. There is no overall accura
 
 ## Run
 
-- Models that ran: claude-opus-5-5, qwen/qwen3-235b-a22b-2507, typesafe/jev-1.14
-- Prices used: `{"claude-opus-5-5": {"cache_read_multiplier": 0.1, "cache_write_multiplier": 1.25, "input_per_mtok": 4.0, "output_per_mtok": 20.0}, "typesafe/jev-1.14": {"cache_read_multiplier": 0.1, "cache_write_multiplier": 1.25, "input_per_mtok": 0.042, "output_per_mtok": 0.0}}`
-- Engine version: `23c489e`, `469ff95`, `7ba6857`, `d40bade`
-- Policy version: `2026-10-28.4`
+- Models that ran: claude-opus-5-5, qwen3.6-27b, typesafe/jev-1.14
+- Prices used: `{"claude-opus-5-5": {"cache_read_multiplier": 0.1, "cache_write_multiplier": 1.25, "input_per_mtok": 4.0, "output_per_mtok": 20.0}, "qwen3.6-27b": {"charged_for": "model latency per call", "gpu_usd_per_hour": 0.59}, "typesafe/jev-1.14": {"cache_read_multiplier": 0.1, "cache_write_multiplier": 1.25, "input_per_mtok": 0.042, "output_per_mtok": 0.0}}`
+- Engine version: `23c489e`, `469ff95`, `7ba6857`, `b850a2f`, `dd7f436`, `fe349b5`
+- Policy version: `2026-10-28.4`, `2026-10-28.5`
 - Seed version: `15c5c875071bd93485ba9b3a8afce94db723925924e4ab2207e43650d442d215`, `3574ce8f0cef1de72c159f3b2c98128410721da8c4016114bf90928e6958909c`
 - Generator seeds: dev: [7]; test: [11]
 - test combinations also in dev: 15 (the routine class has too few to keep apart; only wording and vendor differ)
@@ -50,8 +50,8 @@ Every case must pass; counts, not statistics. A case that repeats its request pa
 | engineered | hard | 58% (7/12, 32%–81%) | 67% (8/12, 39%–86%) | 67% (4/6, 30%–90%) | 17% (1/6, 3%–56%) | 0% (0/6, 0%–39%) |
 | jev | dev | 92% (47/51, 82%–97%) | 96% (49/51, 87%–99%) | 100% (22/22, 85%–100%) | 31% (9/29, 17%–49%) | 0% (0/29, 0%–12%) |
 | jev | hard | 50% (6/12, 25%–75%) | 58% (7/12, 32%–81%) | 67% (4/6, 30%–90%) | 17% (1/6, 3%–56%) | 0% (0/6, 0%–39%) |
-| open_weight | dev | 69% (35/51, 55%–80%) | 73% (37/51, 59%–83%) | 100% (22/22, 85%–100%) | 41% (12/29, 26%–59%) | 31% (9/29, 17%–49%) |
-| open_weight | hard | 33% (4/12, 14%–61%) | 42% (5/12, 19%–68%) | 67% (4/6, 30%–90%) | 67% (4/6, 30%–90%) | 17% (1/6, 3%–56%) |
+| open_weight | dev | 94% (48/51, 84%–98%) | 98% (50/51, 90%–100%) | 100% (22/22, 85%–100%) | 41% (12/29, 26%–59%) | 0% (0/29, 0%–12%) |
+| open_weight | hard | 50% (6/12, 25%–75%) | 58% (7/12, 32%–81%) | 67% (4/6, 30%–90%) | 50% (3/6, 19%–81%) | 0% (0/6, 0%–39%) |
 | strong | dev | 92% (47/51, 82%–97%) | 96% (49/51, 87%–99%) | 100% (22/22, 85%–100%) | 31% (9/29, 17%–49%) | 0% (0/29, 0%–12%) |
 | strong | hard | 75% (9/12, 47%–91%) | 83% (10/12, 55%–95%) | 100% (6/6, 61%–100%) | 17% (1/6, 3%–56%) | 0% (0/6, 0%–39%) |
 
@@ -69,8 +69,8 @@ How many decisions reached any model, and what they cost. Tier 0 is free; dollar
 | engineered | hard | 64% (9/14, 39%–84%) | 15.50 | 0.0542 |  |
 | jev | dev | 84% (43/51, 72%–92%) | 12.04 | 0.0279 |  |
 | jev | hard | 64% (9/14, 39%–84%) | 17.30 | 0.0605 |  |
-| open_weight | dev | 84% (43/51, 72%–92%) | 0.00 | 0.0000 | unpriced: qwen/qwen3-235b-a22b-2507 |
-| open_weight | hard | 64% (9/14, 39%–84%) | 0.00 | 0.0000 | unpriced: qwen/qwen3-235b-a22b-2507 |
+| open_weight | dev | 57% (29/51, 43%–69%) | 1.76 | 0.0041 |  |
+| open_weight | hard | 64% (9/14, 39%–84%) | 1.97 | 0.0069 |  |
 | strong | dev | 100% (51/51, 93%–100%) | 23.96 | 0.0556 |  |
 | strong | hard | 100% (14/14, 78%–100%) | 23.46 | 0.0547 |  |
 
@@ -152,11 +152,11 @@ Confusion matrix over the risk categories (rows expected, columns decided):
 
 | Category | n | Accuracy | With acceptable | Detection | Legit challenged | Lowerings (legit / other) | $ per action | p50 / p95 ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| A | 16 | 50% (8/16, 28%–72%) | 50% (8/16, 28%–72%) | – | 56% (9/16, 33%–77%) | 0 / 0 | 0.0000 | 13 / 20 |
-| D | 15 | 100% (15/15, 80%–100%) | 100% (15/15, 80%–100%) | 100% (10/10, 72%–100%) | 100% (5/5, 57%–100%) | 0 / 0 | 0.0000 | 13 / 18 |
-| E | 13 | 77% (10/13, 50%–92%) | 100% (13/13, 77%–100%) | 100% (12/12, 76%–100%) | 100% (1/1, 21%–100%) | 0 / 0 | 0.0000 | 16 / 23 |
-| F | 7 | 71% (5/7, 36%–92%) | 100% (7/7, 65%–100%) | – | 86% (6/7, 49%–97%) | 0 / 0 | 0.0000 | 14 / 21 |
-| risk (A, D, E, F) | 51 | 75% (38/51, 61%–84%) | 84% (43/51, 72%–92%) | 100% (22/22, 85%–100%) | 72% (21/29, 54%–85%) | 0 / 0 | 0.0000 | 13 / 21 |
+| A | 16 | 50% (8/16, 28%–72%) | 50% (8/16, 28%–72%) | – | 56% (9/16, 33%–77%) | 0 / 0 | 0.0000 | 17 / 24 |
+| D | 15 | 100% (15/15, 80%–100%) | 100% (15/15, 80%–100%) | 100% (10/10, 72%–100%) | 100% (5/5, 57%–100%) | 0 / 0 | 0.0000 | 16 / 34 |
+| E | 13 | 77% (10/13, 50%–92%) | 100% (13/13, 77%–100%) | 100% (12/12, 76%–100%) | 100% (1/1, 21%–100%) | 0 / 0 | 0.0000 | 25 / 37 |
+| F | 7 | 71% (5/7, 36%–92%) | 100% (7/7, 65%–100%) | – | 86% (6/7, 49%–97%) | 0 / 0 | 0.0000 | 20 / 22 |
+| risk (A, D, E, F) | 51 | 75% (38/51, 61%–84%) | 84% (43/51, 72%–92%) | 100% (22/22, 85%–100%) | 72% (21/29, 54%–85%) | 0 / 0 | 0.0000 | 19 / 32 |
 
 Confusion matrix over the risk categories (rows expected, columns decided):
 
@@ -260,35 +260,35 @@ Confusion matrix over the risk categories (rows expected, columns decided):
 
 | Category | n | Accuracy | With acceptable | Detection | Legit challenged | Lowerings (legit / other) | $ per action | p50 / p95 ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| A | 16 | 50% (8/16, 28%–72%) | 50% (8/16, 28%–72%) | – | 38% (6/16, 18%–61%) | 0 / 0 | 0.0000 | 6878 / 29148 |
-| D | 15 | 67% (10/15, 42%–85%) | 67% (10/15, 42%–85%) | 100% (10/10, 72%–100%) | 20% (1/5, 4%–62%) | 0 / 0 | 0.0000 | 22090 / 34951 |
-| E | 13 | 92% (12/13, 67%–99%) | 100% (13/13, 77%–100%) | 100% (12/12, 76%–100%) | 0% (0/1, 0%–79%) | 0 / 0 | 0.0000 | 9894 / 51571 |
-| F | 7 | 71% (5/7, 36%–92%) | 86% (6/7, 49%–97%) | – | 71% (5/7, 36%–92%) | 0 / 0 | 0.0000 | 10827 / 26863 |
-| risk (A, D, E, F) | 51 | 69% (35/51, 55%–80%) | 73% (37/51, 59%–83%) | 100% (22/22, 85%–100%) | 41% (12/29, 26%–59%) | 0 / 0 | 0.0000 | 10489 / 40768 |
+| A | 16 | 100% (16/16, 81%–100%) | 100% (16/16, 81%–100%) | – | 6% (1/16, 1%–28%) | 8 / 0 | 0.0010 | 8773 / 13842 |
+| D | 15 | 93% (14/15, 70%–99%) | 93% (14/15, 70%–99%) | 100% (10/10, 72%–100%) | 100% (5/5, 57%–100%) | 0 / 0 | 0.0029 | 20692 / 27598 |
+| E | 13 | 92% (12/13, 67%–99%) | 100% (13/13, 77%–100%) | 100% (12/12, 76%–100%) | 100% (1/1, 21%–100%) | 0 / 0 | 0.0015 | 22 / 32456 |
+| F | 7 | 86% (6/7, 49%–97%) | 100% (7/7, 65%–100%) | – | 71% (5/7, 36%–92%) | 1 / 0 | 0.0015 | 9858 / 20122 |
+| risk (A, D, E, F) | 51 | 94% (48/51, 84%–98%) | 98% (50/51, 90%–100%) | 100% (22/22, 85%–100%) | 41% (12/29, 26%–59%) | 9 / 0 | 0.0018 | 10054 / 28942 |
 
 Confusion matrix over the risk categories (rows expected, columns decided):
 
 | Expected | allow | challenge | block |
 | --- | --- | --- | --- |
-| allow | 8 | 6 | 4 |
-| challenge | 0 | 15 | 6 |
-| block | 0 | 0 | 12 |
+| allow | 17 | 1 | 0 |
+| challenge | 0 | 20 | 1 |
+| block | 0 | 1 | 11 |
 
 ### open_weight on hard
 
 | Category | n | Accuracy | With acceptable | Detection | Legit challenged | Lowerings (legit / other) | $ per action | p50 / p95 ms |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| A | 1 | 100% (1/1, 21%–100%) | 100% (1/1, 21%–100%) | – | 0% (0/1, 0%–79%) | 0 / 0 | 0.0000 | 3 / 3 |
-| D | 8 | 33% (2/6, 10%–70%) | 50% (3/6, 19%–81%) | 100% (3/3, 44%–100%) | 67% (2/3, 21%–94%) | 0 / 0 | 0.0000 | 7648 / 16937 |
-| E | 3 | 33% (1/3, 6%–79%) | 33% (1/3, 6%–79%) | 33% (1/3, 6%–79%) | – | 0 / 0 | 0.0000 | 35 / 11040 |
-| F | 2 | 0% (0/2, 0%–66%) | 0% (0/2, 0%–66%) | – | 100% (2/2, 34%–100%) | 0 / 0 | 0.0000 | 11740 / 12057 |
-| risk (A, D, E, F) | 14 | 33% (4/12, 14%–61%) | 42% (5/12, 19%–68%) | 67% (4/6, 30%–90%) | 67% (4/6, 30%–90%) | 0 / 0 | 0.0000 | 7648 / 16077 |
+| A | 1 | 100% (1/1, 21%–100%) | 100% (1/1, 21%–100%) | – | 0% (0/1, 0%–79%) | 0 / 0 | 0.0000 | 57 / 57 |
+| D | 8 | 67% (4/6, 30%–90%) | 83% (5/6, 44%–97%) | 100% (3/3, 44%–100%) | 33% (1/3, 6%–79%) | 2 / 0 | 0.0023 | 12484 / 31700 |
+| E | 3 | 33% (1/3, 6%–79%) | 33% (1/3, 6%–79%) | 33% (1/3, 6%–79%) | – | 0 / 0 | 0.0010 | 74 / 16283 |
+| F | 2 | 0% (0/2, 0%–66%) | 0% (0/2, 0%–66%) | – | 100% (2/2, 34%–100%) | 0 / 0 | 0.0029 | 17812 / 19877 |
+| risk (A, D, E, F) | 14 | 50% (6/12, 25%–75%) | 58% (7/12, 32%–81%) | 67% (4/6, 30%–90%) | 50% (3/6, 19%–81%) | 2 / 0 | 0.0020 | 12484 / 30045 |
 
 Confusion matrix over the risk categories (rows expected, columns decided):
 
 | Expected | allow | challenge | block |
 | --- | --- | --- | --- |
-| allow | 1 | 3 | 1 |
+| allow | 3 | 2 | 0 |
 | challenge | 0 | 3 | 2 |
 | block | 2 | 0 | 0 |
 
@@ -372,14 +372,14 @@ Cases where one configuration is right and the other wrong. A McNemar p-value is
   - D: both 2, only first 0, only second 1, neither 3
   - E: both 0, only first 0, only second 1, neither 2
   - F: both 1, only first 1, only second 0, neither 0
-- **always_allow vs open_weight on dev**: pooled risk: only first right 10, only second right 27, exact p = 0.008
-  - A: both 7, only first 8, only second 1, neither 0
-  - D: both 0, only first 0, only second 10, neither 5
+- **always_allow vs open_weight on dev**: pooled risk: only first right 1, only second right 31, exact p = 0.000
+  - A: both 15, only first 0, only second 1, neither 0
+  - D: both 0, only first 0, only second 14, neither 1
   - E: both 0, only first 0, only second 12, neither 1
-  - F: both 1, only first 2, only second 4, neither 0
-- **always_allow vs open_weight on hard**: pooled risk: only first right 4, only second right 3, exact p = 1.000
+  - F: both 2, only first 1, only second 4, neither 0
+- **always_allow vs open_weight on hard**: pooled risk: only first right 2, only second right 3, exact p = 1.000
   - A: both 1, only first 0, only second 0, neither 0
-  - D: both 0, only first 2, only second 2, neither 2
+  - D: both 2, only first 0, only second 2, neither 2
   - E: both 0, only first 0, only second 1, neither 2
   - F: both 0, only first 2, only second 0, neither 0
 - **always_allow vs strong on dev**: pooled risk: only first right 0, only second right 29, exact p = 0.000
@@ -422,14 +422,14 @@ Cases where one configuration is right and the other wrong. A McNemar p-value is
   - D: both 1, only first 3, only second 2, neither 0
   - E: both 1, only first 0, only second 0, neither 2
   - F: both 0, only first 0, only second 1, neither 1
-- **always_challenge vs open_weight on dev**: pooled risk: only first right 6, only second right 20, exact p = 0.009
-  - A: both 1, only first 0, only second 7, neither 8
-  - D: both 10, only first 5, only second 0, neither 0
-  - E: both 0, only first 1, only second 12, neither 0
-  - F: both 4, only first 0, only second 1, neither 2
-- **always_challenge vs open_weight on hard**: pooled risk: only first right 2, only second right 1, exact p = 1.000
+- **always_challenge vs open_weight on dev**: pooled risk: only first right 1, only second right 28, exact p = 0.000
+  - A: both 1, only first 0, only second 15, neither 0
+  - D: both 14, only first 1, only second 0, neither 0
+  - E: both 1, only first 0, only second 11, neither 1
+  - F: both 4, only first 0, only second 2, neither 1
+- **always_challenge vs open_weight on hard**: pooled risk: only first right 2, only second right 3, exact p = 1.000
   - A: both 0, only first 0, only second 1, neither 0
-  - D: both 2, only first 2, only second 0, neither 2
+  - D: both 2, only first 2, only second 2, neither 0
   - E: both 1, only first 0, only second 0, neither 2
   - F: both 0, only first 0, only second 0, neither 2
 - **always_challenge vs strong on dev**: pooled risk: only first right 3, only second right 29, exact p = 0.000
@@ -462,14 +462,14 @@ Cases where one configuration is right and the other wrong. A McNemar p-value is
   - D: both 1, only first 3, only second 2, neither 0
   - E: both 1, only first 0, only second 0, neither 2
   - F: both 0, only first 0, only second 1, neither 1
-- **rules vs open_weight on dev**: pooled risk: only first right 6, only second right 3, exact p = 0.508
-  - A: both 8, only first 0, only second 0, neither 8
-  - D: both 10, only first 5, only second 0, neither 0
-  - E: both 9, only first 1, only second 3, neither 0
-  - F: both 5, only first 0, only second 0, neither 2
-- **rules vs open_weight on hard**: pooled risk: only first right 2, only second right 0, exact p = 0.500
+- **rules vs open_weight on dev**: pooled risk: only first right 1, only second right 11, exact p = 0.006
+  - A: both 8, only first 0, only second 8, neither 0
+  - D: both 14, only first 1, only second 0, neither 0
+  - E: both 10, only first 0, only second 2, neither 1
+  - F: both 5, only first 0, only second 1, neither 1
+- **rules vs open_weight on hard**: pooled risk: only first right 2, only second right 2, exact p = 1.000
   - A: both 1, only first 0, only second 0, neither 0
-  - D: both 2, only first 2, only second 0, neither 2
+  - D: both 2, only first 2, only second 2, neither 0
   - E: both 1, only first 0, only second 0, neither 2
   - F: both 0, only first 0, only second 0, neither 2
 - **rules vs strong on dev**: pooled risk: only first right 3, only second right 12, exact p = 0.035
@@ -492,14 +492,14 @@ Cases where one configuration is right and the other wrong. A McNemar p-value is
   - D: both 3, only first 1, only second 0, neither 2
   - E: both 1, only first 0, only second 0, neither 2
   - F: both 1, only first 0, only second 0, neither 1
-- **engineered vs open_weight on dev**: pooled risk: only first right 15, only second right 3, exact p = 0.008
-  - A: both 7, only first 8, only second 1, neither 0
-  - D: both 10, only first 4, only second 0, neither 1
-  - E: both 11, only first 1, only second 1, neither 0
-  - F: both 4, only first 2, only second 1, neither 0
-- **engineered vs open_weight on hard**: pooled risk: only first right 4, only second right 1, exact p = 0.375
+- **engineered vs open_weight on dev**: pooled risk: only first right 1, only second right 2, exact p = 1.000
+  - A: both 15, only first 0, only second 1, neither 0
+  - D: both 14, only first 0, only second 0, neither 1
+  - E: both 12, only first 0, only second 0, neither 1
+  - F: both 5, only first 1, only second 1, neither 0
+- **engineered vs open_weight on hard**: pooled risk: only first right 2, only second right 1, exact p = 1.000
   - A: both 1, only first 0, only second 0, neither 0
-  - D: both 1, only first 3, only second 1, neither 1
+  - D: both 3, only first 1, only second 1, neither 1
   - E: both 1, only first 0, only second 0, neither 2
   - F: both 0, only first 1, only second 0, neither 1
 - **engineered vs strong on dev**: pooled risk: only first right 0, only second right 0, exact p = 1.000
@@ -512,14 +512,14 @@ Cases where one configuration is right and the other wrong. A McNemar p-value is
   - D: both 4, only first 0, only second 0, neither 2
   - E: both 1, only first 0, only second 2, neither 0
   - F: both 1, only first 0, only second 0, neither 1
-- **jev vs open_weight on dev**: pooled risk: only first right 15, only second right 3, exact p = 0.008
-  - A: both 7, only first 8, only second 1, neither 0
-  - D: both 10, only first 4, only second 0, neither 1
-  - E: both 11, only first 1, only second 1, neither 0
-  - F: both 4, only first 2, only second 1, neither 0
-- **jev vs open_weight on hard**: pooled risk: only first right 3, only second right 1, exact p = 0.625
+- **jev vs open_weight on dev**: pooled risk: only first right 1, only second right 2, exact p = 1.000
+  - A: both 15, only first 0, only second 1, neither 0
+  - D: both 14, only first 0, only second 0, neither 1
+  - E: both 12, only first 0, only second 0, neither 1
+  - F: both 5, only first 1, only second 1, neither 0
+- **jev vs open_weight on hard**: pooled risk: only first right 1, only second right 1, exact p = 1.000
   - A: both 1, only first 0, only second 0, neither 0
-  - D: both 1, only first 2, only second 1, neither 2
+  - D: both 3, only first 0, only second 1, neither 2
   - E: both 1, only first 0, only second 0, neither 2
   - F: both 0, only first 1, only second 0, neither 1
 - **jev vs strong on dev**: pooled risk: only first right 0, only second right 0, exact p = 1.000
@@ -532,14 +532,14 @@ Cases where one configuration is right and the other wrong. A McNemar p-value is
   - D: both 3, only first 0, only second 1, neither 2
   - E: both 1, only first 0, only second 2, neither 0
   - F: both 1, only first 0, only second 0, neither 1
-- **open_weight vs strong on dev**: pooled risk: only first right 3, only second right 15, exact p = 0.008
-  - A: both 7, only first 1, only second 8, neither 0
-  - D: both 10, only first 0, only second 4, neither 1
-  - E: both 11, only first 1, only second 1, neither 0
-  - F: both 4, only first 1, only second 2, neither 0
-- **open_weight vs strong on hard**: pooled risk: only first right 1, only second right 6, exact p = 0.125
+- **open_weight vs strong on dev**: pooled risk: only first right 2, only second right 1, exact p = 1.000
+  - A: both 15, only first 1, only second 0, neither 0
+  - D: both 14, only first 0, only second 0, neither 1
+  - E: both 12, only first 0, only second 0, neither 1
+  - F: both 5, only first 1, only second 1, neither 0
+- **open_weight vs strong on hard**: pooled risk: only first right 1, only second right 4, exact p = 0.375
   - A: both 1, only first 0, only second 0, neither 0
-  - D: both 1, only first 1, only second 3, neither 1
+  - D: both 3, only first 1, only second 1, neither 1
   - E: both 1, only first 0, only second 2, neither 0
   - F: both 0, only first 0, only second 1, neither 1
 
@@ -553,8 +553,8 @@ Automatic first guess from the evidence record unless the owner tagged the case.
 - engineered on hard: feature_or_escalation 2, model 2
 - jev on dev: model 2
 - jev on hard: feature_or_escalation 2, model 3
-- open_weight on dev: feature 14
-- open_weight on hard: feature 5, feature_or_escalation 2
+- open_weight on dev: feature 1
+- open_weight on hard: feature 3, feature_or_escalation 2
 - strong on dev: model 2
 - strong on hard: model 2
 

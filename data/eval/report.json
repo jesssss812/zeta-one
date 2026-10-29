@@ -205,16 +205,16 @@
     "always_allow vs open_weight on dev": {
       "per_category": {
         "A": {
-          "both": 7,
+          "both": 15,
           "neither": 0,
-          "only_a": 8,
+          "only_a": 0,
           "only_b": 1
         },
         "D": {
           "both": 0,
-          "neither": 5,
+          "neither": 1,
           "only_a": 0,
-          "only_b": 10
+          "only_b": 14
         },
         "E": {
           "both": 0,
@@ -223,16 +223,16 @@
           "only_b": 12
         },
         "F": {
-          "both": 1,
+          "both": 2,
           "neither": 0,
-          "only_a": 2,
+          "only_a": 1,
           "only_b": 4
         }
       },
       "pooled_risk": {
-        "only_a": 10,
-        "only_b": 27,
-        "p": 0.007632078602910042
+        "only_a": 1,
+        "only_b": 31,
+        "p": 1.5366822481155396e-08
       }
     },
     "always_allow vs open_weight on hard": {
@@ -244,9 +244,9 @@
           "only_b": 0
         },
         "D": {
-          "both": 0,
+          "both": 2,
           "neither": 2,
-          "only_a": 2,
+          "only_a": 0,
           "only_b": 2
         },
         "E": {
@@ -263,7 +263,7 @@
         }
       },
       "pooled_risk": {
-        "only_a": 4,
+        "only_a": 2,
         "only_b": 3,
         "p": 1.0
       }
@@ -536,33 +536,33 @@
       "per_category": {
         "A": {
           "both": 1,
-          "neither": 8,
+          "neither": 0,
           "only_a": 0,
-          "only_b": 7
+          "only_b": 15
         },
         "D": {
-          "both": 10,
+          "both": 14,
           "neither": 0,
-          "only_a": 5,
+          "only_a": 1,
           "only_b": 0
         },
         "E": {
-          "both": 0,
-          "neither": 0,
-          "only_a": 1,
-          "only_b": 12
+          "both": 1,
+          "neither": 1,
+          "only_a": 0,
+          "only_b": 11
         },
         "F": {
           "both": 4,
-          "neither": 2,
+          "neither": 1,
           "only_a": 0,
-          "only_b": 1
+          "only_b": 2
         }
       },
       "pooled_risk": {
-        "only_a": 6,
-        "only_b": 20,
-        "p": 0.009355306625366211
+        "only_a": 1,
+        "only_b": 28,
+        "p": 1.1175870895385742e-07
       }
     },
     "always_challenge vs open_weight on hard": {
@@ -575,9 +575,9 @@
         },
         "D": {
           "both": 2,
-          "neither": 2,
+          "neither": 0,
           "only_a": 2,
-          "only_b": 0
+          "only_b": 2
         },
         "E": {
           "both": 1,
@@ -594,7 +594,7 @@
       },
       "pooled_risk": {
         "only_a": 2,
-        "only_b": 1,
+        "only_b": 3,
         "p": 1.0
       }
     },
@@ -799,34 +799,34 @@
     "engineered vs open_weight on dev": {
       "per_category": {
         "A": {
-          "both": 7,
+          "both": 15,
           "neither": 0,
-          "only_a": 8,
+          "only_a": 0,
           "only_b": 1
         },
         "D": {
-          "both": 10,
+          "both": 14,
           "neither": 1,
-          "only_a": 4,
+          "only_a": 0,
           "only_b": 0
         },
         "E": {
-          "both": 11,
-          "neither": 0,
-          "only_a": 1,
-          "only_b": 1
+          "both": 12,
+          "neither": 1,
+          "only_a": 0,
+          "only_b": 0
         },
         "F": {
-          "both": 4,
+          "both": 5,
           "neither": 0,
-          "only_a": 2,
+          "only_a": 1,
           "only_b": 1
         }
       },
       "pooled_risk": {
-        "only_a": 15,
-        "only_b": 3,
-        "p": 0.007537841796875
+        "only_a": 1,
+        "only_b": 2,
+        "p": 1.0
       }
     },
     "engineered vs open_weight on hard": {
@@ -838,9 +838,9 @@
           "only_b": 0
         },
         "D": {
-          "both": 1,
+          "both": 3,
           "neither": 1,
-          "only_a": 3,
+          "only_a": 1,
           "only_b": 1
         },
         "E": {
@@ -857,9 +857,9 @@
         }
       },
       "pooled_risk": {
-        "only_a": 4,
+        "only_a": 2,
         "only_b": 1,
-        "p": 0.375
+        "p": 1.0
       }
     },
     "engineered vs strong on dev": {
@@ -931,34 +931,34 @@
     "jev vs open_weight on dev": {
       "per_category": {
         "A": {
-          "both": 7,
+          "both": 15,
           "neither": 0,
-          "only_a": 8,
+          "only_a": 0,
           "only_b": 1
         },
         "D": {
-          "both": 10,
+          "both": 14,
           "neither": 1,
-          "only_a": 4,
+          "only_a": 0,
           "only_b": 0
         },
         "E": {
-          "both": 11,
-          "neither": 0,
-          "only_a": 1,
-          "only_b": 1
+          "both": 12,
+          "neither": 1,
+          "only_a": 0,
+          "only_b": 0
         },
         "F": {
-          "both": 4,
+          "both": 5,
           "neither": 0,
-          "only_a": 2,
+          "only_a": 1,
           "only_b": 1
         }
       },
       "pooled_risk": {
-        "only_a": 15,
-        "only_b": 3,
-        "p": 0.007537841796875
+        "only_a": 1,
+        "only_b": 2,
+        "p": 1.0
       }
     },
     "jev vs open_weight on hard": {
@@ -970,9 +970,9 @@
           "only_b": 0
         },
         "D": {
-          "both": 1,
+          "both": 3,
           "neither": 2,
-          "only_a": 2,
+          "only_a": 0,
           "only_b": 1
         },
         "E": {
@@ -989,9 +989,9 @@
         }
       },
       "pooled_risk": {
-        "only_a": 3,
+        "only_a": 1,
         "only_b": 1,
-        "p": 0.625
+        "p": 1.0
       }
     },
     "jev vs strong on dev": {
@@ -1063,34 +1063,34 @@
     "open_weight vs strong on dev": {
       "per_category": {
         "A": {
-          "both": 7,
+          "both": 15,
           "neither": 0,
           "only_a": 1,
-          "only_b": 8
+          "only_b": 0
         },
         "D": {
-          "both": 10,
+          "both": 14,
           "neither": 1,
           "only_a": 0,
-          "only_b": 4
+          "only_b": 0
         },
         "E": {
-          "both": 11,
+          "both": 12,
+          "neither": 1,
+          "only_a": 0,
+          "only_b": 0
+        },
+        "F": {
+          "both": 5,
           "neither": 0,
           "only_a": 1,
           "only_b": 1
-        },
-        "F": {
-          "both": 4,
-          "neither": 0,
-          "only_a": 1,
-          "only_b": 2
         }
       },
       "pooled_risk": {
-        "only_a": 3,
-        "only_b": 15,
-        "p": 0.007537841796875
+        "only_a": 2,
+        "only_b": 1,
+        "p": 1.0
       }
     },
     "open_weight vs strong on hard": {
@@ -1102,10 +1102,10 @@
           "only_b": 0
         },
         "D": {
-          "both": 1,
+          "both": 3,
           "neither": 1,
           "only_a": 1,
-          "only_b": 3
+          "only_b": 1
         },
         "E": {
           "both": 1,
@@ -1122,8 +1122,8 @@
       },
       "pooled_risk": {
         "only_a": 1,
-        "only_b": 6,
-        "p": 0.125
+        "only_b": 4,
+        "p": 0.375
       }
     },
     "rules vs engineered on dev": {
@@ -1262,33 +1262,33 @@
       "per_category": {
         "A": {
           "both": 8,
-          "neither": 8,
+          "neither": 0,
           "only_a": 0,
-          "only_b": 0
+          "only_b": 8
         },
         "D": {
-          "both": 10,
+          "both": 14,
           "neither": 0,
-          "only_a": 5,
+          "only_a": 1,
           "only_b": 0
         },
         "E": {
-          "both": 9,
-          "neither": 0,
-          "only_a": 1,
-          "only_b": 3
+          "both": 10,
+          "neither": 1,
+          "only_a": 0,
+          "only_b": 2
         },
         "F": {
           "both": 5,
-          "neither": 2,
+          "neither": 1,
           "only_a": 0,
-          "only_b": 0
+          "only_b": 1
         }
       },
       "pooled_risk": {
-        "only_a": 6,
-        "only_b": 3,
-        "p": 0.5078125
+        "only_a": 1,
+        "only_b": 11,
+        "p": 0.00634765625
       }
     },
     "rules vs open_weight on hard": {
@@ -1301,9 +1301,9 @@
         },
         "D": {
           "both": 2,
-          "neither": 2,
+          "neither": 0,
           "only_a": 2,
-          "only_b": 0
+          "only_b": 2
         },
         "E": {
           "both": 1,
@@ -1320,8 +1320,8 @@
       },
       "pooled_risk": {
         "only_a": 2,
-        "only_b": 0,
-        "p": 0.5
+        "only_b": 2,
+        "p": 1.0
       }
     },
     "rules vs strong on dev": {
@@ -1412,10 +1412,10 @@
     },
     "open_weight": {
       "dev": {
-        "feature": 14
+        "feature": 1
       },
       "hard": {
-        "feature": 5,
+        "feature": 3,
         "feature_or_escalation": 2
       }
     },
@@ -5375,24 +5375,24 @@
       "dev": {
         "A": {
           "accuracy": {
-            "high": 0.7200043638967398,
-            "k": 8,
-            "low": 0.27999563610326017,
+            "high": 1.0,
+            "k": 16,
+            "low": 0.8063923194655637,
             "n": 16,
-            "rate": 0.5
+            "rate": 1.0
           },
           "accuracy_with_acceptable": {
-            "high": 0.7200043638967398,
-            "k": 8,
-            "low": 0.27999563610326017,
+            "high": 1.0,
+            "k": 16,
+            "low": 0.8063923194655637,
             "n": 16,
-            "rate": 0.5
+            "rate": 1.0
           },
           "confusion": {
             "allow": {
-              "allow": 7,
-              "block": 3,
-              "challenge": 5
+              "allow": 15,
+              "block": 0,
+              "challenge": 0
             },
             "block": {
               "allow": 0,
@@ -5415,13 +5415,11 @@
               "n": 16,
               "rate": 0.5625
             },
-            "unpriced_models": [
-              "qwen/qwen3-235b-a22b-2507"
-            ],
-            "usd_per_1000_decisions": 0.0,
+            "unpriced_models": [],
+            "usd_per_1000_decisions": 1.0288534722222222,
             "usd_per_fraud_caught": null
           },
-          "cost_per_action_usd": 0.0,
+          "cost_per_action_usd": 0.0010288534722222222,
           "detection": {
             "high": 1.0,
             "k": 0,
@@ -5430,25 +5428,25 @@
             "rate": null
           },
           "latency_ms": {
-            "p50": 6878.0,
-            "p95": 29147.75
+            "p50": 8773.0,
+            "p95": 13841.5
           },
           "legit_block_rate": {
-            "high": 0.4300888096197414,
-            "k": 3,
-            "low": 0.06591599071428142,
+            "high": 0.1936076805344365,
+            "k": 0,
+            "low": 0.0,
             "n": 16,
-            "rate": 0.1875
+            "rate": 0.0
           },
           "legit_challenge_rate": {
-            "high": 0.6135895945449727,
-            "k": 6,
-            "low": 0.18481232558863633,
+            "high": 0.28328737570298945,
+            "k": 1,
+            "low": 0.01111934476464252,
             "n": 16,
-            "rate": 0.375
+            "rate": 0.0625
           },
           "lowerings": {
-            "legitimate": 0,
+            "legitimate": 8,
             "not_legitimate": 0
           },
           "n": 16,
@@ -5458,18 +5456,18 @@
         },
         "D": {
           "accuracy": {
-            "high": 0.8482367556028526,
-            "k": 10,
-            "low": 0.41713547738519774,
+            "high": 0.9881331045067315,
+            "k": 14,
+            "low": 0.7018347012621998,
             "n": 15,
-            "rate": 0.6666666666666666
+            "rate": 0.9333333333333333
           },
           "accuracy_with_acceptable": {
-            "high": 0.8482367556028526,
-            "k": 10,
-            "low": 0.41713547738519774,
+            "high": 0.9881331045067315,
+            "k": 14,
+            "low": 0.7018347012621998,
             "n": 15,
-            "rate": 0.6666666666666666
+            "rate": 0.9333333333333333
           },
           "confusion": {
             "allow": {
@@ -5484,27 +5482,25 @@
             },
             "challenge": {
               "allow": 0,
-              "block": 5,
-              "challenge": 10
+              "block": 1,
+              "challenge": 14
             }
           },
           "cost": {
             "decisions": 15,
             "estimated_usage": false,
             "reached_a_model": {
-              "high": 1.0,
-              "k": 15,
-              "low": 0.7961166989641515,
+              "high": 0.9295245065301844,
+              "k": 12,
+              "low": 0.5481455128483065,
               "n": 15,
-              "rate": 1.0
+              "rate": 0.8
             },
-            "unpriced_models": [
-              "qwen/qwen3-235b-a22b-2507"
-            ],
-            "usd_per_1000_decisions": 0.0,
-            "usd_per_fraud_caught": 0.0
+            "unpriced_models": [],
+            "usd_per_1000_decisions": 2.894944259259259,
+            "usd_per_fraud_caught": 0.004342416388888889
           },
-          "cost_per_action_usd": 0.0,
+          "cost_per_action_usd": 0.002894944259259259,
           "detection": {
             "high": 0.9999999999999999,
             "k": 10,
@@ -5513,22 +5509,22 @@
             "rate": 1.0
           },
           "latency_ms": {
-            "p50": 22090.0,
-            "p95": 34951.3
+            "p50": 20692.0,
+            "p95": 27598.4
           },
           "legit_block_rate": {
-            "high": 0.9637758913675698,
-            "k": 4,
-            "low": 0.37553462976252533,
+            "high": 0.43448246478317476,
+            "k": 0,
+            "low": 0.0,
             "n": 5,
-            "rate": 0.8
+            "rate": 0.0
           },
           "legit_challenge_rate": {
-            "high": 0.6244653702374747,
-            "k": 1,
-            "low": 0.03622410863243014,
+            "high": 1.0,
+            "k": 5,
+            "low": 0.5655175352168251,
             "n": 5,
-            "rate": 0.2
+            "rate": 1.0
           },
           "lowerings": {
             "legitimate": 0,
@@ -5562,32 +5558,30 @@
             },
             "block": {
               "allow": 0,
-              "block": 12,
-              "challenge": 0
+              "block": 11,
+              "challenge": 1
             },
             "challenge": {
               "allow": 0,
-              "block": 1,
-              "challenge": 0
+              "block": 0,
+              "challenge": 1
             }
           },
           "cost": {
             "decisions": 13,
             "estimated_usage": false,
             "reached_a_model": {
-              "high": 0.9999999999999999,
-              "k": 13,
-              "low": 0.7719046276458016,
+              "high": 0.5763065681945096,
+              "k": 4,
+              "low": 0.12680703655710515,
               "n": 13,
-              "rate": 1.0
+              "rate": 0.3076923076923077
             },
-            "unpriced_models": [
-              "qwen/qwen3-235b-a22b-2507"
-            ],
-            "usd_per_1000_decisions": 0.0,
-            "usd_per_fraud_caught": 0.0
+            "unpriced_models": [],
+            "usd_per_1000_decisions": 1.5111564102564103,
+            "usd_per_fraud_caught": 0.001637086111111111
           },
-          "cost_per_action_usd": 0.0,
+          "cost_per_action_usd": 0.0015111564102564103,
           "detection": {
             "high": 1.0,
             "k": 12,
@@ -5596,22 +5590,22 @@
             "rate": 1.0
           },
           "latency_ms": {
-            "p50": 9894.0,
-            "p95": 51571.2
+            "p50": 22.0,
+            "p95": 32455.600000000002
           },
           "legit_block_rate": {
-            "high": 1.0,
-            "k": 1,
-            "low": 0.20654931437723745,
-            "n": 1,
-            "rate": 1.0
-          },
-          "legit_challenge_rate": {
             "high": 0.7934506856227626,
             "k": 0,
             "low": 0.0,
             "n": 1,
             "rate": 0.0
+          },
+          "legit_challenge_rate": {
+            "high": 1.0,
+            "k": 1,
+            "low": 0.20654931437723745,
+            "n": 1,
+            "rate": 1.0
           },
           "lowerings": {
             "legitimate": 0,
@@ -5624,23 +5618,23 @@
         },
         "F": {
           "accuracy": {
-            "high": 0.9177810759959433,
-            "k": 5,
-            "low": 0.35893445183261935,
-            "n": 7,
-            "rate": 0.7142857142857143
-          },
-          "accuracy_with_acceptable": {
             "high": 0.9743203756552565,
             "k": 6,
             "low": 0.4868721707256811,
             "n": 7,
             "rate": 0.8571428571428571
           },
+          "accuracy_with_acceptable": {
+            "high": 1.0,
+            "k": 7,
+            "low": 0.6456695649333126,
+            "n": 7,
+            "rate": 1.0
+          },
           "confusion": {
             "allow": {
-              "allow": 1,
-              "block": 1,
+              "allow": 2,
+              "block": 0,
               "challenge": 1
             },
             "block": {
@@ -5658,19 +5652,17 @@
             "decisions": 7,
             "estimated_usage": false,
             "reached_a_model": {
-              "high": 0.9743203756552565,
-              "k": 6,
-              "low": 0.4868721707256811,
+              "high": 0.8417801447485302,
+              "k": 4,
+              "low": 0.2504583645276572,
               "n": 7,
-              "rate": 0.8571428571428571
+              "rate": 0.5714285714285714
             },
-            "unpriced_models": [
-              "qwen/qwen3-235b-a22b-2507"
-            ],
-            "usd_per_1000_decisions": 0.0,
+            "unpriced_models": [],
+            "usd_per_1000_decisions": 1.47413373015873,
             "usd_per_fraud_caught": null
           },
-          "cost_per_action_usd": 0.0,
+          "cost_per_action_usd": 0.00147413373015873,
           "detection": {
             "high": 1.0,
             "k": 0,
@@ -5679,15 +5671,15 @@
             "rate": null
           },
           "latency_ms": {
-            "p50": 10827.0,
-            "p95": 26862.600000000006
+            "p50": 9858.0,
+            "p95": 20122.3
           },
           "legit_block_rate": {
-            "high": 0.5131278292743189,
-            "k": 1,
-            "low": 0.02567962434474355,
+            "high": 0.35433043506668743,
+            "k": 0,
+            "low": 5.551115123125783e-17,
             "n": 7,
-            "rate": 0.14285714285714285
+            "rate": 0.0
           },
           "legit_challenge_rate": {
             "high": 0.9177810759959433,
@@ -5697,7 +5689,7 @@
             "rate": 0.7142857142857143
           },
           "lowerings": {
-            "legitimate": 0,
+            "legitimate": 1,
             "not_legitimate": 0
           },
           "n": 7,
@@ -5707,53 +5699,51 @@
         },
         "risk (A, D, E, F)": {
           "accuracy": {
-            "high": 0.7967232153447456,
-            "k": 35,
-            "low": 0.5497300046930566,
+            "high": 0.9797933605775353,
+            "k": 48,
+            "low": 0.8407537395119957,
             "n": 51,
-            "rate": 0.6862745098039216
+            "rate": 0.9411764705882353
           },
           "accuracy_with_acceptable": {
-            "high": 0.8288572476535512,
-            "k": 37,
-            "low": 0.5905334923922092,
+            "high": 0.9965303073589391,
+            "k": 50,
+            "low": 0.8969543127385502,
             "n": 51,
-            "rate": 0.7254901960784313
+            "rate": 0.9803921568627451
           },
           "confusion": {
             "allow": {
-              "allow": 8,
-              "block": 4,
-              "challenge": 6
+              "allow": 17,
+              "block": 0,
+              "challenge": 1
             },
             "block": {
               "allow": 0,
-              "block": 12,
-              "challenge": 0
+              "block": 11,
+              "challenge": 1
             },
             "challenge": {
               "allow": 0,
-              "block": 6,
-              "challenge": 15
+              "block": 1,
+              "challenge": 20
             }
           },
           "cost": {
             "decisions": 51,
             "estimated_usage": false,
             "reached_a_model": {
-              "high": 0.9183077677995128,
-              "k": 43,
-              "low": 0.7198955322701224,
+              "high": 0.6949876389209046,
+              "k": 29,
+              "low": 0.43265302109302245,
               "n": 51,
-              "rate": 0.8431372549019608
+              "rate": 0.5686274509803921
             },
-            "unpriced_models": [
-              "qwen/qwen3-235b-a22b-2507"
-            ],
-            "usd_per_1000_decisions": 0.0,
-            "usd_per_fraud_caught": 0.0
+            "unpriced_models": [],
+            "usd_per_1000_decisions": 1.7617605664488014,
+            "usd_per_fraud_caught": 0.004084081313131312
           },
-          "cost_per_action_usd": 0.0,
+          "cost_per_action_usd": 0.0017617605664488015,
           "detection": {
             "high": 1.0,
             "k": 22,
@@ -5762,15 +5752,15 @@
             "rate": 1.0
           },
           "latency_ms": {
-            "p50": 10489.0,
-            "p95": 40767.5
+            "p50": 10054.0,
+            "p95": 28942.5
           },
           "legit_block_rate": {
-            "high": 0.4923013423309317,
-            "k": 9,
-            "low": 0.17275616744483216,
+            "high": 0.11696979849974075,
+            "k": 0,
+            "low": 0.0,
             "n": 29,
-            "rate": 0.3103448275862069
+            "rate": 0.0
           },
           "legit_challenge_rate": {
             "high": 0.5926216401212141,
@@ -5780,7 +5770,7 @@
             "rate": 0.41379310344827586
           },
           "lowerings": {
-            "legitimate": 0,
+            "legitimate": 9,
             "not_legitimate": 0
           },
           "n": 51,
@@ -5845,8 +5835,8 @@
             "rate": null
           },
           "latency_ms": {
-            "p50": 3.0,
-            "p95": 3.0
+            "p50": 57.0,
+            "p95": 57.0
           },
           "legit_block_rate": {
             "high": 0.7934506856227626,
@@ -5873,24 +5863,24 @@
         },
         "D": {
           "accuracy": {
-            "high": 0.700006684861608,
-            "k": 2,
-            "low": 0.09677141110578041,
+            "high": 0.9032285888942195,
+            "k": 4,
+            "low": 0.299993315138392,
             "n": 6,
-            "rate": 0.3333333333333333
+            "rate": 0.6666666666666666
           },
           "accuracy_with_acceptable": {
-            "high": 0.8123836935173494,
-            "k": 3,
-            "low": 0.1876163064826506,
+            "high": 0.9699466302516935,
+            "k": 5,
+            "low": 0.43649717781352987,
             "n": 6,
-            "rate": 0.5
+            "rate": 0.8333333333333334
           },
           "confusion": {
             "allow": {
-              "allow": 0,
-              "block": 1,
-              "challenge": 1
+              "allow": 2,
+              "block": 0,
+              "challenge": 0
             },
             "block": {
               "allow": 0,
@@ -5913,13 +5903,11 @@
               "n": 8,
               "rate": 0.75
             },
-            "unpriced_models": [
-              "qwen/qwen3-235b-a22b-2507"
-            ],
-            "usd_per_1000_decisions": 0.0,
-            "usd_per_fraud_caught": 0.0
+            "unpriced_models": [],
+            "usd_per_1000_decisions": 2.3401079861111107,
+            "usd_per_fraud_caught": 0.006240287962962963
           },
-          "cost_per_action_usd": 0.0,
+          "cost_per_action_usd": 0.002340107986111111,
           "detection": {
             "high": 1.0,
             "k": 3,
@@ -5928,25 +5916,25 @@
             "rate": 1.0
           },
           "latency_ms": {
-            "p50": 7648.5,
-            "p95": 16937.2
+            "p50": 12484.5,
+            "p95": 31700.350000000002
           },
           "legit_block_rate": {
+            "high": 0.5614970317550454,
+            "k": 0,
+            "low": 5.551115123125783e-17,
+            "n": 3,
+            "rate": 0.0
+          },
+          "legit_challenge_rate": {
             "high": 0.7923403991979522,
             "k": 1,
             "low": 0.06149194472039621,
             "n": 3,
             "rate": 0.3333333333333333
           },
-          "legit_challenge_rate": {
-            "high": 0.9385080552796037,
-            "k": 2,
-            "low": 0.2076596008020477,
-            "n": 3,
-            "rate": 0.6666666666666666
-          },
           "lowerings": {
-            "legitimate": 0,
+            "legitimate": 2,
             "not_legitimate": 0
           },
           "n": 8,
@@ -5996,13 +5984,11 @@
               "n": 3,
               "rate": 0.3333333333333333
             },
-            "unpriced_models": [
-              "qwen/qwen3-235b-a22b-2507"
-            ],
-            "usd_per_1000_decisions": 0.0,
-            "usd_per_fraud_caught": 0.0
+            "unpriced_models": [],
+            "usd_per_1000_decisions": 0.9865564814814815,
+            "usd_per_fraud_caught": 0.002959669444444444
           },
-          "cost_per_action_usd": 0.0,
+          "cost_per_action_usd": 0.0009865564814814814,
           "detection": {
             "high": 0.7923403991979522,
             "k": 1,
@@ -6011,8 +5997,8 @@
             "rate": 0.3333333333333333
           },
           "latency_ms": {
-            "p50": 35.0,
-            "p95": 11040.199999999999
+            "p50": 74.0,
+            "p95": 16282.999999999998
           },
           "legit_block_rate": {
             "high": 1.0,
@@ -6079,13 +6065,11 @@
               "n": 2,
               "rate": 1.0
             },
-            "unpriced_models": [
-              "qwen/qwen3-235b-a22b-2507"
-            ],
-            "usd_per_1000_decisions": 0.0,
+            "unpriced_models": [],
+            "usd_per_1000_decisions": 2.915911111111111,
             "usd_per_fraud_caught": null
           },
-          "cost_per_action_usd": 0.0,
+          "cost_per_action_usd": 0.002915911111111111,
           "detection": {
             "high": 1.0,
             "k": 0,
@@ -6094,8 +6078,8 @@
             "rate": null
           },
           "latency_ms": {
-            "p50": 11740.5,
-            "p95": 12056.85
+            "p50": 17811.5,
+            "p95": 19877.45
           },
           "legit_block_rate": {
             "high": 0.6576197724933469,
@@ -6122,24 +6106,24 @@
         },
         "risk (A, D, E, F)": {
           "accuracy": {
-            "high": 0.6093779111272004,
-            "k": 4,
-            "low": 0.13812009109121315,
+            "high": 0.7462184023662939,
+            "k": 6,
+            "low": 0.2537815976337061,
             "n": 12,
-            "rate": 0.3333333333333333
+            "rate": 0.5
           },
           "accuracy_with_acceptable": {
-            "high": 0.6804886874504503,
-            "k": 5,
-            "low": 0.19326031365875665,
+            "high": 0.8067396863412435,
+            "k": 7,
+            "low": 0.31951131254954973,
             "n": 12,
-            "rate": 0.4166666666666667
+            "rate": 0.5833333333333334
           },
           "confusion": {
             "allow": {
-              "allow": 1,
-              "block": 1,
-              "challenge": 3
+              "allow": 3,
+              "block": 0,
+              "challenge": 2
             },
             "block": {
               "allow": 2,
@@ -6162,13 +6146,11 @@
               "n": 14,
               "rate": 0.6428571428571429
             },
-            "unpriced_models": [
-              "qwen/qwen3-235b-a22b-2507"
-            ],
-            "usd_per_1000_decisions": 0.0,
-            "usd_per_fraud_caught": 0.0
+            "unpriced_models": [],
+            "usd_per_1000_decisions": 1.9651682539682538,
+            "usd_per_fraud_caught": 0.006878088888888889
           },
-          "cost_per_action_usd": 0.0,
+          "cost_per_action_usd": 0.0019651682539682538,
           "detection": {
             "high": 0.9032285888942195,
             "k": 4,
@@ -6177,25 +6159,25 @@
             "rate": 0.6666666666666666
           },
           "latency_ms": {
-            "p50": 7648.5,
-            "p95": 16076.8
+            "p50": 12484.5,
+            "p95": 30044.649999999998
           },
           "legit_block_rate": {
-            "high": 0.5635028221864702,
-            "k": 1,
-            "low": 0.030053369748306635,
+            "high": 0.3903342879021653,
+            "k": 0,
+            "low": 2.7755575615628914e-17,
             "n": 6,
-            "rate": 0.16666666666666666
+            "rate": 0.0
           },
           "legit_challenge_rate": {
-            "high": 0.9032285888942195,
-            "k": 4,
-            "low": 0.299993315138392,
+            "high": 0.8123836935173494,
+            "k": 3,
+            "low": 0.1876163064826506,
             "n": 6,
-            "rate": 0.6666666666666666
+            "rate": 0.5
           },
           "lowerings": {
-            "legitimate": 0,
+            "legitimate": 2,
             "not_legitimate": 0
           },
           "n": 14,
@@ -6262,8 +6244,8 @@
             "rate": 1.0
           },
           "latency_ms": {
-            "p50": 36.0,
-            "p95": 70.20000000000002
+            "p50": 18.0,
+            "p95": 22.0
           },
           "legit_block_rate": {
             "high": 0.6576197724933469,
@@ -6343,8 +6325,8 @@
             "rate": 1.0
           },
           "latency_ms": {
-            "p50": 1.0,
-            "p95": 16.000000000000004
+            "p50": 0.0,
+            "p95": 14.300000000000004
           },
           "legit_block_rate": {
             "high": 1.0,
@@ -6505,8 +6487,8 @@
             "rate": 1.0
           },
           "latency_ms": {
-            "p50": 33.0,
-            "p95": 33.0
+            "p50": 12.0,
+            "p95": 12.0
           },
           "legit_block_rate": {
             "high": 1.0,
@@ -6588,8 +6570,8 @@
             "rate": null
           },
           "latency_ms": {
-            "p50": 13.0,
-            "p95": 19.5
+            "p50": 17.0,
+            "p95": 24.5
           },
           "legit_block_rate": {
             "high": 0.1936076805344365,
@@ -6669,8 +6651,8 @@
             "rate": 1.0
           },
           "latency_ms": {
-            "p50": 13.0,
-            "p95": 18.3
+            "p50": 16.0,
+            "p95": 33.7
           },
           "legit_block_rate": {
             "high": 0.43448246478317476,
@@ -6750,8 +6732,8 @@
             "rate": 1.0
           },
           "latency_ms": {
-            "p50": 16.0,
-            "p95": 23.0
+            "p50": 25.0,
+            "p95": 36.800000000000004
           },
           "legit_block_rate": {
             "high": 0.7934506856227626,
@@ -6831,8 +6813,8 @@
             "rate": null
           },
           "latency_ms": {
-            "p50": 14.0,
-            "p95": 20.8
+            "p50": 20.0,
+            "p95": 22.4
           },
           "legit_block_rate": {
             "high": 0.35433043506668743,
@@ -6912,8 +6894,8 @@
             "rate": 1.0
           },
           "latency_ms": {
-            "p50": 13.0,
-            "p95": 21.0
+            "p50": 19.0,
+            "p95": 31.5
           },
           "legit_block_rate": {
             "high": 0.11696979849974075,
@@ -8166,7 +8148,7 @@
   },
   "models": [
     "claude-opus-5-5",
-    "qwen/qwen3-235b-a22b-2507",
+    "qwen3.6-27b",
     "typesafe/jev-1.14"
   ],
   "not_run": {
@@ -8208,6 +8190,10 @@
       "cache_write_multiplier": 1.25,
       "input_per_mtok": 4.0,
       "output_per_mtok": 20.0
+    },
+    "qwen3.6-27b": {
+      "charged_for": "model latency per call",
+      "gpu_usd_per_hour": 0.59
     },
     "typesafe/jev-1.14": {
       "cache_read_multiplier": 0.1,
@@ -8915,53 +8901,51 @@
     "open_weight": {
       "dev": {
         "accuracy": {
-          "high": 0.7967232153447456,
-          "k": 35,
-          "low": 0.5497300046930566,
+          "high": 0.9797933605775353,
+          "k": 48,
+          "low": 0.8407537395119957,
           "n": 51,
-          "rate": 0.6862745098039216
+          "rate": 0.9411764705882353
         },
         "accuracy_with_acceptable": {
-          "high": 0.8288572476535512,
-          "k": 37,
-          "low": 0.5905334923922092,
+          "high": 0.9965303073589391,
+          "k": 50,
+          "low": 0.8969543127385502,
           "n": 51,
-          "rate": 0.7254901960784313
+          "rate": 0.9803921568627451
         },
         "confusion": {
           "allow": {
-            "allow": 8,
-            "block": 4,
-            "challenge": 6
+            "allow": 17,
+            "block": 0,
+            "challenge": 1
           },
           "block": {
             "allow": 0,
-            "block": 12,
-            "challenge": 0
+            "block": 11,
+            "challenge": 1
           },
           "challenge": {
             "allow": 0,
-            "block": 6,
-            "challenge": 15
+            "block": 1,
+            "challenge": 20
           }
         },
         "cost": {
           "decisions": 51,
           "estimated_usage": false,
           "reached_a_model": {
-            "high": 0.9183077677995128,
-            "k": 43,
-            "low": 0.7198955322701224,
+            "high": 0.6949876389209046,
+            "k": 29,
+            "low": 0.43265302109302245,
             "n": 51,
-            "rate": 0.8431372549019608
+            "rate": 0.5686274509803921
           },
-          "unpriced_models": [
-            "qwen/qwen3-235b-a22b-2507"
-          ],
-          "usd_per_1000_decisions": 0.0,
-          "usd_per_fraud_caught": 0.0
+          "unpriced_models": [],
+          "usd_per_1000_decisions": 1.7617605664488014,
+          "usd_per_fraud_caught": 0.004084081313131312
         },
-        "cost_per_action_usd": 0.0,
+        "cost_per_action_usd": 0.0017617605664488015,
         "detection": {
           "high": 1.0,
           "k": 22,
@@ -8970,15 +8954,15 @@
           "rate": 1.0
         },
         "latency_ms": {
-          "p50": 10489.0,
-          "p95": 40767.5
+          "p50": 10054.0,
+          "p95": 28942.5
         },
         "legit_block_rate": {
-          "high": 0.4923013423309317,
-          "k": 9,
-          "low": 0.17275616744483216,
+          "high": 0.11696979849974075,
+          "k": 0,
+          "low": 0.0,
           "n": 29,
-          "rate": 0.3103448275862069
+          "rate": 0.0
         },
         "legit_challenge_rate": {
           "high": 0.5926216401212141,
@@ -8988,7 +8972,7 @@
           "rate": 0.41379310344827586
         },
         "lowerings": {
-          "legitimate": 0,
+          "legitimate": 9,
           "not_legitimate": 0
         },
         "n": 51,
@@ -8998,24 +8982,24 @@
       },
       "hard": {
         "accuracy": {
-          "high": 0.6093779111272004,
-          "k": 4,
-          "low": 0.13812009109121315,
+          "high": 0.7462184023662939,
+          "k": 6,
+          "low": 0.2537815976337061,
           "n": 12,
-          "rate": 0.3333333333333333
+          "rate": 0.5
         },
         "accuracy_with_acceptable": {
-          "high": 0.6804886874504503,
-          "k": 5,
-          "low": 0.19326031365875665,
+          "high": 0.8067396863412435,
+          "k": 7,
+          "low": 0.31951131254954973,
           "n": 12,
-          "rate": 0.4166666666666667
+          "rate": 0.5833333333333334
         },
         "confusion": {
           "allow": {
-            "allow": 1,
-            "block": 1,
-            "challenge": 3
+            "allow": 3,
+            "block": 0,
+            "challenge": 2
           },
           "block": {
             "allow": 2,
@@ -9038,13 +9022,11 @@
             "n": 14,
             "rate": 0.6428571428571429
           },
-          "unpriced_models": [
-            "qwen/qwen3-235b-a22b-2507"
-          ],
-          "usd_per_1000_decisions": 0.0,
-          "usd_per_fraud_caught": 0.0
+          "unpriced_models": [],
+          "usd_per_1000_decisions": 1.9651682539682538,
+          "usd_per_fraud_caught": 0.006878088888888889
         },
-        "cost_per_action_usd": 0.0,
+        "cost_per_action_usd": 0.0019651682539682538,
         "detection": {
           "high": 0.9032285888942195,
           "k": 4,
@@ -9053,25 +9035,25 @@
           "rate": 0.6666666666666666
         },
         "latency_ms": {
-          "p50": 7648.5,
-          "p95": 16076.8
+          "p50": 12484.5,
+          "p95": 30044.649999999998
         },
         "legit_block_rate": {
-          "high": 0.5635028221864702,
-          "k": 1,
-          "low": 0.030053369748306635,
+          "high": 0.3903342879021653,
+          "k": 0,
+          "low": 2.7755575615628914e-17,
           "n": 6,
-          "rate": 0.16666666666666666
+          "rate": 0.0
         },
         "legit_challenge_rate": {
-          "high": 0.9032285888942195,
-          "k": 4,
-          "low": 0.299993315138392,
+          "high": 0.8123836935173494,
+          "k": 3,
+          "low": 0.1876163064826506,
           "n": 6,
-          "rate": 0.6666666666666666
+          "rate": 0.5
         },
         "lowerings": {
-          "legitimate": 0,
+          "legitimate": 2,
           "not_legitimate": 0
         },
         "n": 14,
@@ -9136,8 +9118,8 @@
           "rate": 1.0
         },
         "latency_ms": {
-          "p50": 13.0,
-          "p95": 21.0
+          "p50": 19.0,
+          "p95": 31.5
         },
         "legit_block_rate": {
           "high": 0.11696979849974075,
@@ -9420,10 +9402,13 @@
       "23c489e",
       "469ff95",
       "7ba6857",
-      "d40bade"
+      "b850a2f",
+      "dd7f436",
+      "fe349b5"
     ],
     "policy_version": [
-      "2026-10-28.4"
+      "2026-10-28.4",
+      "2026-10-28.5"
     ],
     "seed_version": [
       "15c5c875071bd93485ba9b3a8afce94db723925924e4ab2207e43650d442d215",
