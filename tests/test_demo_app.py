@@ -52,3 +52,13 @@ def test_with_models_off_a_case_shows_the_evidence_and_makes_no_model_call():
     case = client.post("/v1/cases", headers={"Authorization": f"Bearer {server.token}"},
                        json={"decision_id": decision_id, "by": "demo"}).json()
     assert any("ModelsOff" in error for error in case["errors"]) and case["evidence"]["decision"]["decision_id"] == decision_id
+
+
+def test_the_console_names_each_payment_and_decision(caplog):
+    import logging
+    caplog.set_level(logging.INFO, logger="zeta_one")
+    client = TestClient(DemoServer())
+    client.post("/v1/workspace/add", headers=JSON, content='{"recipe_id": "over-limit"}')
+    lines = [r.getMessage() for r in caplog.records]
+    assert any(line.startswith("workspace: new payment, Above the agent's payment limit") for line in lines)
+    assert any(line.startswith("decision dec_") and "BLOCK (authorization:limits.per_payment)" in line for line in lines)

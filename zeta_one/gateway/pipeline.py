@@ -4,6 +4,7 @@ The engine knows each stage only by its protocol in zeta_one.contracts; whoever 
 picks the implementations. Writing the simulated payment happens after this, not here.
 """
 
+import logging
 import time
 import uuid
 from collections.abc import Callable
@@ -33,6 +34,8 @@ from zeta_one.contracts import (
 )
 from zeta_one.decide import evidence, policy
 from zeta_one.risk import assess
+
+LOG = logging.getLogger("zeta_one.decisions")
 
 
 def _now() -> datetime:
@@ -129,6 +132,7 @@ class Engine:
             proposal=proposal,
             context=context,
         )
+        LOG.info("%s", log_line(record))
         return record, proposal if identity.result == "verified" else None
 
 
@@ -148,3 +152,20 @@ def _parse_or_none(body: bytes) -> Proposal | None:
 
 def _ms_since(start: float) -> int:
     return round((time.perf_counter() - start) * 1000)
+
+
+def log_line(record: EvidenceRecord) -> str:
+    """One line per decision for the console: what was decided, why, which tiers ran, time and spend.
+    Ids and levels only, never request text or credentials."""
+    tiers = []
+    for result in record.risk.tier_results:
+        part = result.tier + (f" {result.model}" if result.model else "")
+        part += f" {result.level}" if result.level else ""
+        part += f" error:{result.error.split(':')[0]}" if result.error else ""
+        if result.latency_ms is not None and result.tier != "tier0":
+            part += f" {result.latency_ms / 1000:.1f}s"
+        tiers.append(part)
+    total = (record.latency_ms or {}).get("total")
+    cost = record.cost.usd if record.cost else 0.0
+    return (f"decision {record.decision_id}: {record.decision.upper()} ({', '.join(record.reasons)}) | "
+            f"{' > '.join(tiers) or 'no risk tiers'} | {total if total is not None else '-'} ms | ${cost:.4f}")

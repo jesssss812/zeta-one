@@ -11,6 +11,7 @@ evidence are flagged, not trusted. Every question and answer is kept with the ca
 
 import ipaddress
 import json
+import logging
 import sqlite3
 from datetime import datetime
 from typing import Any
@@ -21,6 +22,7 @@ import httpx
 from zeta_one.review.case import Research, record_ids, render, RECORD_ID
 from zeta_one.settings import setting
 
+LOG = logging.getLogger("zeta_one.chat")
 DEFAULT_BASE_URL = "http://127.0.0.1:11434/v1"
 DEFAULT_MODEL = "qwen2.5:7b"
 LOCAL_TIMEOUT_SECONDS = 120.0
@@ -124,6 +126,8 @@ class CaseChat:
             self._db.execute("INSERT INTO case_messages (case_id, at, by, question, answer, model, location) "
                              "VALUES (?, ?, ?, ?, ?, ?, ?)",
                              (case["case_id"], now.isoformat(), by, question, answer, self.model, location))
+        LOG.info("case %s: chat answered by %s (%s), citing %d of the case's records", case["case_id"], self.model,
+                 location, len([i for i in cited if i in known]))
         return {"answer": answer, "model": self.model, "location": location, "note": _note(self.model, location),
                 "cited": [i for i in cited if i in known], "not_in_case": [i for i in cited if i not in known]}
 

@@ -11,6 +11,7 @@ calls are enabled only when the server was started with ZETA_DEMO_LIVE=1. In tha
 workspace assessment and case-assembly actions may call models; reading workspace state does not.
 """
 
+import logging
 import os
 import secrets
 import threading
@@ -152,6 +153,14 @@ class DemoServer:
         else:
             await self.story.app(scope, receive, send)
 
+
+# The demo server prints one line per decision and chat answer, so a viewer can follow what ran.
+_console = logging.getLogger("zeta_one")
+if not _console.handlers:
+    _handler = logging.StreamHandler()
+    _handler.setFormatter(logging.Formatter("zeta-one  %(message)s"))
+    _console.addHandler(_handler)
+    _console.setLevel(logging.INFO)
 
 _app: DemoServer | None = None
 
