@@ -80,7 +80,7 @@ def _case(world):
     return client.post("/v1/cases", json={"decision_id": "dec_chat", "by": "cw"}, headers=ADMIN).json()
 
 
-class Local:
+class Server:
     def __init__(self, answer=None, error=None, status=200):
         self.answer, self.error, self.status, self.calls = answer, error, status, []
 
@@ -94,12 +94,12 @@ class Local:
 def test_the_chat_answers_from_the_case_and_checks_what_it_cites(world):
     client, gateway = world
     case = _case(world)
-    local = Local(answer="The payment dec_chat went to the usual method; see also bill_madeup.")
-    gateway.chat = CaseChat(gateway.ledger.connection, post=local)
+    server = Server(answer="The payment dec_chat went to the usual method; see also bill_madeup.")
+    gateway.chat = CaseChat(gateway.ledger.connection, post=server)
     reply = client.post(f"/v1/cases/{case['case_id']}/chat", json={"question": "Was the method new?", "by": "cw"},
                         headers=ADMIN).json()
     assert reply["cited"] == ["dec_chat"] and reply["not_in_case"] == ["bill_madeup"]
-    url, headers, body = local.calls[0]
+    url, headers, body = server.calls[0]
     assert url == "http://127.0.0.1:11434/v1/chat/completions" and headers == {}
     assert body["chat_template_kwargs"] == {"enable_thinking": False}
     assert reply["note"].startswith("Answered by a local model")
@@ -114,22 +114,22 @@ def test_the_chat_answers_from_the_case_and_checks_what_it_cites(world):
 def test_earlier_turns_are_sent_as_history(world):
     client, gateway = world
     case = _case(world)
-    local = Local(answer="ok")
-    gateway.chat = CaseChat(gateway.ledger.connection, post=local)
+    server = Server(answer="ok")
+    gateway.chat = CaseChat(gateway.ledger.connection, post=server)
     for q in ("first?", "second?"):
         client.post(f"/v1/cases/{case['case_id']}/chat", json={"question": q, "by": "cw"}, headers=ADMIN)
-    roles = [m["role"] for m in local.calls[1][2]["messages"]]
+    roles = [m["role"] for m in server.calls[1][2]["messages"]]
     assert roles == ["system", "user", "user", "assistant", "user"]
 
 
-@pytest.mark.parametrize("local, words", [
-    (Local(error=httpx.ConnectError("refused")), "ollama serve"),
-    (Local(status=404), "pulled"),
+@pytest.mark.parametrize("server, words", [
+    (Server(error=httpx.ConnectError("refused")), "ollama serve"),
+    (Server(status=404), "pulled"),
 ])
-def test_an_unreachable_local_model_says_how_to_start_it(world, local, words):
+def test_an_unreachable_local_model_says_how_to_start_it(world, server, words):
     client, gateway = world
     case = _case(world)
-    gateway.chat = CaseChat(gateway.ledger.connection, post=local)
+    gateway.chat = CaseChat(gateway.ledger.connection, post=server)
     response = client.post(f"/v1/cases/{case['case_id']}/chat", json={"question": "hi", "by": "cw"}, headers=ADMIN)
     assert response.status_code == 503 and words in response.json()["error"]["message"]
 
@@ -143,11 +143,11 @@ def test_a_remote_server_gets_the_key_and_the_reply_says_where_it_ran(world, mon
     monkeypatch.setenv("CHAT_BASE_URL", REMOTE)
     monkeypatch.setenv("CHAT_MODEL", "qwen3.6-27b")
     monkeypatch.setenv("CHAT_API_KEY", "test-chat-key")
-    remote = Local(answer="The payment dec_chat went to the usual method; see also bill_madeup.")
-    gateway.chat = CaseChat(gateway.ledger.connection, post=remote)
+    server = Server(answer="The payment dec_chat went to the usual method; see also bill_madeup.")
+    gateway.chat = CaseChat(gateway.ledger.connection, post=server)
     reply = client.post(f"/v1/cases/{case['case_id']}/chat", json={"question": "Was the method new?", "by": "cw"},
                         headers=ADMIN).json()
-    url, headers, body = remote.calls[0]
+    url, headers, body = server.calls[0]
     assert url == REMOTE + "/chat/completions" and headers == {"Authorization": "Bearer test-chat-key"}
     assert body["model"] == "qwen3.6-27b" and body["chat_template_kwargs"] == {"enable_thinking": False}
     assert "Never say whether the payment was fraud" in body["messages"][0]["content"]
@@ -157,17 +157,17 @@ def test_a_remote_server_gets_the_key_and_the_reply_says_where_it_ran(world, mon
     assert [turn["question"] for turn in history] == ["Was the method new?"]
 
 
-@pytest.mark.parametrize("remote, words", [
-    (Local(error=httpx.ConnectError("refused")), "isn't running"),
-    (Local(status=401), "check CHAT_API_KEY"),
-    (Local(error=httpx.ReadTimeout("slow")), "timed out"),
+@pytest.mark.parametrize("server, words", [
+    (Server(error=httpx.ConnectError("refused")), "isn't running"),
+    (Server(status=401), "check CHAT_API_KEY"),
+    (Server(error=httpx.ReadTimeout("slow")), "timed out"),
 ])
-def test_a_failing_remote_server_says_what_failed_without_the_key(world, monkeypatch, remote, words):
+def test_a_failing_remote_server_says_what_failed_without_the_key(world, monkeypatch, server, words):
     client, gateway = world
     case = _case(world)
     monkeypatch.setenv("CHAT_BASE_URL", REMOTE)
     monkeypatch.setenv("CHAT_API_KEY", "test-chat-key")
-    gateway.chat = CaseChat(gateway.ledger.connection, post=remote)
+    gateway.chat = CaseChat(gateway.ledger.connection, post=server)
     response = client.post(f"/v1/cases/{case['case_id']}/chat", json={"question": "hi", "by": "cw"}, headers=ADMIN)
     message = response.json()["error"]["message"]
     assert response.status_code == 503 and words in message
