@@ -23,5 +23,4 @@ app, and Zeta Global. A web search on 2026-10-27 found no fintech or AI company 
 - Never write bare "Zeta".
 - Say it is a hackathon project built on Rho's API, so the Greek-letter name doesn't read as an
   official Rho product.
-- Tagline, explanation, logo idea and design philosophy are in
-  [../strategy/messaging.md](../strategy/messaging.md).
+- The design philosophy is in [../strategy/product.md](../strategy/product.md).

@@ -30,8 +30,7 @@ Every scenario set covers:
 - manipulated or adversarial inputs, such as prompt injection in invoices
 
 Each case carries its expected decision (allow, challenge or block) and where its data came from
-(Rho staging snapshot, or synthetic and how it was generated). The categories are listed in
-[implementation-plan.md](implementation-plan.md#seed-data-and-scenarios).
+(Rho staging snapshot, or synthetic and how it was generated).
 
 ## What to check
 
@@ -241,8 +240,7 @@ list of failure kinds grouped from the notes.
 Jev's probabilities are reported raw and labelled as uncalibrated on our data: no reliability table
 has been built from the cases that reached it.
 
-The judges score "performance: did they optimize for speed or scale?"
-([../reference/hackathon.md](../reference/hackathon.md)), so cost and latency are reported next to
+The judges score "performance: did they optimize for speed or scale?", so cost and latency are reported next to
 accuracy.
 
 ## After the hackathon

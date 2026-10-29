@@ -42,7 +42,7 @@ The lifecycle is **Assess → Decide → Review → Learn**. The hackathon build
 Decide; Review and Learn are designed for but come later.
 
 Design philosophy, from control theory's critical damping: don't maximize friction or minimize it
-blindly; apply the right amount of control for the risk. See [messaging.md](messaging.md).
+blindly; apply the right amount of control for the risk.
 
 ## How a decision is made
 
@@ -184,7 +184,7 @@ the differentiator; replacing human fraud analysts or support staff.
 | Question | Decision | Where |
 | --- | --- | --- |
 | Framing | Authorization-first: identity and risk are inputs to one enforceable decision | this doc |
-| Buyer and story | Platform-first: the layer a platform runs before executing an agent's action; the customer-side gateway is the demonstration, a pre-execution hook is the ask to Rho | [vision.md](vision.md), [0003](../decisions/0003-customer-side-gateway.md) |
+| Buyer and story | Platform-first: the layer a platform runs before executing an agent's action; the customer-side gateway is the demonstration, a pre-execution hook is the ask to Rho | [0003](../decisions/0003-customer-side-gateway.md) |
 | Challenge flow | A typed step-up ladder; first version has `confirm` only | [0008](../decisions/0008-friction-ladder.md) |
 | First domain and action | Accounts payable; one action, `propose_payment`, with the agent stating counterparty, method and amount explicitly | [0005](../decisions/0005-stack-and-first-action.md) |
 | Stack | Python, FastAPI, SQLite, static HTML page | [0005](../decisions/0005-stack-and-first-action.md) |
@@ -192,8 +192,7 @@ the differentiator; replacing human fraud analysts or support staff.
 | Identity | Registered agents with Ed25519-signed requests; replay protection; revocation | [0006](../decisions/0006-identity-and-authorization.md) |
 | Authorization | JSON per (business, agent): actions, counterparty list, per-payment limit, expiry, human-approval threshold in the first version; accounts, method types and rolling limits later; checked in code | [0006](../decisions/0006-identity-and-authorization.md) |
 | Risk | Tier 0 deterministic features, tier 1 Jev, tier 2 Claude on escalation; no smaller model stands in for Jev, so until it runs tier 0 escalates straight to Claude | [0007](../decisions/0007-risk-tiers.md), [0009](../decisions/0009-engineered-escalation.md) |
-| Scenarios and dataset | Hand-written identity and authorization cases; generated risk sets (`dev`, frozen `test`) and a hand-written `hard` set, labelled with AI help and checked by the owner | [implementation-plan.md](implementation-plan.md) |
-| Build order | A thin end-to-end first version with every principle in it, seven extension seams, then ordered extensions | [implementation-plan.md](implementation-plan.md) |
+| Scenarios and dataset | Hand-written identity and authorization cases; generated risk sets (`dev`, frozen `test`) and a hand-written `hard` set, labelled with AI help and checked by the owner | [evaluation.md](evaluation.md) |
 | Review assistant | Designed for, not built; the evidence record is its input | this doc |
 
 Since then (2026-10-28): the review assistant was built

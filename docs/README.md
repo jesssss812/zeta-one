@@ -2,7 +2,7 @@
 
 Two families live here.
 
-**Reference** (`reference/`, `runbooks/`) describes things as they are. If one disagrees with
+**Reference** (`reference/`) describes things as they are. If one disagrees with
 reality, the doc is wrong and should be fixed.
 
 **Intent** (`strategy/`, `decisions/`) records goals and the reasons behind choices, dated when
@@ -15,14 +15,13 @@ What is not done yet is in [roadmap.md](roadmap.md). Every document under `docs/
 
 | Doc | What it covers |
 | --- | --- |
-| [reference/hackathon.md](reference/hackathon.md) | Dates, tracks, the submission checklist and the judging criteria |
 | [reference/rho-api.md](reference/rho-api.md) | What the Rho API allows: hosts, auth, read endpoints, the confirmed limits (read-only by design, no payments write yet, no webhooks or pre-execution hook), the MCP server and the `x-mcp-*` annotations, and what that means for Zeta One |
 | [reference/staging-data.md](reference/staging-data.md) | What the Rho staging business holds: record counts and field coverage per endpoint |
 | [reference/rho-openapi.json](reference/rho-openapi.json) | Rho's public OpenAPI description, copied 2026-10-27 |
 | [reference/jev.md](reference/jev.md) | What Jev (TypeSafe's typed decision model) is, how it is called and priced, with the request and answer shapes |
 | [reference/deterministic-stages.md](reference/deterministic-stages.md) | Implemented seed, identity, authorization and tier-0 interfaces, provenance and gateway wiring |
-| [reference/evaluation-system.md](reference/evaluation-system.md) | How the evaluation's cases are made, labelled, frozen, run and reported, who does each step (a person, a model, code), and the configurations and models compared |
-| [reference/dev-baseline.md](reference/dev-baseline.md) | The first runs of every configuration on labelled `dev`, before tuning: results, cost, the misses and how to compare a later run |
+| [reference/evaluation-system.md](reference/evaluation-system.md) | How the evaluation's cases are made, labeled, frozen, run and reported, who does each step (a person, a model, code), and the configurations and models compared |
+| [reference/dev-baseline.md](reference/dev-baseline.md) | The first runs of every configuration on labeled `dev`, before tuning: results, cost, the misses and how to compare a later run |
 | [reference/dev-tuning.md](reference/dev-tuning.md) | Each change tuned on `dev` after the baseline: what was measured and what it changed |
 | [reference/demo-api.md](reference/demo-api.md) | The contract between the engine and the demo site: endpoints, scenario result, evidence record, ownership of directories |
 | [reference/fintech-integration.md](reference/fintech-integration.md) | The shared decision engine in the working demo and a proposed fintech integration; live inference, static hosting and engineering required before real execution |
@@ -34,25 +33,16 @@ What is not done yet is in [roadmap.md](roadmap.md). Every document under `docs/
 | --- | --- |
 | [images/decision-flow-light.svg](images/decision-flow-light.svg), [images/decision-flow-dark.svg](images/decision-flow-dark.svg) | The README's decision flow and feedback loop, for light and dark themes; distinct roles for rules, Jev typed decisions, language models, people and records, plus decision outcomes |
 
-## Runbooks
-
-| Doc | What it covers |
-| --- | --- |
-| [runbooks/staging-access.md](runbooks/staging-access.md) | Reaching Rho staging over the VPN, running the read-only staging check, and what its errors mean |
 
 ## Strategy
 
 | Doc | What it covers |
 | --- | --- |
-| [strategy/why-agent-risk.md](strategy/why-agent-risk.md) | Research-backed rationale, claim limits, and reusable copy for the site, write-up, and slides |
+| [strategy/why-agent-risk.md](strategy/why-agent-risk.md) | The research behind the problem: sources, what each supports and does not establish, payment-fraud figures, use cases |
 | [strategy/product.md](strategy/product.md) | The problem, who acts, the decision model, where enforcement runs, scope, demo scenarios, open questions |
-| [strategy/evaluation.md](strategy/evaluation.md) | How Zeta One is measured: labels, case sets, labelling, comparisons, metrics, and what waits until after the hackathon |
+| [strategy/evaluation.md](strategy/evaluation.md) | How Zeta One is measured: labels, case sets, labeling, comparisons, metrics, and what waits until after the hackathon |
 | [strategy/security.md](strategy/security.md) | Where Zeta One adds risk of its own (models, design, build, claims), the guardrails for each, and the detailed work |
-| [strategy/messaging.md](strategy/messaging.md) | Tagline, project explanation, design philosophy, visual identity |
-| [strategy/implementation-plan.md](strategy/implementation-plan.md) | Architecture, modules, API, policy table, evidence record, seed and scenarios, schedule and cut list |
 | [strategy/architecture.md](strategy/architecture.md) | Every component, how they connect, what runs where (laptop, judges' machines, the web), the trade-offs behind each technology and hosting choice, and the design trade-offs: what each product choice buys, costs and what would reopen it |
-| [strategy/parallel-build.md](strategy/parallel-build.md) | The engine's kernel, six workstreams with their files, seams and briefs, and how coding agents land work together |
-| [strategy/vision.md](strategy/vision.md) | The narrative for judges and Rho, and the draft submission write-up |
 
 ## Decisions
 

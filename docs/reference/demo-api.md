@@ -116,8 +116,7 @@ before.
 
 ## Evidence record
 
-The engine's record for one decision ([../strategy/implementation-plan.md](../strategy/implementation-plan.md)
-describes how it is produced). Fields the site should rely on:
+The engine's record for one decision. Fields the site should rely on:
 
 ```json
 {

@@ -34,8 +34,7 @@ human resolves it; the resolution is recorded with its outcome and provenance. R
 the rung for an identity or authorization failure is fixed by code, and no model picks it.
 
 **First version:** rungs 0, 2 and 5, with `confirm` the only challenge type, and limit violations at
-rung 5. Rungs 1, 3 and 4 are extensions in the order given in
-[../strategy/implementation-plan.md](../strategy/implementation-plan.md); the enums and the
+rung 5. Rungs 1, 3 and 4 are extensions; the enums and the
 evidence-record fields exist from the start so adding a rung adds a policy row, not a schema change.
 
 **Measurement:** each rung has a friction weight; the evaluation reports the friction score on
