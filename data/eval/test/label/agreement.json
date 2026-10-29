@@ -1,0 +1,12 @@
+{
+  "n": 40,
+  "agreement": 0.45,
+  "kappa": -0.009174311926605514,
+  "low": -0.1522633744855969,
+  "high": 0.14606741573033716,
+  "resamples": 2000,
+  "seed": 0,
+  "labeller_blindness": "every batch sent through the Anthropic API with no tools offered, so the labeller could not open a file; it saw only its prompt",
+  "adjudicated": 15,
+  "adjudicated_to_ai": 15
+}

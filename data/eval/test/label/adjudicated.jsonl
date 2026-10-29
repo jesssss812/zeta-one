@@ -1,0 +1,15 @@
+{"also_acceptable": ["challenge"], "expected": "block", "id": "c004", "settled": "owner took the AI's label"}
+{"also_acceptable": [], "expected": "allow", "id": "c006", "settled": "owner took the AI's label"}
+{"also_acceptable": ["challenge"], "expected": "block", "id": "c016", "settled": "owner took the AI's label"}
+{"also_acceptable": ["challenge"], "expected": "block", "id": "c019", "settled": "owner took the AI's label"}
+{"also_acceptable": [], "expected": "challenge", "id": "c024", "settled": "owner took the AI's label"}
+{"also_acceptable": ["challenge"], "expected": "block", "id": "c025", "settled": "owner took the AI's label"}
+{"also_acceptable": [], "expected": "challenge", "id": "c031", "settled": "owner took the AI's label"}
+{"also_acceptable": ["challenge"], "expected": "allow", "id": "c033", "settled": "owner took the AI's label"}
+{"also_acceptable": ["challenge"], "expected": "block", "id": "c036", "settled": "owner took the AI's label"}
+{"also_acceptable": ["challenge"], "expected": "block", "id": "c037", "settled": "owner took the AI's label"}
+{"also_acceptable": ["challenge"], "expected": "block", "id": "c042", "settled": "owner took the AI's label"}
+{"also_acceptable": ["challenge"], "expected": "block", "id": "c043", "settled": "owner took the AI's label"}
+{"also_acceptable": [], "expected": "challenge", "id": "c067", "settled": "owner took the AI's label"}
+{"also_acceptable": ["challenge"], "expected": "block", "id": "c078", "settled": "owner took the AI's label"}
+{"also_acceptable": ["challenge"], "expected": "block", "id": "c079", "settled": "owner took the AI's label"}
