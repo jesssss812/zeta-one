@@ -211,6 +211,9 @@ def render(risk_input: RiskInput, boundary: str | None = None) -> str:
         from_whom = "the same payee" if bill.counterparty_id == payee.id else f"a different payee, {bill.counterparty_id}"
         matches = "matches" if bill.amount == proposal.amount else "does not match"
         facts.append(f"- Bill {bill.id}: {_money(bill.amount)} from {from_whom}; the amount {matches} the payment.")
+        if bill.status == "paid":
+            paid = f", by a settled payment on {bill.paid_by.posted_at.date()}" if bill.paid_by else ""
+            facts.append(f"- The payment system shows bill {bill.id} already paid{paid}.")
     history = context.payment_history
     if history.count and history.first_at and history.median_amount:
         ratio = features.get("amount_ratio_to_vendor_median")
@@ -226,6 +229,15 @@ def render(risk_input: RiskInput, boundary: str | None = None) -> str:
         facts.append(f"- The payee's bank account was changed {changed.value} days ago; the change was {who}.")
     elif method:
         facts.append("- The payee's bank account on this payment has not changed recently.")
+    if history.by_method:
+        use = next((u for u in history.by_method if u.payment_method_id == proposal.payment_method_id), None)
+        changed_ever = any(c.method_id == proposal.payment_method_id for c in context.payment_method_history)
+        if use:
+            since = f"; {use.since_latest_change} of them after its last change" if changed_ever else ""
+            facts.append(f"- Settled payments the records link to this bank account: {use.count}, from "
+                         f"{use.first_at.date()} to {use.last_at.date()}{since}.")
+        else:
+            facts.append("- None of the settled payments the records link to a bank account went to this one.")
     others = [other for other in context.open_bills if not bill or other.id != bill.id]
     if others:
         facts.append(f"- The payee has {len(others)} other open bill(s).")

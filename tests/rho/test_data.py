@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from zeta_one.contracts import Context, InvalidProposal, Proposal, SetupOp
+from zeta_one.contracts import Context, InvalidProposal, Money, Proposal, SetupOp
 from zeta_one.rho.snapshot import Store
 from zeta_one.rho.seed import SEED_NOW, make_seed
 from zeta_one.rho.view import context_for
@@ -152,3 +152,46 @@ def test_duplicate_window_includes_payments_beyond_the_three_item_summary(days_a
     risk = assess(proposal, context, SEED_NOW, Tier0(), {}, Configuration(tiers=['tier0']))
     assert risk.features['duplicate_candidate'].value is duplicate
     assert bool(risk.floor) is duplicate
+
+
+def _vendor(store):
+    apply(store, SetupOp(op='add_counterparty', args={'counterparty_id': 'cp_dest', 'name': 'Destination vendor',
+          'created_days_ago': 400, 'payment_method_id': 'pm_old'}))
+    return routine().model_copy(update={'counterparty_id': 'cp_dest', 'payment_method_id': 'pm_old', 'bill_id': None})
+
+
+def test_payments_record_their_destination_and_count_since_the_latest_change():
+    store = Store()
+    proposal = _vendor(store)
+    for days in (130, 100):
+        apply(store, SetupOp(op='add_payments', args={'counterparty_id': 'cp_dest', 'amount': 500,
+              'days_ago': days, 'payment_method_id': 'pm_old'}))
+    apply(store, SetupOp(op='add_payments', args={'counterparty_id': 'cp_dest', 'amount': 500, 'days_ago': 70}))
+    apply(store, SetupOp(op='change_payment_method', args={'counterparty_id': 'cp_dest', 'days_ago': 50,
+          'new_method_id': 'pm_new'}))
+    for days in (40, 10):
+        apply(store, SetupOp(op='add_payments', args={'counterparty_id': 'cp_dest', 'amount': 500,
+              'days_ago': days, 'payment_method_id': 'pm_new'}))
+    history = context_for(store)(proposal.model_copy(update={'payment_method_id': 'pm_new'}),
+                                 'biz_seed_01', SEED_NOW).payment_history
+    assert history.count == 5
+    assert [r.payment_method_id for r in history.recent] == ['pm_new', 'pm_new', None]
+    uses = {u.payment_method_id: (u.count, u.since_latest_change) for u in history.by_method}
+    assert uses == {'pm_new': (2, 2), 'pm_old': (2, 2)}  # the unlinked payment is in neither
+
+
+def test_a_payment_can_pay_a_named_bill_once():
+    store = Store()
+    proposal = _vendor(store)
+    apply(store, SetupOp(op='add_bill', args={'bill_id': 'bill_named', 'counterparty_id': 'cp_dest', 'amount': 2100}))
+    apply(store, SetupOp(op='add_payments', args={'counterparty_id': 'cp_dest', 'bill_id': 'bill_named',
+          'days_ago': 45, 'payment_method_id': 'pm_old'}))
+    named = proposal.model_copy(update={'bill_id': 'bill_named', 'amount': Money(amount=2100, currency='USD')})
+    ctx = context_for(store)(named, 'biz_seed_01', SEED_NOW)
+    assert ctx.bill.status == 'paid' and ctx.open_bills == []
+    assert (SEED_NOW - ctx.bill.paid_by.posted_at).days == 45
+    assert ctx.bill.paid_by.amount.amount == 2100 and ctx.bill.paid_by.payment_method_id == 'pm_old'
+    with pytest.raises(ValueError):
+        apply(store, SetupOp(op='add_payments', args={'counterparty_id': 'cp_dest', 'bill_id': 'bill_named'}))
+    with pytest.raises(ValueError):
+        apply(store, SetupOp(op='add_payments', args={'counterparty_id': 'cp_dest', 'payment_method_id': 'pm_other'}))

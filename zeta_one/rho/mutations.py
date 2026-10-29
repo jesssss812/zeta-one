@@ -12,8 +12,10 @@ Operations and args (all optional defaults are synthetic):
   (default awaiting_approval), business_id (default biz_seed_01), invoice_number.
 - add_payments: counterparty_id, count (default 1), amount (Money dict or integer;
   alias median_amount), currency (default USD), days_ago (default 10),
-  source_account_id (default acct_seed_checking_01). Creates settled outgoing
-  transactions linked through paid bills, one per day counting backwards.
+  source_account_id (default acct_seed_checking_01), payment_method_id (the
+  destination; default none recorded), bill_id (an existing unpaid bill of the
+  counterparty, which this one payment pays; count must be 1). Creates settled
+  outgoing transactions linked through paid bills, one per day counting backwards.
 
 All changes are local simulated data. Unknown references or operations raise
 ValueError. Repeated add operations require distinct entity IDs.
@@ -131,7 +133,15 @@ def apply(store, op: SetupOp):
         count = a.get('count', 1)
         if not isinstance(count, int) or isinstance(count, bool) or count < 0:
             raise ValueError('count must be a nonnegative integer')
-        amount = _money(a)
+        method_id = a.get('payment_method_id')
+        if method_id is not None and not any(m['id'] == method_id for m in cp['payment_methods']):
+            raise ValueError(f'Payment method {method_id} is not on counterparty')
+        paid = a.get('bill_id')
+        if paid is not None:
+            bill = _require(store, 'bills', paid)
+            if bill['counterparty']['id'] != cp['id'] or bill['status'] == 'paid' or count != 1:
+                raise ValueError('bill_id must be an unpaid bill of the counterparty, paid by one payment')
+        amount = _money(a) if paid is None or 'amount' in a or 'median_amount' in a else bill['amount']
         for n in range(count):
             index = len(store.all('transactions'))
             transaction_id = f'txn_setup_{index:05}'
@@ -142,6 +152,12 @@ def apply(store, op: SetupOp):
             store.put('transactions', {'id': transaction_id, 'account_id': account,
                 'transaction_type': 'ach_debit', 'status': 'settled', 'amount': amount,
                 'counterparty_name': cp['legal_name'], 'posted_at': stamp, 'initiated_at': stamp})
+            if method_id is not None:
+                store.put('payment_destinations', {'id': transaction_id, 'payment_method_id': method_id})
+            if paid is not None:
+                store.put('bills', {**bill, 'status': 'paid', 'transaction': {'id': transaction_id},
+                                    'created_at': min(bill['created_at'], stamp), 'updated_at': stamp})
+                continue
             bill_id = f'paid_{transaction_id}'
             store.put('bills', {'id': bill_id, 'status': 'paid', 'amount': amount,
                 'counterparty': {'id': cp['id']}, 'transaction': {'id': transaction_id},

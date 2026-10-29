@@ -38,12 +38,16 @@ historical payment to its counterparty, so the total bill count exceeds the plan
 - History joins paid bills to settled outgoing transactions, deduplicates transaction IDs, and
   excludes future transactions and other currencies. Count and median use all qualifying history;
   `recent` contains at most three payments within 90 days.
-- Bills carry their Rho status, and each history payment the bill it settled (`bill_id`). The
-  gateway drops bills it has already paid from `open_bills`, since the stand-in records keep them open.
+- Bills carry their Rho status, and each history payment the bill it settled (`bill_id`). A paid
+  bill carries the settled payment that paid it (`paid_by`). The gateway drops bills it has already
+  paid from `open_bills`, since the stand-in records keep them open.
+- A history payment carries its destination (`payment_method_id`) when the stand-in records one;
+  `by_method` counts settled payments per destination, and how many came after that method's latest
+  change. Synthetic setup records destinations only when a case names them, so most history has none.
 - Open bills are looked up independently of the proposal's bill reference. A bill for another
   payee also supplies that payee and its history for the risk assessment.
 - Amounts and payee records follow the portions of Rho's shapes the engine reads. Ownership,
-  method dates/history and invoice text are synthetic stand-in records.
+  method dates/history, payment destinations and invoice text are synthetic stand-in records.
 
 `rho.mutations.apply(store, SetupOp(...))` supports `change_payment_method`, `set_bill_text`,
 `add_counterparty`, `add_bill` and `add_payments`. Its

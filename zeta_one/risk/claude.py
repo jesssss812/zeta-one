@@ -204,6 +204,8 @@ def known_ids(risk_input: RiskInput) -> set[str]:
     ids.update(bill.id for bill in context.open_bills)
     if context.bill:
         ids.update({context.bill.id, context.bill.counterparty_id})
+        if context.bill.paid_by:
+            ids.add(context.bill.paid_by.id)
     if context.bill_counterparty:
         ids.add(context.bill_counterparty.id)
         ids.update(method.id for method in context.bill_counterparty.payment_methods)
@@ -280,8 +282,19 @@ def _bill(bill, field: str, text) -> dict[str, Any]:
     text(f"{field}.invoice_number", bill.id, bill.invoice_number)
     text(f"{field}.memo", bill.id, bill.memo)
     text(f"{field}.document_text", bill.id, bill.document_excerpt)
-    return {"id": bill.id, "counterparty_id": bill.counterparty_id, "invoice_date": bill.invoice_date,
+    view = {"id": bill.id, "counterparty_id": bill.counterparty_id, "invoice_date": bill.invoice_date,
             "due_date": bill.due_date, "amount": bill.amount.model_dump(mode="json"), "status": bill.status}
+    if bill.paid_by:
+        view["paid_by"] = _record(bill.paid_by)
+    return view
+
+
+def _record(record) -> dict[str, Any]:
+    view = {"id": record.id, "posted_at": record.posted_at.isoformat(), "amount": record.amount.model_dump(mode="json"),
+            "method_type": record.method_type}
+    if record.payment_method_id:
+        view["payment_method_id"] = record.payment_method_id
+    return view
 
 
 def _history(history) -> dict[str, Any]:
@@ -290,11 +303,11 @@ def _history(history) -> dict[str, Any]:
         "first_at": history.first_at.isoformat() if history.first_at else None,
         "last_at": history.last_at.isoformat() if history.last_at else None,
         "median_amount": history.median_amount.model_dump(mode="json") if history.median_amount else None,
-        "recent": [
-            {"id": record.id, "posted_at": record.posted_at.isoformat(), "amount": record.amount.model_dump(mode="json"),
-             "method_type": record.method_type}
-            for record in history.recent
-        ],
+        "recent": [_record(record) for record in history.recent],
+        **({"by_payment_method": [
+            {"payment_method_id": use.payment_method_id, "count": use.count, "first_at": use.first_at.isoformat(),
+             "last_at": use.last_at.isoformat(), "since_latest_change": use.since_latest_change}
+            for use in history.by_method]} if history.by_method else {}),
     }
 
 

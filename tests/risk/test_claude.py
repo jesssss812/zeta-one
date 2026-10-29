@@ -9,7 +9,7 @@ import httpx2
 import pytest
 from anthropic.types import Message
 
-from zeta_one.contracts import RiskInput, ScenarioResult, Tier0Output
+from zeta_one.contracts import PaymentRecord, RiskInput, ScenarioResult, Tier0Output
 from zeta_one.risk import claude, escalation
 from zeta_one.risk.claude import MODEL, PRICES, StrongTier
 
@@ -25,6 +25,24 @@ def risk_input(name: str = "invoice_redirect_instructions") -> RiskInput:
     fixture = scenario(name)
     risk = fixture.decision_record.risk
     return RiskInput(proposal=fixture.proposal, context=fixture.context, features=risk.features, tier0=risk.tier_results[0])
+
+
+def linked_input() -> RiskInput:
+    """The routine payment, with the records saying where past payments went after a change to its method."""
+    from datetime import timedelta
+
+    from zeta_one.contracts import MethodUse, PaymentMethodChange
+
+    ri = risk_input("routine_bill_payment")
+    context, now = ri.context, ri.context.payment_history.last_at
+    method = context.counterparty.payment_methods[0]
+    context.payment_method_history = [
+        PaymentMethodChange(id="pmh_2", method_id=method.id, change="added_as_default", changed_at=now - timedelta(days=20))]
+    for record in context.payment_history.recent:
+        record.payment_method_id = method.id
+    context.payment_history.by_method = [MethodUse(payment_method_id=method.id, count=6, since_latest_change=2,
+                                                   first_at=now - timedelta(days=150), last_at=now)]
+    return ri
 
 
 def tier0_output(name: str) -> Tier0Output:
@@ -258,6 +276,28 @@ def test_each_request_gets_a_fresh_boundary():
 
 def test_the_prompt_explains_the_boundary():
     assert 'boundary="..."' in claude.SYSTEM_PROMPT
+
+
+def _facts(text: str) -> dict:
+    return json.loads(text.partition("</gateway_facts>")[0].removeprefix("<gateway_facts>\n"))
+
+
+def test_past_payment_destinations_and_paid_bills_are_facts():
+    linked = linked_input()
+    linked.context.bill.paid_by = PaymentRecord(id="txn_paid", posted_at=linked.context.payment_history.last_at,
+                                                amount=linked.context.bill.amount, payment_method_id="pm_0012_01")
+    facts = _facts(claude.render(linked, boundary="B"))
+    assert facts["payment_history"]["recent"][0]["payment_method_id"] == "pm_0012_01"
+    assert facts["payment_history"]["by_payment_method"][0]["since_latest_change"] == 2
+    assert facts["bill"]["paid_by"]["id"] == "txn_paid"
+    assert "txn_paid" in claude.known_ids(linked)
+
+
+def test_records_without_these_details_render_as_before():
+    facts = _facts(claude.render(risk_input("routine_bill_payment"), boundary="B"))
+    assert all("payment_method_id" not in record for record in facts["payment_history"]["recent"])
+    for key in ("by_payment_method", "paid_by"):
+        assert f'"{key}"' not in json.dumps(facts)
 
 
 def test_context_fields_not_listed_never_reach_the_facts():

@@ -273,7 +273,8 @@ class Ledger:
             proposal = Proposal.model_validate_json(row["proposal"])
             if proposal.counterparty_id == counterparty_id:
                 records.append(PaymentRecord(id=row["payment_id"], posted_at=row["created_at"],
-                                             amount=proposal.amount, bill_id=proposal.bill_id, status=row["status"]))
+                                             amount=proposal.amount, bill_id=proposal.bill_id,
+                                             payment_method_id=proposal.payment_method_id, status=row["status"]))
         return records
 
     def spend_source(self, exclude: str | None = None) -> SpendSource:

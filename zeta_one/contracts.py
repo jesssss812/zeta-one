@@ -117,6 +117,29 @@ class PaymentMethodChange(_Open):
     summary: str | None = None
 
 
+class PaymentRecord(_Open):
+    """`payment_method_id` is the destination the payment went to and `bill_id` the bill it paid,
+    when the records say; None means the records don't say, not that there was none."""
+
+    id: str
+    posted_at: datetime
+    amount: Money
+    method_type: str | None = None
+    payment_method_id: str | None = None
+    bill_id: str | None = None
+
+
+class MethodUse(_Open):
+    """Settled payments the records link to one payment method; `since_latest_change` counts those
+    posted after the method's latest change (all of them if it never changed)."""
+
+    payment_method_id: str
+    count: int
+    first_at: datetime
+    last_at: datetime
+    since_latest_change: int
+
+
 class BillView(_Open):
     id: str
     counterparty_id: str
@@ -128,18 +151,14 @@ class BillView(_Open):
     memo: str | None = None
     document_excerpt: str | None = None
     status: str | None = None
-
-
-class PaymentRecord(_Open):
-    id: str
-    posted_at: datetime
-    amount: Money
-    method_type: str | None = None
+    # The settled payment that paid this bill, when the records link one.
+    paid_by: PaymentRecord | None = None
 
 
 class PaymentHistory(_Open):
     """`recent` is a short summary (up to three payments in 90 days); `duplicate_candidates` is every
-    payment in the duplicate window, so a matching payment can't hide behind three newer ones."""
+    payment in the duplicate window, so a matching payment can't hide behind three newer ones.
+    `by_method` covers every payment whose destination the records give."""
 
     count: int = 0
     first_at: datetime | None = None
@@ -147,6 +166,7 @@ class PaymentHistory(_Open):
     median_amount: Money | None = None
     recent: list[PaymentRecord] = Field(default_factory=list)
     duplicate_candidates: list[PaymentRecord] = Field(default_factory=list)
+    by_method: list[MethodUse] = Field(default_factory=list)
 
 
 class BusinessView(_Open):

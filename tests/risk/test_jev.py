@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from tests.risk.test_claude import risk_input, scenario, tier0_output
+from tests.risk.test_claude import linked_input, risk_input, scenario, tier0_output
 from zeta_one import settings
 from zeta_one.contracts import Configuration
 from zeta_one.decide import policy
@@ -349,3 +349,26 @@ def test_the_missing_key_test_never_reads_the_checkouts_env(monkeypatch, tmp_pat
     monkeypatch.setattr(settings, "ROOT", tmp_path)
     (tmp_path / ".env").write_text("")
     assert jev.api_key() is None
+
+
+def test_the_state_says_how_many_past_payments_went_to_this_account():
+    facts = jev.render(linked_input(), boundary="B").partition("Text from invoices")[0]
+    assert "- Settled payments the records link to this bank account: 6, from" in facts
+    assert "; 2 of them after its last change." in facts
+
+
+def test_a_bill_the_records_show_paid_is_said():
+    from zeta_one.contracts import PaymentRecord
+
+    paid = risk_input("routine_bill_payment")
+    paid.context.bill.status = "paid"
+    paid.context.bill.paid_by = PaymentRecord(id="txn_x", posted_at=paid.context.payment_history.last_at,
+                                              amount=paid.context.bill.amount)
+    day = paid.context.payment_history.last_at.date()
+    assert f"already paid, by a settled payment on {day}." in jev.render(paid, boundary="B")
+
+
+def test_records_without_these_details_add_no_sentence():
+    state = jev.render(risk_input("routine_bill_payment"), boundary="B")
+    assert "records link" not in state
+    assert "was confirmed by a person" not in state
