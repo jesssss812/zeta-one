@@ -19,8 +19,8 @@ flowchart LR
     sample["Sample combinations<br/>seeded, reproducible"]:::code
     word["Write invoice text + agent rationale<br/>Claude Haiku 5.5, sees no labels"]:::model
     assemble["Assemble cases<br/>dev 48 · test 100"]:::code
-    hard["Hard set, written by hand<br/>15–20 cases outside the generator"]:::human
-    convert["Hard set as case files<br/>drafted with Claude, checked by a person"]:::assisted
+    hard["Hard set, written by hand<br/>20 specs outside the generator"]:::human
+    convert["Hard set as case files<br/>14 of the 20, drafted with Claude, checked by a person"]:::assisted
     fixed["Identity + authorization cases<br/>23, labelled by construction"]:::code
     feedback["Feedback cases<br/>labelled by verified findings"]:::code
     sample --> word --> assemble
