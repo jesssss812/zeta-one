@@ -94,6 +94,9 @@ section { display: grid; gap: 14px; }
 .steps span { font-size: 13.5px; }
 .sources td:last-child a { color: var(--fg); }
 @media (max-width: 860px) { .steps { grid-template-columns: 1fr 1fr; } .dims { grid-template-columns: 1fr; } .dims > div:nth-child(2) { border-top: 1px solid var(--line); } .dims .dim { padding-bottom: 0; } .dims .vals { border-top: 0; } }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.findings { margin: 0; padding-left: 18px; max-width: 80ch; }
+.findings li { margin: 6px 0; }
 @media (max-width: 860px) { .legend, .cols { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 480px) { .legend, .cols { grid-template-columns: 1fr; } }
 </style>
@@ -146,15 +149,15 @@ section { display: grid; gap: 14px; }
     <text class="title" x="32" y="243">Assemble cases</text>
     <text class="sub" x="32" y="258">dev 48 · test 100, unlabelled</text>
 
-    <rect class="n-you" x="20" y="300" width="220" height="58" rx="8"/>
-    <text class="badge b-you" x="32" y="317">PERSON</text>
-    <text class="title" x="32" y="335">Write the hard set</text>
-    <text class="sub" x="32" y="350">15–20, outside the generator</text>
+    <rect class="n-assist" x="20" y="300" width="220" height="58" rx="8"/>
+    <text class="badge b-assist" x="32" y="317">MODEL-ASSISTED</text>
+    <text class="title" x="32" y="335">Hard set specs</text>
+    <text class="sub" x="32" y="350">20 drafted with Claude · approved</text>
 
     <rect class="n-assist" x="20" y="376" width="220" height="58" rx="8"/>
     <text class="badge b-assist" x="32" y="393">MODEL-ASSISTED</text>
     <text class="title" x="32" y="411">Turn specs into case files</text>
-    <text class="sub" x="32" y="426">Claude drafts · a person checks</text>
+    <text class="sub" x="32" y="426">14 of 20 · a person checks</text>
 
     <rect class="n-code" x="20" y="468" width="220" height="58" rx="8"/>
     <text class="badge b-code" x="32" y="485">CODE</text>
@@ -235,8 +238,8 @@ section { display: grid; gap: 14px; }
 
       <rect fill="var(--panel)" x="762" y="456" width="206" height="54" rx="6"/>
       <text class="cfg-name" x="772" y="476">open_weight</text>
-      <rect class="n-model" x="886" y="464" width="74" height="18" rx="9"/><text class="chip-t b-model" x="923" y="477" text-anchor="middle">Qwen3 235B</text>
-      <text class="sub" x="772" y="495">open model in Opus's place</text>
+      <rect class="n-model" x="880" y="464" width="80" height="18" rx="9"/><text class="chip-t b-model" x="920" y="477" text-anchor="middle">Qwen 3.6 27B</text>
+      <text class="sub" x="772" y="495">open-weight, in Opus's place</text>
 
       <rect fill="var(--panel)" x="762" y="518" width="206" height="54" rx="6"/>
       <text class="cfg-name" x="772" y="538">strong</text>
@@ -285,7 +288,7 @@ section { display: grid; gap: 14px; }
 
     <!-- hard set → freeze -->
     <path class="edge" d="M240 405 H278 V530 H635 V360" marker-end="url(#arrow)"/>
-    <text class="elabel" x="440" y="524" text-anchor="middle">hard set, labelled by a person</text>
+    <text class="elabel" x="440" y="524" text-anchor="middle">hard set, labels approved by a person</text>
 
     <!-- deterministic + feedback → run -->
     <path class="edge" d="M240 497 H256 V614 H865 V598" marker-end="url(#arrow)"/>
@@ -302,6 +305,36 @@ section { display: grid; gap: 14px; }
   </div>
   <figcaption>Cases are made by code and Claude Haiku. Claude Sonnet labels every case blind, and a person labels 40 test cases without seeing its labels; the two are compared for agreement and the person settles every disagreement. Code then freezes the labelled sets, runs each case through all seven configurations in a fresh sandbox, and writes the report.</figcaption>
 </figure>
+
+<section id="results">
+  <div>
+    <h2>Results</h2>
+    <p class="note">One run of each configuration, on 29 October 2026, on synthetic cases. Acceptable means the decision matched the case's label or one of its listed alternatives. Stopped means challenged or blocked.</p>
+  </div>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Configuration</th><th class="num">test: acceptable, of 100</th><th class="num">test: fraud let through, of 49</th><th class="num">test: honest payments stopped, of 51</th><th class="num">hard: acceptable, of 12</th><th class="num">hard: fraud let through, of 6</th><th class="num">$ per 1,000 decisions on test</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">always_allow</td><td class="num">41</td><td class="num">49</td><td class="num">0</td><td class="num">5</td><td class="num">6</td><td class="num">0</td></tr>
+      <tr><td class="mono">always_challenge</td><td class="num">74</td><td class="num">0</td><td class="num">51</td><td class="num">7</td><td class="num">0</td><td class="num">0</td></tr>
+      <tr><td class="mono">rules</td><td class="num">79</td><td class="num">0</td><td class="num">39</td><td class="num">6</td><td class="num">2</td><td class="num">0</td></tr>
+      <tr><td class="mono">jev</td><td class="num">90</td><td class="num">2</td><td class="num">14</td><td class="num">7</td><td class="num">2</td><td class="num">12.00†</td></tr>
+      <tr><td class="mono">engineered</td><td class="num">91</td><td class="num">1</td><td class="num">16</td><td class="num">8</td><td class="num">2</td><td class="num">15.15†</td></tr>
+      <tr><td class="mono">open_weight</td><td class="num">94</td><td class="num">0</td><td class="num">19</td><td class="num">7</td><td class="num">2</td><td class="num">1.85*</td></tr>
+      <tr><td class="mono">strong</td><td class="num">90</td><td class="num">2</td><td class="num">14</td><td class="num">10</td><td class="num">0</td><td class="num">23.77†</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <ul class="findings">
+    <li><b>The rules alone let no generated fraud through, and stop 39 of 51 honest payments.</b> What the models add on test is clearing honest payments: down to 14–19 stopped.</li>
+    <li><b>Claude Opus cleared fraud in two test cases.</b> It took recent payments to the vendor as proof that an old, unconfirmed bank change was safe, though none of them was linked to the new account.</li>
+    <li><b>The open-weight model on one rented GPU scored highest on test</b>, at about an eighth of the cost of Opus where needed, with no fraud let through. Its prompt has one section written from its dev errors, which Opus's prompt does not, and on the hard set it scored 7 of 12 against 10 for Opus on every payment.</li>
+    <li><b>The rules' blind spot shows on the hard set.</b> Two detectable frauds there trip no tier-0 rule, so every configuration that escalates only uncertain cases allowed them without asking a model; Opus on every payment caught both.</li>
+    <li><b>A defect the evaluation found:</b> once a model rates a payment high, an amount that differs from its bill is blocked as if it were a redirect, where two authorization cases require a challenge. It is not fixed.</li>
+  </ul>
+  <p class="note"><b>What these numbers cannot show.</b> The hard set has 14 cases; 12 are scored, and the other two are frauds no configuration can see from the evidence, which every configuration but always_challenge allowed. At 12 cases an interval spans about ±25 points, and the open-weight arm ran on hard under a newer policy version (it differs on one case). Generated dev and test cases share one structure and 15 test combinations also appear in dev, so test shows overfitting to the tuning within that structure, not behaviour on unlike cases. Labels: the AI labeller labelled all 100 test cases and a person 40 of them blind; their agreement was at chance level (Cohen's κ −0.01). After reading the AI's reasons, the person took its label on 15 of the 22 disagreements and kept their own on 7; the other 60 labels, all 35 routine cases among them, are the AI's alone. None of these is a production rate.</p>
+  <p class="note">* GPU time at $0.59 an hour for each call's time, an upper bound; a business running its own GPU pays a fixed cost whatever the volume. † Opus's cost prices cache reads at 0.1× the input price, where Anthropic bills 0.05×, so it is slightly high.</p>
+</section>
 
 <section>
   <div>
@@ -324,7 +357,7 @@ section { display: grid; gap: 14px; }
     <div class="model"><b class="t-model">3 · Model</b><span>Claude Haiku 5.5 writes the invoice text and the agent's rationale, never seeing the truth</span></div>
     <div class="code"><b class="t-code">4 · Code</b><span>Each case's records are applied to a fresh copy of the synthetic data</span></div>
   </div>
-  <p class="note">Harmless look-alikes are built in on purpose: honest urgent invoices, confirmed bank changes and real change notices, so a warning sign alone is never the answer. Because the dimensions resemble the rules' own features, the hand-written hard set, which comes from none of them, is the headline.</p>
+  <p class="note">Harmless look-alikes are built in on purpose: honest urgent invoices, confirmed bank changes and real change notices, so a warning sign alone is never the answer. Because the dimensions resemble the rules' own features, the hard set, written outside the generator, is the check on them. Every generated case also shares one structure: each vendor is paid monthly at a steady amount, and banks are a few synthetic labels.</p>
 </section>
 
 <section>
@@ -339,10 +372,12 @@ section { display: grid; gap: 14px; }
       <tr><td>Build cases from dimensions and their combinations, with a model writing only the wording</td><td>Covers the space on purpose instead of by whatever examples come to mind</td><td><a href="https://hamel.dev/blog/posts/evals">Hamel Husain, Your AI product needs evals</a></td></tr>
       <tr><td>Write the labelling guide only after reading 20 generated cases</td><td>What counts as a good decision shifts once you read real cases</td><td><a href="https://hamel.dev/blog/posts/evals-faq/">Hamel Husain, Evals FAQ</a></td></tr>
       <tr><td>Check the AI labeller against a person labelling blind, and let the person settle disagreements</td><td>An AI label is a measurement with its own error, not ground truth</td><td><a href="https://hamel.dev/blog/posts/evals-faq/">Hamel Husain, Evals FAQ</a></td></tr>
-      <tr><td>Report agreement as Cohen's κ with an interval, and say how the labels were made</td><td>Scores built on model-made labels have to carry that labeller's error</td><td><a href="https://arxiv.org/abs/2511.21140">How to correctly report LLM-as-a-judge evaluations (arXiv 2511.21140)</a></td></tr>
+      <tr><td>Report agreement as Cohen's κ with an interval</td><td>κ corrects agreement for chance: 0 is chance, 1 is perfect</td><td><a href="https://doi.org/10.1177/001316446002000104">J. Cohen, A coefficient of agreement for nominal scales (1960)</a></td></tr>
+      <tr><td>Say how the labels were made</td><td>Scores built on model-made labels carry that labeller's error; the paper also corrects for it, which this report does not</td><td><a href="https://arxiv.org/abs/2511.21140">Lee et al., How to correctly report LLM-as-a-judge evaluations (arXiv 2511.21140)</a></td></tr>
       <tr><td>Grade with code: the decision against its label, with no model as judge</td><td>The outcome here is a decision, so it can be checked exactly</td><td><a href="https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents">Anthropic, Demystifying evals for AI agents</a></td></tr>
       <tr><td>Read every wrong decision on dev and tag the first stage that went wrong</td><td>Error analysis on the evidence records finds what to fix; rates alone don't</td><td><a href="https://hamel.dev/blog/posts/evals">Hamel Husain, Your AI product needs evals</a></td></tr>
-      <tr><td>Every rate with its count and a Wilson 95% interval; paired comparisons with exact McNemar</td><td>At about 30 cases per class, one case moves a rate by several points</td><td>Standard statistics</td></tr>
+      <tr><td>Every rate with its count and a Wilson 95% interval</td><td>At about 30 cases per class, one case moves a rate by several points; Wilson's interval stays inside 0–100% on small samples</td><td><a href="https://doi.org/10.1080/01621459.1927.10502953">E. B. Wilson, Probable inference (1927)</a></td></tr>
+      <tr><td>Compare two configurations on the same cases with the exact McNemar test</td><td>It uses only the cases where the two disagree</td><td><a href="https://doi.org/10.1007/BF02295996">Q. McNemar, Note on the sampling error of the difference between correlated proportions (1947)</a></td></tr>
     </tbody>
   </table>
   </div>
@@ -356,7 +391,7 @@ section { display: grid; gap: 14px; }
   </div>
   <div class="tablewrap">
   <table>
-    <thead><tr><th>Configuration</th><th>Tier-0 rules (code)</th><th>Jev 1.14</th><th>Qwen3 235B</th><th>Claude Opus 5.5</th><th>Paid calls</th></tr></thead>
+    <thead><tr><th>Configuration</th><th>Tier-0 rules (code)</th><th>Jev 1.14</th><th>Qwen 3.6 27B</th><th>Claude Opus 5.5</th><th>Paid calls</th></tr></thead>
     <tbody>
       <tr><td class="mono">always_allow</td><td class="dash">–</td><td class="dash">–</td><td class="dash">–</td><td class="dash">–</td><td>none</td></tr>
       <tr><td class="mono">always_challenge</td><td class="dash">–</td><td class="dash">–</td><td class="dash">–</td><td class="dash">–</td><td>none</td></tr>
@@ -382,8 +417,8 @@ section { display: grid; gap: 14px; }
       <tr><td><span class="pill model t-model">Claude Haiku 5.5</span></td><td>Writes each case's invoice text and agent rationale</td><td>Claude Code subagents</td><td>The case's combination only: never its truth, category, label or the rules' lexicon</td></tr>
       <tr><td><span class="pill model t-model">Claude Sonnet 5.5</span></td><td>Labels every dev and test case, blind</td><td>Anthropic API, no tools offered</td><td>What the engine sees, plus the labelling guide; it cannot open a file</td></tr>
       <tr><td><span class="pill model t-model">Claude Opus 5.5</span></td><td>Strong tier under test</td><td>Anthropic API</td><td>The proposal and its context, with invoice text in marked untrusted blocks</td></tr>
-      <tr><td><span class="pill model t-model">Jev 1.14</span></td><td>Cheap typed-decision tier under test (TypeSafe)</td><td>OpenRouter; TypeSafe direct as the backup</td><td>The same as Opus</td></tr>
-      <tr><td><span class="pill model t-model">Qwen3 235B</span></td><td>Open-weight comparison arm, in Opus's place</td><td>OpenRouter</td><td>The same as Opus</td></tr>
+      <tr><td><span class="pill model t-model">Jev 1.14</span></td><td>Cheap tier under test: <a href="https://typesafe.ai/blog/introducing-system-one-models-and-jev">TypeSafe's typed decision model</a>, which answers fixed questions with probabilities instead of writing text</td><td><a href="https://openrouter.ai">OpenRouter</a>; TypeSafe direct as the backup</td><td>The same as Opus</td></tr>
+      <tr><td><span class="pill model t-model">Qwen 3.6 27B</span></td><td>Open-weight comparison arm, in Opus's place, as a business would run it on its own server</td><td><a href="https://docs.vllm.ai">vLLM</a>, an open-source model server, on one GPU we rent; <a href="https://huggingface.co/Qwen/Qwen3.6-27B-FP8">the weights</a> are Apache 2.0</td><td>The same as Opus, plus a note on what the business's confirmation records mean</td></tr>
       <tr><td><span class="pill assist t-assist">Claude, assisting the author</span></td><td>Drafts the labelling guide and the hard set's case files, which a person edits</td><td>Claude Code</td><td>The repository, never credentials</td></tr>
     </tbody>
   </table>
@@ -405,10 +440,10 @@ section { display: grid; gap: 14px; }
       </ul>
     </div>
     <div class="col you">
-      <h3 class="t-you">The hard set is the headline</h3>
+      <h3 class="t-you">The hard set checks the generator</h3>
       <ul>
-        <li>Generated cases resemble the rules' features<small>so the rules would look near-perfect on them</small></li>
-        <li>15–20 cases written by hand, outside the generator<small>unfamiliar impersonation, subtle injection, honest urgency</small></li>
+        <li>Generated cases resemble the rules' features<small>the rules caught every generated fraud, and 4 of 6 on the hard set</small></li>
+        <li>14 cases written outside the generator<small>drafted with Claude, labels approved by a person: unfamiliar impersonation, subtle injection, honest urgency</small></li>
       </ul>
     </div>
     <div class="col model">
@@ -417,6 +452,7 @@ section { display: grid; gap: 14px; }
         <li>The AI labeller never sees the truth<small>only what the engine sees, plus the guide</small></li>
         <li>A person labels 40 test cases blind<small>agreement reported as Cohen's κ with a 95% interval</small></li>
         <li>The person settles every disagreement<small>each case records where its label came from</small></li>
+        <li>The check came out weak<small>agreement was at chance level, and 60 of 100 test labels are the AI's alone</small></li>
       </ul>
     </div>
     <div class="col assist">
