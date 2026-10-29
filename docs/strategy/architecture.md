@@ -11,6 +11,13 @@ Since then (2026-10-28): Jev runs as a model tier through OpenRouter, with TypeS
 ([../decisions/0014-open-weight-arm.md](../decisions/0014-open-weight-arm.md)); the gateway also
 serves the case review page ([../decisions/0015-case-review-assistant.md](../decisions/0015-case-review-assistant.md)).
 
+Since then (2026-10-29): the open-weight arm runs Qwen 3.6 27B on one rented GPU through vLLM
+([../decisions/0018-self-hosted-open-weight-arm.md](../decisions/0018-self-hosted-open-weight-arm.md));
+the AI labeller runs through the Anthropic API with no tools rather than as a Claude Code subagent
+(case wording is still written by subagents, row 7); and no model runs when tier 0's floor is
+already high ([../decisions/0017-no-model-on-a-high-floor.md](../decisions/0017-no-model-on-a-high-floor.md)).
+The price of each design choice as the code stands is in [Design trade-offs](#design-trade-offs).
+
 The hackathon credits ($25 Supabase, $25 Apify) are resources, not requirements. Each choice below
 is made on what the demo, the judges and the reproduction need; where a credit fits, it says so.
 
@@ -29,11 +36,13 @@ flowchart LR
     SEED[("Rho stand-in · SQLite from data/seed/<br/>synthetic, in Rho's shapes")]
     UI["Evidence view<br/>served by the gateway"]
     EVAL["Evaluation CLI<br/>eval/run.py · report"]
+    CHK["Staging check<br/>scripts/staging_check.py"]
   end
 
   subgraph External["External services"]
     ANT["Anthropic API<br/>claude-opus-5-5 strong tier"]
-    JEV["TypeSafe Jev<br/>cheap tier (extension)"]
+    JEV["Jev, cheap tier<br/>OpenRouter; TypeSafe as backup"]
+    GPU["Rented GPU · vLLM<br/>open-weight arm, evaluation only"]
     RHO["Rho staging API<br/>read-only, over VPN"]
   end
 
@@ -46,22 +55,23 @@ flowchart LR
   A2 -- signed propose_payment --> GW
   GW <--> DB
   GW -- reads --> SEED
-  GW -. live read, demo only .-> RHO
+  CHK -. GET only, over VPN .-> RHO
   GW -- escalated cases only --> ANT
-  GW -. extension .-> JEV
+  GW -. jev configuration .-> JEV
+  GW -. open_weight configuration .-> GPU
   UI --> GW
   EVAL -- in-process Engine --> GW
   EVAL -- report.json, recorded scenario results --> REPO
   REPO -- deploys site/ --> SITE
 ```
 
-Solid lines run in the first version; dotted lines are optional or extensions. Everything that moves
+Solid lines run in every configuration; dotted lines run only in some configurations or on request. Everything that moves
 money (simulated) or holds a secret stays on the laptop: the gateway, its keys, the Rho token and the
 Anthropic key.
 
 ## Components and choices
 
-Each row with a real alternative has a tradeoff below. "Settled" means an earlier decision already
+Each row with a real alternative has a trade-off below. "Settled" means an earlier decision already
 chose it.
 
 | # | Component | Choice | Status |
@@ -178,6 +188,87 @@ push. **Chosen:** added.
 | Site hosting and CI | $0 on free plans |
 | Supabase | $0 unless a hosted gateway is added; the credit would cover it |
 | Apify | Not used: nothing in the design needs web scraping |
+
+## Design trade-offs
+
+Added 2026-10-29. The product's main design choices, each with what it buys, what it costs and what
+would reopen it. The decision records give the reasons; this section is the price of each choice as
+the code stands. Where a number is a convention rather than an estimate, it says so.
+
+### Product and integration
+
+| Choice | What it buys | What it costs | Reopen when |
+| --- | --- | --- | --- |
+| One action, `propose_payment`, on business payables (0005) | A small authorization and a clear set of scenarios | The steps that create a vendor or change its bank details are not checked themselves; only their effect on a payment is | A customer shows where a fraudulent instruction first becomes a record a control could stop |
+| Identity, authorization and risk kept as separate answers (0001, 0006) | A model can't repair a failed authorization; a reviewer sees which question failed and what would resolve it | More to read than one score | Kept even if a platform supplies identity or authorization itself |
+| A gateway that alone holds the execution credentials (0003) | Enforcement that doesn't depend on the agent obeying anything | Covers only payments routed through it; a real deployment needs an integration that closes every other route. An advisory risk API would be easier to adopt but couldn't stop a payment | A platform offers a pre-execution hook |
+| Simulated execution on synthetic records (0002) | Reproducible by anyone, no real money, no raw staging data in the repo | Shows behaviour on constructed cases, not fraud caught in operation; real execution also needs idempotency, lost-response handling and reconciliation | A sandbox with real writes, then a shadow-mode pilot |
+| The agent states payee, method and amount even when it names a bill (0005) | Any disagreement with the bill is visible; money is integer minor units, compared only in one currency | Instalments, partial payments, credits and amended bills look like mismatches | Those payment shapes are in scope |
+
+### Identity and authority
+
+| Choice | What it buys | What it costs | Reopen when |
+| --- | --- | --- | --- |
+| Ed25519-signed requests from registered agent keys (0006) | Integrity and replay protection that can be shown and tested | Proves possession of a registered key, not that the software was uncompromised or that a person intended the payment; a stolen key acts as the agent. The ±5-minute timestamp window is a convention | Key rotation, compromise recovery and a standard credential issuer are needed |
+| A small JSON authorization checked in code (0006) | A model can't reinterpret a limit; the authorization is copied into every record | Fields the checker doesn't know are kept but not enforced, which could look like enforcement | Several administrators or composed policies make a hand-written checker hard to reason about |
+| Rolling limits that count held payments (0010) | Splitting a payment under the per-payment cap doesn't work, and concurrent holds can't share the same allowance | An abandoned hold keeps using allowance; limits are per agent, so several agents, or several payee records for one bank account, each get their own | Multi-agent or business-wide budgets are needed |
+| Recheck the state when a person approves a held payment (0010) | Revocation or a changed payment method after the hold blocks the approval | A local recheck can't make a remote transfer atomic | Real execution exists |
+| One shared admin token for approvals and findings (0010, 0013) | Agents are kept out of approval and registration with minimal setup | Holding the token doesn't prove who the person is; the `by` name is attribution, not authentication | Before any pilot, especially for trusting new destinations and unblocking accounts |
+
+### Risk assessment
+
+| Choice | What it buys | What it costs | Reopen when |
+| --- | --- | --- | --- |
+| Deterministic rules first; a model only on uncertain cases (0007, 0009) | Routine payments cost nothing and take milliseconds | The rules decide what a model never sees: an attack that trips no rule is allowed unread. On the `hard` set, two detectable frauds went through that way under every configuration that escalates; only a model on every payment caught them | Missed fraud among cases never escalated is measured on representative data |
+| Hard flags set a floor no model can lower (0007, 0010) | A persuasive document can't clear a recent bank change or a bill mismatch | A floor is a policy on imperfect evidence, not proof. The instruction lexicon includes "urgent" and "immediately", so an honest urgent invoice always waits for a person, though the labelling guide would allow it when everything else fits | Floor-caused challenges are counted apart from model mistakes |
+| Above the floor, the latest tier that ran decides (0007) | A model can clear false alarms, which is most of what the models did on `test` | A later model isn't independent evidence; both of Opus's `test` misses were lowerings of a soft signal | Lowerings on fraud cases are audited on representative data |
+| Jev or no cheap tier; no small general-purpose model in between (0009) | A typed contract and one comparison arm | A product preference, not a measured result: the 0.8 and 0.9 thresholds are conventions and Jev's calibration is unmeasured, and an open-weight 27B model did well on `test` | Calibration, cost and latency are measured on this task |
+| An open-weight model in Opus's place, with a section of its own (0014, 0019) | Shows what a model a business could host itself does at the same job | The two arms no longer read the same prompt, and the section was written from `dev` errors | Opus is run with the same section |
+| No model when tier 0's floor is already high (0016, 0017) | Spend only where a model could change the risk level | Such records carry no model rationale, and a model can no longer turn a held high-risk payment into a block. Under `jev`, Jev still runs on a high floor, so `jev` and `engineered` differ in configuration as well as model | Review effort, not only model spend, is measured |
+| A required model that fails holds the payment (0010) | Breaking or confusing the model never buys an allow | An outage, or input crafted to trigger refusals, adds review work, and review capacity is finite | Outage behaviour, queue limits and expiry of held payments are defined |
+| Reuse a risk result for 24 hours; at most three fresh model assessments per agent, payee and method (0010) | Resubmitting until a model says yes doesn't work | "The same proposal" is defined by its fields; other agents or payee aliases aren't covered, and reuse doesn't ensure an obligation is paid only once. 24 hours and three are conventions | Retries across agents and aliases are threat-modelled |
+
+The thresholds are conventions chosen for direction, not estimated optima:
+
+| Convention | Why its direction makes sense | What is not established |
+| --- | --- | --- |
+| A bank change within 30 days is recent; so is a payee created within 30 days | Fresh changes deserve attention | That day 30 is the right cut-off |
+| An amount outside 0.5–2 times the vendor's median is unusual | Large deviations can mark anomalies | That one band suits every vendor and billing pattern. The labelling guide treats exactly half the median as unusual, while tier 0's band includes 0.5 |
+| A duplicate is the same amount to the payee within 7 days | Close repeats can be duplicates | That repeats outside it are harmless |
+| The labelling guide accepts an old unconfirmed change after three settled payments linked to it | Payments to the same destination are better evidence than vendor age | That three is enough, or that a settled payment proves the right beneficiary |
+| A confirmed bank change is trusted for 90 days; a blocked payment method never expires | Trust shouldn't last forever; a known bad destination shouldn't quietly return | That 90 days matches the risk, or that indefinite blocks without review are workable |
+
+### Review and feedback
+
+| Choice | What it buys | What it costs | Reopen when |
+| --- | --- | --- | --- |
+| One challenge type, `confirm` (0008) | A resolvable hold instead of a forced allow or block | Confirming the payer doesn't verify new supplier bank details; a challenge is an intervention, not a caught fraud | `verify_payee` and `renew_authorization` exist, with review time and wrong approvals measured |
+| "Verified" means a person recorded one of four recognised methods (0012) | A complaint alone never becomes a label; every finding has provenance | The gateway records the person's statement, not the call-back or bank check itself, or the person's authority | Each method states what it establishes and carries its artifact |
+| Findings turn into risk adjustments automatically (0013) | The loop closes without a model writing labels, scoped to one business and revocable | A `manipulated_agent` finding blocks the payment method as `payee_fraud` does, though an injected instruction can make an unwanted payment to the real vendor; a `legitimate` finding on a recent-change case trusts that change without saying the change itself was checked | Before the loop is shown as a general learning mechanism; until then, demonstrate it on an explicitly verified destination |
+| Append-only records (0012, 0013) | Every decision can be traced to the finding behind it | Not proof against whoever controls the database, and not proof the original records were true | A pilot needs retention, correction and tamper evidence |
+| A case review assistant with no verdict field; a local chat model (0015) | Evidence gathered by code, researched and summarised for a person, who decides | A fluent summary can still sway a reviewer; a cited source may not support the claim; the research and assembly calls go to Anthropic, and the chat stays local only while `CHAT_BASE_URL` points at the laptop | Its effect on review quality is measured |
+
+### Implementation and evaluation
+
+| Choice | What it buys | What it costs | Reopen when |
+| --- | --- | --- | --- |
+| Python, FastAPI, SQLite, one process (0005, 0011) | Few moving parts and a one-command reproduction | The gateway handles one request at a time under a lock, model calls included; no throughput or tail-latency claim | A load target exists |
+| Two labels per case, truth and the decision the evidence supports ([evaluation.md](evaluation.md)) | Hindsight can't pass for detection; undetectable frauds are listed by name | Acceptable alternatives need fixed reasons, not ones added after seeing a model's answer | – |
+| Synthetic `dev` and `test` from one generator, and a `hard` set written outside it | Reproducible, and labelled before scoring | A new seed doesn't remove a shared template; `hard` is small and drafted with AI help | Representative labelled data exists |
+| The `unneeded_challenges` count in `GET /v1/stats` | A visible cost of friction | It counts every challenged payment later found legitimate, which doesn't mean the challenge was wrong given what was known at the time | Workload and justified-at-the-time disagreement are reported apart |
+| Critical damping as the design metaphor (0004, 0008) | A memorable way to say "match the control to the risk" | Nothing here estimates ζ; the measures are detection, review burden, cost and latency | – |
+
+### Why not a trained fraud model
+
+There is no evidence here that language models beat a tree-based or other trained fraud model.
+This build has no representative labelled payment history to train or validate one on, and its
+cases turn on instructions and explanations in documents, so it uses deterministic permission
+checks, auditable rule features and a pretrained model on selected cases. Trees are strong on
+structured data in published benchmarks ([Grinsztajn et al., NeurIPS 2022](https://papers.nips.cc/paper_files/paper/2022/hash/0378c7692da36807bdec87ab043cdadc-Abstract.html)),
+which is a reason to include one as a baseline when data exists, not a result about this domain. A
+fair comparison would give each system the same information at decision time, split by time and
+by vendor, and compare at the same review workload. A trained model would replace or add to the
+risk tier; it would never decide whether to honour a revoked authorization.
 
 ## Later
 
