@@ -3,7 +3,7 @@ requests, a subagent writes the text, `assemble` turns combinations plus wording
 
     python -m eval.generate combos dev [--seed 7]
     python -m eval.generate assemble dev
-    python -m eval.generate freeze test     # or hard, the hand-written set
+    python -m eval.generate freeze test     # or hard, the set written outside the generator
 
 Per set, under data/eval/<set>/:
     combos.jsonl                 the sampled combinations, with truth and category by construction
@@ -107,7 +107,7 @@ def truth_of(c: dict) -> str:
 def detectable(c: dict) -> bool:
     """Every generated combination leaves a trace tier 0 sees: a fraud here always involves a bill for
     another payee or a payment-method change, and tier 0 flags any change, even an old one. A case
-    with no observable trace is written by hand, in the hard set, and marked there."""
+    with no observable trace is written outside the generator, in the hard set, and marked there."""
     return True
 
 

@@ -1,15 +1,17 @@
-"""The open-weight comparison tier: an open-weight model in the strong tier's place (decision 0009).
+"""The open-weight comparison tier: an open-weight model in the strong tier's place (decisions 0014,
+0018 and 0019).
 
 It gets the strong tier's system prompt, plus a section on what the business's confirmation records
 mean, and its rendered request (gateway facts, then untrusted text in bounded blocks), and must
-answer the same schema, through any OpenAI-compatible chat API: OpenRouter
-by default, or another provider by setting OPEN_WEIGHT_BASE_URL. The answer is handled exactly as
-the strong tier's: evidence kept only where the request named it, the level at least the worst
-signal, and its self-reported confidence never used.
+answer the same schema, through any OpenAI-compatible chat API: OpenRouter with DEFAULT_MODEL by
+default, or another server by setting OPEN_WEIGHT_BASE_URL and OPEN_WEIGHT_MODEL. The evaluation
+points it at a vLLM server running Qwen 3.6 27B on a rented GPU (decision 0018). The answer is
+handled exactly as the strong tier's: evidence kept only where the request named it, the level at
+least the worst signal, and its self-reported confidence never used.
 
 `OpenWeightTier.assess` never raises: a missing key, an HTTP error, a refusal, a truncated or
-invalid answer comes back as `result.error`, which the policy challenges. The model id, prices and
-the provider's support for JSON output are unverified until the first live call.
+invalid answer comes back as `result.error`, which the policy challenges. A model with neither
+OPEN_WEIGHT_GPU_HOURLY nor OPEN_WEIGHT_PRICES is listed as unpriced, never as free.
 """
 
 import json

@@ -1,5 +1,5 @@
-"""The cheap risk tier: TypeSafe's Jev, a typed decision model with calibrated probabilities
-(decisions 0007, 0009; docs/reference/jev.md).
+"""The cheap risk tier: TypeSafe's Jev, a typed decision model whose probabilities its maker calls
+calibrated; that is not measured on our cases (decisions 0007, 0009; docs/reference/jev.md).
 
 Jev gets a `state` string and typed questions and answers each with a probability. The state is a
 compact rendering (decision 0007): the gateway facts and tier-0 checks as short sentences, then the
@@ -9,9 +9,8 @@ nearly every case high; the measurements are in docs/reference/dev-tuning.md.
 
 It is reached through OpenRouter's decisions endpoint by default and TypeSafe's own API when
 OpenRouter can't be reached; the result names the route that answered. The request and response
-shapes are unverified until the first real call on each route: the request follows the most
-consistent shape in the reference doc, and `_answers` accepts the shapes sources describe. Anything
-else is invalid output. `JevTier.assess` never raises: a missing key, an HTTP error, a
+shapes are those confirmed by live calls on both routes (docs/reference/jev.md), and `_answers`
+accepts the shapes sources describe. Anything else is invalid output. `JevTier.assess` never raises: a missing key, an HTTP error, a
 timeout or an answer it can't read comes back as `result.error`, which the policy challenges.
 
 Like the strong tier, the level is at least the most severe finding, so a "low" risk_level can't
