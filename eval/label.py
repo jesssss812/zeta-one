@@ -76,8 +76,6 @@ def seed_context(setup: list[SetupOp], proposal: Proposal) -> dict:
     from zeta_one.rho.snapshot import Store
     from zeta_one.rho.view import context_for
 
-    from datetime import timedelta
-
     from eval.cases import EVAL_OPS, confirmed_change
 
     with Store() as store:
@@ -85,8 +83,9 @@ def seed_context(setup: list[SetupOp], proposal: Proposal) -> dict:
             if op.op not in EVAL_OPS:
                 mutations.apply(store, op)
         context = context_for(store)(proposal, mutations.BUSINESS, SEED_NOW)
-        if any(op.op == "confirm_method_change" for op in setup):
-            confirmation = confirmed_change(store, proposal, mutations.BUSINESS, SEED_NOW - timedelta(minutes=1))
+        confirm = next((op for op in setup if op.op == "confirm_method_change"), None)
+        if confirm:
+            confirmation = confirmed_change(store, proposal, mutations.BUSINESS, SEED_NOW, confirm.args)
             # As the gateway would show it: the business's active adjustments that bear on the payee.
             context = context.model_copy(update={"adjustments": [confirmation] if confirmation else []})
     return context.model_dump(mode="json")

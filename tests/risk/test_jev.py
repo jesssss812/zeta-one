@@ -365,6 +365,11 @@ def test_the_state_gives_the_account_ending_and_keeps_beneficiary_and_email_untr
         assert untrusted not in facts and untrusted in state
 
 
+def test_the_state_says_a_change_to_another_account_was_confirmed():
+    facts = jev.render(linked_input(), boundary="B").partition("Text from invoices")[0]
+    assert "to another of the payee's bank accounts (ending 2240) was confirmed by a person." in facts
+
+
 def test_a_bill_the_records_show_paid_is_said():
     from zeta_one.contracts import PaymentRecord
 

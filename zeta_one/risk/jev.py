@@ -240,6 +240,13 @@ def render(risk_input: RiskInput, boundary: str | None = None) -> str:
                          f"{use.first_at.date()} to {use.last_at.date()}{since}.")
         else:
             facts.append("- None of the settled payments the records link to a bank account went to this one.")
+    for change in context.payment_method_history:
+        if change.method_id != proposal.payment_method_id and any(
+                a.kind == "confirmed_method_change" and a.subject == change.id for a in context.adjustments):
+            other = next((m for m in payee.payment_methods if m.id == change.method_id), None)
+            ending = f" (ending {other.account_ending})" if other and other.account_ending else ""
+            facts.append(f"- A change on {change.changed_at.date()} to another of the payee's bank "
+                         f"accounts{ending} was confirmed by a person.")
     others = [other for other in context.open_bills if not bill or other.id != bill.id]
     if others:
         facts.append(f"- The payee has {len(others)} other open bill(s).")

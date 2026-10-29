@@ -166,10 +166,10 @@ class RealBackend:
             gateway = Gateway(stages=stages, ledger=ledger, reuse=RiskReuse(connection), clock=lambda: SEED_NOW,
                               version=self._version)
             if "confirm_method_change" in ops:
-                confirmation = hand_cases.confirmed_change(store, case.proposal, business_id,
-                                                           SEED_NOW - timedelta(minutes=1))
+                confirmation = hand_cases.confirmed_change(store, case.proposal, business_id, SEED_NOW,
+                                                           ops["confirm_method_change"].args)
                 if confirmation is None:
-                    raise Unsupported("confirm_method_change needs a change to the proposal's payment method")
+                    raise Unsupported("confirm_method_change needs a change to that payment method")
                 gateway.adjustments.append(confirmation)
 
             body = case.proposal.model_dump_json().encode()

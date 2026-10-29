@@ -29,18 +29,23 @@ def risk_input(name: str = "invoice_redirect_instructions") -> RiskInput:
 
 def linked_input() -> RiskInput:
     """The routine payment, with the records saying where past payments went after a change to its method,
-    the method's ending and beneficiary, and the payee's email."""
+    the method's ending and beneficiary, the payee's email, and a confirmed change to another method
+    before that unconfirmed one."""
     from datetime import timedelta
 
-    from zeta_one.contracts import MethodUse, PaymentMethodChange
+    from zeta_one.contracts import MethodUse, PaymentMethodChange, PaymentMethodView, RiskAdjustment
 
     ri = risk_input("routine_bill_payment")
     context, now = ri.context, ri.context.payment_history.last_at
     method = context.counterparty.payment_methods[0]
     method.account_ending, method.beneficiary_name = "4821", "Alder Receivables"
     context.counterparty.email = "accounts@alder-mechanical.example"
+    context.counterparty.payment_methods.append(PaymentMethodView(id="pm_earlier", type="ach", account_ending="2240"))
     context.payment_method_history = [
+        PaymentMethodChange(id="pmh_1", method_id="pm_earlier", change="added_as_default", changed_at=now - timedelta(days=50)),
         PaymentMethodChange(id="pmh_2", method_id=method.id, change="added_as_default", changed_at=now - timedelta(days=20))]
+    context.adjustments = [RiskAdjustment(adjustment_id="adj_1", business_id=context.business.id,
+                                          kind="confirmed_method_change", subject="pmh_1", by="reviewer", at=now)]
     for record in context.payment_history.recent:
         record.payment_method_id = method.id
     context.payment_history.by_method = [MethodUse(payment_method_id=method.id, count=6, since_latest_change=2,
@@ -306,10 +311,16 @@ def test_the_account_ending_is_a_fact_and_beneficiary_and_email_are_untrusted():
         assert f'field="{field}"' in text and untrusted in text
 
 
+def test_a_change_carries_the_confirmation_that_covers_it():
+    facts = _facts(claude.render(linked_input(), boundary="B"))
+    assert [change.get("confirmed_by") for change in facts["payment_method_history"]] == [["adj_1"], None]
+    assert "adj_1" in claude.known_ids(linked_input())
+
+
 def test_records_without_these_details_render_as_before():
     facts = _facts(claude.render(risk_input("routine_bill_payment"), boundary="B"))
     assert all("payment_method_id" not in record for record in facts["payment_history"]["recent"])
-    for key in ("by_payment_method", "paid_by", "account_ending"):
+    for key in ("by_payment_method", "paid_by", "account_ending", "confirmed_by"):
         assert f'"{key}"' not in json.dumps(facts)
 
 

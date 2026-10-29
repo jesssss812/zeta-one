@@ -202,6 +202,7 @@ def known_ids(risk_input: RiskInput) -> set[str]:
     ids.update(change.id for change in context.payment_method_history)
     ids.update(record.id for record in context.payment_history.recent)
     ids.update(bill.id for bill in context.open_bills)
+    ids.update(adjustment.adjustment_id for adjustment in context.adjustments)
     if context.bill:
         ids.update({context.bill.id, context.bill.counterparty_id})
         if context.bill.paid_by:
@@ -244,11 +245,7 @@ def _split(risk_input: RiskInput) -> tuple[dict[str, Any], list[tuple[str, str, 
         "business_id": context.business.id,
         "counterparty": _counterparty(context.counterparty, "counterparty", text),
         "payment_history": _history(context.payment_history),
-        "payment_method_history": [
-            {"id": change.id, "method_id": change.method_id, "change": change.change,
-             "changed_at": change.changed_at.isoformat()}
-            for change in context.payment_method_history
-        ],
+        "payment_method_history": [_change(change, context.adjustments) for change in context.payment_method_history],
         "bill": _bill(context.bill, "bill", text) if context.bill else None,
         "open_bills": [_bill(bill, f"open_bills[{i}]", text) for i, bill in enumerate(context.open_bills)],
         "tier0": {
@@ -278,6 +275,15 @@ def _counterparty(counterparty, field: str, text) -> dict[str, Any]:
         methods.append(view)
     return {"id": counterparty.id, "status": counterparty.status, "created_at": counterparty.created_at.isoformat(),
             "payment_methods": methods}
+
+
+def _change(change, adjustments) -> dict[str, Any]:
+    view = {"id": change.id, "method_id": change.method_id, "change": change.change,
+            "changed_at": change.changed_at.isoformat()}
+    confirmed = [a.adjustment_id for a in adjustments if a.kind == "confirmed_method_change" and a.subject == change.id]
+    if confirmed:
+        view["confirmed_by"] = confirmed
+    return view
 
 
 def _bill(bill, field: str, text) -> dict[str, Any]:

@@ -213,3 +213,21 @@ def test_a_reviewer_confirmed_change_is_not_a_floor_and_an_unconfirmed_one_is(ba
     assert "payment_method_changed_days_ago" in floor_u.flags
     assert risk_c.floor is None or "payment_method_changed_days_ago" not in risk_c.floor.flags
     assert risk_c.adjustments and risk_c.adjustments[0].startswith("adj_setup_")
+
+
+def test_a_confirmation_of_an_earlier_change_does_not_confirm_a_later_one(backend):
+    from zeta_one.contracts import SetupOp
+    base = next(c for c in cases.all_cases() if c.id == "demo_routine_bill")
+    setup = [SetupOp(op="change_payment_method", args={"counterparty_id": "cp_0012", "days_ago": 50,
+                                                        "new_method_id": "pm_confirmed"}),
+             SetupOp(op="confirm_method_change", args={"method_id": "pm_confirmed", "days_ago": 50}),
+             SetupOp(op="change_payment_method", args={"counterparty_id": "cp_0012", "days_ago": 1,
+                                                        "new_method_id": "pm_latest"})]
+    case = base.model_copy(update={"id": "scoped", "setup": setup,
+                                   "proposal": base.proposal.model_copy(update={"payment_method_id": "pm_latest"})})
+    result = backend.run(case, run.CONFIGS["rules"])
+    assert "payment_method_changed_days_ago" in result.record.risk.floor.flags
+    assert result.record.risk.features["payment_method_change_confirmed"].value is False
+    confirmation = result.record.context.adjustments[0]
+    assert confirmation.subject == result.record.context.payment_method_history[0].id
+    assert (result.record.context.payment_method_history[0].changed_at - confirmation.at).days == 0

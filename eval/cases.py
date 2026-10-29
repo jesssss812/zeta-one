@@ -20,7 +20,7 @@ and ledger of the gateway it builds for each case:
 | `add_spend` | `amount`, `currency`, `days_ago`: an executed payment by the agent, for the rolling limit |
 | `fail_model` | none: the strong tier errors on every call |
 | `repeat` | `times`: send the same proposal this many times, each signed afresh |
-| `confirm_method_change` | none: a person at the business verified the latest change to the proposal's payment method earlier, recorded as a `confirmed_method_change` risk adjustment (decision 0013) |
+| `confirm_method_change` | optional `method_id` (default the proposal's) and `days_ago` (default a minute before the decision): a person at the business verified the latest change to that payment method, recorded as a `confirmed_method_change` risk adjustment (decision 0013) |
 | `after:agent_resolves_own_challenge` | none: after the decision, the agent signs a resolve of its own challenge |
 | `after:revoke_then_approve` | none: after the decision, revoke the grant, then an admin approves the held payment |
 
@@ -46,15 +46,19 @@ EVAL_OPS = frozenset(
 )
 
 
-def confirmed_change(store, proposal: Proposal, business_id: str, at):
-    """The `confirm_method_change` op's adjustment: the latest change to the proposal's payment method,
-    confirmed by the business's reviewer at `at`. None if the method has no change."""
+def confirmed_change(store, proposal: Proposal, business_id: str, now, args: dict | None = None):
+    """The `confirm_method_change` op's adjustment: the latest change to `args["method_id"]` (default
+    the proposal's payment method), confirmed by the business's reviewer `args["days_ago"]` days
+    before `now` (default a minute before). None if the method has no change."""
     from datetime import timedelta
 
     from zeta_one.contracts import RiskAdjustment
     from zeta_one.gateway.adjustments import CONFIRMATION_DAYS
 
-    changes = [row for row in store.all("method_history") if row.get("method_id") == proposal.payment_method_id]
+    args = args or {}
+    method_id = args.get("method_id", proposal.payment_method_id)
+    at = now - (timedelta(days=args["days_ago"]) if "days_ago" in args else timedelta(minutes=1))
+    changes = [row for row in store.all("method_history") if row.get("method_id") == method_id]
     if not changes:
         return None
     latest = max(changes, key=lambda row: row["changed_at"])
