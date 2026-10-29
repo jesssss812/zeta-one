@@ -30,10 +30,11 @@ MAX_TOKENS = 4096
 # Without reported usage the input is estimated high, so spend is never undercounted.
 CHARS_PER_TOKEN_ESTIMATE = 2
 
+ANSWER_SCHEMA = claude.StrongAnswer.model_json_schema()
 SYSTEM_PROMPT = (
     claude.SYSTEM_PROMPT
     + "\n\n## Output format\n\nReply with one JSON object and nothing else, matching this JSON schema:\n\n"
-    + json.dumps(claude.StrongAnswer.model_json_schema(), indent=1)
+    + json.dumps(ANSWER_SCHEMA, indent=1)
 )
 
 
@@ -73,7 +74,11 @@ class OpenWeightTier:
         body = {
             "model": self.model,
             "messages": [{"role": "system", "content": SYSTEM_PROMPT}, {"role": "user", "content": user}],
-            "response_format": {"type": "json_object"},
+            # The answer's schema is enforced while decoding, where the server supports it, and the
+            # model answers directly: Qwen-style chat templates otherwise think first.
+            "response_format": {"type": "json_schema",
+                                "json_schema": {"name": "risk_answer", "schema": ANSWER_SCHEMA}},
+            "chat_template_kwargs": {"enable_thinking": False},
             "max_tokens": MAX_TOKENS,
             "temperature": 0,
         }

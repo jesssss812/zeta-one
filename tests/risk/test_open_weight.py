@@ -52,6 +52,14 @@ def test_the_request_is_the_strong_tiers_prompt_and_rendering_with_the_schema():
     assert "<untrusted_data boundary=" in user["content"] and body["temperature"] == 0
 
 
+def test_the_request_enforces_the_answer_schema_and_asks_for_no_thinking():
+    _, calls = run(reply(answer()))
+    body = calls[0][2]
+    assert body["response_format"] == {"type": "json_schema", "json_schema": {
+        "name": "risk_answer", "schema": claude.StrongAnswer.model_json_schema()}}
+    assert body["chat_template_kwargs"] == {"enable_thinking": False}
+
+
 def test_a_fenced_answer_is_read():
     output, _ = run(reply("```json\n" + answer() + "\n```"))
     assert output.result.error is None and output.result.level == "high"
