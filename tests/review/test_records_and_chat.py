@@ -191,8 +191,50 @@ def test_a_failing_remote_server_says_what_failed_without_the_key(world, monkeyp
     assert client.get(f"/v1/cases/{case['case_id']}/chat", headers=ADMIN).json() == []
 
 
-def test_the_chat_gives_up_before_the_gpu_proxy_cuts_the_request():
-    assert chat.TIMEOUT_SECONDS < 100
+class Httpx:
+    """Stands in for httpx.post, below the chat's own HTTP helper."""
+
+    def __init__(self, response):
+        self.response, self.calls = response, []
+
+    def __call__(self, url, headers, json, timeout):
+        self.calls.append({"url": url, "headers": headers, "json": json, "timeout": timeout})
+        return self.response
+
+
+ANSWER = {"choices": [{"finish_reason": "stop", "message": {"content": "See dec_chat."}}]}
+
+
+def _ask_through_httpx(world, monkeypatch, response):
+    client, gateway = world
+    case = _case(world)
+    fake = Httpx(response)
+    monkeypatch.setattr(chat.httpx, "post", fake)
+    gateway.chat = CaseChat(gateway.ledger.connection)
+    reply = client.post(f"/v1/cases/{case['case_id']}/chat", json={"question": "hi", "by": "cw"}, headers=ADMIN)
+    return reply, fake.calls
+
+
+def test_a_local_server_gets_no_key_and_the_longer_timeout(world, monkeypatch):
+    reply, calls = _ask_through_httpx(world, monkeypatch, httpx.Response(200, json=ANSWER))
+    assert reply.status_code == 200 and reply.json()["cited"] == ["dec_chat"]
+    assert calls[0]["headers"] == {} and calls[0]["timeout"] == chat.LOCAL_TIMEOUT_SECONDS
+    assert calls[0]["json"]["chat_template_kwargs"] == {"enable_thinking": False}
+
+
+def test_a_remote_server_gets_the_key_and_gives_up_sooner(world, monkeypatch):
+    monkeypatch.setenv("CHAT_BASE_URL", REMOTE)
+    monkeypatch.setenv("CHAT_API_KEY", "test-chat-key")
+    reply, calls = _ask_through_httpx(world, monkeypatch, httpx.Response(200, json=ANSWER))
+    assert reply.status_code == 200 and calls[0]["url"] == REMOTE + "/chat/completions"
+    assert calls[0]["headers"] == {"Authorization": "Bearer test-chat-key"}
+    assert calls[0]["timeout"] == chat.REMOTE_TIMEOUT_SECONDS < chat.LOCAL_TIMEOUT_SECONDS
+
+
+@pytest.mark.parametrize("status, words", [(502, "HTTP 502"), (200, "had no text")])
+def test_a_reply_that_is_not_json_is_unavailable(world, monkeypatch, status, words):
+    reply, _ = _ask_through_httpx(world, monkeypatch, httpx.Response(status, text="<html>Bad gateway</html>"))
+    assert reply.status_code == 503 and words in reply.json()["error"]["message"]
 
 
 def test_the_chat_needs_the_token_and_a_known_case(world):

@@ -22,8 +22,10 @@ from zeta_one.settings import setting
 
 DEFAULT_BASE_URL = "http://127.0.0.1:11434/v1"
 DEFAULT_MODEL = "qwen2.5:7b"
-# Under the 100 s RunPod's proxy allows a request, so a slow answer ends here with a clear message.
-TIMEOUT_SECONDS = 90.0
+LOCAL_TIMEOUT_SECONDS = 120.0
+# RunPod's proxy cuts any request at 100 s; a remote call gives up first, so a slow answer ends with
+# a clear message.
+REMOTE_TIMEOUT_SECONDS = 90.0
 MAX_TOKENS = 1024
 MAX_HISTORY = 6
 LOCAL_HOSTS = {"127.0.0.1", "localhost", "::1"}
@@ -59,10 +61,11 @@ class CaseChat:
     def __init__(self, connection: sqlite3.Connection, post: Any = None):
         self._db = connection
         self._db.executescript(SCHEMA)
-        self._post = post or _http_post
         self.base_url = (setting("CHAT_BASE_URL") or DEFAULT_BASE_URL).rstrip("/")
         self.model = setting("CHAT_MODEL") or DEFAULT_MODEL
         self.local = urlparse(self.base_url).hostname in LOCAL_HOSTS
+        timeout = LOCAL_TIMEOUT_SECONDS if self.local else REMOTE_TIMEOUT_SECONDS
+        self._post = post or (lambda url, headers, body: _http_post(url, headers, body, timeout))
 
     def ask(self, case: dict[str, Any], question: str, by: str, now: datetime) -> dict[str, Any]:
         """The answer, with the ids it cited checked against the case. Raises ChatUnavailable when the
@@ -122,8 +125,8 @@ class CaseChat:
         return [{"at": r[0], "by": r[1], "question": r[2], "answer": r[3]} for r in rows]
 
 
-def _http_post(url: str, headers: dict[str, str], body: dict) -> tuple[int, Any]:
-    response = httpx.post(url, headers=headers, json=body, timeout=TIMEOUT_SECONDS)
+def _http_post(url: str, headers: dict[str, str], body: dict, timeout: float) -> tuple[int, Any]:
+    response = httpx.post(url, headers=headers, json=body, timeout=timeout)
     try:
         return response.status_code, response.json()
     except ValueError:
