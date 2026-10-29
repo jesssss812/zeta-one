@@ -194,3 +194,12 @@ def test_a_confirmed_change_is_a_reviewer_confirmation_not_a_seed_note(tmp_path)
         confirmed = any(op["op"] == "confirm_method_change" for op in ops)
         assert confirmed is (row["dimensions"]["change_verified"] == "yes"), row["dimensions"]
         assert not any("verified_with_vendor" in op["args"] for op in ops)
+
+
+def test_the_hard_set_can_be_frozen_but_not_generated(monkeypatch):
+    frozen = []
+    monkeypatch.setattr(generate.sets, "freeze", lambda name, **kwargs: frozen.append(name) or "digest")
+    assert generate.main(["freeze", "hard"]) == 0 and frozen == ["hard"]
+    for command in ("combos", "assemble"):
+        with pytest.raises(SystemExit):
+            generate.main([command, "hard"])

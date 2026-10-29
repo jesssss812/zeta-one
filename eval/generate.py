@@ -3,7 +3,7 @@ requests, a subagent writes the text, `assemble` turns combinations plus wording
 
     python -m eval.generate combos dev [--seed 7]
     python -m eval.generate assemble dev
-    python -m eval.generate freeze test
+    python -m eval.generate freeze test     # or hard, the hand-written set
 
 Per set, under data/eval/<set>/:
     combos.jsonl                 the sampled combinations, with truth and category by construction
@@ -298,11 +298,13 @@ def assemble(set_name: str, data: Path = sets.DATA) -> list[dict]:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("command", choices=["combos", "assemble", "freeze"])
-    parser.add_argument("set", choices=["dev", "test"])
+    parser.add_argument("set", choices=["dev", "test", "hard"])
     parser.add_argument("--seed", type=int)
     parser.add_argument("--force", action="store_true", help="freeze: re-freeze a frozen set (needs --note)")
     parser.add_argument("--note", help="freeze: why a frozen set is re-frozen")
     args = parser.parse_args(argv)
+    if args.set == "hard" and args.command != "freeze":
+        parser.error("hard is hand-written: only freeze applies to it")
     if args.command == "combos":
         print(f"{len(combos(args.set, args.seed))} combinations written")
     elif args.command == "assemble":
