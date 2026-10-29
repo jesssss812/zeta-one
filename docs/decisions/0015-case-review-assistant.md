@@ -63,3 +63,15 @@ money.
   with the case.
 - Risk added: a small local model is weaker at resisting injected text and at staying grounded than
   the assembly model. Its answers are labelled as such and every claim points to a record to check.
+
+## Amendment, 2026-10-29: the chat on the rented GPU
+
+- For the live demo the chat can run on the open-weight arm's server (decision 0018), Qwen 3.6 27B on
+  the rented GPU, instead of a model downloaded to the laptop: `CHAT_BASE_URL` points at it and
+  `CHAT_API_KEY` carries its access key, kept only in `.env`. With no key set the chat calls Ollama as
+  before.
+- That sends the whole case to a server outside this machine, which the local default avoids. It is
+  acceptable here because the demo's cases are synthetic; real case data would need a server the
+  business controls. Each answer says whether it ran locally or on a remote server.
+- A larger model should stay grounded and resist injected text better than the 7B default, but that
+  is not measured.
