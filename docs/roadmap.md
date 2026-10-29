@@ -1,11 +1,9 @@
 # Roadmap
 
-What is not done, as of 2026-10-29. Remove a line when it is done. Items marked **owner** need the
-owner's own time or accounts.
+What is not done, as of 2026-10-29. Remove a line when it is done.
 
 ## Live models
 
-- **Owner:** to use the case chat, run `ollama serve` and `ollama pull qwen2.5:7b` (about 4.7 GB).
 - The first live case file reported its web research cut short after one query, with the limit set
   at five searches. Find out what counts against the limit with dynamic filtering (the response's
   server-tool usage), then set the limit.
@@ -25,19 +23,6 @@ in [data/eval/report.md](../data/eval/report.md). Not done:
   with the missed-fraud weight halved and doubled.
 - Jev's calibration on our cases, and whether Opus would gain from the open-weight model's prompt
   section on confirmation records.
-
-## Submission (by Thu Oct 29, 5:00 PM CT)
-
-Checklist in [reference/hackathon.md](reference/hackathon.md).
-
-- The site renders the recorded runs in `site/data/`.
-- **Owner:** run `scripts/keygen.py` once on the demo machine, so the default gateway registers
-  the demo agent and has an admin token.
-- **Owner:** connect the repo to Vercel, serving `site/` as a static site (decision 0011).
-- **Owner:** Loom video, 2–5 minutes; 150–300 word write-up; team roster; confirm the Rho
-  fintech track.
-- **Owner:** make the repo public, after checking it holds no personal details, raw staging data
-  or credentials.
 
 ## Extensions
 

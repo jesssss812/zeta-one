@@ -1,9 +1,7 @@
-# Why agent risk: research and reusable narrative
+# Why agent risk: the research
 
-Prepared 2026-10-27 for the submission site, write-up, and future slides. This synthesizes the
-owner-supplied research discussion beginning “I agree with your framing: C should be a security
-property…”, and distinguishes verified source material from hypotheses. It does not change the
-[product scope](product.md) or promise new implementation.
+Written 2026-10-27. The sources behind the problem Zeta One addresses, what each supports, and
+what it does not establish. It does not change the [product scope](product.md).
 
 ## Core argument
 
@@ -65,35 +63,6 @@ by payment method from an earlier AFP survey, which the 2026 press release does 
 Blue41 banking-assistant test and the IEEE agent-payment study mentioned in the research
 discussion, for which no exact citation was supplied. No source here establishes population-level
 agent-driven financial fraud losses.
-
-## Reusable copy
-
-### Website
-
-**Familiar fraud. A new actor moving money.**
-
-A known agent with valid permissions can still be manipulated. Verify the actor. Bound its
-authority. Assess the action.
-
-### Write-up paragraph
-
-Businesses already face vendor impersonation and payment-redirection attacks. Agents add a new
-route into the same workflow: an instruction hidden in an invoice can influence what an otherwise
-legitimate agent proposes. Zeta One separates who is acting, what the business authorized, and
-whether the proposed payment is risky. Independent controls enforce hard boundaries; contextual
-assessment identifies cases needing verification. The platform receives signals and evidence
-alongside the outcome, while selective intelligence aims to reduce inference cost and avoid
-unnecessary customer interruptions. Synthetic evaluation tests that trade-off; it does not
-establish production fraud-detection accuracy.
-
-### Future slide outline
-
-- Existing threat: impersonation and payment redirection (FBI source).
-- New attack surface: untrusted content influencing an agent (NIST source).
-- Trust gap: verified identity and valid authority do not settle transaction risk.
-- Product response: separate findings, evidence, proportionate intervention.
-- Economics: inexpensive classification where suitable, selective escalation.
-- Proof: baselines, recall, false positives, customer friction, cost, and latency.
 
 ## Use-case bank
 

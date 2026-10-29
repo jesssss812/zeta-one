@@ -19,7 +19,7 @@ Anything not listed here as confirmed is not confirmed.
 - **Staging API base URL:** `https://rhoapi.rho-staging.co/api/v1`. Staging tokens only work
   there; a `401` from the production host with a staging token is expected.
 - **Staging app:** `https://app.rho-staging.co/`. Reaching staging requires the OpenVPN profile Rho
-  assigned. See [../runbooks/staging-access.md](../runbooks/staging-access.md).
+  assigned.
 - **Auth:** `Authorization: Bearer <token>`. Tokens are issued in Rho settings with a chosen subset
   of scopes. The hackathon staging token reads every list endpoint `scripts/staging_check.py` calls
   except `/fields`, which returns `403` for a missing scope.
@@ -65,8 +65,7 @@ can move money through the API yet, and the next scope on Rho's own list is
 before it ships, and `x-mcp-requires-approval` is the shape of the place its decision would plug
 in. That framing is grounded in Rho's spec and page; anything beyond it (that Rho will ship the
 scope, that the flag will gate it, when) is not confirmed. See
-[../decisions/0009-engineered-escalation.md](../decisions/0009-engineered-escalation.md) and
-[../strategy/vision.md](../strategy/vision.md).
+[../decisions/0009-engineered-escalation.md](../decisions/0009-engineered-escalation.md).
 
 ## Read endpoints
 

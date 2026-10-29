@@ -5,7 +5,7 @@ Date: 2026-10-27. Status: accepted. Amends 0005 (where the UI lives).
 ## Context
 
 The judges reproduce the build from the README, score a live Hack Fair demo and a Loom, and accept
-a screen capture in place of a deployed URL ([../reference/hackathon.md](../reference/hackathon.md)).
+a screen capture in place of a deployed URL.
 The live Rho read needs a VPN only the owner's laptop has. A public gateway would expose open demo
 endpoints and a way to spend the owner's Anthropic budget ([../strategy/security.md](../strategy/security.md)).
 Several coding agents will push to `main` at once. The hackathon offers $25 of Supabase credit. The

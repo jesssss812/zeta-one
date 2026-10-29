@@ -7,7 +7,6 @@ live in `docs/`.
 at the Rho fintech track. Submissions close **Thu Oct 29, 2026, 5:00 PM CT**; the live demo is at the Hack
 Fair on Fri Oct 30. The engine runs end to end on the real stages (identity, authorization, seed
 context, tier 0, strong tier) behind the local gateway; the evaluation runs on the real backend.
-How it was split up is in [docs/strategy/parallel-build.md](docs/strategy/parallel-build.md).
 
 ## Safety rules
 
@@ -112,19 +111,18 @@ python3 scripts/staging_check.py     # read-only Rho staging check; needs the VP
 checks that every Markdown link resolves and every doc is in `docs/README.md`, and runs the test
 suite. Add each new kind of check (lint) to it as the code grows.
 
-`zeta_one/contracts.py` and the kernel files listed in
-[docs/strategy/parallel-build.md](docs/strategy/parallel-build.md) are changed only by the
-integrator; every other module programs to their protocols.
+`zeta_one/contracts.py` holds the protocols every stage programs to; change it deliberately, with
+its callers in the same commit.
 
 ## Keeping docs true
 
-`docs/reference/` and `docs/runbooks/` describe things as they are: a change that makes one wrong
-fixes it in the same commit. The README and the public site (`site/index.html`) tell one story: a
-change to either's content changes the other in the same commit. `docs/strategy/` and
-`docs/decisions/` are dated intent and are not rewritten to match the code, except
-`docs/strategy/evaluation.md`, which changes with how things are measured. Each fact has one home;
-link to it rather than copying it. A new doc gets a row in [docs/README.md](docs/README.md). Rules
-for one area of code go in `.claude/rules/` with `paths:` frontmatter, once that code exists.
+`docs/reference/` describes things as they are: a change that makes one wrong fixes it in the same
+commit. The README and the public site (`site/index.html`) tell one story: a change to either's
+content changes the other in the same commit. `docs/strategy/` and `docs/decisions/` are dated
+intent and are not rewritten to match the code, except `docs/strategy/evaluation.md`, which changes
+with how things are measured. Each fact has one home; link to it rather than copying it. A new doc
+gets a row in [docs/README.md](docs/README.md). Rules for one area of code go in `.claude/rules/`
+with `paths:` frontmatter, once that code exists.
 
 ## Where detail lives
 
@@ -135,10 +133,7 @@ for one area of code go in `.claude/rules/` with `paths:` frontmatter, once that
 - [docs/strategy/evaluation.md](docs/strategy/evaluation.md): how it is measured.
 - [docs/strategy/security.md](docs/strategy/security.md): where Zeta One adds risk of its own, and
   the guardrails.
-- [docs/strategy/parallel-build.md](docs/strategy/parallel-build.md): who builds what, and the seams.
 - [docs/reference/rho-api.md](docs/reference/rho-api.md): what the Rho API allows.
 - [docs/reference/staging-data.md](docs/reference/staging-data.md): what Rho staging holds.
-- [docs/reference/hackathon.md](docs/reference/hackathon.md): deadline, submission checklist and
-  judging criteria.
 - [docs/decisions/](docs/decisions/): why things are the way they are.
 - [docs/roadmap.md](docs/roadmap.md): what is not done.

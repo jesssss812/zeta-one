@@ -2,8 +2,7 @@
 
 Written 2026-10-27, with the engine's kernel built and the stages about to be built in parallel.
 Status: **accepted** the same day; the choices are recorded in
-[../decisions/0011-deployment-and-hosting.md](../decisions/0011-deployment-and-hosting.md). How the engine decides is in [implementation-plan.md](implementation-plan.md);
-who builds each module is in [parallel-build.md](parallel-build.md); the guardrails are in
+[../decisions/0011-deployment-and-hosting.md](../decisions/0011-deployment-and-hosting.md). How the engine decides is in [product.md](product.md); the guardrails are in
 [security.md](security.md).
 
 Since then (2026-10-28): Jev runs as a model tier through OpenRouter, with TypeSafe as the backup
@@ -163,7 +162,7 @@ recorded real runs on the deployed site. The site session decides how to render 
 
 ### 13. CI
 
-Several coding agents will push to `main` at once (parallel-build.md). The pre-push hook runs only
+Several coding agents will push to `main` at once. The pre-push hook runs only
 where it is enabled, so a GitHub Actions job running `python3 scripts/check.py` on every push makes
 the check hold for everyone. It costs a few minutes of the private repo's free Actions allowance per
 push. **Chosen:** added.
@@ -182,7 +181,7 @@ push. **Chosen:** added.
 
 | Item | Expected |
 | --- | --- |
-| Anthropic API (development, evaluation, demo) | Under $35, as budgeted in [implementation-plan.md](implementation-plan.md#evaluation-runner) |
+| Anthropic API (development, evaluation, demo) | Under $35 |
 | Jev | Cents, if the extension lands |
 | Wording and labelling subagents | The owner's subscription |
 | Site hosting and CI | $0 on free plans |
