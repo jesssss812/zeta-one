@@ -7,7 +7,8 @@
 `/review` shows the sandbox's decisions with their evidence and source records. The sandbox holds
 only synthetic data in memory, and its admin token is made for this process and handed to the demo
 page, so the review page opens without setup; it is never the gateway's real admin token. Paid model
-calls happen only when the server was started with ZETA_DEMO_LIVE=1, never because of a click.
+calls are enabled only when the server was started with ZETA_DEMO_LIVE=1. In that mode explicit
+workspace assessment and case-assembly actions may call models; reading workspace state does not.
 """
 
 import os
@@ -18,6 +19,9 @@ from typing import Any
 
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
+
+from zeta_one.demo.workspace import Workspace
 
 from zeta_one.demo.story import TITLES, Story
 from zeta_one.review.explain import summary
@@ -48,6 +52,7 @@ class DemoServer:
         self.token = secrets.token_urlsafe(24)
         self._lock = threading.Lock()
         self.story = self._new_story()
+        self.workspace = Workspace(live_models=live_models, review_client=review_client)
         self.control = self._control_app()
 
     def _new_story(self) -> Story:
@@ -104,11 +109,45 @@ class DemoServer:
                 self.story = self._new_story()
                 return self.state()
 
+        @control.get("/workspace/config.json")
+        def workspace_config():
+            return {"mode": "live" if self.live_models else "rules", "api_base": "/v1/workspace", "explanation_url": "/about/"}
+
+        @control.get("/v1/workspace")
+        def workspace_current():
+            with self._lock:
+                return self.workspace.state()
+
+        @control.post("/v1/workspace/{action}")
+        async def workspace_action(action: str, request: Request):
+            if problem := json_only(request):
+                return problem
+            try:
+                payload = await request.json()
+                if not isinstance(payload, dict):
+                    raise ValueError("request must be a JSON object")
+                from starlette.concurrency import run_in_threadpool
+
+                def perform():
+                    with self._lock:
+                        return self.workspace.act(action, payload)
+
+                return await run_in_threadpool(perform)
+            except ValueError as error:
+                return JSONResponse(status_code=400, content={"error": {"code": "invalid_workspace_action", "message": str(error)}})
+
+        @control.get("/about/workspace")
+        @control.get("/about/workspace/")
+        def local_workspace_link():
+            return RedirectResponse("/workspace/")
+
+        control.mount("/about", StaticFiles(directory=Path(__file__).resolve().parents[2] / "site", html=True))
+        control.mount("/workspace", StaticFiles(directory=Path(__file__).resolve().parents[2] / "site" / "workspace", html=True, check_dir=False))
         return control
 
     async def __call__(self, scope, receive, send) -> None:
         path = scope.get("path", "")
-        if scope["type"] != "http" or path in ("/", "/demo", "/v1/demo") or path.startswith("/v1/demo/"):
+        if scope["type"] != "http" or path in ("/", "/demo", "/v1/demo") or path.startswith("/v1/demo/") or path.startswith("/workspace") or path.startswith("/about") or path.startswith("/v1/workspace"):
             await self.control(scope, receive, send)
         else:
             await self.story.app(scope, receive, send)

@@ -279,3 +279,10 @@ can decide without a model. The story controller submits signed proposals throug
 HTTP client. The evidence records distinguish actual model calls, failures and deterministic
 results. Business context remains synthetic, and payment execution remains simulated. The static
 Vercel site runs none of these backend steps.
+
+## Payment workspace
+
+The interactive `/workspace/` inbox complements the guided `/demo`. It uses its own synthetic
+sandbox and exposes `GET /v1/workspace` plus JSON-only `POST /v1/workspace/{action}` for scenario
+selection and review. The [workspace guide](payment-workspace.md) explains public recorded mode,
+local fresh decisions and explicit case assembly.
