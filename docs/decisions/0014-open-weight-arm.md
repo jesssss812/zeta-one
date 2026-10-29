@@ -1,7 +1,7 @@
 # 0014: The open-weight arm takes the strong tier's place; it is not a cascade step
 
 Date: 2026-10-28. Status: accepted. Amends 0007's escalation rule for a language-model tier and 0009's
-open-weight arm.
+open-weight arm. Point 2's OpenRouter default is superseded for the evaluation by 0018 (a GPU we control).
 
 ## Context
 

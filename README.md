@@ -113,7 +113,8 @@ Reproduce the recorded runs the site shows:
 | --- | --- |
 | `ZETA_ADMIN_TOKEN` | Admin endpoints and the review page; `scripts/keygen.py` writes it to `.env` |
 | `ANTHROPIC_API_KEY` | Claude model review and the case review assistant |
-| `OPENROUTER_API_KEY`, `TYPESAFE_API_KEY` | Jev and the open-weight arm |
+| `OPENROUTER_API_KEY`, `TYPESAFE_API_KEY` | Jev |
+| `OPEN_WEIGHT_BASE_URL`, `OPEN_WEIGHT_MODEL`, `OPEN_WEIGHT_API_KEY`, `OPEN_WEIGHT_GPU_HOURLY` | The open-weight arm on its own GPU server |
 | `CHAT_BASE_URL`, `CHAT_MODEL` | The case chat on a local model (`ollama pull qwen2.5:7b`) |
 | `RHO_API_TOKEN` | The read-only Rho staging check (needs the hackathon VPN) |
 
@@ -122,8 +123,8 @@ With no keys, everything runs: escalated cases are held for a person and the tes
 ## Tech stack
 
 Python 3.14, FastAPI, Pydantic, SQLite, pytest and Hypothesis. Claude Opus 5.5 through the
-Anthropic API; Jev and the open-weight model through OpenRouter; the chat through Ollama. A static
-site in `site/`. Where each piece runs is in
+Anthropic API; Jev through OpenRouter; the open-weight model through vLLM on a GPU we rent; the chat
+through Ollama. A static site in `site/`. Where each piece runs is in
 [docs/strategy/architecture.md](docs/strategy/architecture.md).
 
 ## Data

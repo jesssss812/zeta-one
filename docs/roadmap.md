@@ -60,5 +60,7 @@ connector in claude.ai and recording the answer in [reference/rho-api.md](refere
 - Security follow-ups in [strategy/security.md](strategy/security.md#later): snapshot comparison
   of payment methods, signed authorizations, hash-chained evidence, rate limits, key rotation.
 - Approval side panel: poll Rho items waiting for approval and score them (decision 0003).
+- For a customer that wants no case data to leave its servers: evaluate an open model built like
+  Jev, such as openjev, as a self-hosted cheap tier, including against prompt injection (decision 0018).
 - Case review assistant: dual control on findings, a per-day model budget, and an evaluation of the
   assistant on adversarial web pages (decision 0015).

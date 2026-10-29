@@ -138,7 +138,7 @@ by side for each configuration.
 | Claude Sonnet 5.5 | Labels every `dev` and `test` case, through the Anthropic API | What the engine sees, plus the labelling guide; no tools are offered, so it cannot open a file |
 | Claude Opus 5.5 | Strong tier under test, through the Anthropic API | The proposal and its context, with invoice text in marked untrusted blocks |
 | Jev 1.14 (TypeSafe) | Cheap typed-decision tier under test, through OpenRouter, with TypeSafe direct as the backup | The same as Opus |
-| Qwen3 235B | Open-weight comparison arm in Opus's place, through OpenRouter | The same as Opus |
+| Qwen 3.6 27B (FP8) | Open-weight comparison arm in Opus's place, served by vLLM on a GPU we rent, as a customer's own server would (decision 0018); the first `dev` run used Qwen3 235B through OpenRouter | The same as Opus |
 
 The three Claude models come from one family, which the report lists as a limitation.
 
