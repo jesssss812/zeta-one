@@ -253,6 +253,9 @@ Fixture `tier_results[].model` is `"illustrative"`; `model_rationale`, where pre
 
 ## The one-screen demo
 
+For the combined flow diagram and the engineering needed to connect this engine to a fintech's
+payment execution path, see [From the working demo to a fintech integration](fintech-integration.md).
+
 `zeta_one.demo.app:app` (`uvicorn … --port 8001`) runs the feedback-loop story of
 `zeta_one/demo/story.py` one step per click, on a sandbox gateway of its own: an in-memory
 database, a fresh seed and a one-off agent key. `GET /demo` is the page. Every other path is that
@@ -268,3 +271,10 @@ sandbox gateway, so `/review` and the endpoints above show the sandbox's decisio
 page without setup. It is never the gateway's `ZETA_ADMIN_TOKEN`, and the sandbox holds only
 synthetic data. Models are called only when the server was started with `ZETA_DEMO_LIVE=1`; with
 models off, escalations are held for a person and the case assistant makes no call.
+
+Each payment step computes its decision when clicked. In live mode, eligible assessments call the
+model during that run rather than replaying stored model answers; routine checks and high floors
+can decide without a model. The story controller submits signed proposals through an in-process
+HTTP client. The evidence records distinguish actual model calls, failures and deterministic
+results. Business context remains synthetic, and payment execution remains simulated. The static
+Vercel site runs none of these backend steps.

@@ -223,3 +223,14 @@ footer p{display:none}
 .curve{height:160px}.curve .ghost{stroke:#7d925d;stroke-width:2.4;transform-origin:50% 51.7857%}
 .decision-flow{margin:40px 0 0}.flow-steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr) 1.35fr;border-block:1px solid var(--line)}.flow-steps li{position:relative;padding:22px 26px 22px 20px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:6px}.flow-steps li:last-child{border-right:0}.flow-steps li:not(:last-child)::after{content:'→';position:absolute;right:-9px;top:50%;transform:translateY(-50%);background:var(--paper);color:var(--green);font-size:14px;line-height:1;padding:2px 0}.flow-steps span{font:9px monospace;letter-spacing:.6px;color:var(--muted)}.flow-steps strong{font-size:17px;font-weight:500}.flow-steps small{font-size:12px;color:var(--muted)}.flow-out{background:#edf1e5}.flow-out strong{font-size:15px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}.flow-out .outcome-dot{margin-right:4px}.flow-loop{margin:0;padding:14px 20px;background:var(--ink);color:#f5f6ec;font-size:13px}.flow-loop span{color:var(--accent);margin-right:8px}
 @media(max-width:800px){.flow-steps{grid-template-columns:1fr}.flow-steps li{border-right:0;border-bottom:1px solid var(--line);padding:16px 4px}.flow-out{padding-inline:14px!important}.flow-steps li:not(:last-child)::after{content:'↓';right:auto;left:50%;top:auto;bottom:-9px;transform:translateX(-50%)}}
+
+/* Shared engine and the proposed platform integration. */
+.integration-section{padding:70px 6%;border-top:1px solid var(--line)}
+.integration-status{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin:28px 0;color:var(--muted);font-size:15px;line-height:1.65}
+.integration-status strong{display:block;color:var(--ink);margin-bottom:6px}
+.integration-figure{margin:28px 0 36px}.integration-diagram{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:#f5f6ef}
+.integration-diagram img{display:block;width:100%;min-width:680px;height:auto}.integration-diagram:focus-visible{outline:3px solid var(--green);outline-offset:4px}
+.integration-subtitle{font-size:25px;font-weight:500;margin:28px 0 18px}
+.integration-requirements{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:28px}
+.integration-requirements article{border-top:1px solid var(--line);padding-top:18px}.integration-requirements h3{font-size:20px;font-weight:500;margin:10px 0}.integration-requirements p{color:var(--muted);font-size:14px;line-height:1.65}
+@media(max-width:800px){.integration-section{padding:45px 5%}.integration-status{grid-template-columns:1fr;gap:12px}.integration-requirements{grid-template-columns:1fr;gap:20px}}

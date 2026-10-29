@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="610" viewBox="0 0 1100 610" role="img" aria-labelledby="title desc">
+  <title id="title">One decision engine: working demo and proposed fintech integration</title>
+  <desc id="desc">Today, a demo controller signs payment proposals using synthetic records. In a future integration, a fintech supplies customer agent requests, actual records and delegated permissions. Both feed the same Zeta One decision engine: identity, authorization, risk, policy and evidence. Models run selectively; they cannot override hard checks. The demo records simulated payment outcomes. A future fintech must enforce allow, hold or block before real execution, recheck approvals and report outcomes. The future integration is not implemented.</desc>
+  <defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8" fill="none" stroke="#486340" stroke-width="1.4"/></marker></defs>
+  <rect width="1100" height="610" rx="16" fill="#f5f6ef"/>
+  <g font-family="Arial, sans-serif" fill="#24332b">
+    <text x="35" y="35" font-size="13" letter-spacing="1.5" font-weight="700">TODAY / WORKING LOCAL DEMO</text>
+    <text x="595" y="35" font-size="13" letter-spacing="1.5" font-weight="700">FUTURE / FINTECH INTEGRATION</text>
+    <rect x="30" y="55" width="480" height="120" rx="10" fill="#fff" stroke="#b4c1aa"/>
+    <rect x="590" y="55" width="480" height="120" rx="10" fill="#fff" stroke="#809078" stroke-dasharray="6 5"/>
+    <text x="50" y="85" font-size="20" font-weight="700">Click → signed payment proposal</text>
+    <text x="50" y="114" font-size="16">Demo controller acts as the customer’s agent</text>
+    <text x="50" y="142" font-size="16">Synthetic bills, vendor history and permissions</text>
+    <text x="610" y="85" font-size="20" font-weight="700">Customer agent → platform payment API</text>
+    <text x="610" y="114" font-size="16">Authenticated actor and delegated permissions</text>
+    <text x="610" y="142" font-size="16">Current customer, bill and destination records</text>
+    <g fill="none" stroke="#486340" stroke-width="2" marker-end="url(#arrow)">
+      <path d="M270 175V202H450V225"/>
+      <path d="M830 175V202H650V225" stroke-dasharray="6 5"/>
+    </g>
+    <rect x="165" y="230" width="770" height="165" rx="12" fill="#243c32"/>
+    <text x="550" y="261" text-anchor="middle" font-size="13" letter-spacing="2" fill="#c9e395">SHARED CORE / BUILT AND RUNNING IN THE DEMO</text>
+    <text x="550" y="295" text-anchor="middle" font-size="29" font-weight="700" fill="#fff">Zeta One decision engine</text>
+    <text x="550" y="326" text-anchor="middle" font-size="19" fill="#fff">Identity → Authorization → Risk → Policy → Evidence</text>
+    <text x="550" y="355" text-anchor="middle" font-size="16" fill="#e0e9db">Rules first; live model calls on eligible cases when enabled.</text>
+    <text x="550" y="379" text-anchor="middle" font-size="16" fill="#e0e9db">Models cannot override hard checks. Every decision records its evidence.</text>
+    <g fill="none" stroke="#486340" stroke-width="2" marker-end="url(#arrow)">
+      <path d="M450 395V420H270V445"/>
+      <path d="M650 395V420H830V445" stroke-dasharray="6 5"/>
+    </g>
+    <rect x="30" y="450" width="480" height="115" rx="10" fill="#fff" stroke="#b4c1aa"/>
+    <rect x="590" y="450" width="480" height="115" rx="10" fill="#fff" stroke="#809078" stroke-dasharray="6 5"/>
+    <text x="50" y="481" font-size="20" font-weight="700">Simulated execution / hold / block</text>
+    <text x="50" y="510" font-size="16">Evidence and human review in the local app</text>
+    <text x="50" y="537" font-size="16">Reset starts a fresh sandbox. No money moves.</text>
+    <text x="610" y="481" font-size="20" font-weight="700">Platform enforces allow / hold / block</text>
+    <text x="610" y="510" font-size="16">Recheck approvals → execute eligible payments</text>
+    <text x="610" y="537" font-size="16">Reconcile execution; return verified outcomes</text>
+    <text x="550" y="592" text-anchor="middle" font-size="14" fill="#52614e">Solid: implemented demo path. Dashed: proposed integration. The public website runs neither path.</text>
+  </g>
+</svg>

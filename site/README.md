@@ -40,3 +40,12 @@ and narrow layouts, visible focus, and absence of missing assets. Run `node --ch
 All changes stay in `site/`; the engine owns the root README and docs. Suggested root README text:
 “Preview the submission site with `python3 -m http.server 4173 --bind 127.0.0.1 --directory site`.
 It includes a labeled synthetic decision example. Payment execution is simulated.”
+
+## Demo and fintech integration
+
+The public section at `index.html#integration` distinguishes fresh decisions in the local demo
+from this static website and a proposed platform integration. `integration-flow.svg` is the shared
+diagram used here and in [the integration reference](../docs/reference/fintech-integration.md),
+which owns the engineering details. Keep its implemented/demo and proposed/platform boundaries
+consistent when updating the site. Live mode calls models only for eligible assessments; a fresh
+decision does not imply a model call or live bank data.

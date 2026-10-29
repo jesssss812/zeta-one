@@ -25,6 +25,7 @@ What is not done yet is in [roadmap.md](roadmap.md). Every document under `docs/
 | [reference/dev-baseline.md](reference/dev-baseline.md) | The first runs of every configuration on labelled `dev`, before tuning: results, cost, the misses and how to compare a later run |
 | [reference/dev-tuning.md](reference/dev-tuning.md) | Each change tuned on `dev` after the baseline: what was measured and what it changed |
 | [reference/demo-api.md](reference/demo-api.md) | The contract between the engine and the demo site: endpoints, scenario result, evidence record, ownership of directories |
+| [reference/fintech-integration.md](reference/fintech-integration.md) | The shared decision engine in the working demo and a proposed fintech integration; live inference, static hosting and engineering required before real execution |
 
 ## Runbooks
 
