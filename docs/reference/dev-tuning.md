@@ -80,6 +80,27 @@ decisions, both 49/51 acceptable with the same fraud caught and friction.
   and friction, for 44% and 49% less.** The gap would differ on a mix with fewer risky payments,
   where fewer cases reach any model.
 
+## 4. No model on a high floor under `engineered`
+
+Decision [0017](../decisions/0017-no-model-on-a-high-floor.md) applies section 2's first change to
+the engineered rule, which `engineered` and the open-weight arm use. `engineered` rerun on `dev`,
+one run, per-case record in
+[data/eval/baselines/dev-2026-10-28-engineered-tuned/](../../data/eval/baselines/dev-2026-10-28-engineered-tuned/):
+
+| `engineered` on `dev` | Baseline | Tuned |
+| --- | --- | --- |
+| Acceptable | 49/51 | 49/51 |
+| Fraud caught | 22/22 | 22/22 |
+| Legitimate challenged / blocked | 9/29 / 0 | 9/29 / 0 |
+| Cases that reached Claude Opus 5.5 | 43 | 29 |
+| $ per 1,000 decisions | 21.76 | 15.53 |
+| Run cost | $1.11 | $0.79 |
+| Latency p50 / p95 | 6.5 s / 10.3 s | 5.5 s / 9.6 s |
+
+No decision changed against the baseline; the two misses are the same. `jev`, at $12.14, stays the
+cheapest configuration with a model. The open-weight arm follows the same rule but was not rerun:
+its `dev` results are from before the change.
+
 ## Limits
 
 - One run of each arm. Jev answered almost identically on repeat passes; Opus did not always.

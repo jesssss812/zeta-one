@@ -732,7 +732,7 @@
     "hard": "not frozen",
     "test": "not frozen"
   },
-  "generated": "2026-10-28",
+  "generated": "2026-10-29",
   "label_agreement": null,
   "limitations": [
     "The data is synthetic; no rate here is a production rate, and the sets say nothing about how often each case occurs.",
@@ -2258,10 +2258,10 @@
               "rate": 0.5625
             },
             "unpriced_models": [],
-            "usd_per_1000_decisions": 13.2555,
+            "usd_per_1000_decisions": 13.2385,
             "usd_per_fraud_caught": null
           },
-          "cost_per_action_usd": 0.0132555,
+          "cost_per_action_usd": 0.0132385,
           "detection": {
             "high": 1.0,
             "k": 0,
@@ -2270,8 +2270,8 @@
             "rate": null
           },
           "latency_ms": {
-            "p50": 4876.5,
-            "p95": 8377.5
+            "p50": 5181.5,
+            "p95": 8739.0
           },
           "legit_block_rate": {
             "high": 0.1936076805344365,
@@ -2332,17 +2332,17 @@
             "decisions": 15,
             "estimated_usage": false,
             "reached_a_model": {
-              "high": 1.0,
-              "k": 15,
-              "low": 0.7961166989641515,
+              "high": 0.9295245065301844,
+              "k": 12,
+              "low": 0.5481455128483065,
               "n": 15,
-              "rate": 1.0
+              "rate": 0.8
             },
             "unpriced_models": [],
-            "usd_per_1000_decisions": 24.26,
-            "usd_per_fraud_caught": 0.03639
+            "usd_per_1000_decisions": 22.420266666666667,
+            "usd_per_fraud_caught": 0.0336304
           },
-          "cost_per_action_usd": 0.02426,
+          "cost_per_action_usd": 0.022420266666666668,
           "detection": {
             "high": 0.9999999999999999,
             "k": 10,
@@ -2351,8 +2351,8 @@
             "rate": 1.0
           },
           "latency_ms": {
-            "p50": 6733.0,
-            "p95": 10027.5
+            "p50": 7540.0,
+            "p95": 10079.2
           },
           "legit_block_rate": {
             "high": 0.43448246478317476,
@@ -2413,17 +2413,17 @@
             "decisions": 13,
             "estimated_usage": false,
             "reached_a_model": {
-              "high": 0.9999999999999999,
-              "k": 13,
-              "low": 0.7719046276458016,
+              "high": 0.5763065681945096,
+              "k": 4,
+              "low": 0.12680703655710515,
               "n": 13,
-              "rate": 1.0
+              "rate": 0.3076923076923077
             },
             "unpriced_models": [],
-            "usd_per_1000_decisions": 30.21507692307692,
-            "usd_per_fraud_caught": 0.032733
+            "usd_per_1000_decisions": 10.539076923076921,
+            "usd_per_fraud_caught": 0.011417333333333333
           },
-          "cost_per_action_usd": 0.03021507692307692,
+          "cost_per_action_usd": 0.010539076923076922,
           "detection": {
             "high": 1.0,
             "k": 12,
@@ -2432,8 +2432,8 @@
             "rate": 1.0
           },
           "latency_ms": {
-            "p50": 8745.0,
-            "p95": 10774.4
+            "p50": 9.0,
+            "p95": 9383.0
           },
           "legit_block_rate": {
             "high": 0.7934506856227626,
@@ -2494,17 +2494,17 @@
             "decisions": 7,
             "estimated_usage": false,
             "reached_a_model": {
-              "high": 0.9743203756552565,
-              "k": 6,
-              "low": 0.4868721707256811,
+              "high": 0.8417801447485302,
+              "k": 4,
+              "low": 0.2504583645276572,
               "n": 7,
-              "rate": 0.8571428571428571
+              "rate": 0.5714285714285714
             },
             "unpriced_models": [],
-            "usd_per_1000_decisions": 20.113714285714288,
+            "usd_per_1000_decisions": 15.289142857142858,
             "usd_per_fraud_caught": null
           },
-          "cost_per_action_usd": 0.020113714285714287,
+          "cost_per_action_usd": 0.015289142857142859,
           "detection": {
             "high": 1.0,
             "k": 0,
@@ -2513,8 +2513,8 @@
             "rate": null
           },
           "latency_ms": {
-            "p50": 6871.0,
-            "p95": 10942.6
+            "p50": 7118.0,
+            "p95": 9675.9
           },
           "legit_block_rate": {
             "high": 0.35433043506668743,
@@ -2575,17 +2575,17 @@
             "decisions": 51,
             "estimated_usage": false,
             "reached_a_model": {
-              "high": 0.9183077677995128,
-              "k": 43,
-              "low": 0.7198955322701224,
+              "high": 0.6949876389209046,
+              "k": 29,
+              "low": 0.43265302109302245,
               "n": 51,
-              "rate": 0.8431372549019608
+              "rate": 0.5686274509803921
             },
             "unpriced_models": [],
-            "usd_per_1000_decisions": 21.756470588235295,
-            "usd_per_fraud_caught": 0.05043545454545455
+            "usd_per_1000_decisions": 15.532392156862745,
+            "usd_per_fraud_caught": 0.03600690909090909
           },
-          "cost_per_action_usd": 0.021756470588235294,
+          "cost_per_action_usd": 0.015532392156862744,
           "detection": {
             "high": 1.0,
             "k": 22,
@@ -2594,8 +2594,8 @@
             "rate": 1.0
           },
           "latency_ms": {
-            "p50": 6484.0,
-            "p95": 10343.5
+            "p50": 5529.0,
+            "p95": 9567.5
           },
           "legit_block_rate": {
             "high": 0.11696979849974075,
@@ -4874,17 +4874,17 @@
           "decisions": 51,
           "estimated_usage": false,
           "reached_a_model": {
-            "high": 0.9183077677995128,
-            "k": 43,
-            "low": 0.7198955322701224,
+            "high": 0.6949876389209046,
+            "k": 29,
+            "low": 0.43265302109302245,
             "n": 51,
-            "rate": 0.8431372549019608
+            "rate": 0.5686274509803921
           },
           "unpriced_models": [],
-          "usd_per_1000_decisions": 21.756470588235295,
-          "usd_per_fraud_caught": 0.05043545454545455
+          "usd_per_1000_decisions": 15.532392156862745,
+          "usd_per_fraud_caught": 0.03600690909090909
         },
-        "cost_per_action_usd": 0.021756470588235294,
+        "cost_per_action_usd": 0.015532392156862744,
         "detection": {
           "high": 1.0,
           "k": 22,
@@ -4893,8 +4893,8 @@
           "rate": 1.0
         },
         "latency_ms": {
-          "p50": 6484.0,
-          "p95": 10343.5
+          "p50": 5529.0,
+          "p95": 9567.5
         },
         "legit_block_rate": {
           "high": 0.11696979849974075,
@@ -5261,6 +5261,7 @@
   "versions": {
     "engine_version": [
       "7ba6857",
+      "8be8e8e",
       "d40bade",
       "e4a4e41",
       "e853f63"
