@@ -97,9 +97,14 @@ class CaseChat:
                     401: "; check CHAT_API_KEY", 403: "; check CHAT_API_KEY"}.get(status, "")
             raise ChatUnavailable(f"{where} answered HTTP {status}{hint}")
         try:
-            answer = payload["choices"][0]["message"]["content"] or ""
+            choice = payload["choices"][0]
+            answer = choice["message"]["content"] or ""
         except (KeyError, IndexError, TypeError) as error:
             raise ChatUnavailable(f"{where}'s answer had no text") from error
+        if choice.get("finish_reason") != "stop":
+            raise ChatUnavailable(f"{where}'s answer was cut off ({choice.get('finish_reason')})")
+        if not answer.strip():
+            raise ChatUnavailable(f"{where}'s answer had no text")
         known = record_ids(case["evidence"]) | {f["url"] for f in (case.get("research") or {}).get("findings", [])}
         cited = sorted(set(RECORD_ID.findall(answer)))
         with self._db:

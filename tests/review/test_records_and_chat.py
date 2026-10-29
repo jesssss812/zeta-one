@@ -81,14 +81,14 @@ def _case(world):
 
 
 class Server:
-    def __init__(self, answer=None, error=None, status=200):
-        self.answer, self.error, self.status, self.calls = answer, error, status, []
+    def __init__(self, answer=None, error=None, status=200, finish="stop"):
+        self.answer, self.error, self.status, self.finish, self.calls = answer, error, status, finish, []
 
     def __call__(self, url, headers, body):
         self.calls.append((url, headers, body))
         if self.error:
             raise self.error
-        return self.status, {"choices": [{"message": {"content": self.answer}}]}
+        return self.status, {"choices": [{"finish_reason": self.finish, "message": {"content": self.answer}}]}
 
 
 def test_the_chat_answers_from_the_case_and_checks_what_it_cites(world):
@@ -132,6 +132,20 @@ def test_an_unreachable_local_model_says_how_to_start_it(world, server, words):
     gateway.chat = CaseChat(gateway.ledger.connection, post=server)
     response = client.post(f"/v1/cases/{case['case_id']}/chat", json={"question": "hi", "by": "cw"}, headers=ADMIN)
     assert response.status_code == 503 and words in response.json()["error"]["message"]
+
+
+@pytest.mark.parametrize("server, words", [
+    (Server(answer="The payment dec_chat went to", finish="length"), "cut off (length)"),
+    (Server(answer=None), "had no text"),
+    (Server(answer="  "), "had no text"),
+])
+def test_a_cut_off_or_empty_answer_is_unavailable_and_not_kept(world, server, words):
+    client, gateway = world
+    case = _case(world)
+    gateway.chat = CaseChat(gateway.ledger.connection, post=server)
+    response = client.post(f"/v1/cases/{case['case_id']}/chat", json={"question": "hi", "by": "cw"}, headers=ADMIN)
+    assert response.status_code == 503 and words in response.json()["error"]["message"]
+    assert client.get(f"/v1/cases/{case['case_id']}/chat", headers=ADMIN).json() == []
 
 
 REMOTE = "https://pod-8000.proxy.example.test/v1"
