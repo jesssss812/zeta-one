@@ -110,7 +110,7 @@
     },
     "created_at": "2026-10-27T22:00:00Z",
     "decision": "block",
-    "decision_id": "dec_07a42555986a4bcd",
+    "decision_id": "dec_58e18996ac1b479a",
     "engine_version": null,
     "execution": {
       "simulated": true,
@@ -125,7 +125,7 @@
       ],
       "claimed_agent_id": "agent_unregistered_77",
       "key_id": null,
-      "nonce": "5ff8956aceb0f17063fe24d9d3bc019b",
+      "nonce": "1a20dba0e955bb466c200e3a4df1c6c9",
       "owner": null,
       "result": "unknown_agent",
       "timestamp": "2026-10-27T22:00:00+00:00"
@@ -191,7 +191,7 @@
     ]
   },
   "recorded": {
-    "at": "2026-10-28T14:42:48+00:00",
+    "at": "2026-10-29T00:06:10+00:00",
     "live_models": false
   },
   "replayed_stages": [],

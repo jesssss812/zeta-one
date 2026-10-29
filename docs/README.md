@@ -66,3 +66,4 @@ What is not done yet is in [roadmap.md](roadmap.md). Every document under `docs/
 | [decisions/0014-open-weight-arm.md](decisions/0014-open-weight-arm.md) | The open-weight arm takes the strong tier's place on the same prompt and rules, through any OpenAI-compatible API; it is a comparison, not a cascade step |
 | [decisions/0015-case-review-assistant.md](decisions/0015-case-review-assistant.md) | An AI assistant assembles a case file for a person: code gathers internal evidence, a minimised call researches the vendor on the web, no verdict; its risks |
 | [decisions/0016-jev-rule-after-tuning.md](decisions/0016-jev-rule-after-tuning.md) | After Jev, the strong tier never runs on a high floor and runs when Jev's findings contradict its own level |
+| [decisions/0017-no-model-on-a-high-floor.md](decisions/0017-no-model-on-a-high-floor.md) | Under engineered escalation, no model runs when tier 0's floor is already high |

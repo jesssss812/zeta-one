@@ -204,7 +204,7 @@
     },
     "risk": {
       "level": "high",
-      "level_set_by": "strong",
+      "level_set_by": "tier0",
       "floor": {
         "level": "high",
         "flags": [
@@ -213,8 +213,7 @@
         ]
       },
       "tiers_run": [
-        "tier0",
-        "strong"
+        "tier0"
       ],
       "features": {
         "counterparty_is_new": {
@@ -259,18 +258,6 @@
           ],
           "latency_ms": null,
           "usage": null
-        },
-        {
-          "tier": "strong",
-          "model": "illustrative",
-          "level": "high",
-          "confidence": null,
-          "signals": [
-            "injection_detected",
-            "payee_redirect"
-          ],
-          "latency_ms": null,
-          "usage": null
         }
       ],
       "signals": [
@@ -299,17 +286,9 @@
             "cp_0051"
           ],
           "source": "tier0"
-        },
-        {
-          "name": "injection_detected",
-          "severity": "high",
-          "evidence": [
-            "bill_0194"
-          ],
-          "source": "strong"
         }
       ],
-      "model_rationale": "[illustrative model output] The invoice text addresses automated accounts-payable systems directly, instructs them to discard stored payment details, and discourages verification. The proposed payee was created yesterday, has no payment history, and differs from the counterparty on the bill. This matches a payment-redirection pattern."
+      "model_rationale": null
     },
     "execution": {
       "status": "blocked",

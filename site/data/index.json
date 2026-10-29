@@ -1,11 +1,11 @@
 {
-  "engine_version": "e853f63",
+  "engine_version": "b289dfb",
   "eval_report": "eval_report.json",
   "live_models": false,
   "note": "Recorded results of real engine runs on synthetic data. Payments are simulated. Model tiers replay the fixtures' recorded answers, so those scenarios are marked illustrative.",
   "policy_version": "2026-10-28.4",
   "recorded": true,
-  "recorded_at": "2026-10-28T14:42:48+00:00",
+  "recorded_at": "2026-10-29T00:06:10+00:00",
   "scenarios": [
     {
       "decision": "challenge",
@@ -47,14 +47,12 @@
     },
     {
       "decision": "block",
-      "illustrative": true,
+      "illustrative": false,
       "name": "invoice_redirect_instructions",
       "reasons": [
         "risk:high_with_redirect_pattern"
       ],
-      "replayed_stages": [
-        "strong"
-      ]
+      "replayed_stages": []
     }
   ],
   "simulated": true

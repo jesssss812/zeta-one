@@ -92,7 +92,8 @@ def test_the_runner_refuses_the_live_backend_without_a_budget(tmp_path):
 def test_a_repeated_adversarial_proposal_reaches_the_model_once():
     strong = EchoStrong()
     case = next(c for c in cases.all_cases() if c.id == "guardrail_repeat_not_rerolled")
-    outcome = backends.RealBackend(strong_tier=strong).run(case, run.CONFIGS["engineered"])
+    # `strong` runs the model on every case: under `engineered` this case's high floor skips it.
+    outcome = backends.RealBackend(strong_tier=strong).run(case, run.CONFIGS["strong"])
     assert strong.calls == 1 and len(outcome.decisions) == 5 and outcome.model_calls == 0  # stand-in has no usage
 
 

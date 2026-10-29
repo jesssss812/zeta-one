@@ -1,6 +1,6 @@
 # 0009: Cost savings come from engineered escalation, not from weaker models
 
-Date: 2026-10-27. Status: accepted. Amends 0007.
+Date: 2026-10-27. Status: accepted. Amends 0007. Its engineered rule is amended by 0017 (no model on a high floor).
 
 ## Context
 

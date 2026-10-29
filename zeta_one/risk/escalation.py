@@ -93,13 +93,18 @@ def soft_signals(features: dict[str, Feature]) -> list[str]:
 
 
 def should_escalate(configuration: Configuration, tier0: Tier0Output) -> bool:
-    """Whether the first model tier runs after tier 0. Under the Jev rule Jev is that tier, and it
-    runs when the engineered rule would run a model."""
+    """Whether the first model tier runs after tier 0. Under the engineered rule it never runs on a
+    high floor (decision 0017): no tier can lower a floor or go above high. Under the Jev rule Jev is
+    the first tier, and it runs when tier 0 isn't clean; the rule after Jev skips the strong tier on a
+    high floor (decision 0016)."""
     if configuration.escalation == "none":
         return False
     if configuration.escalation == "always":
         return True
     if configuration.escalation in ("engineered", "jev"):
+        hard = floor(tier0.features)
+        if configuration.escalation == "engineered" and hard and hard.level == "high":
+            return False
         return tier0.result.level in ("elevated", "high") or bool(soft_signals(tier0.features))
     raise ValueError(f"unknown escalation rule {configuration.escalation!r}")
 

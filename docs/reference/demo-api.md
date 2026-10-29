@@ -189,7 +189,8 @@ Rules the site can count on:
 - Tier roles are `tier0`, `cheap` (Jev, or an open-weight model in that comparison arm) and
   `strong`; the model id is in `model`. In the first engine version the configuration is
   `["tier0", "strong"]` with engineered escalation: the strong tier runs only when tier 0 isn't
-  clean, so a routine payment shows `tiers_run: ["tier0"]` and no model.
+  clean and its floor isn't already high (decision 0017), so a routine payment and a payment tier 0
+  floors at high both show `tiers_run: ["tier0"]` and no model.
   `escalation: "none"` runs tier 0 alone (the evaluation's rules-only arm); `"always"` runs the
   model tiers on every case. `"jev"` runs `["tier0", "cheap", "strong"]`: Jev when tier 0 isn't
   clean, then the strong tier only on Jev's rule, so a record may show `tiers_run: ["tier0", "cheap"]`

@@ -143,3 +143,15 @@ def test_ratio_rounding_does_not_hide_soft_signal_at_threshold():
             TierOutput(result=TierResult(tier="strong", level="low"))
         ])
         assert lowered.lowered.signals == ["amount_ratio_to_vendor_median"]
+
+
+def test_a_high_floor_runs_no_model_under_engineered_but_still_runs_jev_and_always():
+    """No tier can lower a high floor or go above high (decision 0017)."""
+    high = {"bill_mismatch": Feature(value=True), "counterparty_is_new": Feature(value=True)}
+    assert escalation.floor(high).level == "high"
+    tier0 = _tier0("high", high)
+    assert not escalation.should_escalate(Configuration(escalation="engineered"), tier0)
+    assert escalation.should_escalate(Configuration(tiers=["tier0", "cheap", "strong"], escalation="jev"), tier0)
+    assert escalation.should_escalate(Configuration(escalation="always"), tier0)
+    elevated = {"bill_mismatch": Feature(value=True)}
+    assert escalation.should_escalate(Configuration(escalation="engineered"), _tier0("elevated", elevated))
