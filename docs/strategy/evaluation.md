@@ -186,6 +186,12 @@ list of failure kinds grouped from the notes.
 - The data is synthetic; no rate here is a production rate, and the sets say nothing about how
   often each case occurs.
 - The generator's dimensions resemble tier 0's features; `hard` is the check on that.
+- Generated cases vary in their dimension values and wording, but share one structure: every
+  payment history is monthly at a steady amount, banks are a few synthetic labels, and no past
+  payment or bank account carries an identifier that ties them together. The owner, labelling the
+  `test` sample, found the cases too alike to say much beyond that structure. `dev` and `test`
+  therefore measure overfitting to the tuning within one structure, not behaviour on unlike
+  cases; `hard`, written by hand, is the check on that.
 - Which model families wrote, labelled and decided the cases.
 - The cases marked `detectable: false`, by name.
 
@@ -232,6 +238,10 @@ accuracy.
 ## After the hackathon
 
 - A second AI labeller from another model family, and agreement between the labellers.
+- Structural variety in the generator: irregular schedules and amounts, payments tied to the
+  bank account they went to, account endings and beneficiaries, more kinds of payee and history,
+  and wording from another model family, labelled as such. More cases of one structure add no
+  variety.
 - Larger sets (about 100 `dev`, 200 `test`), so per-category comparisons have power.
 - Jev's calibration against `truth`, as a reliability table, once enough cases reach it.
 - A curve of expected cost against detection, by sweeping a threshold; engineered escalation is a
