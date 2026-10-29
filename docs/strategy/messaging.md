@@ -27,19 +27,21 @@ Use this to settle product decisions. In damping terms:
   what is clearly unauthorized.
 
 The challenge ladder ([../decisions/0008-friction-ladder.md](../decisions/0008-friction-ladder.md))
-is the damping made concrete. The evaluation measures ζ as detection next to unnecessary
-challenges, and as a friction score once there is more than one challenge type.
+is the damping made concrete. Critical damping is the metaphor, not a measurement: nothing here
+estimates ζ. The evaluation reports what the metaphor points at, detection next to unnecessary
+challenges, and a friction score once there is more than one challenge type.
 
 ## What sets it apart
 
-Four claims, each with where it is shown. Say only what the evidence column supports; the dollar
-figures wait for the live evaluation runs.
+Four claims, each with where it is shown. Say only what the evidence column supports. The
+measured figures are in [../../data/eval/report.md](../../data/eval/report.md), one run of each
+configuration on synthetic cases.
 
 | Claim | Why it matters | Where it is shown |
 | --- | --- | --- |
 | **No model can talk a payment past a hard check.** Identity, authorization and tier-0 hard flags are deterministic floors; a model may only lower soft signals, and every lowering is recorded | An agent's model, an invoice's injected text or our own model being fooled can't move money by itself | Property tests over every model answer ([../decisions/0007-risk-tiers.md](../decisions/0007-risk-tiers.md)); a model that clears everything lets no blocked or challenged case through in the evaluation |
-| **Most payments need no model at all.** Engineered escalation sends only the uncertain fraction to a model; Jev, a typed decision model, can take a cut of that before a frontier model reads anything | Cost scales with judgement, not with volume | The report's Cost table: the share of decisions that reached a model, dollars per 1,000 decisions and per fraud caught, rules against engineered, `jev`, open-weight and strong-on-everything ([evaluation.md](evaluation.md)) |
-| **The loop closes, and it is audited.** A person records what turned out to be true and how they know; a verified fraud blocks the account, a verified bank change stops costing friction, a customer's report alone changes nothing | The system gets better at exactly the cases it got wrong, without a model writing its own labels | `scripts/demo_loop.py` runs it end to end; every change is an append-only adjustment cited by the decisions it affects ([../decisions/0012-verified-outcomes.md](../decisions/0012-verified-outcomes.md), [../decisions/0013-outcomes-change-risk.md](../decisions/0013-outcomes-change-risk.md)) |
+| **Routine payments need no model at all.** Engineered escalation sends only what tier 0 finds uncertain to a model; Jev, a typed decision model, can take a cut of that before a frontier model reads anything. How large that fraction is depends on the payments: on `test`, built mostly from flagged cases, it was 59 of 100 | Cost scales with judgement, not with volume | The report's Cost table: the share of decisions that reached a model, dollars per 1,000 decisions and per fraud caught, rules against engineered, `jev`, open-weight and strong-on-everything ([evaluation.md](evaluation.md)) |
+| **The loop closes, and it is audited.** A person records what turned out to be true and how they know; a verified fraud finding blocks the account, a confirmed bank change stops being a hard flag, a customer's report alone changes nothing. The gateway records the person's statement of how they checked; it does not perform the check | The system gets better at exactly the cases it got wrong, without a model writing its own labels | `scripts/demo_loop.py` runs it end to end; every change is an append-only adjustment cited by the decisions it affects ([../decisions/0012-verified-outcomes.md](../decisions/0012-verified-outcomes.md), [../decisions/0013-outcomes-change-risk.md](../decisions/0013-outcomes-change-risk.md)) |
 | **Agents help people, not instead of them.** When a customer disputes a payment, an assistant assembles the evidence and researches the vendor; a person decides | Case work gets faster without handing a fraud ruling to a model | The case file has no verdict field; web research never sees the business's data ([../decisions/0015-case-review-assistant.md](../decisions/0015-case-review-assistant.md)) |
 
 And one honest line to keep: the evaluation reports the friction the engine costs legitimate
@@ -53,8 +55,10 @@ payments next to the fraud it catches, so a reader can see the trade, not only t
 - *How is this different from "know your agent"?* Knowing the agent and checking its authorization
   are two of the three questions. The third is the one a trusted, authorized agent still fails:
   is this payment fraud anyway?
-- *Why not a strong model on everything?* Because most legitimate actions need no judgement at all,
-  and the ones that do are a small, measurable fraction. The evaluation shows the fraction.
+- *Why not a strong model on everything?* Because routine actions need no judgement at all, and the
+  evaluation shows the fraction that reaches a model and what it costs. The trade runs both ways:
+  on the `hard` set, Opus on every payment caught two frauds that tier 0 found clean and so never
+  sent to a model.
 - *Why not a cheaper model?* Savings should come from engineering, not from routing money decisions
   to a less capable model. The only cheap model in the loop is a typed decision model built for
   calibrated answers, and its calibration is never assumed: until our cases can measure it, its

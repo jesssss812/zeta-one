@@ -59,15 +59,16 @@ the step-up proves the payee or the authorization rather than the human behind t
 
 ## Deterministic first, calibrated second
 
-Promises are enforced in code. Judgement is tiered, and the savings come from engineering: most
-legitimate actions are decided by deterministic checks and never reach a model; a frontier model
+Promises are enforced in code. Judgement is tiered, and the savings come from engineering: routine
+actions are decided by deterministic checks and never reach a model; a frontier model
 reads the documents only where judgement is needed, and a typed decision model (Jev, which its
 maker says returns calibrated probabilities at low cost) can sit between them; until our own cases
 can measure its calibration, its probabilities are reported as uncalibrated. No decision is routed
 to a weaker general-purpose model to save money. The evaluation compares rules alone, engineered
-escalation and a strong model on everything against trivial baselines, with the Jev cascade added
-when that tier runs: accuracy, friction, cost and latency side by side, per category, with
-confidence intervals. That is critical damping made measurable: enough control, no oscillation.
+escalation, the Jev cascade, an open-weight model in the frontier model's place and a strong model
+on everything against trivial baselines: accuracy, friction, cost and latency side by side, per
+category, with confidence intervals. Critical damping is the metaphor; those measures are what is
+reported.
 
 ## Why it matters to Rho
 
@@ -92,8 +93,8 @@ gather and structure the evidence for a challenged, blocked or disputed action: 
 timeline, point out discrepancies, separate verified facts from inferences and open questions. A
 person decides. Verified outcomes, a confirmed or cleared payment, a renewed or revoked
 authorization, a payee confirmed as attacker-controlled, feed back into authorizations, trusted
-entities, evaluation data and risk rules, each carrying its provenance. The assistant is designed
-for and not yet built; the core works without it.
+entities, evaluation data and risk rules, each carrying its provenance. The assistant is built
+(decision 0015); the core works without it.
 
 ## What it is not
 
@@ -108,26 +109,25 @@ says so.
 >
 > **Problem.** AI agents already read business finances on Rho through its MCP server, read-only by
 > design, and Rho's API spec names the next scope: initiating accounts-payable payments. When an
-> agent can pay, a valid token says nothing about which agent acted, what the business meant to
-> allow, or whether the invoice it just read was written by an attacker for an AI reader. Vendor
-> impersonation, changed bank details and malicious invoices are old fraud; agents are a new way to
-> fall for them.
+> agent can pay, a valid token will not show which agent acted, what the business meant to allow,
+> or whether the invoice it just read was written by an attacker. Vendor impersonation, changed bank
+> details and malicious invoices are old fraud; agents are a new way to fall for them.
 >
-> **Who it helps.** Platforms like Rho that will receive these actions, the finance teams that want
-> agents to pay routine bills without friction, and the people who review what goes wrong.
+> **Who it helps.** Platforms like Rho, finance teams that want agents to pay routine bills without
+> friction, and the people who review what goes wrong.
 >
 > **Solution.** Zeta One is the layer a platform runs before executing an agent's action, shown here
 > as a gateway in front of simulated payments on Rho's data shapes. Every proposal is signed by a
 > registered agent and checked against the authorization the business granted (actions, payees,
 > limits, expiry). Then it is assessed against the business's own records: vendor history, recent
 > payment-method changes, disagreement with the bill, and invoice text aimed at an automated reader.
-> Hard limits are enforced in code; most routine actions never reach a model, and a frontier model reads documents
-> only where judgement is needed. The result is allow, challenge or block, with the step-up matched
-> to the risk and an evidence record a person can audit.
+> Hard limits are enforced in code; routine actions never reach a model. The result is allow,
+> challenge or block, with an evidence record a person can audit.
 >
-> **Impact.** On labelled synthetic cases, including a hand-written held-out set, the evaluation
-> compares rules only, engineered escalation and a strong model everywhere, reporting per category
-> with confidence intervals: accuracy, unnecessary challenges, cost per action and latency. It shows
-> how much control is enough: critical damping for agentic finance. ζ = 1.
+> **Impact.** On 100 labelled synthetic test cases, one run each, rules alone let no fraud through
+> but stopped 39 of 51 honest payments. Escalating uncertain cases to Claude Opus decided 91
+> acceptably at $15 per 1,000 decisions; an open-weight model on one rented GPU, 94 at under $2. On
+> 12 harder cases, Opus on every payment led with 10. Synthetic results, not production rates.
 
-(Fill in the measured numbers on Thursday; keep the counts honest.)
+(The measured numbers are from [../../data/eval/report.md](../../data/eval/report.md); recheck them
+against the report before submitting.)

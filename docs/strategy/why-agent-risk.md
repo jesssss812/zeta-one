@@ -23,10 +23,11 @@ supporting evidence and a measurable cost/friction trade-off.
 | --- | --- | --- |
 | [FBI IC3: Business Email Compromise](https://www.ic3.gov/CrimeInfo/BEC) | BEC targets fund transfers; account-information changes should be verified using another channel | Agent-specific loss estimates; prevalence of a particular bank-change subtype |
 | [NIST: Strengthening AI Agent Hijacking Evaluations](https://www.nist.gov/news-events/news/2025/01/technical-blog-strengthening-ai-agent-hijacking-evaluations) | Malicious instructions embedded in data can redirect agent behavior; agent hijacking needs systematic evaluation | Financial fraud loss rates or effectiveness of Zeta One |
-| [TypeSafe: introducing Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) | Vendor describes structured probabilistic outputs and an inexpensive risk-classification candidate | Independent confirmation of cost, calibration, or accuracy on our payment scenarios |
+| [OWASP: LLM01 Prompt Injection](https://genai.owasp.org/llmrisk/llm01-prompt-injection/) | Defines prompt injection, including indirect injection through content a model reads, such as a file or web page | How often it happens, or losses from it |
+| [TypeSafe: introducing Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) | Vendor describes Jev, its first "System One" model: typed answers with probabilities instead of generated text, $0.042 per million input tokens with output free, 70–500 ms; an inexpensive risk-classification candidate | Independent confirmation of cost, calibration, or accuracy on our payment scenarios |
 
-The first two source pages were located and checked through web search on 2026-10-27. The TypeSafe
-announcement was read earlier in this site work. Keep vendor performance statements attributed;
+The FBI and NIST pages were located and checked through web search on 2026-10-27; the TypeSafe
+announcement and the OWASP page were read directly on 2026-10-29. Keep vendor performance statements attributed;
 report our own measurements separately.
 
 ## Two threat models
@@ -44,18 +45,26 @@ signature proves neither that the proposed recipient is safe nor that the agent 
 invoice correctly. Evidence from the bill, payee records, and payment history helps identify the gap.
 Those records also require provenance; calling them ground truth does not make them infallible.
 
-## Research leads requiring verification before publication
+## Payment-fraud figures, checked
 
-The pasted research lists $3.0B in 2025 reported BEC losses; 76% payment-fraud exposure, 74% BEC
-exposure, and 58% check-fraud exposure in 2026 survey reporting; $8.6B investment-fraud losses;
-and 63% wire / 50% ACH-credit BEC targeting in an earlier survey. Exact primary report pages,
-populations, periods, and denominators were not supplied or verified here. Do not publish these
-numbers until checked against the original FBI/AFP reports. Reported losses, survey exposure,
-attempts, incidents, and transaction-level rates are different measures.
+These measure payment fraud in general. None of them measures fraud carried out through AI agents,
+and none may be quoted as if it did (AGENTS.md rule 16). Checked against the primary sources on
+2026-10-29.
 
-The discussion also mentions a Blue41 banking-assistant test and an IEEE agent-payment study without
-exact paper citations. Preserve these as discovery leads, not evidence of actual financial losses.
-No source here establishes population-level agent-driven financial fraud losses.
+| Figure | What it measures | Source |
+| --- | --- | --- |
+| $3.05 billion reported business email compromise (BEC) losses in 2025 (24,768 complaints); BEC was the second-largest loss category after investment fraud ($8.65 billion) | Losses reported to the FBI by victims, US-centred; reported losses, not all losses | [FBI IC3, 2025 Internet Crime Report](https://www.ic3.gov/AnnualReport/Reports/2025_IC3Report.pdf) |
+| 76% of organizations saw attempted or actual payments fraud in 2025; 74% were targeted by BEC; 58% saw check fraud | A survey of 465 US treasury practitioners in January 2026: the share of organizations exposed, not a loss amount or a rate per payment | [AFP, 2026 Payments Fraud and Control Survey (press release, 14 April 2026)](https://www.financialprofessionals.org/about/learn-more/press-releases/Details/over-75-percent-of-us-firms-experienced-payments-fraud-in-2025-while-ai-adoption-for-fraud-mitigation-lags) |
+
+Business email compromise is a scam in which an attacker compromises or imitates a business or
+supplier email account to have payments sent to an account the attacker controls; changed bank
+details on an invoice are a common form of it.
+
+Not verified, so not for publication: a figure of 63% (wire) and 50% (ACH credit) of BEC attempts
+by payment method from an earlier AFP survey, which the 2026 press release does not give; and the
+Blue41 banking-assistant test and the IEEE agent-payment study mentioned in the research
+discussion, for which no exact citation was supplied. No source here establishes population-level
+agent-driven financial fraud losses.
 
 ## Reusable copy
 
@@ -95,7 +104,7 @@ one category rather than suggesting vendor changes are the whole product.
 
 The variations the discussion raised (unfamiliar impersonation styles, compromised legitimate
 vendor communications, subtle instruction injection, legitimate urgent payments that resemble
-fraud) are now part of the [evaluation plan](evaluation.md#sets): the hand-written `hard` set and
+fraud) are now part of the [evaluation plan](evaluation.md#sets): the `hard` set, written outside the generator, and
 the generator's dimensions. They are planned cases, not results.
 
 ## Adaptation and feedback

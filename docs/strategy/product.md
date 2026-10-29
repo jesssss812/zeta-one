@@ -196,6 +196,10 @@ the differentiator; replacing human fraud analysts or support staff.
 | Build order | A thin end-to-end first version with every principle in it, seven extension seams, then ordered extensions | [implementation-plan.md](implementation-plan.md) |
 | Review assistant | Designed for, not built; the evidence record is its input | this doc |
 
+Since then (2026-10-28): the review assistant was built
+([0015](../decisions/0015-case-review-assistant.md)), and verified outcomes change risk
+([0012](../decisions/0012-verified-outcomes.md), [0013](../decisions/0013-outcomes-change-risk.md)).
+
 Still open: the exact Jev request shape (verify on first call), and whether the staging snapshot is
 rich enough to shape the seed from, or the seed has to be shaped from assumptions and say so.
 

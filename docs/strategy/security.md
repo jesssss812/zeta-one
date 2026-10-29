@@ -7,6 +7,11 @@ The decisions behind the fixes are in
 [../decisions/0010-gateway-guardrails.md](../decisions/0010-gateway-guardrails.md); what is not done
 is tracked in [../roadmap.md](../roadmap.md).
 
+Status on 2026-10-29: the live Rho read is `scripts/staging_check.py`, not a `rho/live.py` client,
+and a test checks that its only request is a GET (S17). The S18 hook is not built; the roadmap lists
+it. The prices each choice pays are in
+[architecture.md](architecture.md#design-trade-offs).
+
 ## What is protected, and from whom
 
 ```
