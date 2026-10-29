@@ -115,7 +115,7 @@ function renderCase(payment, preview) {
   result.append(node('div', {class:'actions'}, actionButton(outer ? 'Refresh case' : 'Assemble case', 'assemble', payment, preview)));
   if (!outer) return result;
   if (f?.summary) result.append(node('p', {text:f.summary}));
-  if (outer.errors?.length) result.append(node('p', {class:'case-note',text:outer.errors.map(e => typeof e === 'string' ? e : json(e)).join(' · ')}));
+  if (outer.errors?.length) result.append(node('p', {class:'case-note',text:workspace.mode === 'live' ? outer.errors.map(e => typeof e === 'string' ? e : json(e)).join(' · ') : 'Models are off in this sandbox, so the assistant wrote no summary. The records below were gathered by code. Start the demo server with ZETA_DEMO_LIVE=1 to have the assistant assemble the case.'}));
   for (const [key,label] of [['verified_facts','Facts with sources'],['inferences','Inferences'],['contradictions','Contradictions'],['open_questions','Open questions'],['missing_evidence','Missing evidence']]) {
     if (!f?.[key]?.length) continue;
     result.append(disclosure(label,node('ul',{class:'case-list'},f[key].map(item => node('li',{}, typeof item === 'string' ? item : item.statement || json(item), item.sources?.length ? node('small',{text:'Sources: ' + item.sources.join(', ')}) : null,item.basis ? node('small',{text:'Basis: ' + item.basis}) : null)))));
