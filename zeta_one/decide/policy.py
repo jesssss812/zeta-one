@@ -31,6 +31,9 @@ class PolicyInput:
     authorization_doc: Authorization | None
     risk: RiskEvidence
     proposal: Proposal | None
+    # Whether the context shows a settled payment to this payee; None, when the context didn't load,
+    # counts as never paid.
+    payee_paid_before: bool | None = None
 
 
 @dataclass(frozen=True)
@@ -60,9 +63,9 @@ def _redirect_pattern(p: PolicyInput) -> bool:
 
 
 def _new_counterparty_needs_approval(p: PolicyInput) -> bool:
-    feature = p.risk.features.get("counterparty_is_new")
+    """A payee with no settled payment history (decision 0006). A payee's age is a risk signal, not this rule."""
     allowed = p.authorization_doc.allow_new_counterparties if p.authorization_doc else False
-    return bool(feature and feature.value is True) and not allowed
+    return p.payee_paid_before is not True and not allowed
 
 
 def _above_approval_threshold(p: PolicyInput) -> bool:

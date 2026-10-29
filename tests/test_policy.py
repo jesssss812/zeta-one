@@ -31,8 +31,9 @@ def _proposal(amount=100) -> Proposal:
                     amount=Money(amount=amount, currency="USD"))
 
 
-def _decide(risk, auth=None, amount=100):
-    return policy.decide(policy.PolicyInput(VERIFIED, AuthorizationEvidence(), auth or _auth(), risk, _proposal(amount)))
+def _decide(risk, auth=None, amount=100, paid_before=True):
+    return policy.decide(policy.PolicyInput(VERIFIED, AuthorizationEvidence(), auth or _auth(), risk, _proposal(amount),
+                                            paid_before))
 
 
 @pytest.mark.parametrize("risk, decision, reason", [
@@ -43,8 +44,6 @@ def _decide(risk, auth=None, amount=100):
     (RiskEvidence(level="low", tier_results=[TierResult(tier="strong", error="refusal")]), "challenge",
      "risk:model_unavailable"),
     (RiskEvidence(level="high"), "challenge", "risk:high"),
-    (RiskEvidence(level="low", features={"counterparty_is_new": Feature(value=True)}), "challenge",
-     "authorization:new_counterparty_requires_approval"),
     (RiskEvidence(level="elevated"), "challenge", "risk:elevated"),
     (RiskEvidence(level="low"), "allow", "clean"),
 ])
@@ -54,9 +53,16 @@ def test_rows(risk, decision, reason):
     assert outcome.friction_rung == {"allow": 0, "challenge": 2, "block": 5}[decision]
 
 
-def test_new_counterparty_allowed_by_authorization_passes():
+@pytest.mark.parametrize("paid_before", [False, None])
+def test_a_payee_never_paid_needs_approval_unless_the_grant_allows_new_payees(paid_before):
+    outcome = _decide(RiskEvidence(level="low"), paid_before=paid_before)
+    assert (outcome.decision, outcome.reasons) == ("challenge", ["authorization:new_counterparty_requires_approval"])
+    assert _decide(RiskEvidence(level="low"), _auth(allow_new_counterparties=True), paid_before=paid_before).decision == "allow"
+
+
+def test_a_young_payee_that_has_been_paid_is_not_an_authorization_question():
     risk = RiskEvidence(level="low", features={"counterparty_is_new": Feature(value=True)})
-    assert _decide(risk, _auth(allow_new_counterparties=True)).decision == "allow"
+    assert _decide(risk).decision == "allow"
 
 
 def test_approval_threshold_is_inclusive_and_currency_strict():
@@ -65,7 +71,7 @@ def test_approval_threshold_is_inclusive_and_currency_strict():
     assert _decide(RiskEvidence(level="low"), auth, amount=1001).reasons == ["authorization:human_approval_threshold"]
     eur = Proposal(counterparty_id="cp", payment_method_id="pm", source_account_id="acct",
                    amount=Money(amount=10, currency="EUR"))
-    outcome = policy.decide(policy.PolicyInput(VERIFIED, AuthorizationEvidence(), auth, RiskEvidence(level="low"), eur))
+    outcome = policy.decide(policy.PolicyInput(VERIFIED, AuthorizationEvidence(), auth, RiskEvidence(level="low"), eur, True))
     assert outcome.reasons == ["authorization:human_approval_threshold"]
 
 

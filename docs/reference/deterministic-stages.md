@@ -83,6 +83,8 @@ expiry, per-payment cap and rolling cap. An expiry without a timezone fails clos
 violation. Currency comparisons are strict; equal-to-cap payments pass.
 Rolling spend includes held and executed payments supplied by the gateway. Missing or revoked grants
 block. New-payee permission and human-approval thresholds remain policy challenges, not scope blocks.
+The new-payee challenge is for a payee with no settled payment history; a payee added in the last
+30 days that has been paid is a risk signal (`counterparty_is_new`), not an authorization question.
 Authorizations are stored unsigned; unknown fields are preserved but not enforced.
 
 `.venv/bin/python scripts/keygen.py` creates missing local demo keys under gitignored `data/keys/`

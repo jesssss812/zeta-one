@@ -109,7 +109,8 @@ class Engine:
             proposal = _parse_or_none(request.body)
 
         outcome = policy.decide(policy.PolicyInput(identity, authorization, authorization_doc, risk,
-                                                   proposal if identity.result == "verified" else None))
+                                                   proposal if identity.result == "verified" else None,
+                                                   context.payment_history.count > 0 if context else None))
         latency["total"] = _ms_since(started)
         record = evidence.build(
             decision_id=self.new_id(),

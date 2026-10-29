@@ -4,6 +4,7 @@ import pytest
 
 from eval import backends, cases, run
 from zeta_one.contracts import TierOutput, TierResult
+from zeta_one.rho.models import Money
 
 
 class EchoStrong:
@@ -231,3 +232,23 @@ def test_a_confirmation_of_an_earlier_change_does_not_confirm_a_later_one(backen
     confirmation = result.record.context.adjustments[0]
     assert confirmation.subject == result.record.context.payment_method_history[0].id
     assert (result.record.context.payment_method_history[0].changed_at - confirmation.at).days == 0
+
+
+@pytest.mark.parametrize("paid, needs_approval", [(False, True), (True, False)])
+def test_only_a_payee_never_paid_needs_approval_as_new(backend, paid, needs_approval):
+    from zeta_one.contracts import SetupOp
+    base = next(c for c in cases.all_cases() if c.id == "demo_routine_bill")
+    setup = [SetupOp(op="add_counterparty", args={"counterparty_id": "cp_young", "name": "Young Supply",
+                                                   "created_days_ago": 10, "payment_method_id": "pm_young"}),
+             SetupOp(op="add_bill", args={"bill_id": "bill_young", "counterparty_id": "cp_young", "amount": 46000,
+                                          "currency": "USD", "document_text": "Delivery job: $460."})]
+    if paid:
+        setup.append(SetupOp(op="add_payments", args={"counterparty_id": "cp_young", "count": 1,
+                                                      "median_amount": 46000, "currency": "USD", "days_ago": 5}))
+    proposal = base.proposal.model_copy(update={"counterparty_id": "cp_young", "payment_method_id": "pm_young",
+                                                "bill_id": "bill_young", "source_document_ids": ["bill_young"],
+                                                "amount": Money(amount=46000, currency="USD")})
+    record = backend.run(base.model_copy(update={"id": "young", "setup": setup, "proposal": proposal}),
+                         run.CONFIGS["rules"]).record
+    assert record.risk.features["counterparty_is_new"].value is True
+    assert ("authorization:new_counterparty_requires_approval" in record.reasons) is needs_approval

@@ -122,7 +122,7 @@ describes how it is produced). Fields the site should rely on:
 ```json
 {
   "schema_version": 1,
-  "decision_id": "dec_...", "created_at": "...", "policy_version": "2026-10-28.4",
+  "decision_id": "dec_...", "created_at": "...", "policy_version": "2026-10-28.5",
   "engine_version": "<git sha>" | null, "seed_version": "<hash>" | null,
   "configuration": {"tiers": ["tier0", "strong"] | ["tier0", "cheap", "strong"], "escalation": "engineered" | "jev" | "always" | "none", "jev_min_confidence": 0.8, "jev_min_finding_confidence": 0.9},
   "decision": "allow" | "challenge" | "block",

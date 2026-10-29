@@ -13,7 +13,7 @@ from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validat
 
 from zeta_one.rho.models import Money
 
-POLICY_VERSION = "2026-10-28.4"
+POLICY_VERSION = "2026-10-28.5"
 SCHEMA_VERSION = 1
 # The largest payment a proposal may name, in minor units: $10 billion, far inside SQLite's integer range.
 MAX_PAYMENT_MINOR_UNITS = 10**12
