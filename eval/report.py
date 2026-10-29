@@ -38,6 +38,15 @@ LIMITATIONS = [
     "repeated proposal reuses its earlier risk result (decision 0010), and the strong tier's fixed system "
     "prompt is prompt-cached; nothing else is cached.",
     "Payments are simulated.",
+    "Each configuration ran once per set; Opus did not always give the same level on a repeat pass.",
+    "On test, 60 of the 100 labels are the AI labeller's alone. On the 40 the owner labelled blind, agreement "
+    "was at chance level; the owner then settled 15 of the 22 disagreements by taking the AI's label.",
+    "The open-weight model's prompt has a section on the business's confirmation records, written from its "
+    "dev failures (decision 0019); Opus's prompt does not have it.",
+    "The open-weight model's cost is the rented GPU's hourly rent for each call's time, an upper bound that "
+    "leaves out idle time; for a business running its own GPU it is a fixed cost whatever the volume.",
+    "On hard, the open-weight arm ran under policy 2026-10-28.5 and the other arms under 2026-10-28.4; the two "
+    "differ only on H24.",
 ]
 
 
