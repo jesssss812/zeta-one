@@ -29,6 +29,10 @@ ORDER = [
     "invoice_redirect_instructions",
 ]
 PATH = "/v1/actions/propose_payment"
+# Bills cancelled in a scenario's sandbox, so its context matches its fixture. The redirect
+# scenario's invoice is an open bill of the vendor the bank-change scenario pays, and its injected
+# text would otherwise flag that scenario too.
+CANCELLED_IN_SANDBOX = {"vendor_payment_method_changed": ("bill_0194",)}
 
 
 def load_fixture(name: str) -> ScenarioResult:
@@ -51,6 +55,8 @@ def run(name: str, live_models: bool = False) -> ScenarioResult:
     connection = sqlite3.connect(":memory:", check_same_thread=False)
     key = Ed25519PrivateKey.generate()
     with SeedStore() as store:
+        for bill_id in CANCELLED_IN_SANDBOX.get(name, ()):
+            store.put("bills", {**store.get("bills", bill_id), "status": "canceled"})
         stages = real_stages(connection, store)
         if identity.result != "unknown_agent":
             stages.registry.register(identity.claimed_agent_id, identity.business_id,

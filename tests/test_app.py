@@ -76,6 +76,14 @@ def test_the_latest_evaluation_report_is_served(tmp_path):
     assert client.get("/v1/eval/latest").json() == {"sets": {}}
 
 
+def test_the_bank_change_scenario_sees_only_the_bank_change(client):
+    record = client.post("/v1/scenarios/vendor_payment_method_changed/run", json={}).json()["decision_record"]
+    assert "bill_0194" not in [bill["id"] for bill in record["context"]["open_bills"]]
+    assert record["risk"]["floor"]["flags"] == ["payment_method_changed_days_ago"]
+    redirect = client.post("/v1/scenarios/invoice_redirect_instructions/run", json={}).json()["decision_record"]
+    assert redirect["decision"] == "block"
+
+
 @pytest.mark.parametrize("name", ORDER)
 def test_scenarios_run_on_the_real_stages(client, name):
     body = client.post(f"/v1/scenarios/{name}/run", json={}).json()
