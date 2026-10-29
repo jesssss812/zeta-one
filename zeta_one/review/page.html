@@ -182,12 +182,26 @@ function logo(name, domain) {
   return box;
 }
 
-async function api(path, body) {
+async function api(path, body, retried = false) {
   const headers = { "Authorization": "Bearer " + $("token").value, "Content-Type": "application/json" };
   const response = await fetch(path, body ? { method: "POST", headers, body: JSON.stringify(body) } : { headers });
+  // On the demo server the sandbox's token changes each time it starts; take the current one and retry.
+  if (response.status === 401 && !retried && await demoToken()) return api(path, body, true);
   const data = await response.json();
   if (!response.ok) throw new Error((data.error && data.error.message) || response.status);
   return data;
+}
+
+async function demoToken() {
+  try {
+    const response = await fetch("/v1/demo");
+    if (!response.ok) return false;
+    const token = (await response.json()).review_token;
+    if (!token || token === $("token").value) return false;
+    $("token").value = token;
+    try { sessionStorage.setItem("zeta-admin", token); sessionStorage.setItem("zeta-demo", "1"); } catch (e) {}
+    return true;
+  } catch (e) { return false; }
 }
 
 function card(title, ...children) { return el("section", { class: "card" }, el("h2", { text: title }), ...children); }
