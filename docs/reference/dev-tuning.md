@@ -133,6 +133,33 @@ differences there were are on cases whose input did not change, so they are run-
 under `jev`, Jev sent `dev_016` on to Opus this time and Opus rated `dev_032` high rather than
 elevated; under `engineered`, Opus rated `dev_035` elevated rather than high.
 
+## 6. The open-weight model on a GPU we control
+
+`open_weight` with Qwen 3.6 27B (FP8) on a rented A40 through vLLM (decision 0018), one run, per-case
+record in [data/eval/baselines/dev-2026-10-29-self-hosted/](../../data/eval/baselines/dev-2026-10-29-self-hosted/),
+beside tier 0 alone and Opus under the same escalation:
+
+| On `dev` | `rules` | `open_weight` (Qwen 3.6 27B) | `engineered` (Opus) |
+| --- | --- | --- | --- |
+| Acceptable | 43/51 | 39/51 | 49/51 |
+| Fraud caught | 22/22 | 22/22 | 22/22 |
+| Legitimate challenged / blocked | 21/29 / 0 | 14/29 / 7 | 9/29 / 0 |
+| Cases that reached the model | – | 29 | 29 |
+| Cases where the model lowered tier 0's level | – | 0 | 12 |
+| $ per 1,000 decisions | 0 | 1.98, GPU time, an upper bound | 15.26 |
+| Model latency p50 / p95 | – | 21.2 s / 26.0 s | 7.4 s / 9.4 s |
+
+The 27B model never cleared a payment tier 0 had flagged, and blocked 7 legitimate ones that tier 0
+alone only challenged; it reported an injection in all 7. In the 4 that are bank changes the
+business had confirmed, it read the vendor's ordinary note ("we confirmed the new details by phone
+with your team") as social engineering, and set aside the business's own confirmation record, which
+Opus cites to clear them. It let no fraud through. On `dev` it adds friction tier 0 does not, at about
+an eighth of Opus's model cost.
+
+The earlier run of Qwen3 235B through OpenRouter (37/51, the same fraud caught and legitimate
+challenged or blocked) predates sections 3 to 5: it reached the model in 43 cases, so it is not a
+like-for-like comparison.
+
 ## Limits
 
 - `jev` and `engineered` have two runs each with the tuned rule (sections 3 to 5), with no decision
