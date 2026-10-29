@@ -280,7 +280,7 @@ def create_app(gateway: Gateway, token: str | None, eval_report: Path = EVAL_REP
 
     @app.post("/v1/cases/{case_id}/chat")
     async def ask_about_case(case_id: str, request: Request):
-        """A case worker's question, answered by the local model from this case's evidence only."""
+        """A case worker's question, answered by the chat model from this case's evidence only."""
         admin.require_admin(request.headers, token)
         body, problem = _body(CaseQuestion, await request.body())
         if problem:

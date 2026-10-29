@@ -1,7 +1,8 @@
 # 0018: The open-weight arm runs on a GPU we control, as a customer's own server would
 
 Date: 2026-10-29. Status: accepted. Supersedes point 2 of 0014 for the evaluation; the rest of 0014
-stands.
+stands. Point 2 is amended by 0015's 2026-10-29 amendment: the live demo's case chat also sends its
+synthetic cases to the server, and the pod is kept until after the demo.
 
 ## Context
 

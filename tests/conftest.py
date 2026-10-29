@@ -18,17 +18,20 @@ def scenario(fixture_raw) -> ScenarioResult:
     return ScenarioResult.model_validate(fixture_raw)
 
 
-MODEL_KEYS = ("ANTHROPIC_API_KEY", "OPENROUTER_API_KEY", "TYPESAFE_API_KEY", "OPEN_WEIGHT_API_KEY")
+MODEL_SETTINGS = ("ANTHROPIC_API_KEY", "OPENROUTER_API_KEY", "TYPESAFE_API_KEY", "OPEN_WEIGHT_API_KEY",
+                  "OPEN_WEIGHT_BASE_URL", "OPEN_WEIGHT_MODEL", "OPEN_WEIGHT_PRICES", "OPEN_WEIGHT_GPU_HOURLY",
+                  "CHAT_API_KEY", "CHAT_BASE_URL", "CHAT_MODEL")
 
 
 @pytest.fixture(autouse=True)
-def no_real_model_keys(request, tmp_path_factory, monkeypatch):
-    """Keep every test away from the real `.env` and the shell's model keys, so no test makes a paid
-    call by accident. Tests marked live_models keep them."""
+def no_real_model_settings(request, tmp_path_factory, monkeypatch):
+    """Keep every test away from the real `.env` and the shell's model keys, addresses and prices, so no
+    test makes a paid call by accident or depends on the owner's set-up. Tests marked live_models keep
+    them."""
     if "live_models" in request.keywords:
         return
     from zeta_one import settings
 
     monkeypatch.setattr(settings, "ROOT", tmp_path_factory.mktemp("no_env"))
-    for name in MODEL_KEYS:
+    for name in MODEL_SETTINGS:
         monkeypatch.delenv(name, raising=False)

@@ -284,26 +284,28 @@ function side(c) {
     } catch (e) { $("f-status").textContent = "Not recorded: " + e.message; }
   });
   const log = el("div", { class: "log" });
-  const say = (q, a, extra) => { log.append(el("div", { class: "q", text: q }), el("div", { class: "a" }, linked(a), extra || null)); log.scrollTop = log.scrollHeight; };
+  const ranAt = (note) => note ? el("div", { class: "note", text: note }) : null;
+  const say = (q, a, note) => { log.append(el("div", { class: "q", text: q }), el("div", { class: "a" }, linked(a), ranAt(note))); log.scrollTop = log.scrollHeight; };
   const input = el("input", { placeholder: "Ask about this case…", maxlength: "1000" });
   const ask = el("form", {}, input, el("button", { text: "Ask" }));
   ask.addEventListener("submit", async (event) => {
     event.preventDefault();
     const question = input.value.trim(); if (!question) return;
-    input.value = ""; const pending = el("div", { class: "a note", text: "Thinking (local model)…" });
+    input.value = ""; const pending = el("div", { class: "a note", text: "Thinking…" });
     log.append(el("div", { class: "q", text: question }), pending);
     try {
       const reply = await api(`/v1/cases/${encodeURIComponent(c.case_id)}/chat`, { question, by: $("by").value || "case worker" });
       pending.replaceWith(el("div", { class: "a" }, linked(reply.answer),
-        reply.not_in_case.length ? el("div", { class: "warn", text: "Cited but not in this case: " + reply.not_in_case.join(", ") }) : null));
+        reply.not_in_case.length ? el("div", { class: "warn", text: "Cited but not in this case: " + reply.not_in_case.join(", ") }) : null,
+        ranAt(reply.note)));
     } catch (e) { pending.replaceWith(el("div", { class: "a warn", text: e.message })); }
     log.scrollTop = log.scrollHeight;
   });
-  api(`/v1/cases/${encodeURIComponent(c.case_id)}/chat`).then((turns) => turns.forEach((t) => say(t.question, t.answer))).catch(() => {});
+  api(`/v1/cases/${encodeURIComponent(c.case_id)}/chat`).then((turns) => turns.forEach((t) => say(t.question, t.answer, t.note))).catch(() => {});
   return el("aside", { class: "side" },
     card("Your checks", checks.length ? checklist : el("p", { class: "empty", text: "No checks suggested." })),
     el("section", { class: "card chat" }, el("h2", { text: "Ask about this case" }), log, ask,
-      el("p", { class: "note", text: "A local model answers from this case's evidence only. It runs on this machine and decides nothing." })),
+      el("p", { class: "note", text: "A model answers from this case's evidence only and decides nothing. Each answer names the model and whether it ran through this machine or on a remote server." })),
     card("Record what you found", form, el("p", { class: "note", text: "Only a verified method changes risk. The assistant never records a finding." })));
 }
 
