@@ -11,7 +11,7 @@ bill arriving with a malicious invoice. Also:
 
 - staging needs a VPN, which judges and cloud sessions don't have
 - the submission must be reproducible from a public repo
-- staging access is expected to end after the hackathon, so it may not work at the Hack Fair
+- staging access is expected to end after the hackathon, so it may not work for a later demo
 - live data can change under the evaluation
 
 ## Decision

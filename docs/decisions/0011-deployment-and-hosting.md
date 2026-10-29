@@ -4,7 +4,7 @@ Date: 2026-10-27. Status: accepted. Amends 0005 (where the UI lives).
 
 ## Context
 
-The judges reproduce the build from the README, score a live Hack Fair demo and a Loom, and accept
+The judges reproduce the build from the README, score a live demo and a demo video, and accept
 a screen capture in place of a deployed URL.
 The live Rho read needs a VPN only the owner's laptop has. A public gateway would expose open demo
 endpoints and a way to spend the owner's Anthropic budget ([../strategy/security.md](../strategy/security.md)).
@@ -13,8 +13,8 @@ options and their tradeoffs are in [../strategy/architecture.md](../strategy/arc
 
 ## Decision
 
-1. **The live gateway runs on the owner's laptop**, bound to 127.0.0.1, for the Loom and the Hack
-   Fair. No hosted gateway in the first version.
+1. **The live gateway runs on the owner's laptop**, bound to 127.0.0.1, for the demo video and the
+   live demo. No hosted gateway in the first version.
 2. **Gateway state is SQLite**, `data/zeta.db`. Module SQL stays plain, so a move to Postgres later
    is small.
 3. **The strong tier calls the Anthropic API directly** with the owner's Console key.
