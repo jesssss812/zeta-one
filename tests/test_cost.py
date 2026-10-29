@@ -15,7 +15,7 @@ def _risk(model="claude-opus-5-5", **usage) -> RiskEvidence:
 def test_cache_reads_and_writes_are_priced_from_the_input_price():
     cost = _cost(_risk(input_tokens=100, output_tokens=10, cache_read_input_tokens=50_000,
                        cache_creation_input_tokens=3_000), PRICES)
-    expected = (100 + 50_000 * 0.1 + 3_000 * 1.25) * 4.0 / 1e6 + 10 * 20.0 / 1e6
+    expected = (100 + 50_000 * 0.05 + 3_000 * 1.25) * 4.0 / 1e6 + 10 * 20.0 / 1e6
     assert cost.usd == pytest.approx(expected)
     assert (cost.cache_read_input_tokens, cost.cache_creation_input_tokens) == (50_000, 3_000)
 

@@ -71,8 +71,8 @@ def build(
     )
 
 
-# Anthropic bills cache reads at a tenth of the input price and five-minute cache writes at 1.25x.
-CACHE_READ_MULTIPLIER = 0.1
+# Anthropic bills Claude Opus 5.5's cache reads at 0.05x the input price and five-minute cache writes at 1.25x.
+CACHE_READ_MULTIPLIER = 0.05
 CACHE_WRITE_MULTIPLIER = 1.25
 
 
