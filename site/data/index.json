@@ -1,18 +1,18 @@
 {
-  "engine_version": "301a007",
+  "engine_version": "8c06f8b",
   "eval_report": "eval_report.json",
   "live_models": true,
   "note": "Recorded results of real engine runs on synthetic data. Payments are simulated. Escalating scenarios called the strong tier live.",
   "policy_version": "2026-10-28.5",
   "recorded": true,
-  "recorded_at": "2026-10-29T16:49:33+00:00",
+  "recorded_at": "2026-10-29T18:58:02+00:00",
   "scenarios": [
     {
-      "decision": "block",
+      "decision": "challenge",
       "illustrative": false,
       "name": "vendor_payment_method_changed",
       "reasons": [
-        "risk:high_with_redirect_pattern"
+        "risk:elevated"
       ],
       "replayed_stages": []
     },

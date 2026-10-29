@@ -259,7 +259,7 @@
     },
     "created_at": "2026-10-27T22:00:00Z",
     "decision": "allow",
-    "decision_id": "dec_e0f1cf2409194741",
+    "decision_id": "dec_26c4d45750aa4101",
     "engine_version": null,
     "execution": {
       "simulated": true,
@@ -278,7 +278,7 @@
       ],
       "claimed_agent_id": "agent_ap_assistant_01",
       "key_id": "agent_ap_assistant_01",
-      "nonce": "4ca3f93b43dfdfbe45b80ba837075cd8",
+      "nonce": "d9b6fbcf58e0bf77fdc4217698ab3bb8",
       "owner": "finance-owner@larkspur.example",
       "result": "verified",
       "timestamp": "2026-10-27T22:00:00+00:00"
@@ -407,7 +407,7 @@
     ]
   },
   "recorded": {
-    "at": "2026-10-29T16:49:33+00:00",
+    "at": "2026-10-29T18:58:02+00:00",
     "live_models": true
   },
   "replayed_stages": [],

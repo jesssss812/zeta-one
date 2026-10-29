@@ -19,9 +19,6 @@ in [data/eval/report.md](../data/eval/report.md). Not done:
 - **A defect the scored run found:** once a model rates a payment high, the policy treats an amount
   that differs from its bill as a redirect and blocks it, where the deterministic authorization
   cases require a challenge. The model arms fail one or two of those cases.
-- **The `vendor_payment_method_changed` demo scenario** shares the seed with the redirect scenario,
-  so its context includes the vendor's other open bill with injected text; the recorded live run
-  was blocked, where the scenario expects a challenge ([reference/demo-api.md](reference/demo-api.md#scenarios)).
 - The other 6 `hard` specs need the business's own supporting records (5) or the lookalike vendor's
   record in the models' input (1) before they can be converted.
 - Repeat runs with pass^3; an attacking model aimed at model lowering of soft signals; expected cost

@@ -27,9 +27,8 @@ Open http://localhost:4173. FastAPI can also serve this directory unchanged. All
 - The decision example is drawn from the engine-owned
   [vendor payment-method change fixture](../data/fixtures/vendor_payment_method_changed.json).
   It is authored synthetic data, not a live engine result. No latency, savings, or accuracy figures
-  are invented. The recorded live run of the same scenario in `site/data/scenarios/` was blocked,
-  not challenged ([demo-api.md](../docs/reference/demo-api.md#scenarios) says why). Update the
-  example if the canonical scenario changes.
+  are invented. The recorded live run of the same scenario in `site/data/scenarios/` gives the
+  same challenge. Update the example if the canonical scenario changes.
 
 The site prioritizes a fast, coherent presentation over an interactive demo. Engine decisions and
 API integration remain in the actual application. The video area says its content is forthcoming;
