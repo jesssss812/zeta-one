@@ -57,7 +57,7 @@ first in the `jev` configuration, or an open-weight model in Opus's place.
 | Gateway: identity, authorization, risk rules, policy, evidence, simulated payments | Working end to end over HTTP, on synthetic data in Rho's shapes |
 | Model review: Claude Opus 5.5; Jev (OpenRouter, TypeSafe as backup); an open-weight model, Qwen 3.6 27B, on a GPU we rent | Each ran once on the full evaluation |
 | Feedback loop: verified outcomes and risk adjustments | Working; recorded end to end in `site/data/loop.json` |
-| Case review page with source links and a local chat model | Research and assembly ran live; the chat needs a local model |
+| Case review page with source links and a chat model, local or on the rented GPU | Research and assembly ran live; the chat has not yet answered a live question |
 | Evaluation: labelled `dev` and `test` sets and a `hard` set written outside the generator, seven configurations, cost table ([how it works](docs/reference/evaluation-system.md)) | Scored, one run each: [the report](data/eval/report.md) |
 | Rho | Read-only: the API cannot make payments, so execution is simulated |
 
