@@ -63,6 +63,28 @@ shapes and a read-only staging connection. It is not a Rho product. **Payment ex
   researches the vendor and links its claims to sources for case review; people record findings
   and make consequential decisions.
 
+## How it fits into a fintech
+
+Zeta One is built to sit in a financial platform's payment path, such as Rho's, between a
+customer's agent and the money moving. The local demo runs the same decision engine a platform
+would connect to its own records and payment execution.
+
+<img src="site/integration-flow.svg" width="1000" alt="Today's signed demo proposals and a future fintech's customer requests feed one shared Zeta One engine: identity, authorization, risk, policy and evidence. The demo simulates payment outcomes; a future platform must enforce the decision before real execution. Dashed paths are proposed integration work.">
+
+What a fintech needs to connect:
+
+| | What it means |
+| --- | --- |
+| **Enforcement** | Put the engine in the payment path and enforce allow, hold or block on the server, with no route around the checks |
+| **Authority** | Bind each agent to its customer and delegated limits; connect identity, expiry and revocation to platform systems |
+| **Context** | Supply current bills, vendor and bank-change history, and settled or held payments, keeping each customer's data apart |
+| **Execution** | Bind the decision to the exact payment, recheck changed state, reserve spend and prevent duplicate execution |
+| **Review** | Route holds to authorized staff, record what they verified and how, and keep trust adjustments traceable and revocable |
+| **Operations** | Add durable storage, monitoring and outage handling; validate in shadow mode on representative data before enforcing |
+
+Rho's API has no payment-write endpoint or pre-execution hook today, so none of these connections
+is implemented here. The [integration guide](docs/reference/fintech-integration.md) has the detail.
+
 ## Results
 
 One run per configuration on synthetic cases, recorded on 29 October 2026:
