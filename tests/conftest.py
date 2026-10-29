@@ -18,7 +18,8 @@ def scenario(fixture_raw) -> ScenarioResult:
     return ScenarioResult.model_validate(fixture_raw)
 
 
-MODEL_KEYS = ("ANTHROPIC_API_KEY", "OPENROUTER_API_KEY", "TYPESAFE_API_KEY", "OPEN_WEIGHT_API_KEY")
+MODEL_KEYS = ("ANTHROPIC_API_KEY", "OPENROUTER_API_KEY", "TYPESAFE_API_KEY", "OPEN_WEIGHT_API_KEY",
+              "CHAT_API_KEY", "CHAT_BASE_URL", "CHAT_MODEL")
 
 
 @pytest.fixture(autouse=True)

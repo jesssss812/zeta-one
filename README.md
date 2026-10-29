@@ -154,7 +154,7 @@ Reproduce the recorded runs the site shows:
 | `ANTHROPIC_API_KEY` | Claude model review and the case review assistant |
 | `OPENROUTER_API_KEY`, `TYPESAFE_API_KEY` | Jev |
 | `OPEN_WEIGHT_BASE_URL`, `OPEN_WEIGHT_MODEL`, `OPEN_WEIGHT_API_KEY`, `OPEN_WEIGHT_GPU_HOURLY` | The open-weight arm on its own GPU server |
-| `CHAT_BASE_URL`, `CHAT_MODEL` | The case chat on a local model (`ollama pull qwen2.5:7b`) |
+| `CHAT_BASE_URL`, `CHAT_MODEL`, `CHAT_API_KEY` | The case chat: a local model by default (`ollama pull qwen2.5:7b`), or the open-weight arm's GPU server with its key, which sends the case to that server |
 | `RHO_API_TOKEN` | The read-only Rho staging check (needs the hackathon VPN) |
 
 With no keys, everything runs: escalated cases are held for a person and the tests use stubs.
@@ -168,7 +168,7 @@ Python 3.13 or later (CI runs 3.14), FastAPI, Pydantic, SQLite, pytest and Hypot
 | [Claude Opus 5.5](https://www.anthropic.com/claude) | Anthropic's large language model; the strong risk tier | The Anthropic API |
 | [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) | TypeSafe's typed decision model (a "System One" model): it answers fixed questions with probabilities instead of writing text; the cheap risk tier ([details](docs/reference/jev.md)) | [OpenRouter](https://openrouter.ai), a service that routes one API to many model providers; TypeSafe's own API as the backup |
 | [Qwen 3.6 27B](https://huggingface.co/Qwen/Qwen3.6-27B-FP8) | An open-weight model (weights published under Apache 2.0), compared in Opus's place | [vLLM](https://docs.vllm.ai), an open-source model server, on one GPU we rent |
-| [Ollama](https://ollama.com) | Runs a small model locally | The case review page's chat |
+| [Ollama](https://ollama.com) | Runs a small model locally | The case review page's chat, unless it is pointed at the GPU server above |
 
 A static site is in `site/`. Where each piece runs is in
 [docs/strategy/architecture.md](docs/strategy/architecture.md).

@@ -290,20 +290,22 @@ function side(c) {
   ask.addEventListener("submit", async (event) => {
     event.preventDefault();
     const question = input.value.trim(); if (!question) return;
-    input.value = ""; const pending = el("div", { class: "a note", text: "Thinking (local model)…" });
+    input.value = ""; const pending = el("div", { class: "a note", text: "Thinking…" });
     log.append(el("div", { class: "q", text: question }), pending);
     try {
       const reply = await api(`/v1/cases/${encodeURIComponent(c.case_id)}/chat`, { question, by: $("by").value || "case worker" });
+      where.textContent = reply.note + " It decides nothing.";
       pending.replaceWith(el("div", { class: "a" }, linked(reply.answer),
         reply.not_in_case.length ? el("div", { class: "warn", text: "Cited but not in this case: " + reply.not_in_case.join(", ") }) : null));
     } catch (e) { pending.replaceWith(el("div", { class: "a warn", text: e.message })); }
     log.scrollTop = log.scrollHeight;
   });
+  const where = el("p", { class: "note", text: "A model answers from this case's evidence only and decides nothing. Each answer says where it ran." });
   api(`/v1/cases/${encodeURIComponent(c.case_id)}/chat`).then((turns) => turns.forEach((t) => say(t.question, t.answer))).catch(() => {});
   return el("aside", { class: "side" },
     card("Your checks", checks.length ? checklist : el("p", { class: "empty", text: "No checks suggested." })),
     el("section", { class: "card chat" }, el("h2", { text: "Ask about this case" }), log, ask,
-      el("p", { class: "note", text: "A local model answers from this case's evidence only. It runs on this machine and decides nothing." })),
+      where),
     card("Record what you found", form, el("p", { class: "note", text: "Only a verified method changes risk. The assistant never records a finding." })));
 }
 
