@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 
 from zeta_one.demo.story import TITLES, Story
 from zeta_one.review.explain import summary
@@ -78,6 +78,10 @@ class DemoServer:
         def page():
             return PAGE.read_text()
 
+        @control.get("/")
+        def root():
+            return RedirectResponse("/demo")
+
         @control.get("/v1/demo")
         def current():
             with self._lock:
@@ -104,7 +108,7 @@ class DemoServer:
 
     async def __call__(self, scope, receive, send) -> None:
         path = scope.get("path", "")
-        if scope["type"] != "http" or path == "/demo" or path == "/v1/demo" or path.startswith("/v1/demo/"):
+        if scope["type"] != "http" or path in ("/", "/demo", "/v1/demo") or path.startswith("/v1/demo/"):
             await self.control(scope, receive, send)
         else:
             await self.story.app(scope, receive, send)

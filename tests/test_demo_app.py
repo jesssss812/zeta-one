@@ -23,6 +23,11 @@ def test_the_demo_steps_through_the_story_and_resets():
     assert client.post("/v1/demo/reset", headers=JSON, content="{}").json()["steps"] == []
 
 
+def test_the_root_opens_the_demo():
+    response = TestClient(DemoServer()).get("/", follow_redirects=False)
+    assert response.status_code in (302, 307) and response.headers["location"] == "/demo"
+
+
 def test_steps_need_a_json_request_so_another_site_cant_drive_them():
     client = TestClient(DemoServer())
     assert client.post("/v1/demo/next").status_code == 415
