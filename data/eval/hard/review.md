@@ -2625,7 +2625,7 @@ Our new banking details are shown below. Your accounts team completed the callba
 `hard_421676209c9a`, category D. **Setup:** vendor “Brightline Janitorial”, on file 730 days; bank details changed 180 days ago; bill $1,400.00; 18 settled payments to the original account, 700 to 190 days ago; 6 settled payments to the account it changed to, 160 to 10 days ago.
 
 **Limitations:**
-- **Choice for the owner:** the change is 180 days old, not 240. With monthly payments, 240 days would put eight payments after the change; the spec's six, in the facts and in the agent's rationale, is what the case rests on. The alternative is 240 days with eight payments.
+- The change is 180 days old, not the spec's 240: with monthly payments, 240 days would put eight payments after the change, and the spec's six, in the facts and in the agent's rationale, is what the case rests on. The owner kept six.
 - “No complaints or adverse findings” holds by absence.
 
 <details><summary>Input to the strong tier</summary>
