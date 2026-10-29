@@ -2,7 +2,35 @@
 
 Each change made on the labelled `dev` set after the [baseline](dev-baseline.md), what was measured,
 and what it changed. `dev` is the tuning set: these are not scores. The score comes from the frozen
-`test` and `hard` sets, which no change here was looked at against.
+`test` and `hard` sets, which no change here was looked at against. One change outside this page
+was: the new-payee approval rule (policy 2026-10-28.5) was brought in line with decision 0006 after
+the first `hard` run showed it challenging a young payee that had been paid; it changed no `dev`
+decision.
+
+## Where `dev` stands
+
+The latest run of each arm on the 51 `dev` cases, one run each. 22 cases are fraud or a manipulated
+agent, all of it detectable; 29 are legitimate.
+
+| Arm | Acceptable | Fraud stopped | Legitimate challenged / blocked | Reached the large model | $ per 1,000 decisions | Latency p50 / p95 | Engine, policy |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Always allow | 19/51 | 0/22 | 0 / 0 | – | 0 | – | – |
+| Always challenge | 36/51 | 22/22 | 29 / 0 | – | 0 | – | – |
+| `rules` (tier 0 alone) | 43/51 | 22/22 | 21 / 0 | – | 0 | under 0.1 s | `b850a2f`, .5 |
+| `jev` (tier 0, Jev, then Opus) | 49/51 | 22/22 | 9 / 0 | 23 | 12.04 | 0.9 s / 10.9 s | `23c489e`, .4 |
+| `engineered` (tier 0, then Opus) | 49/51 | 22/22 | 9 / 0 | 29 | 15.26 | 5.5 s / 9.2 s | `23c489e`, .4 |
+| `open_weight` (tier 0, then Qwen 3.6 27B on our GPU) | 50/51 | 22/22 | 12 / 0 | 29 | 1.76, GPU time | 10.1 s / 28.5 s | `fe349b5`, .5 |
+| `strong` (Opus on every case) | 49/51 | 22/22 | 9 / 0 | 51 | 23.96 | 6.4 s / 9.5 s | `7ba6857`, .4 |
+
+"Stopped" is challenged or blocked. Policy 2026-10-28.4 and .5 make the same decision on every `dev`
+case. Latency is the whole decision; the open-weight model's is longer because it runs on one rented
+GPU. `strong` was last run before sections 3 to 5, which change what Opus sees only in confirmed
+changes and Jev's wording.
+
+What it shows on `dev`: every arm with a model stops the same fraud tier 0 alone stops; the models'
+work is clearing legitimate payments tier 0 flagged. Jev sends 6 fewer cases to Opus than
+`engineered` for the same decisions, and the self-hosted 27B matches Opus at about a ninth of the
+model cost per decision, after a prompt section written from these cases (section 6).
 
 ## 1. What Jev is asked, and how
 
