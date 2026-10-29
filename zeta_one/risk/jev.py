@@ -28,6 +28,7 @@ import httpx
 
 from zeta_one.contracts import Level, Money, RiskInput, Signal, TierOutput, TierResult, Usage, max_level
 from zeta_one.risk import claude
+from zeta_one.risk.features import NEW_COUNTERPARTY_DAYS
 from zeta_one.settings import setting
 
 @dataclass(frozen=True)
@@ -184,7 +185,7 @@ class JevTier:
 CHECK_WORDS = {
     "bill_mismatch": "the payee or amount differs from the bill",
     "bill_not_referenced": "the payment cites no bill the payment system holds",
-    "counterparty_is_new": "the payee has never been paid before",
+    "counterparty_is_new": f"the payee was added in the last {NEW_COUNTERPARTY_DAYS} days or has never been paid",
     "document_instruction_patterns": "a document contains text matching known payment-redirect instructions",
     "duplicate_candidate": "a similar payment to this payee went out recently",
     "lookalike_counterparty": "the payee's name closely resembles another vendor's",

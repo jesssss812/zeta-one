@@ -385,3 +385,13 @@ def test_records_without_these_details_add_no_sentence():
     state = jev.render(risk_input("routine_bill_payment"), boundary="B")
     assert "records link" not in state and "ends " not in state
     assert "was confirmed by a person" not in state
+
+
+def test_a_new_payee_check_does_not_claim_a_paid_payee_was_never_paid():
+    from zeta_one.contracts import Feature
+
+    young = risk_input("routine_bill_payment")
+    young.features["counterparty_is_new"] = Feature(value=True, evidence=[young.context.counterparty.id])
+    state = jev.render(young, boundary="B")
+    assert "never been paid before" not in state
+    assert "the payee was added in the last 30 days or has never been paid" in state
