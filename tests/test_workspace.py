@@ -48,7 +48,7 @@ def test_workspace_http_and_legacy_demo():
         assert client.get("/about/").status_code == 200
         for path in ("/about/workspace", "/about/workspace/"):
             assert client.get(path, follow_redirects=False).headers["location"] == "/workspace/"
-        assert client.get("/", follow_redirects=False).headers["location"] == "/demo"
+        assert client.get("/", follow_redirects=False).headers["location"] == "/workspace/"
         assert client.post("/v1/workspace/add", data='{}').status_code == 415
         assert client.post("/v1/workspace/add", json={"recipe_id": "missing"}).status_code == 400
         assert client.post("/v1/workspace/add", json={"recipe_id": "routine", "seed": 42}).status_code == 200

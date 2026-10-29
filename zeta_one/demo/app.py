@@ -85,7 +85,7 @@ class DemoServer:
 
         @control.get("/")
         def root():
-            return RedirectResponse("/demo")
+            return RedirectResponse("/workspace/")
 
         @control.get("/v1/demo")
         def current():

@@ -103,7 +103,7 @@ git config core.hooksPath .githooks  # once per clone: turns on the pre-push che
 .venv/bin/python -m eval.feedback    # verified outcomes in data/zeta.db -> the feedback set
 .venv/bin/python scripts/record_runs.py   # record scenario results and the report into site/data/
 .venv/bin/python scripts/demo_loop.py     # record the feedback loop end to end into site/data/loop.json
-.venv/bin/uvicorn zeta_one.demo.app:app --port 8001  # the one-screen demo at /demo, on its own sandbox
+.venv/bin/uvicorn zeta_one.demo.app:app --port 8001  # the payment workspace at / (/workspace/); the guided story at /demo
 python3 scripts/check.py             # checks that must pass before every push to main
 python3 scripts/staging_check.py     # read-only Rho staging check; needs the VPN and RHO_API_TOKEN in .env
 ```
