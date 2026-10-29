@@ -161,6 +161,8 @@ def test_a_remote_server_gets_the_key_and_the_reply_says_where_it_ran(world, mon
     (Server(error=httpx.ConnectError("refused")), "isn't running"),
     (Server(status=401), "check CHAT_API_KEY"),
     (Server(error=httpx.ReadTimeout("slow")), "timed out"),
+    (Server(error=httpx.RemoteProtocolError("closed mid-answer")), "failed (RemoteProtocolError)"),
+    (Server(error=httpx.ProxyError("bad proxy")), "failed (ProxyError)"),
 ])
 def test_a_failing_remote_server_says_what_failed_without_the_key(world, monkeypatch, server, words):
     client, gateway = world

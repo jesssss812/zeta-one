@@ -84,12 +84,14 @@ class CaseChat:
         where = "the local model" if self.local else "the chat model"
         try:
             status, payload = self._post(f"{self.base_url}/chat/completions", headers, body)
+        except httpx.TimeoutException as error:
+            raise ChatUnavailable(f"{where} timed out") from error
         except (httpx.ConnectError, ConnectionError, OSError) as error:
             raise ChatUnavailable(
                 f"{where} at {self.base_url} isn't running ({type(error).__name__})"
                 + (f"; start it with `ollama serve` and `ollama pull {self.model}`" if self.local else "")) from error
-        except httpx.TimeoutException as error:
-            raise ChatUnavailable(f"{where} timed out") from error
+        except httpx.TransportError as error:
+            raise ChatUnavailable(f"the call to {where} at {self.base_url} failed ({type(error).__name__})") from error
         if status != 200:
             hint = {404: f"; is `{self.model}` pulled?" if self.local else f"; does the server serve `{self.model}`?",
                     401: "; check CHAT_API_KEY", 403: "; check CHAT_API_KEY"}.get(status, "")
