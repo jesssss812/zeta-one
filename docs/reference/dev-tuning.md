@@ -135,30 +135,38 @@ elevated; under `engineered`, Opus rated `dev_035` elevated rather than high.
 
 ## 6. The open-weight model on a GPU we control
 
-`open_weight` with Qwen 3.6 27B (FP8) on a rented A40 through vLLM (decision 0018), one run, per-case
-record in [data/eval/baselines/dev-2026-10-29-self-hosted/](../../data/eval/baselines/dev-2026-10-29-self-hosted/),
-beside tier 0 alone and Opus under the same escalation:
+`open_weight` with Qwen 3.6 27B (FP8) on a rented A40 through vLLM (decision 0018), beside tier 0
+alone and Opus under the same escalation. First with the strong tier's prompt, per-case record in
+[data/eval/baselines/dev-2026-10-29-self-hosted/](../../data/eval/baselines/dev-2026-10-29-self-hosted/);
+then with the section on confirmation records added to its prompt (decision 0019), per-case record in
+[data/eval/baselines/dev-2026-10-29-records/](../../data/eval/baselines/dev-2026-10-29-records/):
 
-| On `dev` | `rules` | `open_weight` (Qwen 3.6 27B) | `engineered` (Opus) |
-| --- | --- | --- | --- |
-| Acceptable | 43/51 | 39/51 | 49/51 |
-| Fraud caught | 22/22 | 22/22 | 22/22 |
-| Legitimate challenged / blocked | 21/29 / 0 | 14/29 / 7 | 9/29 / 0 |
-| Cases that reached the model | – | 29 | 29 |
-| Cases where the model lowered tier 0's level | – | 0 | 12 |
-| $ per 1,000 decisions | 0 | 1.98, GPU time, an upper bound | 15.26 |
-| Model latency p50 / p95 | – | 21.2 s / 26.0 s | 7.4 s / 9.4 s |
+| On `dev` | `rules` | Qwen 3.6 27B, strong tier's prompt | Qwen 3.6 27B, with the section | `engineered` (Opus) |
+| --- | --- | --- | --- | --- |
+| Acceptable | 43/51 | 39/51 | 50/51 | 49/51 |
+| Fraud caught | 22/22 | 22/22 | 22/22 | 22/22 |
+| Legitimate challenged / blocked | 21/29 / 0 | 14/29 / 7 | 12/29 / 0 | 9/29 / 0 |
+| Cases that reached the model | – | 29 | 29 | 29 |
+| Cases where the model lowered tier 0's level | – | 0 | 9 | 12 |
+| $ per 1,000 decisions | 0 | 1.98 | 1.76 | 15.26 |
+| Model latency p50 / p95 | – | 21.2 s / 26.0 s | 18.4 s / 29.4 s | 7.4 s / 9.4 s |
 
-The 27B model never cleared a payment tier 0 had flagged, and blocked 7 legitimate ones that tier 0
-alone only challenged; it reported an injection in all 7. In the 4 that are bank changes the
-business had confirmed, it read the vendor's ordinary note ("we confirmed the new details by phone
-with your team") as social engineering, and set aside the business's own confirmation record, which
-Opus cites to clear them. It let no fraud through. On `dev` it adds friction tier 0 does not, at about
-an eighth of Opus's model cost.
+The 27B's cost is GPU time at $0.59 an hour, an upper bound.
+
+With the strong tier's prompt it never cleared a payment tier 0 had flagged, and blocked 7
+legitimate ones that tier 0 alone only challenged; it reported an injection in all 7. In the 4 that
+are bank changes the business had confirmed, it read the vendor's ordinary note ("we confirmed the
+new details by phone with your team") as social engineering, and set aside the business's own
+confirmation record, which Opus cites to clear them.
+
+With the section it blocked none and cleared 9. Its one miss is the demo bank-change fraud, which
+it blocked where a challenge is expected. A trial run before the recorded one gave the same
+decisions except `dev_022`, challenged there and allowed here. The section was written from these
+`dev` failures, so `test` and `hard` decide whether the gain holds; Opus's prompt does not have it.
 
 The earlier run of Qwen3 235B through OpenRouter (37/51, the same fraud caught and legitimate
-challenged or blocked) predates sections 3 to 5: it reached the model in 43 cases, so it is not a
-like-for-like comparison.
+payments challenged or blocked as the 27B's first run) predates sections 3 to 5: it reached the
+model in 43 cases, so it is not a like-for-like comparison.
 
 ## Limits
 
