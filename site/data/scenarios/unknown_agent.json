@@ -15,6 +15,7 @@
       "invoice_date": "2026-10-25",
       "invoice_number": "CRC-2026-10",
       "memo": "October cleaning services",
+      "paid_by": null,
       "status": null
     },
     "bill_counterparty": null,
@@ -25,12 +26,15 @@
     },
     "counterparty": {
       "created_at": "2025-03-04T17:20:00Z",
+      "email": null,
       "id": "cp_0012",
       "name": "Cedar Ridge Cleaning Services",
       "payment_methods": [
         {
+          "account_ending": null,
           "added_at": "2025-03-04T17:20:00Z",
           "bank_name": "Bluewater Community Bank",
+          "beneficiary_name": null,
           "id": "pm_0012_01",
           "is_default": true,
           "type": "ach"
@@ -41,6 +45,7 @@
     "gateway_payments": [],
     "open_bills": [],
     "payment_history": {
+      "by_method": [],
       "count": 19,
       "duplicate_candidates": [],
       "first_at": "2025-04-01T13:00:00Z",
@@ -55,8 +60,10 @@
             "amount": 185000,
             "currency": "USD"
           },
+          "bill_id": null,
           "id": "txn_0815",
           "method_type": "ach",
+          "payment_method_id": null,
           "posted_at": "2026-10-01T13:02:00Z"
         },
         {
@@ -64,8 +71,10 @@
             "amount": 185000,
             "currency": "USD"
           },
+          "bill_id": null,
           "id": "txn_0783",
           "method_type": "ach",
+          "payment_method_id": null,
           "posted_at": "2026-09-01T13:04:00Z"
         },
         {
@@ -73,8 +82,10 @@
             "amount": 185000,
             "currency": "USD"
           },
+          "bill_id": null,
           "id": "txn_0752",
           "method_type": "ach",
+          "payment_method_id": null,
           "posted_at": "2026-08-01T13:01:00Z"
         }
       ]
@@ -110,7 +121,7 @@
     },
     "created_at": "2026-10-27T22:00:00Z",
     "decision": "block",
-    "decision_id": "dec_94594dc026a040e8",
+    "decision_id": "dec_e8214ed1c1aa4073",
     "engine_version": null,
     "execution": {
       "simulated": true,
@@ -125,7 +136,7 @@
       ],
       "claimed_agent_id": "agent_unregistered_77",
       "key_id": null,
-      "nonce": "5fa8a3fd26618f3f162f90deec0c151e",
+      "nonce": "d4fdf7b9a03ad912f8460b2a16fce4f7",
       "owner": null,
       "result": "unknown_agent",
       "timestamp": "2026-10-27T22:00:00+00:00"
@@ -172,7 +183,7 @@
       "scenario": "unknown_agent"
     },
     "schema_version": 1,
-    "seed_version": "3574ce8f0cef1de72c159f3b2c98128410721da8c4016114bf90928e6958909c"
+    "seed_version": "15c5c875071bd93485ba9b3a8afce94db723925924e4ab2207e43650d442d215"
   },
   "illustrative": false,
   "proposal": {
@@ -191,7 +202,7 @@
     ]
   },
   "recorded": {
-    "at": "2026-10-29T00:08:57+00:00",
+    "at": "2026-10-29T02:18:12+00:00",
     "live_models": false
   },
   "replayed_stages": [],

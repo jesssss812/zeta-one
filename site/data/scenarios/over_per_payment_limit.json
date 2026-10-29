@@ -15,6 +15,7 @@
       "invoice_date": "2026-10-22",
       "invoice_number": "PIT-4471",
       "memo": "Network hardware refresh",
+      "paid_by": null,
       "status": null
     },
     "bill_counterparty": null,
@@ -25,12 +26,15 @@
     },
     "counterparty": {
       "created_at": "2025-09-15T16:00:00Z",
+      "email": null,
       "id": "cp_0019",
       "name": "Pinecrest IT Services",
       "payment_methods": [
         {
+          "account_ending": null,
           "added_at": "2025-09-15T16:00:00Z",
           "bank_name": "Summit National Bank",
+          "beneficiary_name": null,
           "id": "pm_0019_01",
           "is_default": true,
           "type": "ach"
@@ -41,6 +45,7 @@
     "gateway_payments": [],
     "open_bills": [],
     "payment_history": {
+      "by_method": [],
       "count": 5,
       "duplicate_candidates": [],
       "first_at": "2025-10-03T15:00:00Z",
@@ -55,8 +60,10 @@
             "amount": 260000,
             "currency": "USD"
           },
+          "bill_id": null,
           "id": "txn_0770",
           "method_type": "ach",
+          "payment_method_id": null,
           "posted_at": "2026-08-14T15:30:00Z"
         }
       ]
@@ -138,6 +145,7 @@
         "invoice_date": "2026-10-22",
         "invoice_number": "PIT-4471",
         "memo": "Network hardware refresh",
+        "paid_by": null,
         "status": "awaiting_approval"
       },
       "bill_counterparty": null,
@@ -148,12 +156,15 @@
       },
       "counterparty": {
         "created_at": "2025-09-15T16:00:00Z",
+        "email": null,
         "id": "cp_0019",
         "name": "Pinecrest IT Services",
         "payment_methods": [
           {
+            "account_ending": null,
             "added_at": "2025-09-15T16:00:00Z",
             "bank_name": "Summit National Bank",
+            "beneficiary_name": null,
             "id": "pm_0019_01",
             "is_default": true,
             "type": "ach"
@@ -176,10 +187,12 @@
           "invoice_date": "2026-10-22",
           "invoice_number": "PIT-4471",
           "memo": "Network hardware refresh",
+          "paid_by": null,
           "status": "awaiting_approval"
         }
       ],
       "payment_history": {
+        "by_method": [],
         "count": 5,
         "duplicate_candidates": [],
         "first_at": "2025-10-03T15:00:00Z",
@@ -197,6 +210,7 @@
             "bill_id": "paid_txn_0770",
             "id": "txn_0770",
             "method_type": "ach",
+            "payment_method_id": null,
             "posted_at": "2026-08-14T15:30:00Z"
           }
         ]
@@ -214,7 +228,7 @@
     },
     "created_at": "2026-10-27T22:00:00Z",
     "decision": "block",
-    "decision_id": "dec_22e1caf97afe42e1",
+    "decision_id": "dec_fa97efea0ddc4cb9",
     "engine_version": null,
     "execution": {
       "simulated": true,
@@ -233,7 +247,7 @@
       ],
       "claimed_agent_id": "agent_ap_assistant_01",
       "key_id": "agent_ap_assistant_01",
-      "nonce": "13b664c4468bd8b1bd9234b2f32ef35a",
+      "nonce": "898ed8a8c8afd2915cb23c9697ee2383",
       "owner": "finance-owner@larkspur.example",
       "result": "verified",
       "timestamp": "2026-10-27T22:00:00+00:00"
@@ -241,7 +255,7 @@
     "latency_ms": {
       "authorization": 0,
       "identity": 0,
-      "total": 2
+      "total": 3
     },
     "policy_version": "2026-10-28.4",
     "proposal": {
@@ -281,7 +295,7 @@
       "scenario": "over_per_payment_limit"
     },
     "schema_version": 1,
-    "seed_version": "3574ce8f0cef1de72c159f3b2c98128410721da8c4016114bf90928e6958909c"
+    "seed_version": "15c5c875071bd93485ba9b3a8afce94db723925924e4ab2207e43650d442d215"
   },
   "illustrative": false,
   "proposal": {
@@ -300,7 +314,7 @@
     ]
   },
   "recorded": {
-    "at": "2026-10-29T00:08:57+00:00",
+    "at": "2026-10-29T02:18:12+00:00",
     "live_models": false
   },
   "replayed_stages": [],

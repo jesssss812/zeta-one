@@ -15,30 +15,38 @@
       "invoice_date": "2026-10-26",
       "invoice_number": "HOS-10502",
       "memo": "November office supplies",
+      "paid_by": null,
       "status": null
     },
     "bill_counterparty": {
       "created_at": "2025-06-12T15:04:00Z",
+      "email": null,
       "id": "cp_0007",
       "name": "Harbor Office Supply Co.",
       "payment_methods": [
         {
+          "account_ending": null,
           "added_at": "2026-10-24T18:42:00Z",
           "bank_name": "Meridian Trust Bank",
+          "beneficiary_name": null,
           "id": "pm_0007_03",
           "is_default": true,
           "type": "ach"
         },
         {
+          "account_ending": null,
           "added_at": "2025-06-12T15:04:00Z",
           "bank_name": "First Harbor Savings",
+          "beneficiary_name": null,
           "id": "pm_0007_01",
           "is_default": false,
           "type": "ach"
         },
         {
+          "account_ending": null,
           "added_at": "2025-06-12T15:04:00Z",
           "bank_name": null,
+          "beneficiary_name": null,
           "id": "pm_0007_02",
           "is_default": false,
           "type": "check"
@@ -47,6 +55,7 @@
       "status": "active"
     },
     "bill_counterparty_payment_history": {
+      "by_method": [],
       "count": 16,
       "duplicate_candidates": [],
       "first_at": "2025-07-02T14:10:00Z",
@@ -61,8 +70,10 @@
             "amount": 246000,
             "currency": "USD"
           },
+          "bill_id": null,
           "id": "txn_0812",
           "method_type": "ach",
+          "payment_method_id": null,
           "posted_at": "2026-09-30T14:05:00Z"
         },
         {
@@ -70,8 +81,10 @@
             "amount": 251000,
             "currency": "USD"
           },
+          "bill_id": null,
           "id": "txn_0781",
           "method_type": "ach",
+          "payment_method_id": null,
           "posted_at": "2026-08-29T14:11:00Z"
         },
         {
@@ -79,8 +92,10 @@
             "amount": 243500,
             "currency": "USD"
           },
+          "bill_id": null,
           "id": "txn_0749",
           "method_type": "ach",
+          "payment_method_id": null,
           "posted_at": "2026-07-31T14:02:00Z"
         }
       ]
@@ -91,12 +106,15 @@
     },
     "counterparty": {
       "created_at": "2026-10-26T20:15:00Z",
+      "email": null,
       "id": "cp_0051",
       "name": "Harbor Office Supplies LLC",
       "payment_methods": [
         {
+          "account_ending": null,
           "added_at": "2026-10-26T20:15:00Z",
           "bank_name": "Crestline Bank",
+          "beneficiary_name": null,
           "id": "pm_0051_01",
           "is_default": true,
           "type": "ach"
@@ -107,6 +125,7 @@
     "gateway_payments": [],
     "open_bills": [],
     "payment_history": {
+      "by_method": [],
       "count": 0,
       "duplicate_candidates": [],
       "first_at": null,
@@ -178,30 +197,38 @@
         "invoice_date": "2026-10-26",
         "invoice_number": "HOS-10502",
         "memo": "November office supplies",
+        "paid_by": null,
         "status": "awaiting_approval"
       },
       "bill_counterparty": {
         "created_at": "2025-06-12T15:04:00Z",
+        "email": null,
         "id": "cp_0007",
         "name": "Harbor Office Supply Co.",
         "payment_methods": [
           {
+            "account_ending": null,
             "added_at": "2026-10-24T18:42:00Z",
             "bank_name": "Meridian Trust Bank",
+            "beneficiary_name": null,
             "id": "pm_0007_03",
             "is_default": true,
             "type": "ach"
           },
           {
+            "account_ending": null,
             "added_at": "2025-06-12T15:04:00Z",
             "bank_name": "First Harbor Savings",
+            "beneficiary_name": null,
             "id": "pm_0007_01",
             "is_default": false,
             "type": "ach"
           },
           {
+            "account_ending": null,
             "added_at": "2025-06-12T15:04:00Z",
             "bank_name": null,
+            "beneficiary_name": null,
             "id": "pm_0007_02",
             "is_default": false,
             "type": "check"
@@ -210,6 +237,7 @@
         "status": "active"
       },
       "bill_counterparty_payment_history": {
+        "by_method": [],
         "count": 16,
         "duplicate_candidates": [],
         "first_at": "2025-07-02T14:10:00Z",
@@ -227,6 +255,7 @@
             "bill_id": "paid_txn_0812",
             "id": "txn_0812",
             "method_type": "ach",
+            "payment_method_id": null,
             "posted_at": "2026-09-30T14:05:00Z"
           },
           {
@@ -237,6 +266,7 @@
             "bill_id": "paid_txn_0781",
             "id": "txn_0781",
             "method_type": "ach",
+            "payment_method_id": null,
             "posted_at": "2026-08-29T14:11:00Z"
           },
           {
@@ -247,6 +277,7 @@
             "bill_id": "paid_txn_0749",
             "id": "txn_0749",
             "method_type": "ach",
+            "payment_method_id": null,
             "posted_at": "2026-07-31T14:02:00Z"
           }
         ]
@@ -257,12 +288,15 @@
       },
       "counterparty": {
         "created_at": "2026-10-26T20:15:00Z",
+        "email": null,
         "id": "cp_0051",
         "name": "Harbor Office Supplies LLC",
         "payment_methods": [
           {
+            "account_ending": null,
             "added_at": "2026-10-26T20:15:00Z",
             "bank_name": "Crestline Bank",
+            "beneficiary_name": null,
             "id": "pm_0051_01",
             "is_default": true,
             "type": "ach"
@@ -273,6 +307,7 @@
       "gateway_payments": [],
       "open_bills": [],
       "payment_history": {
+        "by_method": [],
         "count": 0,
         "duplicate_candidates": [],
         "first_at": null,
@@ -293,7 +328,7 @@
     },
     "created_at": "2026-10-27T22:00:00Z",
     "decision": "block",
-    "decision_id": "dec_ae8c5f0f18724485",
+    "decision_id": "dec_c8a0075cef344058",
     "engine_version": null,
     "execution": {
       "simulated": true,
@@ -312,7 +347,7 @@
       ],
       "claimed_agent_id": "agent_ap_assistant_01",
       "key_id": "agent_ap_assistant_01",
-      "nonce": "e4f53e86ea99f126ba8f0a36418ec861",
+      "nonce": "0758dc8f8973ae428b4f873ebd7d8eb1",
       "owner": "finance-owner@larkspur.example",
       "result": "verified",
       "timestamp": "2026-10-27T22:00:00+00:00"
@@ -320,8 +355,8 @@
     "latency_ms": {
       "authorization": 0,
       "identity": 0,
-      "risk": 2,
-      "total": 3
+      "risk": 4,
+      "total": 5
     },
     "policy_version": "2026-10-28.4",
     "proposal": {
@@ -456,7 +491,7 @@
       "scenario": "invoice_redirect_instructions"
     },
     "schema_version": 1,
-    "seed_version": "3574ce8f0cef1de72c159f3b2c98128410721da8c4016114bf90928e6958909c"
+    "seed_version": "15c5c875071bd93485ba9b3a8afce94db723925924e4ab2207e43650d442d215"
   },
   "illustrative": false,
   "proposal": {
@@ -475,7 +510,7 @@
     ]
   },
   "recorded": {
-    "at": "2026-10-29T00:08:57+00:00",
+    "at": "2026-10-29T02:18:12+00:00",
     "live_models": false
   },
   "replayed_stages": [],
