@@ -102,7 +102,7 @@ def test_the_chat_answers_from_the_case_and_checks_what_it_cites(world):
     url, headers, body = server.calls[0]
     assert url == "http://127.0.0.1:11434/v1/chat/completions" and headers == {}
     assert body["chat_template_kwargs"] == {"enable_thinking": False}
-    assert reply["note"].startswith("Answered by a local model")
+    assert reply["location"] == "local" and "address on this machine" in reply["note"]
     system, context, question = body["messages"][0], body["messages"][1], body["messages"][-1]
     assert "Never say whether the payment was fraud" in system["content"]
     assert "<gateway_facts>" in context["content"] and "untrusted_data boundary=" in context["content"]
@@ -166,7 +166,7 @@ def test_a_remote_server_gets_the_key_and_the_reply_says_where_it_ran(world, mon
     assert body["model"] == "qwen3.6-27b" and body["chat_template_kwargs"] == {"enable_thinking": False}
     assert "Never say whether the payment was fraud" in body["messages"][0]["content"]
     assert reply["cited"] == ["dec_chat"] and reply["not_in_case"] == ["bill_madeup"]
-    assert "remote server, not this machine" in reply["note"] and "test-chat-key" not in json.dumps(reply)
+    assert reply["location"] == "remote" and "remote server, not this machine" in reply["note"] and "test-chat-key" not in json.dumps(reply)
     history = client.get(f"/v1/cases/{case['case_id']}/chat", headers=ADMIN).json()
     assert [turn["question"] for turn in history] == ["Was the method new?"]
 
@@ -189,6 +189,38 @@ def test_a_failing_remote_server_says_what_failed_without_the_key(world, monkeyp
     assert response.status_code == 503 and words in message
     assert "ollama" not in message and "test-chat-key" not in message
     assert client.get(f"/v1/cases/{case['case_id']}/chat", headers=ADMIN).json() == []
+
+
+def test_each_answer_keeps_the_model_and_where_it_ran(world, monkeypatch):
+    client, gateway = world
+    case = _case(world)
+    gateway.chat = CaseChat(gateway.ledger.connection, post=Server(answer="first"))
+    client.post(f"/v1/cases/{case['case_id']}/chat", json={"question": "here?", "by": "cw"}, headers=ADMIN)
+    monkeypatch.setenv("CHAT_BASE_URL", REMOTE)
+    monkeypatch.setenv("CHAT_MODEL", "qwen3.6-27b")
+    gateway.chat = CaseChat(gateway.ledger.connection, post=Server(answer="second"))
+    client.post(f"/v1/cases/{case['case_id']}/chat", json={"question": "there?", "by": "cw"}, headers=ADMIN)
+    history = client.get(f"/v1/cases/{case['case_id']}/chat", headers=ADMIN).json()
+    assert [(t["model"], t["location"]) for t in history] == [("qwen2.5:7b", "local"), ("qwen3.6-27b", "remote")]
+    assert "address on this machine" in history[0]["note"] and "not this machine" in history[1]["note"]
+
+
+def test_answers_kept_before_the_model_was_recorded_have_no_note():
+    connection = sqlite3.connect(":memory:")
+    connection.execute("CREATE TABLE case_messages (message_id INTEGER PRIMARY KEY AUTOINCREMENT, case_id TEXT NOT NULL,"
+                       " at TEXT NOT NULL, by TEXT NOT NULL, question TEXT NOT NULL, answer TEXT NOT NULL)")
+    connection.execute("INSERT INTO case_messages (case_id, at, by, question, answer) VALUES ('c', 't', 'cw', 'q', 'a')")
+    [turn] = CaseChat(connection, post=Server()).history("c")
+    assert (turn["answer"], turn["model"], turn["location"], turn["note"]) == ("a", None, None, None)
+
+
+@pytest.mark.parametrize("base_url, local", [
+    ("http://127.0.0.1:11434/v1", True), ("http://127.0.0.2:8000/v1", True), ("http://localhost:11434/v1", True),
+    ("http://[::1]:11434/v1", True), ("http://0.0.0.0:11434/v1", True), (REMOTE, False), ("http://10.0.0.5/v1", False),
+])
+def test_local_means_an_address_on_this_machine(monkeypatch, base_url, local):
+    monkeypatch.setenv("CHAT_BASE_URL", base_url)
+    assert CaseChat(sqlite3.connect(":memory:"), post=Server()).local is local
 
 
 class Httpx:
