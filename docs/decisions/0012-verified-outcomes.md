@@ -33,6 +33,6 @@ confirmed bank change is still a floor. That changes the decision model and gets
 
 ## Consequences
 
-- The site and Loom can show the whole loop: decide, review, record what was true, measure.
+- The site and the demo video can show the whole loop: decide, review, record what was true, measure.
 - A feedback case is rebuilt from the proposal on the seed, not from a stored copy of the context at
   decision time; with live Rho data that would need a context snapshot in the record.

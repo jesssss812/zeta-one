@@ -11,7 +11,7 @@ but the evaluation must be reproducible from the repo.
 ## Decision
 
 **Stack.** Python 3.13, FastAPI, SQLite, Pydantic models for Rho's shapes written by hand from
-[../reference/rho-openapi.json](../reference/rho-openapi.json) (only the fields the engine reads),
+[Rho's public OpenAPI description](https://docs.rho.co/api/v1/openapi) (only the fields the engine reads),
 `httpx` for the live backend, `cryptography` for Ed25519, `pytest`. The UI is one static HTML page
 served by FastAPI, no build step. Quick start is `pip install -r requirements.txt && uvicorn ...`.
 

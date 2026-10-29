@@ -94,7 +94,7 @@ chose it.
 
 | Option | For | Against |
 | --- | --- | --- |
-| **Laptop only** (chosen) | Matches the judges' quick start exactly; the live Rho read needs the VPN, which only the laptop has; keys and the Anthropic key never leave the machine; no cost; no public attack surface | No deployed URL for the live engine (the checklist accepts a screen capture instead); the Hack Fair demo depends on the laptop and venue Wi-Fi |
+| **Laptop only** (chosen) | Matches the judges' quick start exactly; the live Rho read needs the VPN, which only the laptop has; keys and the Anthropic key never leave the machine; no cost; no public attack surface | No deployed URL for the live engine (the checklist accepts a screen capture instead); the live demo depends on the laptop and venue Wi-Fi |
 | Render (free web service) | Simplest Python hosting, deploy from GitHub | Spins down after 15 minutes idle with a reported 20–60 s wake; free disk doesn't persist SQLite; the always-on tier is about $7/month |
 | Google Cloud Run | Scales to zero with a short cold start; generous free tier (as reported by third parties) | Container and GCP project setup; no persistent disk, so state needs Postgres |
 | Fly.io | Always-on small machine from about $2/month, volumes for SQLite | No free allowance for new accounts; a card and some setup |
@@ -111,7 +111,7 @@ endpoints off, and says so on every response.
 | Option | For | Against |
 | --- | --- | --- |
 | **SQLite** (chosen) | Zero setup for judges (`pip install` and run); one file; fast; the evaluation copies a fresh store per case in milliseconds; already wired in `zeta_one/db.py` | Not shared between machines; doesn't survive on serverless or free hosts |
-| Supabase Postgres | Managed and durable; a hosted gateway could use it; its table view is a ready-made way to browse evidence records; the $25 credit covers a month of Pro, and the free plan is enough for this data | Judges would need a project and keys to reproduce, or a second code path; network latency on every check; free projects pause after a week idle (reported), so it must be woken before the Hack Fair; another credential to protect |
+| Supabase Postgres | Managed and durable; a hosted gateway could use it; its table view is a ready-made way to browse evidence records; the $25 credit covers a month of Pro, and the free plan is enough for this data | Judges would need a project and keys to reproduce, or a second code path; network latency on every check; free projects pause after a week idle (reported), so it must be woken before a demo; another credential to protect |
 | Both, behind `db.connect` | Local and hosted from one codebase | Two SQL dialects to test in two days |
 
 **Chosen:** SQLite now. Supabase becomes the right choice only together with a hosted gateway
@@ -152,11 +152,11 @@ The site is static: `site/` has no build step and makes no API calls.
 
 | Option | For | Against |
 | --- | --- | --- |
-| **Recorded real runs** (chosen) | After the real engine runs, a script writes each scenario result and the evaluation report as JSON into `site/data/`; the site shows real engine output, dated and labelled as recorded; nothing can break or be abused at the Hack Fair | Not live: a visitor can't change a scenario |
+| **Recorded real runs** (chosen) | After the real engine runs, a script writes each scenario result and the evaluation report as JSON into `site/data/`; the site shows real engine output, dated and labelled as recorded; nothing can break or be abused during a demo | Not live: a visitor can't change a scenario |
 | Site calls a hosted gateway | Live on the web | Everything against row 2's hosted options, and the site would depend on an API at demo time |
-| Live on the laptop only | The real thing, for the Loom and the Hack Fair | Nothing on the deployed URL beyond the presentation |
+| Live on the laptop only | The real thing, for the demo video and the live demo | Nothing on the deployed URL beyond the presentation |
 
-**Chosen:** both of the first and third. Live on the laptop for the Loom and the Hack Fair;
+**Chosen:** both of the first and third. Live on the laptop for the demo video and the live demo;
 recorded real runs on the deployed site. The site session decides how to render them, against
 [../reference/demo-api.md](../reference/demo-api.md), which those JSON files follow exactly.
 
@@ -171,7 +171,7 @@ push. **Chosen:** added.
 
 | Where | What runs | Who uses it |
 | --- | --- | --- |
-| Owner's laptop | Gateway, SQLite state, seed, evidence view, evaluation CLI, live Rho read over VPN | The owner; the Loom; the Hack Fair demo |
+| Owner's laptop | Gateway, SQLite state, seed, evidence view, evaluation CLI, live Rho read over VPN | The owner; the demo video; the live demo |
 | A judge's machine | The same, from the README's quick start; no VPN, so no live Rho read; their own Anthropic key, or the recorded results without one | Judges reproducing the build |
 | Vercel | The static site, with recorded real runs | Anyone with the submission link |
 | GitHub | The public repo after submission; Actions running the checks | Judges reading the code |

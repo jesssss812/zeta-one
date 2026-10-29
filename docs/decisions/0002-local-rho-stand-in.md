@@ -11,13 +11,13 @@ bill arriving with a malicious invoice. Also:
 
 - staging needs a VPN, which judges and cloud sessions don't have
 - the submission must be reproducible from a public repo
-- staging access is expected to end after the hackathon, so it may not work at the Hack Fair
+- staging access is expected to end after the hackathon, so it may not work for a later demo
 - live data can change under the evaluation
 
 ## Decision
 
 Build a small local stand-in that uses Rho's own data shapes (generated from
-[../reference/rho-openapi.json](../reference/rho-openapi.json)), with two backends behind one
+[Rho's public OpenAPI description](https://docs.rho.co/api/v1/openapi)), with two backends behind one
 interface:
 
 - **Live:** read-only calls to Rho staging.

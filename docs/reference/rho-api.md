@@ -1,7 +1,7 @@
 # What the Rho API allows
 
-Sources: the public OpenAPI description (copied to [rho-openapi.json](rho-openapi.json) on
-2026-10-27 from <https://docs.rho.co/api/v1/openapi>), answers from Rho's engineering team to our
+Sources: the public OpenAPI description (<https://docs.rho.co/api/v1/openapi>, read on
+2026-10-27), answers from Rho's engineering team to our
 questions on 2026-10-27, and Rho's public API page (<https://www.rho.co/product/api>, as quoted in
 search results on 2026-10-27; the page itself could not be opened from the planning session).
 Anything not listed here as confirmed is not confirmed.
