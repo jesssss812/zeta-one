@@ -121,7 +121,7 @@
     },
     "created_at": "2026-10-27T22:00:00Z",
     "decision": "block",
-    "decision_id": "dec_e8214ed1c1aa4073",
+    "decision_id": "dec_3c195ba76fc540f7",
     "engine_version": null,
     "execution": {
       "simulated": true,
@@ -136,7 +136,7 @@
       ],
       "claimed_agent_id": "agent_unregistered_77",
       "key_id": null,
-      "nonce": "d4fdf7b9a03ad912f8460b2a16fce4f7",
+      "nonce": "9c53507c20c90be95104effb2ac24283",
       "owner": null,
       "result": "unknown_agent",
       "timestamp": "2026-10-27T22:00:00+00:00"
@@ -145,7 +145,7 @@
       "identity": 0,
       "total": 0
     },
-    "policy_version": "2026-10-28.4",
+    "policy_version": "2026-10-28.5",
     "proposal": {
       "agent_rationale": "Recurring monthly cleaning invoice, same amount as the last twelve months, paid to the vendor's long-standing ACH method.",
       "amount": {
@@ -202,8 +202,8 @@
     ]
   },
   "recorded": {
-    "at": "2026-10-29T02:18:12+00:00",
-    "live_models": false
+    "at": "2026-10-29T16:49:33+00:00",
+    "live_models": true
   },
   "replayed_stages": [],
   "scenario": {

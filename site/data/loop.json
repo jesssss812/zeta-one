@@ -1,10 +1,10 @@
 {
-  "engine_version": "5aad1da",
-  "live_models": false,
-  "note": "A recorded run of the feedback loop on the real engine and synthetic data. Payments are simulated. Models were off: escalations show where a model would review.",
-  "policy_version": "2026-10-28.4",
+  "engine_version": "301a007",
+  "live_models": true,
+  "note": "A recorded run of the feedback loop on the real engine and synthetic data. Payments are simulated.",
+  "policy_version": "2026-10-28.5",
   "recorded": true,
-  "recorded_at": "2026-10-28T14:35:52+00:00",
+  "recorded_at": "2026-10-29T16:50:00+00:00",
   "simulated": true,
   "steps": [
     {
@@ -12,7 +12,7 @@
       "decision": {
         "adjustments": [],
         "decision": "allow",
-        "decision_id": "dec_f69db63454f54e95",
+        "decision_id": "dec_bb8c588557f04889",
         "execution": {
           "simulated": true,
           "status": "executed"
@@ -47,11 +47,11 @@
     {
       "adjustments": [
         {
-          "adjustment_id": "adj_6cb436e36b914fad",
+          "adjustment_id": "adj_40f2a479ee9d47f5",
           "at": "2026-10-30T01:00:00Z",
           "business_id": "biz_seed_01",
           "by": "AP controller",
-          "decision_id": "dec_f69db63454f54e95",
+          "decision_id": "dec_bb8c588557f04889",
           "expires_at": null,
           "finding": "payee_fraud",
           "kind": "blocked_payment_method",
@@ -77,10 +77,10 @@
       "at": "2026-11-07T01:00:00+00:00",
       "decision": {
         "adjustments": [
-          "adj_6cb436e36b914fad"
+          "adj_40f2a479ee9d47f5"
         ],
         "decision": "block",
-        "decision_id": "dec_0b0462d9efb242c1",
+        "decision_id": "dec_02c1327ce22648bf",
         "execution": {
           "simulated": true,
           "status": "blocked"
@@ -107,7 +107,7 @@
       "decision": {
         "adjustments": [],
         "decision": "challenge",
-        "decision_id": "dec_cc430bb59ed143e4",
+        "decision_id": "dec_00dd0f495e6143ad",
         "execution": {
           "simulated": true,
           "status": "held"
@@ -123,7 +123,8 @@
           "risk:elevated"
         ],
         "tiers_run": [
-          "tier0"
+          "tier0",
+          "strong"
         ]
       },
       "title": "A payment after a recent bank change",
@@ -132,11 +133,11 @@
     {
       "adjustments": [
         {
-          "adjustment_id": "adj_6cb436e36b914fad",
+          "adjustment_id": "adj_40f2a479ee9d47f5",
           "at": "2026-10-30T01:00:00Z",
           "business_id": "biz_seed_01",
           "by": "AP controller",
-          "decision_id": "dec_f69db63454f54e95",
+          "decision_id": "dec_bb8c588557f04889",
           "expires_at": null,
           "finding": "payee_fraud",
           "kind": "blocked_payment_method",
@@ -145,11 +146,11 @@
           "verification": "bank_confirmation"
         },
         {
-          "adjustment_id": "adj_99817854f29b4787",
+          "adjustment_id": "adj_2156b8a151484018",
           "at": "2026-11-07T01:00:00Z",
           "business_id": "biz_seed_01",
           "by": "AP controller",
-          "decision_id": "dec_cc430bb59ed143e4",
+          "decision_id": "dec_00dd0f495e6143ad",
           "expires_at": "2027-02-05T01:00:00Z",
           "finding": "legitimate",
           "kind": "confirmed_method_change",
@@ -160,8 +161,8 @@
       ],
       "at": "2026-11-07T01:00:00+00:00",
       "resolution": {
-        "challenge_id": "chl_d73b08279a364310",
-        "decision_id": "dec_cc430bb59ed143e4",
+        "challenge_id": "chl_22d0675fdb0447d6",
+        "decision_id": "dec_00dd0f495e6143ad",
         "reasons": [],
         "status": "executed"
       },
@@ -172,25 +173,27 @@
       "at": "2026-11-15T01:00:00+00:00",
       "decision": {
         "adjustments": [
-          "adj_99817854f29b4787"
+          "adj_2156b8a151484018"
         ],
-        "decision": "challenge",
-        "decision_id": "dec_e80ed3013c674654",
+        "decision": "allow",
+        "decision_id": "dec_1e518ec714e746a6",
         "execution": {
           "simulated": true,
-          "status": "held"
+          "status": "executed"
         },
         "floor": null,
-        "level": "elevated",
+        "level": "low",
         "reasons": [
-          "risk:elevated"
+          "clean",
+          "risk:lowered_by_model"
         ],
         "tiers_run": [
-          "tier0"
+          "tier0",
+          "strong"
         ]
       },
       "title": "That vendor's next payment",
-      "what": "The confirmed change is no longer a floor: a soft signal a model reviews (models are off in this run, so it is held for a person)."
+      "what": "The confirmed change is no longer a floor: a soft signal a model reviews."
     },
     {
       "at": "2026-11-15T01:00:00+00:00",
@@ -201,18 +204,18 @@
           "blocked_on_recheck": 0,
           "rejected": 0,
           "resolved": 1,
-          "total": 2
+          "total": 1
         },
         "decisions": {
-          "allow": 1,
+          "allow": 2,
           "block": 1,
-          "challenge": 2
+          "challenge": 1
         },
         "missed_fraud": [
-          "dec_f69db63454f54e95"
+          "dec_bb8c588557f04889"
         ],
         "unneeded_challenges": [
-          "dec_cc430bb59ed143e4"
+          "dec_00dd0f495e6143ad"
         ],
         "unverified_reports": 1,
         "verified_outcomes": {
