@@ -56,7 +56,7 @@ def test_workspace_http_and_legacy_demo():
         assert client.post("/v1/workspace/add", json={"recipe_id": "routine", "seed": True}).status_code == 400
         assert client.post("/v1/workspace/outcome", json={"id": "missing"}).status_code == 400
         assert client.post("/v1/workspace/assemble", content="{", headers={"Content-Type": "application/json"}).status_code == 400
-        assert client.get("/demo").status_code == 200
+        assert client.get("/demo-legacy").status_code == 200
         assert client.get("/v1/demo").json()["steps"] == []
     finally:
         server.workspace.close()

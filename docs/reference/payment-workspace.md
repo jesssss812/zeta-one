@@ -2,7 +2,7 @@
 
 The workspace at `/workspace/` presents an inbox of synthetic payments. Choose a scenario, inspect
 its invoice and decision evidence, and review held payments. The explanatory site and workspace
-share a visual identity; the original guided story remains available locally at `/demo`.
+share a visual identity; the original guided story remains available locally at `/demo-legacy`.
 All payment execution is simulated.
 
 ## Public preview and local operation

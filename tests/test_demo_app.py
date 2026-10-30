@@ -11,7 +11,8 @@ JSON = {"Content-Type": "application/json"}
 def test_the_demo_steps_through_the_story_and_resets():
     server = DemoServer()
     client = TestClient(server)
-    assert client.get("/demo").status_code == 200
+    assert client.get("/demo-legacy").status_code == 200
+    assert client.get("/demo", follow_redirects=False).headers["location"] == "/workspace/"
     state = client.get("/v1/demo").json()
     assert state["titles"] == list(TITLES) and state["steps"] == [] and state["simulated"] and not state["live_models"]
     first = client.post("/v1/demo/next", headers=JSON, content="{}").json()["steps"][0]

@@ -317,7 +317,7 @@ function side(c) {
       const gone = /^no case /.test(e.message);
       pending.replaceWith(el("div", { class: "a warn" }, gone
         ? el("span", {}, "This case is no longer on the server: it was restarted or the demo was reset, which clears its cases. ",
-            el("a", { href: "/demo", text: "Go back to the demo" }), " and open the evidence again.")
+            el("a", { href: "/demo-legacy", text: "Go back to the legacy demo" }), " and open the evidence again.")
         : e.message));
     }
     log.scrollTop = log.scrollHeight;
@@ -370,7 +370,7 @@ async function openRow(row) {
   const back = el("button", { type: "button", text: "← Inbox" });
   back.addEventListener("click", () => { history.replaceState(null, "", location.pathname); loadInbox(); });
   let fromDemo = false; try { fromDemo = sessionStorage.getItem("zeta-demo") === "1"; } catch (e) {}
-  const toolbar = () => el("div", { class: "toolbar" }, back, fromDemo ? el("a", { href: "/demo", text: "← Demo" }) : null,
+  const toolbar = () => el("div", { class: "toolbar" }, back, fromDemo ? el("a", { href: "/demo-legacy", text: "← Legacy demo" }) : null,
     el("strong", { text: `${row.vendor} · ${money(row.amount)}` }));
   const progress = el("p", { class: "note" });
   $("case").replaceChildren(toolbar(), why(row), progress);

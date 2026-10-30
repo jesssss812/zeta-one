@@ -258,7 +258,7 @@ payment execution path, see [From the working demo to a fintech integration](fin
 
 `zeta_one.demo.app:app` (`uvicorn … --port 8001`) runs the feedback-loop story of
 `zeta_one/demo/story.py` one step per click, on a sandbox gateway of its own: an in-memory
-database, a fresh seed and a one-off agent key. `GET /demo` is the page. Every other path is that
+database, a fresh seed and a one-off agent key. `GET /demo-legacy` is the page; `/demo` redirects to the workspace. Every other path is that
 sandbox gateway, so `/review` and the endpoints above show the sandbox's decisions.
 
 | Method and path | Does |
@@ -281,7 +281,7 @@ Vercel site runs none of these backend steps.
 
 ## Payment workspace
 
-The interactive `/workspace/` inbox complements the guided `/demo`. It uses its own synthetic
+The interactive `/workspace/` inbox complements the guided `/demo-legacy`. It uses its own synthetic
 sandbox and exposes `GET /v1/workspace` plus JSON-only `POST /v1/workspace/{action}` for scenario
 selection and review. The [workspace guide](payment-workspace.md) explains public recorded mode,
 local fresh decisions and explicit case assembly.

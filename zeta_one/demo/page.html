@@ -174,7 +174,7 @@ function render() {
   $("feed").replaceChildren(...(done ? state.steps.map((step, i) => stepCard(step, i, i === done - 1)).reverse()
     : [el("p", { class: "empty" }, "Press ", el("strong", { text: "Next step" }), " to start.")]));
   $("next").disabled = state.done;
-  $("next").textContent = state.done ? "Story complete" : done ? "Next step →" : "Start →";
+  $("next").textContent = state.done ? "Story complete" : "Next step →";
   $("mode").textContent = state.live_models ? "Models: live (paid)" : "Models: off (escalations held for a person)";
 }
 

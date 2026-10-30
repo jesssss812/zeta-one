@@ -1,9 +1,9 @@
 """The one-screen demo: the feedback-loop story, one step per click, on a sandbox gateway.
 
-    .venv/bin/uvicorn zeta_one.demo.app:app --port 8001          # open http://127.0.0.1:8001/demo
+    .venv/bin/uvicorn zeta_one.demo.app:app --port 8001          # open http://127.0.0.1:8001/ (the workspace)
     ZETA_DEMO_LIVE=1 .venv/bin/uvicorn zeta_one.demo.app:app --port 8001   # escalations call Claude (paid)
 
-`/demo` steps through the story and resets it. Every other path is the sandbox gateway itself, so
+`/workspace/` is the payment workspace; `/demo-legacy` steps through the guided story and resets it. Every other path is the sandbox gateway itself, so
 `/review` shows the sandbox's decisions with their evidence and source records. The sandbox holds
 only synthetic data in memory, and its admin token is made for this process and handed to the demo
 page, so the review page opens without setup; it is never the gateway's real admin token. Paid model
@@ -80,12 +80,16 @@ class DemoServer:
                                                                         "message": "send Content-Type: application/json"}})
             return None
 
-        @control.get("/demo", response_class=HTMLResponse)
+        @control.get("/demo-legacy", response_class=HTMLResponse)
         def page():
             return PAGE.read_text()
 
         @control.get("/")
         def root():
+            return RedirectResponse("/workspace/")
+
+        @control.get("/demo")
+        def old_demo():
             return RedirectResponse("/workspace/")
 
         @control.get("/v1/demo")
@@ -148,7 +152,7 @@ class DemoServer:
 
     async def __call__(self, scope, receive, send) -> None:
         path = scope.get("path", "")
-        if scope["type"] != "http" or path in ("/", "/demo", "/v1/demo") or path.startswith("/v1/demo/") or path.startswith("/workspace") or path.startswith("/about") or path.startswith("/v1/workspace"):
+        if scope["type"] != "http" or path in ("/", "/demo", "/demo-legacy", "/v1/demo") or path.startswith("/v1/demo/") or path.startswith("/workspace") or path.startswith("/about") or path.startswith("/v1/workspace"):
             await self.control(scope, receive, send)
         else:
             await self.story.app(scope, receive, send)

@@ -117,7 +117,7 @@ python3 scripts/check.py             # compile, secret, link and docs checks, th
 ```
 
 For the payment-review workspace, run the demo on its own sandbox and open
-`http://127.0.0.1:8001/workspace/`. The original guided story remains at `/demo`:
+`http://127.0.0.1:8001/workspace/`. The original guided story remains at `/demo-legacy`:
 
 ```bash
 .venv/bin/uvicorn zeta_one.demo.app:app --port 8001
