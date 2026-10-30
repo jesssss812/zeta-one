@@ -312,7 +312,14 @@ function side(c) {
       pending.replaceWith(el("div", { class: "a" }, linked(reply.answer),
         reply.not_in_case.length ? el("div", { class: "warn", text: "Cited but not in this case: " + reply.not_in_case.join(", ") }) : null,
         ranAt(reply.note)));
-    } catch (e) { pending.replaceWith(el("div", { class: "a warn", text: e.message })); }
+    } catch (e) {
+      // The demo keeps cases in memory: a restart or a reset of the demo clears them.
+      const gone = /^no case /.test(e.message);
+      pending.replaceWith(el("div", { class: "a warn" }, gone
+        ? el("span", {}, "This case is no longer on the server: it was restarted or the demo was reset, which clears its cases. ",
+            el("a", { href: "/demo", text: "Go back to the demo" }), " and open the evidence again.")
+        : e.message));
+    }
     log.scrollTop = log.scrollHeight;
   });
   api(`/v1/cases/${encodeURIComponent(c.case_id)}/chat`).then((turns) => turns.forEach((t) => say(t.question, t.answer, t.note))).catch(() => {});
