@@ -79,8 +79,8 @@ async function act(action, payload = {}) {
 function recipeDescription() { $('recipe-description').textContent = workspace?.recipes.find(r => r.id === $('recipe').value)?.description || ''; }
 function render() {
   const preview = workspace.mode === 'preview';
-  $('mode').textContent = preview ? 'Recorded public preview' : workspace.mode === 'live' ? 'Local sandbox · models enabled' : 'Local sandbox · deterministic rules';
-  $('mode-description').textContent = preview ? 'Explore prepared results from the real engine. Random selects a recorded example; no decisions or models run here.' : workspace.mode === 'live' ? 'Each new payment gets a fresh assessment. Models run only when the engine needs them. Assemble case explicitly calls the review assistant.' : 'Each new payment gets a fresh assessment using deterministic rules. Case assembly gathers evidence without model calls.';
+  $('mode').textContent = preview ? 'Public preview · example payments' : workspace.mode === 'live' ? 'Local sandbox · models enabled' : 'Local sandbox · deterministic rules';
+  $('mode-description').textContent = preview ? 'Example payments the real engine decided ahead of time. Surprise me picks another; nothing new is decided and no models run here.' : workspace.mode === 'live' ? 'Each new payment gets a fresh assessment. Models run only when the engine needs them. Assemble case explicitly calls the review assistant.' : 'Each new payment gets a fresh assessment using deterministic rules. Case assembly gathers evidence without model calls.';
   $('legacy').hidden = preview;
   $('count').textContent = workspace.payments.length;
   const recipe = $('recipe').value;
@@ -130,7 +130,7 @@ function renderCase(payment, preview) {
   const outer = payment.case_file;
   const f = outer?.case_file;
   const result = section('Review assistant', node('p', {class:'subtle',text:'Gathers and organizes evidence for a person. The assistant does not decide whether to pay or confirm fraud.'}));
-  if (preview) result.append(node('p', {class:'case-note',text:'Case assembly and human review are available in the local sandbox. This public preview displays recorded evidence only.'}));
+  if (preview) result.append(node('p', {class:'case-note',text:'Case assembly and human review are available in the local sandbox. This public preview shows the evidence for each example only.'}));
   else if (!outer) result.append(node('p', {class:'case-note',text:workspace.mode === 'live' ? 'Assemble a case to ask the assistant to gather and summarize the evidence. This action may call models.' : 'Assemble a case to gather the underlying records. The model assistant is disabled in rules mode.'}));
   result.append(node('div', {class:'actions'}, actionButton(outer ? 'Refresh case' : 'Assemble case', 'assemble', payment, preview)));
   if (!outer) return result;

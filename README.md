@@ -5,7 +5,7 @@
 *Autonomy without instability.*
 
 **[Explore the public site](https://zeta-one-site.vercel.app/)** — the project explanation, evaluation
-and recorded payment review workspace. Hosted on Vercel; live decisions run in the local demo.
+and a payment review workspace of example payments. Hosted on Vercel; new decisions run in the local demo.
 
 Businesses are starting to let AI agents pay their bills. A known agent with valid permissions can
 still be manipulated: an invoice can carry instructions, and a vendor's bank details can be swapped.
@@ -29,7 +29,7 @@ shapes and a read-only staging connection. It is not a Rho product. **Payment ex
 | **Decision engine** | Checks each signed payment proposal before it moves: identity, then authorization, then risk (rules first, Jev next, a language model only where needed). Code enforces the hard limits and returns allow, challenge or block with an evidence record |
 | **Case review assistant** | Helps the people who work fraud disputes. Code gathers the decision, the payee's payment history and the bank-change timeline; a separate call researches the vendor on the web from public facts only. The case file cites a record or URL for every fact, and a local model answers questions about it. It has no verdict field: a person records the finding |
 | **Feedback loop** | A finding a person verified becomes a scoped, revocable risk adjustment that the next payment cites. A customer's report alone changes nothing |
-| **Payment workspace** | An inbox of synthetic payments: open one, read its invoice and evidence, review held payments. The public site shows recorded engine runs; run it locally for fresh decisions ([guide](docs/reference/payment-workspace.md)) |
+| **Payment workspace** | An inbox of synthetic payments: open one, read its invoice and evidence, review held payments. On the public site, browse example payments the real engine decided ahead of time; run it on your own machine to decide new ones ([guide](docs/reference/payment-workspace.md)) |
 
 ## How a decision is made
 
@@ -124,7 +124,7 @@ For the payment-review workspace, run the demo on its own sandbox and open
 ```
 
 Choose a scenario, inspect its evidence and review held payments. The
-[workspace guide](docs/reference/payment-workspace.md) explains the recorded public preview and
+[workspace guide](docs/reference/payment-workspace.md) explains the public preview's example payments and
 fresh local assessments. Models are off unless it is started with
 `ZETA_DEMO_LIVE=1`, which calls Claude for escalations and case files (paid).
 

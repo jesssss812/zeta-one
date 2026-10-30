@@ -29,7 +29,7 @@
   const details = document.querySelectorAll(
     '#demo .section-top, section:not(#demo) > .section-top > p, .console, .engineering-steps article, .outcomes > div, ' +
     '.platform-evidence > div, .learning-copy > p, .learning-flow, ' +
-    '.comparison, .eval-summary, .video-placeholder, .why-grid article, .why-thesis, .other-cases'
+    '.comparison, .eval-summary, .try-way, .why-grid article, .why-thesis, .other-cases'
   );
   const observer = new IntersectionObserver((entries) => {
     for (const entry of entries) {

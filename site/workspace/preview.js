@@ -1,11 +1,11 @@
-const PREVIEW_NOTE = 'Recorded examples from the real deterministic engine using synthetic recipe inputs. No model calls; random selects a prepared record.';
+const PREVIEW_NOTE = 'Example payments the real engine decided ahead of time from synthetic inputs, using its rules. No model calls; Surprise me picks another example.';
 const clone = value => JSON.parse(JSON.stringify(value));
 
 export async function createPreview() {
   const response = await fetch(new URL('./data.json', import.meta.url));
-  if (!response.ok) throw new Error(`Could not load recorded examples (${response.status}).`);
+  if (!response.ok) throw new Error(`Could not load the example payments (${response.status}).`);
   const source = await response.json();
-  if (!Array.isArray(source.payments) || source.payments.length < 3 || !Array.isArray(source.recipes)) throw new Error('Recorded workspace examples are incomplete.');
+  if (!Array.isArray(source.payments) || source.payments.length < 3 || !Array.isArray(source.recipes)) throw new Error('The example payments are incomplete.');
   const prepared = clone(source.payments);
   let current;
   let sequence = 0;
