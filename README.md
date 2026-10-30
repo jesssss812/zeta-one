@@ -4,6 +4,9 @@
 
 *Autonomy without instability.*
 
+**[Explore the public site](https://zeta-one-site.vercel.app/)** — the project explanation, evaluation
+and recorded payment review workspace. Hosted on Vercel; live decisions run in the local demo.
+
 Businesses are starting to let AI agents pay their bills. A known agent with valid permissions can
 still be manipulated: an invoice can carry instructions, and a vendor's bank details can be swapped.
 Zeta One checks each proposed payment before execution and returns **allow**, **challenge** or

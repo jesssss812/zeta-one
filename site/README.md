@@ -4,6 +4,12 @@ Static, dependency-free presentation site with optional lightweight motion. No A
 The page explains the project and links to a recorded payment review workspace. Payment execution is
 simulated throughout the project.
 
+## Deployment
+
+The public site is hosted at [zeta-one-site.vercel.app](https://zeta-one-site.vercel.app/).
+Vercel serves `site/` as the root directory, with no build command or environment variables.
+The website includes recorded results; the Python gateway and live payment demo run locally.
+
 ## Preview
 
 From the repository root:
