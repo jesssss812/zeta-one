@@ -61,3 +61,31 @@ def test_workspace_http_and_legacy_demo():
     finally:
         server.workspace.close()
         server.story.close()
+
+
+def test_with_models_on_the_workspace_uses_the_configured_risk_tiers(monkeypatch):
+    from zeta_one.gateway.wiring import CONFIGURATIONS
+
+    monkeypatch.setenv("ZETA_RISK_CONFIGURATION", "jev")
+    live = Workspace(live_models=True, review_client=object())
+    rules = Workspace(live_models=False)
+    try:
+        assert live.gateway.stages.configuration == CONFIGURATIONS["jev"]
+        assert rules.gateway.stages.configuration.tiers == ["tier0"]
+    finally:
+        live.close()
+        rules.close()
+
+
+def test_the_console_line_names_the_rules_and_each_model_that_ran():
+    from zeta_one.contracts import EvidenceRecord, RiskEvidence, TierResult
+    from zeta_one.gateway.pipeline import log_line
+
+    record = export_state(["routine"])["payments"][0]["record"]
+    risk = RiskEvidence(level="elevated", tier_results=[
+        TierResult(tier="tier0", level="elevated"),
+        TierResult(tier="cheap", model="typesafe/jev-1.14", level="elevated", latency_ms=400),
+        TierResult(tier="strong", model="claude-opus-5-5", level="low", latency_ms=6600)])
+    line = log_line(EvidenceRecord.model_validate(record).model_copy(update={"risk": risk}))
+    assert "rules elevated > typesafe/jev-1.14 elevated 0.4s > claude-opus-5-5 low 6.6s" in line
+    assert "tier0" not in line

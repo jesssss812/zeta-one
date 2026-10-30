@@ -156,10 +156,11 @@ def _ms_since(start: float) -> int:
 
 def log_line(record: EvidenceRecord) -> str:
     """One line per decision for the console: what was decided, why, which tiers ran, time and spend.
-    Ids and levels only, never request text or credentials."""
+    Ids and levels only, never request text or credentials. Each tier is named by its model, or
+    `rules` for tier 0, so a run shows which models (Jev, Opus, an open-weight model) it reached."""
     tiers = []
     for result in record.risk.tier_results:
-        part = result.tier + (f" {result.model}" if result.model else "")
+        part = result.model or ("rules" if result.tier == "tier0" else result.tier)
         part += f" {result.level}" if result.level else ""
         part += f" error:{result.error.split(':')[0]}" if result.error else ""
         if result.latency_ms is not None and result.tier != "tier0":

@@ -15,7 +15,7 @@ from zeta_one.gateway.app import create_app
 from zeta_one.gateway.ledger import Ledger
 from zeta_one.gateway.scenarios import load_fixture
 from zeta_one.gateway.service import Gateway
-from zeta_one.gateway.wiring import CONFIGURATIONS, engine_version, real_stages
+from zeta_one.gateway.wiring import configuration_from_env, engine_version, real_stages
 from zeta_one.identity.signing import sign
 from zeta_one.review.explain import summary
 from zeta_one.rho.seed import SEED_NOW
@@ -41,7 +41,9 @@ class Workspace:
         self._connection = sqlite3.connect(":memory:", check_same_thread=False)
         self._connection.row_factory = sqlite3.Row
         self._store = Store()
-        config = CONFIGURATIONS["engineered"]
+        # With models on, the configuration ZETA_RISK_CONFIGURATION names (engineered by default, or
+        # jev, which puts Jev before Opus); with models off, the rules alone.
+        config = configuration_from_env()
         if not live_models:
             config = config.model_copy(update={"tiers": ["tier0"], "escalation": "none"})
         self._clock = SEED_NOW

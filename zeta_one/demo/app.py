@@ -2,6 +2,7 @@
 
     .venv/bin/uvicorn zeta_one.demo.app:app --port 8001          # open http://127.0.0.1:8001/ (the workspace)
     ZETA_DEMO_LIVE=1 .venv/bin/uvicorn zeta_one.demo.app:app --port 8001   # escalations call Claude (paid)
+    ZETA_DEMO_LIVE=1 ZETA_RISK_CONFIGURATION=jev .venv/bin/uvicorn ...   # the workspace puts Jev before Claude
 
 `/workspace/` is the payment workspace; `/demo-legacy` steps through the guided story and resets it. Every other path is the sandbox gateway itself, so
 `/review` shows the sandbox's decisions with their evidence and source records. The sandbox holds

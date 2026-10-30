@@ -11,7 +11,7 @@ All payment execution is simulated.
 | --- | --- | --- |
 | Public static site | Prepared records from real deterministic engine runs; no gateway or model call | Browse examples, inspect evidence and select another prepared example |
 | Local, default | A fresh signed proposal through the real identity, authorization, context, tier-0 and policy stages | Choose scenarios, record human findings and resolve holds against the sandbox |
-| Local, `ZETA_DEMO_LIVE=1` | The same pipeline with models available for eligible risk assessments and explicitly requested case assembly | Exercise the working system with fresh model calls when the pipeline requires them |
+| Local, `ZETA_DEMO_LIVE=1` | The same pipeline with models available for eligible risk assessments and explicitly requested case assembly. The risk tiers are the configuration `ZETA_RISK_CONFIGURATION` names: `engineered` (the rules, then Claude Opus where they leave a payment uncertain) by default, or `jev` (the rules, then Jev, then Opus where Jev escalates) | Exercise the working system with fresh model calls when the pipeline requires them |
 
 A fresh decision does not necessarily involve a model. Stage results and timings show what ran.
 Opening a payment's evidence does not assemble a case or invoke a model. **Assemble case** is an
