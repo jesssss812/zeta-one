@@ -163,7 +163,6 @@ Python 3.13 or later (CI runs 3.14), FastAPI, Pydantic, SQLite, pytest and Hypot
 | [Claude Opus 5.5](https://www.anthropic.com/claude) | Anthropic's large language model; the strong risk tier | The Anthropic API |
 | [Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev) | TypeSafe's typed decision model (a "System One" model): it answers fixed questions with probabilities instead of writing text; the cheap risk tier ([details](docs/reference/jev.md)) | [OpenRouter](https://openrouter.ai), a service that routes one API to many model providers; TypeSafe's own API as the backup |
 | [Qwen 3.6 27B](https://huggingface.co/Qwen/Qwen3.6-27B-FP8) | An open-weight model (weights published under Apache 2.0), compared in Opus's place | [vLLM](https://docs.vllm.ai), an open-source model server, on one GPU we rent |
-| [Ollama](https://ollama.com) | Runs a small model locally | The case review page's chat |
 
 Requests use **Ed25519**, a digital-signature scheme. Each registered agent signs a request with
 its private key; the gateway uses the corresponding public key to verify who signed it and that
